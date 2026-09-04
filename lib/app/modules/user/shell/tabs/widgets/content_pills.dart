@@ -61,20 +61,47 @@ class ArtworkPlaceholder extends StatelessWidget {
     required this.width,
     required this.height,
     this.radius = 0,
+    this.assetPath,
   });
 
   final double width;
   final double height;
   final double radius;
 
+  /// The exported cover, when the item has one. Null or missing falls back to
+  /// the flat block, so a item without art still lays out at the right size.
+  final String? assetPath;
+
   @override
   Widget build(BuildContext context) {
+    final flat = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: appTheme.surfaceAlt,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+    final path = assetPath;
+    if (path == null || path.isEmpty) return flat;
+
+    // The block stays underneath rather than being replaced: an asset that is
+    // still decoding, missing, or unloaded (as in a widget test) then leaves
+    // the card looking as it did before instead of blank.
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
         color: appTheme.surfaceAlt,
         borderRadius: BorderRadius.circular(radius),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        path,
+        width: width,
+        height: height,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       ),
     );
   }

@@ -85,7 +85,12 @@ class _Cover extends StatelessWidget {
       height: 92.h,
       child: Stack(
         children: [
-          ArtworkPlaceholder(width: 92.h, height: 92.h, radius: 6.h),
+          ArtworkPlaceholder(
+            width: 92.h,
+            height: 92.h,
+            radius: 6.h,
+            assetPath: item.coverAsset,
+          ),
           Positioned(
             top: 6.h,
             left: 6.h,
@@ -120,8 +125,12 @@ class _SideRail extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(Icons.favorite_border,
-              size: 20.h, color: appTheme.textPrimary),
+          CustomImageView(
+            imagePath: ImageConstant.icHeart,
+            height: 20.h,
+            width: 20.h,
+            color: appTheme.textPrimary,
+          ),
           if (isLocked)
             Container(
               width: 29.h,
@@ -131,8 +140,12 @@ class _SideRail extends StatelessWidget {
                 color: appTheme.lockCircle,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.lock_outline,
-                  size: 14.h, color: appTheme.textPrimary),
+              child: CustomImageView(
+                imagePath: ImageConstant.icLock,
+                height: 14.h,
+                width: 14.h,
+                color: appTheme.textPrimary,
+              ),
             ),
         ],
       ),

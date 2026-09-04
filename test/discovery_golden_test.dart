@@ -14,6 +14,17 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/discovery_golden_test.dart
+// PNGs only: precacheImage decodes raster data, and handing it an SVG
+// fails with "Invalid image data". flutter_svg loads those itself.
+const _covers = [
+  'assets/images/content/unshakeable.png',
+  'assets/images/content/hope_in_the_shadows.png',
+  'assets/images/content/breaking_bad_habit.png',
+  'assets/images/content/daily_focus.png',
+  'assets/images/content/breath_work.png',
+  'assets/images/content/mindfulness.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -39,6 +50,9 @@ void main() {
       // does not advance.
       await tester.pump(const Duration(milliseconds: 900));
       await tester.pumpAndSettle();
+      // Asset images resolve asynchronously; without this the covers render
+      // blank and the golden records placeholders instead of the art.
+      await precacheAll(tester, find.byType(DiscoveryTab), _covers);
 
       await expectLater(find.byType(DiscoveryTab),
           matchesGoldenFile('goldens/discovery_$name.png'));

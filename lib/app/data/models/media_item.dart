@@ -12,6 +12,7 @@ class MediaItem {
     this.tag = 'Meditation',
     this.description = '',
     this.coverUrl = '',
+    this.coverAsset = '',
     this.remoteUrl = '',
     this.localPath,
     this.rating = 0,
@@ -31,6 +32,11 @@ class MediaItem {
   final MediaType type;
   final int durationSeconds;
   final String coverUrl;
+
+  /// Bundled cover art, exported from Figma. Distinct from [coverUrl], which
+  /// is the remote one the API will serve — this is what ships in the app and
+  /// is what the mock uses while there is no backend.
+  final String coverAsset;
 
   /// Streamed source. Expected to be a short-lived signed URL once the
   /// Django backend is in place, so it must not be persisted long-term.
@@ -63,6 +69,7 @@ class MediaItem {
         type: type,
         durationSeconds: durationSeconds,
         coverUrl: coverUrl,
+        coverAsset: coverAsset,
         remoteUrl: remoteUrl,
         localPath: localPath ?? this.localPath,
         categoryId: categoryId,

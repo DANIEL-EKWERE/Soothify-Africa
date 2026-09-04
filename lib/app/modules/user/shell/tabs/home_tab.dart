@@ -134,7 +134,12 @@ class _MoodCheckerCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            ArtworkPlaceholder(width: 38.h, height: 38.h, radius: 4.h),
+            ArtworkPlaceholder(
+              width: 38.h,
+              height: 38.h,
+              radius: 4.h,
+              assetPath: ImageConstant.imgMoodCheckerIcon,
+            ),
             SizedBox(width: 15.h),
             Expanded(
               child: Column(
@@ -215,6 +220,7 @@ class _ExploreTile extends StatelessWidget {
                 width: destination.artSize.h,
                 height: destination.artSize.h,
                 radius: 8.h,
+                assetPath: destination.assetPath,
               ),
             ),
             SizedBox(height: 8.h),
@@ -309,7 +315,12 @@ class _PopularCard extends StatelessWidget {
       height: 166.h,
       child: Stack(
         children: [
-          ArtworkPlaceholder(width: 159.h, height: 166.h, radius: 8.h),
+          ArtworkPlaceholder(
+            width: 159.h,
+            height: 166.h,
+            radius: 8.h,
+            assetPath: item.coverAsset,
+          ),
           Positioned(
             top: 8.h,
             left: 8.h,

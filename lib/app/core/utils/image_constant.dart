@@ -21,6 +21,20 @@ class ImageConstant {
   static const String icTickCircle = '$_icons/ic_tick_circle.svg';
   static const String icEyeHidden = '$_icons/ic_eye_hidden.svg';
 
+  /// Content cover art, exported from Figma. Addressed by slug from the
+  /// repository rather than listed one by one, so adding an item does not
+  /// mean editing this file too.
+  static const String contentDir = '$_images/content';
+
+  static const String imgMoodCheckerIcon = '$_images/home/mood_checker_icon.png';
+  static const String imgAiAssist = '$_images/home/ai_assist.png';
+
+  static const String icHeart = '$_icons/ic_heart.svg';
+  static const String icLock = '$_icons/lock.svg';
+  static const String icPlay = '$_icons/play.svg';
+  static const String icMoon = '$_icons/ic_moon.svg';
+  static const String icArrowRight = '$_icons/ic_arrow_right.svg';
+
   /// Mood emoji are addressed through [Mood.assetPath] rather than listed
   /// here, so adding a mood does not mean editing two files.
   static const String moodsDir = '$_images/moods';

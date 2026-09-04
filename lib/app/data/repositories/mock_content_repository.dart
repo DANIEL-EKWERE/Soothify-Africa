@@ -1,3 +1,4 @@
+import '../../core/utils/image_constant.dart';
 import '../models/media_item.dart';
 import 'content_repository.dart';
 
@@ -23,6 +24,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '1',
       title: 'Daily focus',
+      coverAsset: '${ImageConstant.contentDir}/daily_focus.png',
       subtitle: 'Burnout relief',
       tag: 'Meditation',
       type: MediaType.audio,
@@ -33,6 +35,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '2',
       title: 'Breath work',
+      coverAsset: '${ImageConstant.contentDir}/breath_work.png',
       subtitle: 'Burnout relief',
       tag: 'Meditation',
       type: MediaType.audio,
@@ -43,6 +46,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '3',
       title: 'Mindfulness',
+      coverAsset: '${ImageConstant.contentDir}/mindfulness.png',
       subtitle: 'Ease frustration',
       tag: 'Sound effect',
       type: MediaType.audio,
@@ -54,6 +58,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '4',
       title: 'Unshakeable',
+      coverAsset: '${ImageConstant.contentDir}/unshakeable.png',
       subtitle: 'Popular',
       type: MediaType.audio,
       durationSeconds: 2700,
@@ -64,6 +69,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '5',
       title: 'Hope in the Shadows',
+      coverAsset: '${ImageConstant.contentDir}/hope_in_the_shadows.png',
       subtitle: 'Popular',
       type: MediaType.audio,
       durationSeconds: 2700,
@@ -74,6 +80,7 @@ class MockContentRepository implements ContentRepository {
     MediaItem(
       id: '6',
       title: 'Breaking Bad Habit',
+      coverAsset: '${ImageConstant.contentDir}/breaking_bad_habit.png',
       subtitle: 'Popular',
       type: MediaType.audio,
       durationSeconds: 2700,

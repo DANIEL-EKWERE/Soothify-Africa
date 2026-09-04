@@ -14,6 +14,21 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/home_golden_test.dart
+// PNGs only: precacheImage decodes raster data, and handing it an SVG
+// fails with "Invalid image data". flutter_svg loads those itself.
+const _covers = [
+  'assets/images/content/unshakeable.png',
+  'assets/images/content/hope_in_the_shadows.png',
+  'assets/images/content/breaking_bad_habit.png',
+  'assets/images/content/daily_focus.png',
+  'assets/images/content/breath_work.png',
+  'assets/images/content/mindfulness.png',
+  'assets/images/explore/meditation.png',
+  'assets/images/explore/schedule.png',
+  'assets/images/explore/balance.png',
+  'assets/images/home/mood_checker_icon.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -40,6 +55,7 @@ void main() {
       // test.
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
+      await precacheAll(tester, find.byType(HomeTab), _covers);
 
       await expectLater(
           find.byType(HomeTab), matchesGoldenFile('goldens/home_$name.png'));

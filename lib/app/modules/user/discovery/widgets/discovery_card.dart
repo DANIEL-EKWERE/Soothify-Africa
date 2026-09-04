@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/media_item.dart';
+import '../../shell/tabs/widgets/content_pills.dart';
 
 /// A Discovery shelf card — cover art with three overlays.
 ///
@@ -39,11 +40,11 @@ class DiscoveryCard extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: appTheme.avatarBacking,
-                  borderRadius: BorderRadius.circular(8.h),
-                ),
+              child: ArtworkPlaceholder(
+                width: width.h,
+                height: 166.v,
+                radius: 8.h,
+                assetPath: item.coverAsset,
               ),
             ),
             Positioned(
@@ -84,14 +85,12 @@ class DiscoveryCard extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _MetaPill(
-                    icon: Icons.play_arrow_rounded,
-                    label: _duration,
-                  ),
+                  _MetaPill(asset: ImageConstant.icPlay, label: _duration),
                   // Zero means unrated rather than a genuine 0.0, so the pill
                   // is dropped entirely rather than printing a bad score.
                   if (item.rating > 0)
                     _MetaPill(
+                      // No star was exported; Material stands in for this one.
                       icon: Icons.star_rounded,
                       label: item.rating.toStringAsFixed(1),
                     ),
@@ -106,9 +105,12 @@ class DiscoveryCard extends StatelessWidget {
 }
 
 class _MetaPill extends StatelessWidget {
-  const _MetaPill({required this.icon, required this.label});
+  const _MetaPill({this.icon, this.asset, required this.label});
 
-  final IconData icon;
+  /// Exactly one of these is set: [asset] when Figma exported the glyph,
+  /// [icon] where it did not and Material still stands in.
+  final IconData? icon;
+  final String? asset;
   final String label;
 
   @override
@@ -122,7 +124,15 @@ class _MetaPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 6.h, color: appTheme.onPrimary),
+          if (asset != null)
+            CustomImageView(
+              imagePath: asset,
+              height: 6.h,
+              width: 6.h,
+              color: appTheme.onPrimary,
+            )
+          else
+            Icon(icon, size: 6.h, color: appTheme.onPrimary),
           SizedBox(width: 2.h),
           Text(label, style: CustomTextStyles.cardMeta),
         ],

@@ -71,7 +71,10 @@ class DiscussionCard extends StatelessWidget {
             SizedBox(height: 12.v),
             Row(
               children: [
-                _Counter(icon: Icons.favorite_border, value: discussion.likes),
+                _Counter(
+                  asset: ImageConstant.icHeart,
+                  value: discussion.likes,
+                ),
                 SizedBox(width: 28.h),
                 _Counter(
                   icon: Icons.chat_bubble_outline,
@@ -94,9 +97,12 @@ class DiscussionCard extends StatelessWidget {
 }
 
 class _Counter extends StatelessWidget {
-  const _Counter({required this.icon, required this.value});
+  const _Counter({this.icon, this.asset, required this.value});
 
-  final IconData icon;
+  /// Exactly one of these is set: [asset] where Figma exported the glyph,
+  /// [icon] where it did not and Material still stands in.
+  final IconData? icon;
+  final String? asset;
   final int value;
 
   @override
@@ -104,7 +110,15 @@ class _Counter extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 17.h, color: appTheme.onPrimary),
+        if (asset != null)
+          CustomImageView(
+            imagePath: asset,
+            height: 17.h,
+            width: 17.h,
+            color: appTheme.onPrimary,
+          )
+        else
+          Icon(icon, size: 17.h, color: appTheme.onPrimary),
         SizedBox(width: 6.h),
         Text('$value', style: CustomTextStyles.discussionMeta),
       ],

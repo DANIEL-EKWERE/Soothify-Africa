@@ -50,9 +50,16 @@ void main() {
   });
 
   group('ThemeService', () {
-    test('defaults to following the system', () async {
+    test('defaults to light, not to the system setting', () async {
       final service = await ThemeService().init();
-      expect(service.mode.value, ThemeMode.system);
+      // The design is drawn light-first, so a phone set to dark must not open
+      // the app dark before the user has chosen anything.
+      expect(service.mode.value, ThemeMode.light);
+    });
+
+    test('a stored system preference is still honoured', () async {
+      await (await ThemeService().init()).setMode(ThemeMode.system);
+      expect((await ThemeService().init()).mode.value, ThemeMode.system);
     });
 
     test('persists an explicit choice across restarts', () async {

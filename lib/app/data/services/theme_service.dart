@@ -9,7 +9,10 @@ import '../../core/utils/pref_utils.dart';
 /// itself is resolved by `PrimaryColors.syncFrom` in the app builder — this
 /// service only decides which [ThemeMode] is in force.
 class ThemeService extends GetxService {
-  final Rx<ThemeMode> mode = ThemeMode.system.obs;
+  /// Light until the user says otherwise. Following the system was the old
+  /// default, which meant a phone set to dark opened the app dark before the
+  /// user had ever chosen — and the design is drawn light-first.
+  final Rx<ThemeMode> mode = ThemeMode.light.obs;
 
   Future<ThemeService> init() async {
     // Idempotent; guarantees preferences are loaded even if this service
@@ -37,10 +40,12 @@ class ThemeService extends GetxService {
   Future<void> toggle(BuildContext context) =>
       setMode(isDark(context) ? ThemeMode.light : ThemeMode.dark);
 
+  /// 'system' still decodes to [ThemeMode.system] so a stored preference is
+  /// honoured; it is only the *absence* of one that now means light.
   static ThemeMode _decode(String? value) => switch (value) {
-        'light' => ThemeMode.light,
         'dark' => ThemeMode.dark,
-        _ => ThemeMode.system,
+        'system' => ThemeMode.system,
+        _ => ThemeMode.light,
       };
 
   static String _encode(ThemeMode value) => switch (value) {

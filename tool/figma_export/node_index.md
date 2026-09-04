@@ -31,18 +31,34 @@ larger y. Themes are handled by tokens, so only the light frame was read.
 | Create username | `135:5768` | `community/widgets/community_steps.dart` |
 | Join discussion | `135:5035` | `community/forum/forum_screen.dart` |
 | Start a discussion | `135:5783` | `community/compose/compose_screen.dart` |
+| Discussion thread | `135:6190` | `community/thread/thread_screen.dart` |
 
 ## Not built
 
 Discovery search (`135:3630`, `135:3821`, `135:3951`, `135:3967`);
 Plans checkout (`135:2518`, `135:2526`, `135:2565`, `135:2573`, `135:2584`);
-Discussion thread and comments (`135:6190`, `135:6531`, `135:6599`) and the
-community moderation screens (`135:5128`–`135:6456`, a separate manager role);
+Thread variants (`135:6531`, `135:6599`) and the community moderation screens
+(`135:5128`–`135:6456`, a separate manager role);
 Profile history and check-ins (`135:8133`, `135:8202`, `135:8481`, `135:8515`);
 Profile reminders (`135:8888`–`135:9181`); Notification (`135:8045`);
 Meditation and Balance filters (`135:12427`, `135:12573`, `135:19379`,
 `135:19491`); Balance KYC (`135:19200`+); Schedule booking flow
 (`135:20803`–`135:21767`); Article (`135:22150`).
+
+## Access
+
+Both routes are spent as of 2026-09-04:
+
+- **REST token** — quota exhausted, ~4.5 days (`figma.py` reports this and
+  stops rather than sleeping through it). A fresh token clears it at once.
+- **MCP server** (`mcp__plugin_figma_figma__*`) — the Starter plan's monthly
+  tool-call cap. `get_metadata` still answered once; `get_design_context` was
+  refused.
+
+`get_metadata` is worth knowing about: it returns structure, positions, sizes
+*and layer names*, and in this file the names carry the copy — enough to build
+a screen whose components were already measured elsewhere. It is not enough on
+its own, because it carries no fills or type.
 
 ## Gotchas
 

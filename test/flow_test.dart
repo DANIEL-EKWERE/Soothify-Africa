@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soothifyafrica/app/core/utils/initial_bindings.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/discussion.dart';
 import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/services/language_service.dart';
 import 'package:soothifyafrica/app/data/services/session_service.dart';
@@ -113,13 +114,37 @@ void main() {
     );
     await tester.pump();
 
+    // Routes that cannot resolve without an argument. Listed explicitly, and
+    // covered instead by the test below, so a route added without arguments
+    // is never skipped by accident.
+    const needsArguments = {AppRoutes.communityThread};
+
     for (final page in AppPages.pages) {
       // Parameterised routes need a value to resolve.
-      if (page.name.contains(':') || page.name == AppRoutes.splash) continue;
+      if (page.name.contains(':') ||
+          page.name == AppRoutes.splash ||
+          needsArguments.contains(page.name)) {
+        continue;
+      }
 
       Get.toNamed(page.name);
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull, reason: 'route ${page.name}');
     }
+
+    // The argument-taking routes, given one.
+    Get.toNamed(
+      AppRoutes.communityThread,
+      arguments: Discussion(
+        id: '1',
+        title: 'Depressed and tired',
+        body: 'body',
+        author: 'Kosin',
+        postedAt: DateTime(2024, 7, 15, 8, 41),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull,
+        reason: 'route ${AppRoutes.communityThread}');
   });
 }

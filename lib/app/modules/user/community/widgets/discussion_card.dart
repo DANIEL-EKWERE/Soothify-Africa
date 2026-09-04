@@ -61,7 +61,12 @@ class DiscussionCard extends StatelessWidget {
                     style: CustomTextStyles.discussionTitle,
                   ),
                 ),
-                Icon(Icons.more_horiz, size: 21.h, color: appTheme.onPrimary),
+                CustomImageView(
+                  imagePath: ImageConstant.icMore,
+                  height: 4.h,
+                  width: 21.h,
+                  color: appTheme.onPrimary,
+                ),
               ],
             ),
             SizedBox(height: 14.v),
@@ -71,17 +76,14 @@ class DiscussionCard extends StatelessWidget {
             SizedBox(height: 12.v),
             Row(
               children: [
-                _Counter(
-                  asset: ImageConstant.icHeart,
-                  value: discussion.likes,
-                ),
+                _Counter(asset: ImageConstant.icLike, value: discussion.likes),
                 SizedBox(width: 28.h),
                 _Counter(
-                  icon: Icons.chat_bubble_outline,
+                  asset: ImageConstant.icComment,
                   value: discussion.comments,
                 ),
                 SizedBox(width: 28.h),
-                _Counter(icon: Icons.ios_share, value: discussion.shares),
+                _Counter(asset: ImageConstant.icShare, value: discussion.shares),
                 const Spacer(),
                 Text(
                   discussion.relativeTime(now),
@@ -97,12 +99,9 @@ class DiscussionCard extends StatelessWidget {
 }
 
 class _Counter extends StatelessWidget {
-  const _Counter({this.icon, this.asset, required this.value});
+  const _Counter({required this.asset, required this.value});
 
-  /// Exactly one of these is set: [asset] where Figma exported the glyph,
-  /// [icon] where it did not and Material still stands in.
-  final IconData? icon;
-  final String? asset;
+  final String asset;
   final int value;
 
   @override
@@ -110,15 +109,12 @@ class _Counter extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (asset != null)
-          CustomImageView(
-            imagePath: asset,
-            height: 17.h,
-            width: 17.h,
-            color: appTheme.onPrimary,
-          )
-        else
-          Icon(icon, size: 17.h, color: appTheme.onPrimary),
+        CustomImageView(
+          imagePath: asset,
+          height: 17.h,
+          width: 17.h,
+          color: appTheme.onPrimary,
+        ),
         SizedBox(width: 6.h),
         Text('$value', style: CustomTextStyles.discussionMeta),
       ],

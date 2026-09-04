@@ -29,6 +29,21 @@ class ImageConstant {
   static const String imgMoodCheckerIcon = '$_images/home/mood_checker_icon.png';
   static const String imgAiAssist = '$_images/home/ai_assist.png';
 
+  static const String icBack = '$_icons/ic_back.svg';
+  static const String icSearch = '$_icons/ic_search.svg';
+  static const String icFilter = '$_icons/ic_filter.svg';
+  static const String icSend = '$_icons/ic_send.svg';
+  static const String icStar = '$_icons/ic_star.svg';
+  static const String icMore = '$_icons/ic_more.svg';
+  static const String icLike = '$_icons/ic_like.svg';
+  static const String icComment = '$_icons/ic_comment.svg';
+  static const String icShare = '$_icons/ic_share.svg';
+  static const String icReply = '$_icons/ic_reply.svg';
+  static const String icLocation = '$_icons/ic_location.svg';
+  static const String icLiveSession = '$_icons/ic_live_session.svg';
+  static const String imgStatMeditation = '$_images/profile/stat_meditation.png';
+  static const String imgStatBalance = '$_images/profile/stat_balance.png';
+
   static const String icHeart = '$_icons/ic_heart.svg';
   static const String icLock = '$_icons/lock.svg';
   static const String icPlay = '$_icons/play.svg';

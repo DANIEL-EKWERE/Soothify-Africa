@@ -73,6 +73,7 @@ flutter:
     - assets/images/explore/
     - assets/images/home/
     - assets/images/content/
+    - assets/images/profile/
     - assets/images/onboarding/
     - assets/icons/
     - assets/data/

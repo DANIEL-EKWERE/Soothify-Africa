@@ -334,12 +334,12 @@ class _PopularCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 DarkPill(
-                  icon: Icons.play_arrow,
+                  asset: ImageConstant.icPlay,
                   label:
                       '${item.duration.inMinutes.toString().padLeft(2, '0')}'
                       ':00',
                 ),
-                const DarkPill(icon: Icons.star, label: '4.6'),
+                DarkPill(asset: ImageConstant.icStar, label: '4.6'),
               ],
             ),
           ),

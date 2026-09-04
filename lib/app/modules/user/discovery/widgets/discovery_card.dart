@@ -90,8 +90,7 @@ class DiscoveryCard extends StatelessWidget {
                   // is dropped entirely rather than printing a bad score.
                   if (item.rating > 0)
                     _MetaPill(
-                      // No star was exported; Material stands in for this one.
-                      icon: Icons.star_rounded,
+                      asset: ImageConstant.icStar,
                       label: item.rating.toStringAsFixed(1),
                     ),
                 ],
@@ -105,12 +104,9 @@ class DiscoveryCard extends StatelessWidget {
 }
 
 class _MetaPill extends StatelessWidget {
-  const _MetaPill({this.icon, this.asset, required this.label});
+  const _MetaPill({required this.asset, required this.label});
 
-  /// Exactly one of these is set: [asset] when Figma exported the glyph,
-  /// [icon] where it did not and Material still stands in.
-  final IconData? icon;
-  final String? asset;
+  final String asset;
   final String label;
 
   @override
@@ -124,15 +120,12 @@ class _MetaPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (asset != null)
-            CustomImageView(
-              imagePath: asset,
-              height: 6.h,
-              width: 6.h,
-              color: appTheme.onPrimary,
-            )
-          else
-            Icon(icon, size: 6.h, color: appTheme.onPrimary),
+          CustomImageView(
+            imagePath: asset,
+            height: 6.h,
+            width: 6.h,
+            color: appTheme.onPrimary,
+          ),
           SizedBox(width: 2.h),
           Text(label, style: CustomTextStyles.cardMeta),
         ],

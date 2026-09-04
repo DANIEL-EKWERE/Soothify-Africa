@@ -13,8 +13,7 @@ import '../../../../data/models/app_tab.dart';
 /// labels are Nunito Sans 400 at 10.88 with a 14.8 line height, the active one
 /// gradient-filled `#4B84F6 -> #0A399A`, the rest flat `#999999`.
 ///
-/// Only the icon artwork is still substituted — Material glyphs stand in until
-/// the design's own icons are exported.
+/// Icons are the design's own, exported from the nav component as SVG.
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -68,9 +67,10 @@ class _NavItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          isSelected ? tab.activeIcon : tab.icon,
-          size: 24.h,
+        CustomImageView(
+          imagePath: tab.asset,
+          height: 24.h,
+          width: 24.h,
           // White under the shader when selected; srcIn takes the gradient
           // from whatever is opaque, so the base colour must not be faded.
           color: isSelected ? appTheme.onPrimary : appTheme.navInactive,

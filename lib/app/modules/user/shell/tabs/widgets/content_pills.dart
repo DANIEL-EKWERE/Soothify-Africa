@@ -25,9 +25,10 @@ class CategoryPill extends StatelessWidget {
 
 /// A dark pill carrying an icon and a short value — duration, or a rating.
 class DarkPill extends StatelessWidget {
-  const DarkPill({super.key, required this.icon, required this.label});
+  const DarkPill({super.key, required this.asset, required this.label});
 
-  final IconData icon;
+  /// The exported glyph — play or star, from the card component.
+  final String asset;
   final String label;
 
   @override
@@ -42,7 +43,12 @@ class DarkPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 6.h, color: appTheme.onPrimary),
+          CustomImageView(
+            imagePath: asset,
+            height: 6.h,
+            width: 6.h,
+            color: appTheme.onPrimary,
+          ),
           SizedBox(width: 3.h),
           Text(label, style: CustomTextStyles.pillLabelOnDark),
         ],
@@ -51,10 +57,8 @@ class DarkPill extends StatelessWidget {
   }
 }
 
-/// Stands in for artwork not yet exported from Figma.
-///
-/// Sized exactly as the design specifies, so the layout is already right and
-/// only the fill is missing.
+/// Renders an item's cover art, falling back to a sized block when there is
+/// none — so the layout is right either way.
 class ArtworkPlaceholder extends StatelessWidget {
   const ArtworkPlaceholder({
     super.key,

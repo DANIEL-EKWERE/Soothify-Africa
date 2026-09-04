@@ -86,7 +86,12 @@ class _SearchRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, size: 18.h, color: appTheme.textPrimary),
+                  CustomImageView(
+                    imagePath: ImageConstant.icSearch,
+                    height: 18.h,
+                    width: 18.h,
+                    color: appTheme.textPrimary,
+                  ),
                   SizedBox(width: 14.h),
                   // Flexible so a large system text scale shortens the hint
                   // rather than overflowing the field.
@@ -106,7 +111,12 @@ class _SearchRow extends StatelessWidget {
         SizedBox(width: 19.h),
         InkWell(
           onTap: controller.openFilters,
-          child: Icon(Icons.tune, size: 25.h, color: appTheme.actionFill),
+          child: CustomImageView(
+            imagePath: ImageConstant.icFilter,
+            height: 19.h,
+            width: 25.h,
+            color: appTheme.actionFill,
+          ),
         ),
       ],
     );

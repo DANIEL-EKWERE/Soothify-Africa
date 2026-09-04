@@ -44,9 +44,10 @@ class _Header extends StatelessWidget {
       children: [
         InkWell(
           onTap: Get.back,
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            size: 16.h,
+          child: CustomImageView(
+            imagePath: ImageConstant.icBack,
+            height: 18.h,
+            width: 18.h,
             color: appTheme.textPrimary,
           ),
         ),

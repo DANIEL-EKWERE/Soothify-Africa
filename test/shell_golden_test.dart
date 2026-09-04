@@ -18,6 +18,16 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/shell_golden_test.dart
+const _art = [
+  'assets/images/content/daily_focus.png',
+  'assets/images/content/breath_work.png',
+  'assets/images/content/mindfulness.png',
+  'assets/images/explore/meditation.png',
+  'assets/images/explore/schedule.png',
+  'assets/images/explore/balance.png',
+  'assets/images/home/mood_checker_icon.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -49,6 +59,7 @@ void main() {
       // left a timer pending and failed the test after the tree was gone.
       await tester.pump(const Duration(milliseconds: 1200));
       await tester.pumpAndSettle();
+      await precacheAll(tester, find.byType(ShellScreen), _art);
 
       await expectLater(find.byType(ShellScreen),
           matchesGoldenFile('goldens/shell_$name.png'));

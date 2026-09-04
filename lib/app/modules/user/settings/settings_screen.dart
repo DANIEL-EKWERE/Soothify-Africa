@@ -52,9 +52,10 @@ class _Header extends StatelessWidget {
       children: [
         InkWell(
           onTap: Get.back,
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            size: 16.h,
+          child: CustomImageView(
+            imagePath: ImageConstant.icBack,
+            height: 18.h,
+            width: 18.h,
             color: appTheme.textPrimary,
           ),
         ),
@@ -148,7 +149,12 @@ class _SettingsRow extends StatelessWidget {
         height: 44.v,
         child: Row(
           children: [
-            Icon(entry.icon, size: 20.h, color: appTheme.textPrimary),
+            CustomImageView(
+              imagePath: entry.asset,
+              height: 20.h,
+              width: 20.h,
+              color: appTheme.textPrimary,
+            ),
             SizedBox(width: 16.h),
             Expanded(
               child: Text(entry.label, style: CustomTextStyles.settingsRow),

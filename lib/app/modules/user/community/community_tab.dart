@@ -103,9 +103,10 @@ class _Identity extends StatelessWidget {
               SizedBox(height: 5.v),
               Row(
                 children: [
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 16.h,
+                  CustomImageView(
+                    imagePath: ImageConstant.icLocation,
+                    height: 16.h,
+                    width: 16.h,
                     color: appTheme.textSecondary,
                   ),
                   SizedBox(width: 6.h),

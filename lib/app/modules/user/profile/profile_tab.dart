@@ -222,22 +222,21 @@ class _StatRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _Stat(
-          // Artwork not exported; Material stands in, as elsewhere.
-          icon: Icons.self_improvement,
+          asset: ImageConstant.imgStatMeditation,
           label: 'Meditation minutes',
           value: stats.meditationMinutes,
           width: 95,
         ),
         SizedBox(width: 4.h),
         _Stat(
-          icon: Icons.spa_outlined,
+          asset: ImageConstant.imgStatBalance,
           label: 'Balance minutes',
           value: stats.balanceMinutes,
           width: 76,
         ),
         SizedBox(width: 4.h),
         _Stat(
-          icon: Icons.videocam_outlined,
+          asset: ImageConstant.icLiveSession,
           label: 'Live sessions',
           value: stats.liveSessions,
           width: 82,
@@ -249,13 +248,15 @@ class _StatRow extends StatelessWidget {
 
 class _Stat extends StatelessWidget {
   const _Stat({
-    required this.icon,
+    required this.asset,
     required this.label,
     required this.value,
     required this.width,
   });
 
-  final IconData icon;
+  /// The exported glyph — a PNG for the two illustrated ones, an SVG for the
+  /// live-session camera.
+  final String asset;
   final String label;
   final int value;
   final double width;
@@ -267,7 +268,11 @@ class _Stat extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20.h, color: appTheme.onPrimary),
+          CustomImageView(
+            imagePath: asset,
+            height: 20.h,
+            width: 20.h,
+          ),
           SizedBox(height: 8.v),
           // Fixed at the design's 28 — two lines — so the values below sit on
           // one line across all three columns whether or not a label wraps.

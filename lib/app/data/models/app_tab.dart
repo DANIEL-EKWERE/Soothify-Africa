@@ -1,23 +1,19 @@
-import 'package:flutter/material.dart';
-
 /// The five destinations in the signed-in bottom navigation, in the order the
 /// design lays them out.
-///
-/// Each has its own section in the Figma file, so only [home] is being built
-/// now; the rest are registered so the shell is complete and each screen can
-/// drop in without touching navigation.
 enum AppTab {
-  home('Home', Icons.home_outlined, Icons.home),
-  plans('Plans', Icons.star_outline, Icons.star),
-  discovery('Discovery', Icons.search_outlined, Icons.search),
-  community('Community', Icons.people_outline, Icons.people),
-  profile('Profile', Icons.sentiment_satisfied_outlined, Icons.sentiment_satisfied);
+  home('Home', 'nav_home'),
+  plans('Plans', 'nav_plans'),
+  discovery('Discovery', 'nav_discovery'),
+  community('Community', 'nav_community'),
+  profile('Profile', 'nav_profile');
 
-  const AppTab(this.label, this.icon, this.activeIcon);
+  const AppTab(this.label, this._icon);
 
   final String label;
 
-  /// Material icons stand in until the design's own icon set is exported.
-  final IconData icon;
-  final IconData activeIcon;
+  final String _icon;
+
+  /// The glyph exported from the nav component. One per tab, not two: the
+  /// design marks the active tab with a gradient fill, never a filled variant.
+  String get asset => 'assets/icons/$_icon.svg';
 }

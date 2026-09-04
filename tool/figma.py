@@ -109,6 +109,32 @@ def render(ids, scale=2):
         print(f"  {i:>13} {dest.stat().st_size/1024:7.1f} KB -> {dest}")
 
 
+def icons(args):
+    """Export named nodes as SVG into assets/icons/.
+
+      tool/figma.py icons nav_home=135:1 ic_send=135:2 ...
+
+    Batched into one request: the images endpoint charges per call, not per
+    node, and the quota is the scarce thing here.
+    """
+    pairs = [a.split("=", 1) for a in args]
+    ids = [nid for _, nid in pairs]
+    data = api(
+        f"images/{KEY}?ids={urllib.parse.quote(','.join(ids))}&format=svg"
+    )
+    if data.get("err"):
+        sys.exit(f"ERROR: {data['err']}")
+    dest_dir = ROOT / "assets" / "icons"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for name, nid in pairs:
+        url = data["images"].get(nid)
+        if not url:
+            print(f"  !! {name} ({nid}) returned no image"); continue
+        dest = dest_dir / f"{name}.svg"
+        urllib.request.urlretrieve(url, dest)
+        print(f"  {name:<26} {dest.stat().st_size:6d} bytes")
+
+
 def _hex(c):
     return "#%02X%02X%02X" % (
         round(c["r"] * 255), round(c["g"] * 255), round(c["b"] * 255))
@@ -164,4 +190,5 @@ def spec(nid):
 
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
-    {"nodes": nodes, "render": render}.get(cmd, lambda a: spec(a[0]))(args)
+    {"nodes": nodes, "render": render, "icons": icons}.get(
+        cmd, lambda a: spec(a[0]))(args)

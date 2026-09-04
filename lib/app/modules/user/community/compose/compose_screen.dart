@@ -25,9 +25,10 @@ class ComposeScreen extends GetView<ComposeController> {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   onTap: Get.back,
-                  child: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 14.h,
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icBack,
+                    height: 18.h,
+                    width: 18.h,
                     color: appTheme.textSecondary,
                   ),
                 ),

@@ -99,12 +99,12 @@ class _Cover extends StatelessWidget {
           Positioned(
             bottom: 6.h,
             left: 6.h,
-            child: DarkPill(icon: Icons.play_arrow, label: duration),
+            child: DarkPill(asset: ImageConstant.icPlay, label: duration),
           ),
           Positioned(
             bottom: 6.h,
             right: 6.h,
-            child: const DarkPill(icon: Icons.star, label: '4.6'),
+            child: DarkPill(asset: ImageConstant.icStar, label: '4.6'),
           ),
         ],
       ),

@@ -74,9 +74,10 @@ class _Header extends StatelessWidget {
         children: [
           InkWell(
             onTap: Get.back,
-            child: Icon(
-              Icons.arrow_back,
-              size: 18.h,
+            child: CustomImageView(
+              imagePath: ImageConstant.icBack,
+              height: 18.h,
+              width: 18.h,
               color: appTheme.textPrimary,
             ),
           ),
@@ -156,9 +157,10 @@ class _CommentRow extends StatelessWidget {
               children: [
                 Text('Reply', style: CustomTextStyles.replyLink),
                 SizedBox(width: 4.h),
-                Icon(
-                  Icons.chat_bubble_outline,
-                  size: 16.h,
+                CustomImageView(
+                  imagePath: ImageConstant.icReply,
+                  height: 16.h,
+                  width: 16.h,
                   color: appTheme.soothifyBlue,
                 ),
               ],
@@ -202,9 +204,10 @@ class _MessageBar extends StatelessWidget {
             ),
             Obx(() => InkWell(
                   onTap: controller.canSend.value ? controller.send : null,
-                  child: Icon(
-                    Icons.send,
-                    size: 24.h,
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icSend,
+                    height: 24.h,
+                    width: 24.h,
                     color: controller.canSend.value
                         ? appTheme.actionFill
                         : appTheme.navInactive,

@@ -54,9 +54,10 @@ class _Header extends StatelessWidget {
       children: [
         InkWell(
           onTap: Get.back,
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            size: 16.h,
+          child: CustomImageView(
+            imagePath: ImageConstant.icBack,
+            height: 18.h,
+            width: 18.h,
             color: appTheme.textPrimary,
           ),
         ),
@@ -68,7 +69,12 @@ class _Header extends StatelessWidget {
           ),
         ),
         // The design puts a filter glyph here; artwork was not exported.
-        Icon(Icons.tune, size: 20.h, color: appTheme.actionFill),
+        CustomImageView(
+          imagePath: ImageConstant.icFilter,
+          height: 16.h,
+          width: 20.h,
+          color: appTheme.actionFill,
+        ),
       ],
     );
   }
@@ -95,7 +101,12 @@ class _SearchRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, size: 18.h, color: appTheme.textPrimary),
+                  CustomImageView(
+                    imagePath: ImageConstant.icSearch,
+                    height: 18.h,
+                    width: 18.h,
+                    color: appTheme.textPrimary,
+                  ),
                   SizedBox(width: 14.h),
                   Flexible(
                     child: Text(
@@ -111,7 +122,12 @@ class _SearchRow extends StatelessWidget {
           ),
         ),
         SizedBox(width: 28.h),
-        Icon(Icons.tune, size: 25.h, color: appTheme.actionFill),
+        CustomImageView(
+          imagePath: ImageConstant.icFilter,
+          height: 19.h,
+          width: 25.h,
+          color: appTheme.actionFill,
+        ),
       ],
     );
   }

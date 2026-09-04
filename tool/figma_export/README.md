@@ -27,6 +27,18 @@ visible rather than assumed:
 3. **Assets are not included.** Export cover art and icons separately:
    right-click -> Export -> PNG at 2x, into `assets/images/`.
 
+## Exporting icons
+
+    tool/figma.py icons nav_home=135:1 ic_send=135:2 ...
+
+Batched into one request and written to `assets/icons/<name>.svg` — the images
+endpoint charges per call, not per node, so name every glyph you need in one
+go. Raster glyphs (the Profile stat art) go through `render` at 2x instead.
+
+Icon node ids are easiest to find from a cached screen: the design names them
+with iconify ids (`solar:arrow-left-linear`, `mynaui:send`), and the rest sit
+as the first non-TEXT child of their row or item frame.
+
 ## Rate limits
 
 `figma.py` now stops rather than sleeping when Figma's `Retry-After` exceeds
@@ -34,6 +46,8 @@ visible rather than assumed:
 multi-day wait means the plan's quota is spent and no amount of waiting inside
 one session helps — reach for a plugin export then.
 
-A quota is per token, so a fresh token clears a multi-day block immediately.
+A quota is per token *and* rolling — a block that reports days can clear on
+its own, so probe with one cheap call before assuming it is still in force. A
+fresh token also clears it immediately.
 Put it in `.figma_token` (gitignored). See `node_index.md` for which node is
 which, so a session does not spend calls rediscovering the map.

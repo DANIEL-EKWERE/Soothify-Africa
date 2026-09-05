@@ -31,9 +31,15 @@ class ProfileTabController extends BaseController {
     AppFeedback.info('No sessions on ${date.day}/${date.month} yet.');
   }
 
-  /// Each check-in kind opens its own calendar of entries.
-  void openCheckin(CheckinKind kind) =>
-      Get.toNamed(AppRoutes.checkin, arguments: kind);
+  /// Mood and Journal open a calendar of past entries; the two daily habits
+  /// have their own screen, with a reminder behind it.
+  void openCheckin(CheckinKind kind) => Get.toNamed(
+        switch (kind) {
+          CheckinKind.mood || CheckinKind.journal => AppRoutes.checkin,
+          CheckinKind.meditation || CheckinKind.balance => AppRoutes.daily,
+        },
+        arguments: kind,
+      );
 
   @override
   void onInit() {

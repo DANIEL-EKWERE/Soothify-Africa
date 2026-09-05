@@ -15,6 +15,7 @@ class MonthCalendar extends StatelessWidget {
     required this.selected,
     required this.onSelected,
     this.marked = const {},
+    this.compactWeekdays = false,
   });
 
   final DateTime month;
@@ -24,6 +25,10 @@ class MonthCalendar extends StatelessWidget {
   /// Days with something recorded against them — dotted in the design's
   /// check-in calendars.
   final Set<DateTime> marked;
+
+  /// The daily-habit frames label the columns with single letters rather than
+  /// "Mon".."Sun".
+  final bool compactWeekdays;
 
   static const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const _months = [
@@ -50,7 +55,7 @@ class MonthCalendar extends StatelessWidget {
             for (final d in _weekdays)
               Expanded(
                 child: Text(
-                  d,
+                  compactWeekdays ? d[0] : d,
                   textAlign: TextAlign.center,
                   style: CustomTextStyles.calendarWeekday,
                 ),

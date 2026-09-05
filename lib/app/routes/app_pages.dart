@@ -33,6 +33,9 @@ import '../modules/user/community/thread/thread_screen.dart';
 import '../modules/user/booking/binding/booking_binding.dart';
 import '../modules/user/booking/booking_screen.dart';
 import '../modules/user/checkin/binding/checkin_binding.dart';
+import '../modules/user/daily/binding/daily_binding.dart';
+import '../modules/user/daily/daily_screen.dart';
+import '../modules/user/daily/reminder_screen.dart';
 import '../modules/user/checkin/checkin_screen.dart';
 import '../modules/user/library/binding/library_binding.dart';
 import '../modules/user/shelf/binding/shelf_binding.dart';
@@ -153,6 +156,16 @@ class AppPages {
       name: AppRoutes.schedule,
       page: () => const ScheduleScreen(),
       binding: ScheduleBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.daily,
+      page: () => const DailyScreen(),
+      binding: DailyBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.dailyReminder,
+      page: () => const ReminderScreen(),
+      binding: DailyBinding(),
     ),
     GetPage(
       name: AppRoutes.checkin,

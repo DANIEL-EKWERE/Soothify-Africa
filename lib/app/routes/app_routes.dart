@@ -39,6 +39,11 @@ class AppRoutes {
   /// One kind of check-in history. Takes a [CheckinKind] argument.
   static const String checkin = '/profile/checkin';
 
+  /// A daily habit's history, and its reminder setup. Both take a
+  /// [CheckinKind] argument.
+  static const String daily = '/profile/daily';
+  static const String dailyReminder = '/profile/daily/reminder';
+
   /// The community forum, reached from the Community tab's topic step.
   static const String communityForum = '/community/forum';
   static const String communityCompose = '/community/new';

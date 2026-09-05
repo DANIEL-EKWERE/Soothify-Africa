@@ -15,7 +15,19 @@ import '../../../../data/repositories/content_repository.dart';
 /// Sections come from the design: a Mood Checker entry, three fixed Explore
 /// destinations, a "Recommended for you" list and a "Popular Content" row.
 class HomeTabController extends BaseController {
-  HomeTabController(this._repository);
+  HomeTabController(this._repository, {DateTime Function()? now})
+      : _now = now ?? DateTime.now;
+
+  /// Injectable so the greeting does not make a golden stale by the hour.
+  final DateTime Function() _now;
+
+  /// The unsigned header's greeting. The frame prints "Good morning".
+  String get greeting {
+    final h = _now().hour;
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
 
   final ContentRepository _repository;
 

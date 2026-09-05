@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../data/models/explore_destination.dart';
 import '../../../../data/models/media_item.dart';
+import '../../../../data/services/session_service.dart';
 import '../../../../data/services/theme_service.dart';
 import '../../../../widgets/gradient_text.dart';
 import 'home_tab_controller.dart';
@@ -63,39 +64,43 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Signed in, the header leads with the user's avatar and greets by name;
-    // the greeting itself is gradient-filled. The unsigned variant has neither.
+    // Two frames: signed in (135:518) leads with the avatar and greets by
+    // name; unsigned (135:705) has neither and greets by time of day. The
+    // right-hand cluster is the same in both.
+    final guest = Get.find<SessionService>().isGuest;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 44.h,
-          height: 44.h,
-          decoration: BoxDecoration(
-            color: appTheme.avatarBacking,
-            shape: BoxShape.circle,
+        if (!guest) ...[
+          ClipOval(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgHomeAvatar,
+              height: 44.h,
+              width: 44.h,
+              fit: BoxFit.cover,
+            ),
           ),
-          alignment: Alignment.center,
-          child: ClipOval(
-                child: CustomImageView(
-                  imagePath: ImageConstant.imgHomeAvatar,
-                  height: 44.h,
-                  width: 44.h,
-                  fit: BoxFit.cover,
-                ),
-              ),
-        ),
-        SizedBox(width: 7.h),
+          SizedBox(width: 7.h),
+        ],
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              GradientText(
-                'Hi, Dera',
-                gradient: appTheme.titleGradient,
-                style: CustomTextStyles.homeGreeting,
-              ),
+              if (guest)
+                // The frame shows "Good morning"; a fixed one would be wrong
+                // for most of the day, so it follows the clock.
+                Text(
+                  Get.find<HomeTabController>().greeting,
+                  style: CustomTextStyles.homeGreeting
+                      .copyWith(color: appTheme.soothifyBlue),
+                )
+              else
+                GradientText(
+                  'Hi, Dera',
+                  gradient: appTheme.titleGradient,
+                  style: CustomTextStyles.homeGreeting,
+                ),
               SizedBox(height: 1.h),
               Text('How are you today?',
                   style: CustomTextStyles.homeGreetingSub),

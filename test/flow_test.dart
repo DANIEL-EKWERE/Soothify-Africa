@@ -62,9 +62,23 @@ void main() {
     expect(await splashDestination(tester), AppRoutes.intro);
   });
 
-  testWidgets('past the intro but signed out goes to sign-up', (tester) async {
+  testWidgets('a guest past the intro is not sent to sign-up',
+      (tester) async {
+    // Guest mode: onboarding never asks for an account, so relaunching must
+    // not lock a guest out of an app they were already using. With the
+    // questionnaire unfinished they land on it, exactly as a signed-in user
+    // would.
     SharedPreferences.setMockInitialValues({'introSeen': true});
-    expect(await splashDestination(tester), AppRoutes.signup);
+    expect(await splashDestination(tester), AppRoutes.kyc);
+  });
+
+  testWidgets('a guest who finished the questionnaire lands on the shell',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'introSeen': true,
+      'kycComplete': true,
+    });
+    expect(await splashDestination(tester), AppRoutes.shell);
   });
 
   testWidgets('signed in with the questionnaire unfinished goes to KYC',

@@ -5,6 +5,7 @@ import '../../../data/models/profile_stats.dart';
 import 'controller/profile_tab_controller.dart';
 import 'widgets/profile_checkins.dart';
 import 'widgets/profile_history.dart';
+import 'widgets/profile_unsigned.dart';
 
 /// Profile — Figma "Profile/dashboard" (135:8098).
 ///
@@ -36,18 +37,25 @@ class ProfileTab extends GetView<ProfileTabController> {
                 padding: EdgeInsets.symmetric(horizontal: 2.h),
                 child: const _Header(),
               ),
-              SizedBox(height: 24.v),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2.h),
-                child: const _SectionTabs(),
-              ),
+              // A guest has no stats, history or check-ins to show, so the
+              // tabs are dropped along with them rather than left leading
+              // nowhere.
+              if (controller.isGuest) ...[
+                const ProfileUnsigned(),
+              ] else ...[
+                SizedBox(height: 24.v),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 2.h),
+                  child: const _SectionTabs(),
+                ),
               SizedBox(height: 12.v),
               // Each pill now has a screen behind it.
-              Obx(() => switch (controller.section.value) {
-                    ProfileSection.dashboard => const _Dashboard(),
-                    ProfileSection.history => const ProfileHistory(),
-                    ProfileSection.checkIns => const ProfileCheckins(),
-                  }),
+                Obx(() => switch (controller.section.value) {
+                      ProfileSection.dashboard => const _Dashboard(),
+                      ProfileSection.history => const ProfileHistory(),
+                      ProfileSection.checkIns => const ProfileCheckins(),
+                    }),
+              ],
             ],
           ),
         ),

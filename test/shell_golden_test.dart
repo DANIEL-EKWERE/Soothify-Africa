@@ -10,6 +10,7 @@ import 'package:soothifyafrica/app/data/repositories/mock_subscription_repositor
 import 'package:soothifyafrica/app/data/repositories/subscription_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/local_profile_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/profile_repository.dart';
+import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/shell/binding/shell_binding.dart';
 import 'package:soothifyafrica/app/modules/user/shell/shell_screen.dart';
@@ -47,6 +48,8 @@ void main() {
 
       Get.put(await ThemeService().init());
       Get.put<ContentRepository>(MockContentRepository());
+      // The header branches on guest vs signed in.
+      Get.put(await SessionService().init());
       Get.put<ProfileRepository>(LocalProfileRepository());
       Get.put<SubscriptionRepository>(MockSubscriptionRepository());
       // Through the real binding rather than by hand: the shell's IndexedStack

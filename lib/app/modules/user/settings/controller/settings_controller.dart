@@ -31,7 +31,7 @@ class SettingsController extends GetxController {
         await Get.toNamed(AppRoutes.language);
       case SettingsEntry.logout:
         await _session.signOut();
-        await Get.offAllNamed(AppRoutes.signin);
+        await Get.offAllNamed(AppRoutes.shell);
       case SettingsEntry.themeToggle:
         // Handled by the row's switch, not by tapping the row.
         break;

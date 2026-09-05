@@ -11,6 +11,10 @@ class SessionService extends GetxService {
   final Rxn<UserRole> role = Rxn<UserRole>();
 
   bool get isSignedIn => role.value != null;
+
+  /// Browsing without an account. The app is fully usable this way; only
+  /// things that need to persist across devices ask for sign-up.
+  bool get isGuest => role.value == null;
   bool get isPractitioner => role.value == UserRole.practitioner;
 
   Future<SessionService> init() async {
@@ -26,6 +30,8 @@ class SessionService extends GetxService {
     await PrefUtils().setUserRole(value.key);
   }
 
+  /// Signing out returns to guest browsing rather than to the sign-up wall —
+  /// the same state a user who never registered is in.
   Future<void> signOut() async {
     role.value = null;
     await PrefUtils().clearSession();

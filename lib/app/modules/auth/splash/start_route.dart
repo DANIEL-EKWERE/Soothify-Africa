@@ -11,9 +11,10 @@ import '../../../data/services/session_service.dart';
 ///
 ///   first launch     -> intro carousel
 ///   practitioner     -> practitioner dashboard (no designs yet)
-///   signed out       -> sign up
+///   guest            -> same as a signed-in user; the app is usable without
+///                       an account, and Profile offers sign-up when wanted
 ///   KYC unfinished   -> KYC
-///   otherwise        -> mood checker
+///   otherwise        -> the shell
 ///
 /// If reading KYC state fails we send the user to the questionnaire rather
 /// than past it: repeating a question is recoverable, silently skipping it
@@ -24,17 +25,18 @@ Future<String> resolveStartRoute({
 }) async {
   if (!PrefUtils().introSeen()) return AppRoutes.intro;
 
-  switch (session.role.value) {
-    case UserRole.practitioner:
-      return AppRoutes.practitionerDashboard;
-    case null:
-      return AppRoutes.signup;
-    case UserRole.user:
-      try {
-        return await kyc.isComplete() ? AppRoutes.shell : AppRoutes.kyc;
-      } catch (e, s) {
-        Log.e('could not read KYC state', error: e, stackTrace: s);
-        return AppRoutes.kyc;
-      }
+  if (session.role.value == UserRole.practitioner) {
+    return AppRoutes.practitionerDashboard;
+  }
+
+  // A null role is a guest, not a locked-out user. Onboarding already runs
+  // intro -> personalize -> language -> KYC -> shell without ever asking for
+  // an account, so sending guests to sign-up on the *next* launch would lock
+  // them out of an app they had already been using.
+  try {
+    return await kyc.isComplete() ? AppRoutes.shell : AppRoutes.kyc;
+  } catch (e, s) {
+    Log.e('could not read KYC state', error: e, stackTrace: s);
+    return AppRoutes.kyc;
   }
 }

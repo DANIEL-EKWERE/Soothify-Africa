@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
+import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/shell/tabs/home_tab.dart';
 import 'package:soothifyafrica/app/modules/user/shell/tabs/home_tab_controller.dart';
@@ -48,6 +49,8 @@ void main() {
 
       Get.put(await ThemeService().init());
       Get.put<ContentRepository>(MockContentRepository());
+      // The header branches on guest vs signed in.
+      Get.put(await SessionService().init());
       Get.put(HomeTabController(Get.find<ContentRepository>()));
 
       await pumpScreen(tester, const HomeTab(), brightness: brightness);

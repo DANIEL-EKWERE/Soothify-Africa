@@ -3,11 +3,20 @@ import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/checkin_kind.dart';
 import '../../../../data/models/profile_stats.dart';
+import '../../../../data/services/session_service.dart';
 import '../../../../data/repositories/profile_repository.dart';
 
 /// Backs the Profile tab — Figma "Profile/dashboard" (135:8098).
 class ProfileTabController extends BaseController {
-  ProfileTabController(this._repository);
+  ProfileTabController(this._repository, {SessionService? session})
+      : _session = session;
+
+  /// Null in tests that only exercise the signed-in views; the service is
+  /// resolved lazily so those do not have to register it.
+  final SessionService? _session;
+
+  bool get isGuest =>
+      (_session ?? Get.find<SessionService>()).isGuest;
 
   final ProfileRepository _repository;
 

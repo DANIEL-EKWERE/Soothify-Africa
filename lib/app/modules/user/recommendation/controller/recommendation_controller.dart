@@ -6,7 +6,8 @@ import '../../../../data/repositories/content_repository.dart';
 
 /// Backs the full "Recommended for you" list.
 ///
-/// The same rows Home shows in miniature, without the surrounding sections.
+/// Not Home's row enlarged: the frame lists five cards with their own
+/// practitioners, so this has its own query.
 class RecommendationController extends BaseController {
   RecommendationController(this._repository);
 
@@ -21,7 +22,7 @@ class RecommendationController extends BaseController {
   }
 
   Future<void> load() async {
-    final result = await guard(() => _repository.getFeatured());
+    final result = await guard(() => _repository.getRecommendations());
     if (result != null) items.assignAll(result);
   }
 

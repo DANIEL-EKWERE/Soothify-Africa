@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
 
+import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
-import '../../../../core/utils/feedback_utils.dart';
+import '../../../../data/models/checkin_kind.dart';
 import '../../../../data/models/profile_stats.dart';
 import '../../../../data/repositories/profile_repository.dart';
 
@@ -16,6 +16,25 @@ class ProfileTabController extends BaseController {
 
   List<ProfileSection> get sections => ProfileSection.values;
 
+  /// The month the History calendar is showing. The design prints August 2024.
+  final Rx<DateTime> month = DateTime(2024, 8).obs;
+
+  final Rxn<DateTime> selectedDate = Rxn<DateTime>();
+
+  void selectDate(DateTime date) => selectedDate.value = date;
+
+  void confirmDate() {
+    final date = selectedDate.value;
+    if (date == null) return;
+    // Nothing records sessions yet, so there is no history to open — the
+    // frame's own empty state says as much.
+    AppFeedback.info('No sessions on ${date.day}/${date.month} yet.');
+  }
+
+  /// Each check-in kind opens its own calendar of entries.
+  void openCheckin(CheckinKind kind) =>
+      Get.toNamed(AppRoutes.checkin, arguments: kind);
+
   @override
   void onInit() {
     super.onInit();
@@ -26,17 +45,7 @@ class ProfileTabController extends BaseController {
         stats.value = await _repository.getStats();
       });
 
-  /// History and Check-Ins each have their own frames in the design; neither
-  /// is built, so selecting them says so rather than showing an empty
-  /// Dashboard under a changed pill.
-  void select(ProfileSection value) {
-    if (value == section.value) return;
-    if (value != ProfileSection.dashboard) {
-      AppFeedback.info('${value.label} is not built yet.');
-      return;
-    }
-    section.value = value;
-  }
+  void select(ProfileSection value) => section.value = value;
 
   void openSessionNote() =>
       AppFeedback.info('Session notes are not built yet.');

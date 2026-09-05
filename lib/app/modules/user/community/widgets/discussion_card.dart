@@ -20,6 +20,9 @@ class DiscussionCard extends StatelessWidget {
   final DateTime now;
   final VoidCallback? onTap;
 
+  /// The design clamps the body to three lines.
+  static const int _bodyLines = 3;
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -39,18 +42,12 @@ class DiscussionCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 68.h,
-                  height: 68.h,
-                  decoration: BoxDecoration(
-                    color: appTheme.avatarBacking,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.person_outline,
-                    size: 32.h,
-                    color: appTheme.textPrimary,
+                ClipOval(
+                  child: CustomImageView(
+                    imagePath: ImageConstant.imgMemberAvatar,
+                    height: 68.h,
+                    width: 68.h,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 SizedBox(width: 14.h),
@@ -70,26 +67,68 @@ class DiscussionCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: 14.v),
-            Text(discussion.body, style: CustomTextStyles.discussionBody),
-            SizedBox(height: 14.v),
-            Text(discussion.author, style: CustomTextStyles.discussionBody),
-            SizedBox(height: 12.v),
-            Row(
-              children: [
-                _Counter(asset: ImageConstant.icLike, value: discussion.likes),
-                SizedBox(width: 28.h),
-                _Counter(
-                  asset: ImageConstant.icComment,
-                  value: discussion.comments,
-                ),
-                SizedBox(width: 28.h),
-                _Counter(asset: ImageConstant.icShare, value: discussion.shares),
-                const Spacer(),
-                Text(
-                  discussion.relativeTime(now),
-                  style: CustomTextStyles.discussionMeta,
-                ),
-              ],
+            // Body and footer are built in one pass: whether the clamped copy
+            // overflows decides the "Read more" link, and the frame shows that
+            // link only on the cards whose text is cut. Measuring here avoids
+            // holding the result as state between two separate builds.
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final style = CustomTextStyles.discussionBody;
+                final painter = TextPainter(
+                  text: TextSpan(text: discussion.body, style: style),
+                  maxLines: _bodyLines,
+                  textDirection: Directionality.of(context),
+                )..layout(maxWidth: constraints.maxWidth);
+                final cut = painter.didExceedMaxLines;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      discussion.body,
+                      maxLines: _bodyLines,
+                      overflow: TextOverflow.ellipsis,
+                      style: style,
+                    ),
+                    SizedBox(height: 14.v),
+                    Text(
+                      discussion.author,
+                      style: CustomTextStyles.discussionBody,
+                    ),
+                    SizedBox(height: 12.v),
+                    Row(
+                      children: [
+                        if (cut) ...[
+                          Text(
+                            'Read more',
+                            style: CustomTextStyles.discussionMeta,
+                          ),
+                          SizedBox(width: 28.h),
+                        ],
+                        _Counter(
+                          asset: ImageConstant.icLike,
+                          value: discussion.likes,
+                        ),
+                        SizedBox(width: 28.h),
+                        _Counter(
+                          asset: ImageConstant.icComment,
+                          value: discussion.comments,
+                        ),
+                        SizedBox(width: 28.h),
+                        _Counter(
+                          asset: ImageConstant.icShare,
+                          value: discussion.shares,
+                        ),
+                        const Spacer(),
+                        Text(
+                          discussion.relativeTime(now),
+                          style: CustomTextStyles.discussionMeta,
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

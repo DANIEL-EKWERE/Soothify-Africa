@@ -19,6 +19,8 @@ import 'helpers.dart';
 /// Regenerate with:
 ///   flutter test --update-goldens test/shell_golden_test.dart
 const _art = [
+  'assets/images/home/ai_assist.png',
+  'assets/images/home/avatar.png',
   'assets/images/content/daily_focus.png',
   'assets/images/content/breath_work.png',
   'assets/images/content/mindfulness.png',

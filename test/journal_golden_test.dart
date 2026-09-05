@@ -11,6 +11,11 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/journal_golden_test.dart
+const _art = [
+  'assets/images/journal/empty.png',
+  'assets/images/journal/compose_fab.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -28,6 +33,8 @@ void main() {
       Get.put(JournalController());
 
       await pumpScreen(tester, const JournalScreen(), brightness: brightness);
+
+      await precacheAll(tester, find.byType(JournalScreen), _art);
 
       await expectLater(find.byType(JournalScreen),
           matchesGoldenFile('goldens/journal_$name.png'));

@@ -17,6 +17,8 @@ import 'helpers.dart';
 // PNGs only: precacheImage decodes raster data, and handing it an SVG
 // fails with "Invalid image data". flutter_svg loads those itself.
 const _covers = [
+  'assets/images/home/ai_assist.png',
+  'assets/images/home/avatar.png',
   'assets/images/content/unshakeable.png',
   'assets/images/content/hope_in_the_shadows.png',
   'assets/images/content/breaking_bad_habit.png',

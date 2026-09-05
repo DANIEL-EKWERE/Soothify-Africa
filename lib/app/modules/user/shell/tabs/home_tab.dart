@@ -76,7 +76,14 @@ class _Header extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
-          child: Icon(Icons.person, size: 24.h, color: appTheme.surface),
+          child: ClipOval(
+                child: CustomImageView(
+                  imagePath: ImageConstant.imgHomeAvatar,
+                  height: 44.h,
+                  width: 44.h,
+                  fit: BoxFit.cover,
+                ),
+              ),
         ),
         SizedBox(width: 7.h),
         Expanded(
@@ -109,8 +116,12 @@ class _Header extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: appTheme.bellBorder, width: 0.5),
             ),
-            child: Icon(Icons.notifications_none,
-                size: 20.h, color: appTheme.textPrimary),
+            child: CustomImageView(
+              imagePath: ImageConstant.icBell,
+              height: 20.h,
+              width: 20.h,
+              color: appTheme.textPrimary,
+            ),
           ),
         ),
       ],
@@ -158,7 +169,12 @@ class _MoodCheckerCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 24.h),
-            Icon(Icons.chevron_right, size: 20.h, color: appTheme.onPrimary),
+            CustomImageView(
+            imagePath: ImageConstant.icArrowRight,
+            height: 20.h,
+            width: 20.h,
+            color: appTheme.onPrimary,
+          ),
           ],
         ),
       ),
@@ -357,20 +373,12 @@ class _AiAssistButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: Get.find<HomeTabController>().openAiAssist,
-      child: Container(
-        width: 70.h,
+      // The export is the whole button — white disc, shadow and glyph — so it
+      // is drawn at full size rather than as a glyph inside another circle.
+      child: CustomImageView(
+        imagePath: ImageConstant.imgAiAssistIcon,
         height: 70.h,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: appTheme.surface,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: const Color(0x52000000), blurRadius: 4)],
-        ),
-        child: Icon(
-          Icons.support_agent,
-          size: 32.h,
-          color: appTheme.soothifyBlue,
-        ),
+        width: 70.h,
       ),
     );
   }

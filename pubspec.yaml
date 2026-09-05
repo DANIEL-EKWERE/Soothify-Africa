@@ -74,6 +74,11 @@ flutter:
     - assets/images/home/
     - assets/images/content/
     - assets/images/profile/
+    - assets/images/community/
+    - assets/images/schedule/
+    - assets/images/journal/
+    - assets/images/library/
+    - assets/images/coach/
     - assets/images/onboarding/
     - assets/icons/
     - assets/data/

@@ -530,6 +530,195 @@ class CustomTextStyles {
         color: appTheme.soothifyBlue,
       );
 
+  /// The Sleep Stories card title — Nunito Sans Bold 20.
+  static TextStyle get featureTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        color: appTheme.textPrimary,
+      );
+
+  /// Its supporting line — Nunito Sans Regular 10.
+  static TextStyle get featureBody => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.textPrimary,
+      );
+
+  /// The sessions promo title — Nunito Sans Bold 16.
+  static TextStyle get promoTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 20.8 / 16,
+        color: appTheme.textPrimary,
+      );
+
+  /// Its supporting line — Nunito Sans Regular 14.
+  static TextStyle get promoBody => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 18.2 / 14,
+        color: appTheme.textPrimary,
+      );
+
+  /// A wellness questionnaire's prompt — Nunito Sans Bold 20, gradient
+  /// filled in the design.
+  static TextStyle get kycQuestion => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 26 / 20,
+        color: appTheme.textPrimary,
+      );
+
+  /// The matching interstitial's supporting line — Nunito Sans SemiBold 10.
+  static TextStyle get matchingBlurb => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        height: 13 / 10,
+        color: appTheme.textPrimary,
+      );
+
+  /// The communication-method blurb — Nunito Sans Light 10.
+  static TextStyle get methodBlurb => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w300,
+        fontVariations: const [FontVariation('wght', 300)],
+        height: 13 / 10,
+        color: appTheme.textPrimary,
+      );
+
+  /// The coach's name and the call timer — Nunito Bold 20.
+  static TextStyle get callName => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 26 / 20,
+        color: appTheme.textPrimary,
+      );
+
+  /// "Awesome! You matched with" and the section headings on the coach
+  /// profile — Nunito Sans Bold 20.
+  static TextStyle get matchedLead => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 26 / 20,
+        color: appTheme.textPrimary,
+      );
+
+  /// The coach's name — Nunito Black 20, gradient filled.
+  static TextStyle get coachName => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w900,
+        fontVariations: const [FontVariation('wght', 900)],
+        height: 26 / 20,
+        color: appTheme.textPrimary,
+      );
+
+  /// "98% Match" — Nunito Sans Bold 10, reversed on the dark badge.
+  static TextStyle get matchBadge => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        color: appTheme.onPrimary,
+      );
+
+  /// Body copy on the coach profile — Nunito Regular 14.
+  static TextStyle get coachBlurb => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 18 / 14,
+        color: appTheme.textPrimary,
+      );
+
+  /// "Because you like" / "Other Instructors Matches" — Nunito SemiBold 14.
+  static TextStyle get coachSection => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textPrimary,
+      );
+
+  /// "Signature quote" / "Expertise in" — Nunito SemiBold 16.
+  static TextStyle get coachHeading => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textPrimary,
+      );
+
+  /// An interest chip — Nunito Sans Regular 10.
+  static TextStyle get coachChip => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.textPrimary,
+      );
+
+  /// The calendar sheet's month, weekday row and day numbers.
+  static TextStyle get calendarMonth => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        color: appTheme.textPrimary,
+      );
+
+  static TextStyle get calendarWeekday => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 12.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textSecondary,
+      );
+
+  static TextStyle get calendarDay => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w500,
+        fontVariations: const [FontVariation('wght', 500)],
+        color: appTheme.textPrimary,
+      );
+
+  /// A See All grid card's title — Nunito Sans Bold 14.
+  static TextStyle get gridTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        color: appTheme.textPrimary,
+      );
+
+  /// Its practitioner — Nunito Sans SemiBold 10.
+  static TextStyle get gridAuthor => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textPrimary,
+      );
+
   /// Profile segmented control — Nunito Medium 10.
   static TextStyle get segmentLabel => TextStyle(
         fontFamily: fontNunito,

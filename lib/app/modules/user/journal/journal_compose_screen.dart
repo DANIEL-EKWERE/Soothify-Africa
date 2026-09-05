@@ -127,7 +127,12 @@ class _ChangePrompt extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.refresh, size: 10.h, color: appTheme.textPrimary),
+          CustomImageView(
+            imagePath: ImageConstant.icRefresh,
+            height: 10.h,
+            width: 10.h,
+            color: appTheme.textPrimary,
+          ),
           SizedBox(width: 8.h),
           Text('Change prompt', style: CustomTextStyles.journalChangePrompt),
         ],
@@ -178,8 +183,12 @@ class _MessageField extends StatelessWidget {
             ),
             GestureDetector(
               onTap: controller.send,
-              child: Icon(Icons.send_outlined,
-                  size: 20.h, color: appTheme.textSecondary),
+              child: CustomImageView(
+                imagePath: ImageConstant.icSend,
+                height: 20.h,
+                width: 20.h,
+                color: appTheme.textSecondary,
+              ),
             ),
           ],
         ),

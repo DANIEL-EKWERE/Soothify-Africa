@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/profile_stats.dart';
 import 'controller/profile_tab_controller.dart';
+import 'widgets/profile_checkins.dart';
+import 'widgets/profile_history.dart';
 
 /// Profile — Figma "Profile/dashboard" (135:8098).
 ///
@@ -40,13 +42,32 @@ class ProfileTab extends GetView<ProfileTabController> {
                 child: const _SectionTabs(),
               ),
               SizedBox(height: 12.v),
-              Text('My stats', style: CustomTextStyles.statsHeading),
-              SizedBox(height: 16.v),
-              const _StatsCard(),
+              // Each pill now has a screen behind it.
+              Obx(() => switch (controller.section.value) {
+                    ProfileSection.dashboard => const _Dashboard(),
+                    ProfileSection.history => const ProfileHistory(),
+                    ProfileSection.checkIns => const ProfileCheckins(),
+                  }),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _Dashboard extends StatelessWidget {
+  const _Dashboard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('My stats', style: CustomTextStyles.statsHeading),
+        SizedBox(height: 16.v),
+        const _StatsCard(),
+      ],
     );
   }
 }
@@ -68,19 +89,12 @@ class _Header extends StatelessWidget {
         InkWell(
           onTap: () => Get.toNamed(AppRoutes.settings),
           customBorder: const CircleBorder(),
-          child: Container(
-            width: 40.h,
-            height: 40.h,
-            decoration: BoxDecoration(
-              color: appTheme.avatarBacking,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            // Artwork not exported; the backing circle is the design's own.
-            child: Icon(
-              Icons.person_outline,
-              size: 22.h,
-              color: appTheme.textPrimary,
+          child: ClipOval(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgHomeAvatar,
+              height: 40.h,
+              width: 40.h,
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -105,30 +119,40 @@ class _SectionTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileTabController>();
-    // No Obx: with one pill state in the design there is nothing here that
-    // varies with the selected section.
-    return Row(
-      children: [
-        for (final s in controller.sections) ...[
-          _SegmentPill(label: s.label, onTap: () => controller.select(s)),
-          if (s != controller.sections.last) SizedBox(width: 8.h),
+    return Obx(() {
+      final current = controller.section.value;
+      return Row(
+        children: [
+          for (final s in controller.sections) ...[
+            _SegmentPill(
+              label: s.label,
+              selected: s == current,
+              onTap: () => controller.select(s),
+            ),
+            if (s != controller.sections.last) SizedBox(width: 8.h),
+          ],
         ],
-      ],
-    );
+      );
+    });
   }
 }
 
 /// A section pill.
 ///
-/// The design draws all three identically — it ships no selected state, so
-/// none is invented here. That is a real gap in the design rather than an
-/// omission in this build: nothing on the frame indicates which section is
-/// showing. Revisit when History and Check-Ins are built, since by then the
-/// control has to say where you are.
+/// The design draws all three identically — it ships no selected state. That
+/// was reproduced as-is while only Dashboard existed, but now that each pill
+/// switches real content, a control that never says where you are is a defect
+/// rather than fidelity. The selected pill takes the brand fill; confirm the
+/// intended treatment with the designer.
 class _SegmentPill extends StatelessWidget {
-  const _SegmentPill({required this.label, required this.onTap});
+  const _SegmentPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
+  final bool selected;
   final VoidCallback onTap;
 
   @override
@@ -141,11 +165,16 @@ class _SegmentPill extends StatelessWidget {
         height: 30.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: appTheme.surface,
+          color: selected ? appTheme.actionFill : appTheme.surface,
           borderRadius: BorderRadius.circular(10.h),
           border: Border.all(color: appTheme.segmentBorder),
         ),
-        child: Text(label, style: CustomTextStyles.segmentLabel),
+        child: Text(
+          label,
+          style: CustomTextStyles.segmentLabel.copyWith(
+            color: selected ? appTheme.onPrimary : appTheme.textPrimary,
+          ),
+        ),
       ),
     );
   }

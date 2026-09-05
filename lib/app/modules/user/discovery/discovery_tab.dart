@@ -139,7 +139,24 @@ class _Shelf extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: CustomTextStyles.sectionTitle),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: CustomTextStyles.sectionTitle,
+              ),
+            ),
+            InkWell(
+              onTap: () =>
+                  Get.find<DiscoveryTabController>().openShelf(title),
+              child: Text('See All', style: CustomTextStyles.seeAll),
+            ),
+          ],
+        ),
         SizedBox(height: 16.v),
         SizedBox(
           height: 166.v,

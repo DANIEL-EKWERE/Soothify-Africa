@@ -19,6 +19,13 @@ import 'helpers.dart';
 // PNGs only: precacheImage decodes raster data, and handing it an SVG
 // fails with "Invalid image data". flutter_svg loads those itself.
 const _covers = [
+  'assets/images/library/balance_session.png',
+  'assets/images/library/meditation_session.png',
+  'assets/images/library/sleep_stories.png',
+  'assets/images/content/cover_d.png',
+  'assets/images/content/cover_a.png',
+  'assets/images/content/cover_b.png',
+  'assets/images/content/cover_c.png',
   'assets/images/content/unshakeable.png',
   'assets/images/content/hope_in_the_shadows.png',
   'assets/images/content/breaking_bad_habit.png',
@@ -75,8 +82,16 @@ void main() {
     await tester.pumpAndSettle();
 
     for (final shelf in LibrarySection.meditation.shelves) {
-      expect(find.text(shelf), findsOneWidget, reason: '$shelf is missing');
+      expect(find.text(shelf.title), findsOneWidget,
+          reason: '${shelf.title} is missing');
     }
+    // The frame puts a Sleep Stories card between the two shelves and closes
+    // with a sessions promo; both were absent from the first build.
+    expect(find.text('Sleep Stories'), findsOneWidget);
+    expect(find.text('Calm narratives to help you sleep better'),
+        findsOneWidget);
+    expect(find.text('Meditation sessions'), findsOneWidget);
+    expect(find.text('Speak with a meditation therapist'), findsOneWidget);
   });
 
   for (final (name, brightness) in [

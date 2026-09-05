@@ -13,6 +13,17 @@ abstract class ContentRepository {
   /// Most recently opened, newest first — the Discovery "Recent" shelf.
   Future<List<MediaItem>> getRecent();
 
+  /// The full "Recommended for you" page. A different, longer set than
+  /// [getFeatured], which backs Home's preview row.
+  Future<List<MediaItem>> getRecommendations();
+
+  /// One named library shelf — "voice-overs", "sound-effects", "yoga-flow",
+  /// "sounds". Each frame gives its shelves different cards.
+  Future<List<MediaItem>> getShelf(String query);
+
+  /// The full page behind a shelf's "See All" — a longer, separate list.
+  Future<List<MediaItem>> getShelfPage(String shelf);
+
   Future<List<MediaItem>> getByCategory(String categoryId);
 
   Future<MediaItem?> getById(String id);

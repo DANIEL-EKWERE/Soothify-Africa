@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../data/models/library_section.dart';
 import '../../../data/models/media_item.dart';
 import '../discovery/widgets/discovery_card.dart';
 import 'controller/library_controller.dart';
@@ -27,10 +28,20 @@ class LibraryScreen extends GetView<LibraryController> {
               SizedBox(height: 27.v),
               const _SearchRow(),
               SizedBox(height: 27.v),
+              // Rendered in the frame's own order: the blocks are not all
+              // shelves, and Meditation interleaves a card between two of them.
               Obx(() => Column(
                     children: [
-                      for (final entry in controller.shelves.entries) ...[
-                        _Shelf(title: entry.key, items: entry.value),
+                      for (final block in controller.section.blocks) ...[
+                        switch (block) {
+                          LibraryShelf() => _Shelf(
+                              title: block.title,
+                              items: controller.shelves[block.title] ??
+                                  const [],
+                            ),
+                          LibraryFeature() => _FeatureCard(block: block),
+                          LibraryPromo() => _PromoCard(block: block),
+                        },
                         SizedBox(height: 32.v),
                       ],
                     ],
@@ -177,6 +188,121 @@ class _Shelf extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The Sleep Stories block — a section heading over one wide card.
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({required this.block});
+
+  final LibraryFeature block;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<LibraryController>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(block.heading, style: CustomTextStyles.shelfHeading),
+        SizedBox(height: 16.v),
+        InkWell(
+          onTap: () => controller.openShelf(block.heading),
+          borderRadius: BorderRadius.circular(12.h),
+          child: Container(
+            height: 122.v,
+            padding: EdgeInsets.symmetric(horizontal: 12.h),
+            decoration: BoxDecoration(
+              color: appTheme.surface,
+              borderRadius: BorderRadius.circular(12.h),
+              // #000000 at 5% — at full strength this draws a black box.
+              border: Border.all(color: appTheme.cardBorder),
+            ),
+            child: Row(
+              children: [
+                CustomImageView(
+                  imagePath: block.asset,
+                  height: 92.h,
+                  width: 92.h,
+                  radius: BorderRadius.circular(6.h),
+                ),
+                SizedBox(width: 16.h),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(block.title, style: CustomTextStyles.featureTitle),
+                      SizedBox(height: 2.v),
+                      Text(block.body, style: CustomTextStyles.featureBody),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 9.h),
+                CustomImageView(
+                  imagePath: ImageConstant.icArrowRight,
+                  height: 16.h,
+                  width: 16.h,
+                  color: appTheme.textSecondary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The closing sessions promo. No heading, smaller icon, radius 8.
+class _PromoCard extends StatelessWidget {
+  const _PromoCard({required this.block});
+
+  final LibraryPromo block;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<LibraryController>();
+    return InkWell(
+      onTap: controller.openSessions,
+      borderRadius: BorderRadius.circular(8.h),
+      child: Container(
+        height: 122.v,
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        decoration: BoxDecoration(
+          color: appTheme.surface,
+          borderRadius: BorderRadius.circular(8.h),
+          border: Border.all(color: appTheme.cardBorder),
+        ),
+        child: Row(
+          children: [
+            CustomImageView(
+              imagePath: block.asset,
+              height: block.iconSize.h,
+              width: block.iconSize.h,
+            ),
+            SizedBox(width: 21.h),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(block.title, style: CustomTextStyles.promoTitle),
+                  SizedBox(height: 2.v),
+                  Text(block.body, style: CustomTextStyles.promoBody),
+                ],
+              ),
+            ),
+            SizedBox(width: 16.h),
+            CustomImageView(
+              imagePath: ImageConstant.icArrowRight,
+              height: 24.h,
+              width: 24.h,
+              color: appTheme.textPrimary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

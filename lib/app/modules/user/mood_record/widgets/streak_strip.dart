@@ -78,8 +78,12 @@ class _Day extends StatelessWidget {
             width: size,
             height: size,
             child: isDone
-                ? Icon(Icons.check_circle_outline,
-                    size: size, color: appTheme.soothifyBlue)
+                ? CustomImageView(
+                    imagePath: ImageConstant.icTickCircle,
+                    height: size,
+                    width: size,
+                    color: appTheme.soothifyBlue,
+                  )
                 : Container(
                     decoration: BoxDecoration(
                       color: appTheme.surface,

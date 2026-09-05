@@ -1,7 +1,9 @@
 import '../../../../core/app_export.dart';
+import '../../../../core/utils/wellness_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../data/models/media_item.dart';
+import '../../../../data/models/wellness_kyc.dart';
 import '../../../../data/repositories/content_repository.dart';
 
 /// Backs the Meditation and Balance libraries.
@@ -23,14 +25,31 @@ class LibraryController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
-        // No shelf-specific endpoint exists yet, so every shelf draws from the
-        // same pool. The shape is what matters here; the queries change when
-        // the API lands.
-        final items = await _repository.getRecent();
-        shelves.assignAll({for (final s in section.shelves) s: items});
+        // Each shelf is fetched by its own query: the frames give Voice Overs
+        // and Sound Effects different cards, so one shared list put the wrong
+        // art under the wrong heading.
+        final queries = section.shelves.toList();
+        final results = await Future.wait(
+          queries.map((s) => _repository.getShelf(s.query)),
+        );
+        shelves.assignAll({
+          for (var i = 0; i < queries.length; i++)
+            queries[i].title: results[i],
+        });
       });
 
-  void openShelf(String shelf) => AppFeedback.info('$shelf is not built yet.');
+  void openShelf(String shelf) =>
+      Get.toNamed(AppRoutes.shelf, arguments: shelf);
+
+  /// Which questionnaire fronts this section's sessions.
+  WellnessTrack get track => switch (section) {
+        LibrarySection.meditation => WellnessTrack.meditation,
+        LibrarySection.balance => WellnessTrack.balance,
+      };
+
+  /// Each track is gated separately — answering Meditation's questions says
+  /// nothing about Balance's.
+  void openSessions() => openBooking(track);
 
   void open(MediaItem item) =>
       AppFeedback.info('${item.title} is not built yet.');

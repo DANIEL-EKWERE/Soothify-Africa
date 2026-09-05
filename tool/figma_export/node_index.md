@@ -33,6 +33,40 @@ larger y. Themes are handled by tokens, so only the light frame was read.
 | Start a discussion | `135:5783` | `community/compose/compose_screen.dart` |
 | Discussion thread | `135:6190` | `community/thread/thread_screen.dart` |
 
+## Schedule flow
+
+Entry is gated by a per-track questionnaire (`openBooking` in
+`core/utils/wellness_entry.dart`) — Home's Explore tile and the Meditation and
+Balance sessions cards all route through it, so the gate cannot drift apart
+between them.
+
+| Node | Screen | Built |
+|---|---|---|
+| `135:23481` | Meditation KYC intro + 5 questions (`135:23097`+) | yes |
+| `135:23889` | Schedule KYC intro + 5 questions (`135:23694`+) | yes |
+| `135:20771` | Schedule — three offering cards | yes |
+| `135:20803` | Matching instructor | yes |
+| `135:20817` | Communication method | yes |
+| `135:20906` | Audio/video call | yes |
+| `135:20850` | Rating | yes |
+| `135:20837` | Feedback | yes |
+| `135:20932` | Matched with instructor | yes |
+| `135:21450` | Calendar | yes — a sheet over the profile |
+| `135:21320` | Celebration | yes — same view as `135:20932` |
+
+Those last three are **one screen**, not three: `135:21320` carries copy
+identical to `135:20932`, and `135:21450` is the same profile with a date
+sheet laid over its lower half. Building them as separate routes would have
+triplicated a 1677-tall screen.
+
+The Meditation and Schedule questionnaires are **different sets behind
+identical intro copy** — `135:23481` is titled "Meditation", `135:23889`
+"Schedule", and nothing else distinguishes them. `wellness_kyc_test.dart`
+asserts the two stay distinct.
+
+Balance currently falls back to the Schedule question set; its own frames
+(`Balance Kyc`, `135:19200`–`135:19353`) have not been read.
+
 ## Not built
 
 Discovery search (`135:3630`, `135:3821`, `135:3951`, `135:3967`);
@@ -59,6 +93,25 @@ Both routes are spent as of 2026-09-04:
 *and layer names*, and in this file the names carry the copy — enough to build
 a screen whose components were already measured elsewhere. It is not enough on
 its own, because it carries no fills or type.
+
+## Assets
+
+Everything in `assets/` came out of the file; nothing is hand-drawn. 40 SVG
+icons and 50 PNGs, wired through `ImageConstant` (paths) and `CustomImageView`
+(rendering). Only the auth password eye still uses a Material glyph — the
+sign-in and sign-up frames live in the *old* file, so its "shown" state was
+never exported.
+
+Two traps worth knowing:
+
+- **Some exports are the whole control, not the glyph.** `home/ai_assist.png`
+  is the entire floating button — white disc, shadow and eyes — so drawing it
+  inside another circle double-stacks it. Check what an export actually
+  contains before nesting it in your own decoration.
+- **Goldens need assets precached.** `Image.asset` resolves asynchronously, so
+  without `precacheAll` a golden records placeholders and looks like the wiring
+  failed. `precacheImage` also cannot decode SVG — pass PNGs only, or it throws
+  "Invalid image data"; flutter_svg loads its own.
 
 ## Gotchas
 

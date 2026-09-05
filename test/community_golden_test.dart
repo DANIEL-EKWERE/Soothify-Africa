@@ -12,6 +12,16 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/community_golden_test.dart
+const _emoji = [
+  'assets/images/moods/happy.png',
+  'assets/images/moods/sad.png',
+  'assets/images/moods/depress.png',
+  'assets/images/moods/anxious.png',
+  'assets/images/moods/fearful.png',
+  'assets/images/community/welcome.png',
+  'assets/images/community/avatar.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -37,6 +47,7 @@ void main() {
       Get.find<CommunityTabController>().restore();
 
       await pumpScreen(tester, const CommunityTab(), brightness: brightness);
+      await precacheAll(tester, find.byType(CommunityTab), _emoji);
 
       await expectLater(find.byType(CommunityTab),
           matchesGoldenFile('goldens/community_$name.png'));
@@ -129,6 +140,7 @@ void main() {
       Get.lazyPut(() => CommunityTabController());
 
       await pumpScreen(tester, const CommunityTab(), brightness: brightness);
+      await precacheAll(tester, find.byType(CommunityTab), _emoji);
 
       await expectLater(find.byType(CommunityTab),
           matchesGoldenFile('goldens/community_welcome_$name.png'));

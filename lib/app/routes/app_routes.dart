@@ -36,6 +36,9 @@ class AppRoutes {
   /// Reached from Profile, not from the bottom navigation.
   static const String settings = '/settings';
 
+  /// One kind of check-in history. Takes a [CheckinKind] argument.
+  static const String checkin = '/profile/checkin';
+
   /// The community forum, reached from the Community tab's topic step.
   static const String communityForum = '/community/forum';
   static const String communityCompose = '/community/new';
@@ -50,6 +53,17 @@ class AppRoutes {
   /// screen with different copy — and takes a [LibrarySection] as its argument.
   static const String library = '/library';
   static const String schedule = '/schedule';
+
+  /// A shelf's "See All" grid. Takes the shelf name as its argument, so one
+  /// route serves every shelf in the app.
+  static const String shelf = '/shelf';
+
+  /// A section's pre-booking questionnaire. Takes a [WellnessTrack] argument;
+  /// shown once per track, then skipped.
+  static const String wellnessKyc = '/wellness-kyc';
+
+  /// Matching, call, rating and feedback — everything after Schedule.
+  static const String booking = '/schedule/booking';
 
   static const String moodChecker = '/mood';
   static const String moodRecord = '/mood/record';

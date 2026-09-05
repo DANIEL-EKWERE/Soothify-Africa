@@ -76,18 +76,12 @@ class _Identity extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 68.h,
-          height: 68.h,
-          decoration: BoxDecoration(
-            color: appTheme.avatarBacking,
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            Icons.person_outline,
-            size: 34.h,
-            color: appTheme.textPrimary,
+        ClipOval(
+          child: CustomImageView(
+            imagePath: ImageConstant.imgCommunityAvatar,
+            height: 68.h,
+            width: 68.h,
+            fit: BoxFit.cover,
           ),
         ),
         SizedBox(width: 24.h),
@@ -181,15 +175,17 @@ class _TopicChip extends StatelessWidget {
         child: Row(
           children: [
             if (topic.isOthers)
-              Icon(Icons.more_horiz, size: 20.h, color: appTheme.textSecondary)
+              CustomImageView(
+                imagePath: ImageConstant.icOthers,
+                height: 7.h,
+                width: 13.h,
+                color: appTheme.textSecondary,
+              )
             else
-              Container(
-                width: 30.h,
+              CustomImageView(
+                imagePath: topic.assetPath,
                 height: 30.h,
-                decoration: BoxDecoration(
-                  color: appTheme.avatarBacking,
-                  borderRadius: BorderRadius.circular(6.h),
-                ),
+                width: 30.h,
               ),
             SizedBox(width: 8.h),
             Flexible(

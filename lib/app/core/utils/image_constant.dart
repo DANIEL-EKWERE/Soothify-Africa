@@ -29,6 +29,41 @@ class ImageConstant {
   static const String imgMoodCheckerIcon = '$_images/home/mood_checker_icon.png';
   static const String imgAiAssist = '$_images/home/ai_assist.png';
 
+  /// The Community welcome illustration, exported from the frame itself.
+  static const String imgCommunityWelcome = '$_images/community/welcome.png';
+
+  /// The member avatar the Community and forum frames show.
+  static const String imgCommunityAvatar = '$_images/community/avatar.png';
+
+  static const String imgMemberAvatar = '$_images/community/avatar_member.png';
+  static const String imgJournalEmpty = '$_images/journal/empty.png';
+  static const String imgJournalCompose = '$_images/journal/compose_fab.png';
+  static const String imgSessionCover = '$_images/schedule/session.png';
+  static const String imgHomeAvatar = '$_images/home/avatar.png';
+  static const String imgFilter = '$_images/home/filter.png';
+
+  static const String imgAiAssistIcon = '$_images/home/ai_assist.png';
+
+  static const String icBell = '$_icons/ic_bell.svg';
+  static const String icRefresh = '$_icons/ic_refresh.svg';
+  static const String icMenu = '$_icons/ic_menu.svg';
+  static const String icEditBadge = '$_icons/ic_edit_badge.svg';
+
+  static const String imgCoachPhoto = '$_images/coach/photo.png';
+  static const String imgCoachVideo = '$_images/coach/video.png';
+  static const String imgCoachBanner = '$_images/coach/banner.png';
+  static const String imgCoachCallAvatar = '$_images/coach/call_avatar.png';
+
+  /// The "Other Instructors Matches" row.
+  static List<String> get imgCoachPeers => const [
+        '$_images/coach/peer_1.png',
+        '$_images/coach/peer_2.png',
+        '$_images/coach/peer_3.png',
+        '$_images/coach/peer_4.png',
+      ];
+
+  static const String icOthers = '$_icons/ic_others.svg';
+
   static const String icBack = '$_icons/ic_back.svg';
   static const String icSearch = '$_icons/ic_search.svg';
   static const String icFilter = '$_icons/ic_filter.svg';

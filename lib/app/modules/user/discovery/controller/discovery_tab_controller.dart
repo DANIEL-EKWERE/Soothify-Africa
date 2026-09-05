@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/feedback_utils.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/models/subscription_plan.dart';
 import '../../../../data/repositories/content_repository.dart';
@@ -45,6 +46,10 @@ class DiscoveryTabController extends BaseController {
   void toggleFreeTrial(bool value) => freeTrial.value = value;
 
   void subscribe() => AppFeedback.info('Checkout is not built yet.');
+
+  /// Each shelf's "See All" opens the same grid, named by its heading.
+  void openShelf(String shelf) =>
+      Get.toNamed(AppRoutes.shelf, arguments: shelf);
 
   void openFilters() => AppFeedback.info('Filters are not built yet.');
 

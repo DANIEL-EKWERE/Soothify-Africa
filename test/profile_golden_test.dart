@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/data/models/checkin_kind.dart';
 import 'package:soothifyafrica/app/data/models/profile_stats.dart';
 import 'package:soothifyafrica/app/data/repositories/profile_repository.dart';
 import 'package:soothifyafrica/app/modules/user/profile/controller/profile_tab_controller.dart';
@@ -41,24 +42,45 @@ void main() {
     });
   }
 
-  testWidgets('selecting an unbuilt section leaves Dashboard showing',
-      (tester) async {
+  testWidgets('each pill switches to its own section', (tester) async {
     useDesignFrame(tester);
+    await loadAppFonts();
     final controller = ProfileTabController(_FakeProfileRepository());
     Get.put(controller);
 
     await pumpScreen(tester, const ProfileTab());
+    expect(controller.section.value, ProfileSection.dashboard);
+    expect(find.text('My stats'), findsOneWidget);
 
     await tester.tap(find.text('History'));
-    await tester.pump();
-
-    // The pill must not latch onto a section with no screen behind it.
-    expect(controller.section.value, ProfileSection.dashboard);
-
-    // The rejection surfaces through a GetX snackbar, whose animation
-    // outlives the tree and fails the test as a leaked Ticker unless it is
-    // drained before teardown.
-    Get.closeAllSnackbars();
     await tester.pumpAndSettle();
+    expect(controller.section.value, ProfileSection.history);
+    expect(find.text('My Calendar'), findsOneWidget);
+
+    await tester.tap(find.text('Check-Ins'));
+    await tester.pumpAndSettle();
+    expect(controller.section.value, ProfileSection.checkIns);
+    // All four kinds the design lists.
+    for (final kind in CheckinKind.values) {
+      expect(find.text(kind.title), findsOneWidget,
+          reason: '${kind.title} is missing');
+    }
   });
+
+  for (final (name, section) in [
+    ('history', ProfileSection.history),
+    ('checkins', ProfileSection.checkIns),
+  ]) {
+    testWidgets('profile $name', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      Get.put(ProfileTabController(_FakeProfileRepository())
+        ..section.value = section);
+
+      await pumpScreen(tester, const ProfileTab());
+
+      await expectLater(find.byType(ProfileTab),
+          matchesGoldenFile('goldens/profile_$name.png'));
+    });
+  }
 }

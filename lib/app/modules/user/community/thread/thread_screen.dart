@@ -81,7 +81,12 @@ class _Header extends StatelessWidget {
               color: appTheme.textPrimary,
             ),
           ),
-          Icon(Icons.menu, size: 24.h, color: appTheme.textPrimary),
+          CustomImageView(
+            imagePath: ImageConstant.icMenu,
+            height: 24.h,
+            width: 24.h,
+            color: appTheme.textPrimary,
+          ),
         ],
       ),
     );
@@ -103,18 +108,12 @@ class _CommentRow extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44.h,
-              height: 44.h,
-              decoration: BoxDecoration(
-                color: appTheme.avatarBacking,
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.person_outline,
-                size: 22.h,
-                color: appTheme.textPrimary,
+            ClipOval(
+              child: CustomImageView(
+                imagePath: ImageConstant.imgMemberAvatar,
+                height: 44.h,
+                width: 44.h,
+                fit: BoxFit.cover,
               ),
             ),
             SizedBox(width: 5.h),

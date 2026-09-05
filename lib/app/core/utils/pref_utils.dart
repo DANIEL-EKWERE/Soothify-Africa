@@ -18,6 +18,7 @@ class PrefUtils {
   static const _kWifiOnlyDownloads = 'wifiOnlyDownloads';
   static const _kCommunityWelcomeSeen = 'communityWelcomeSeen';
   static const _kCommunityUsername = 'communityUsername';
+  static const _kWellnessKycPrefix = 'wellnessKyc_';
 
   /// Safe to call from anywhere that needs preferences before main() has run,
   /// such as a test or a service's own init.
@@ -90,6 +91,14 @@ class PrefUtils {
   String? communityUsername() => _store.getString(_kCommunityUsername);
   Future<void> setCommunityUsername(String value) async =>
       _store.setString(_kCommunityUsername, value);
+
+  /// Whether a section's pre-booking questionnaire has been completed. Keyed
+  /// per track, because Meditation, Balance and Schedule each ask their own
+  /// questions and completing one must not skip another.
+  bool wellnessKycDone(String track) =>
+      _store.getBool('$_kWellnessKycPrefix$track') ?? false;
+  Future<void> setWellnessKycDone(String track) async =>
+      _store.setBool('$_kWellnessKycPrefix$track', true);
 
   Future<void> clearSession() async {
     await _store.remove(_kUserRole);

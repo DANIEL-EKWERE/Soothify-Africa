@@ -30,7 +30,15 @@ import '../modules/user/community/forum/binding/forum_binding.dart';
 import '../modules/user/community/forum/forum_screen.dart';
 import '../modules/user/community/thread/binding/thread_binding.dart';
 import '../modules/user/community/thread/thread_screen.dart';
+import '../modules/user/booking/binding/booking_binding.dart';
+import '../modules/user/booking/booking_screen.dart';
+import '../modules/user/checkin/binding/checkin_binding.dart';
+import '../modules/user/checkin/checkin_screen.dart';
 import '../modules/user/library/binding/library_binding.dart';
+import '../modules/user/shelf/binding/shelf_binding.dart';
+import '../modules/user/shelf/shelf_screen.dart';
+import '../modules/user/wellness_kyc/binding/wellness_kyc_binding.dart';
+import '../modules/user/wellness_kyc/wellness_kyc_screen.dart';
 import '../modules/user/library/library_screen.dart';
 import '../modules/user/schedule/binding/schedule_binding.dart';
 import '../modules/user/schedule/schedule_screen.dart';
@@ -127,9 +135,29 @@ class AppPages {
       binding: LibraryBinding(),
     ),
     GetPage(
+      name: AppRoutes.wellnessKyc,
+      page: () => const WellnessKycScreen(),
+      binding: WellnessKycBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.booking,
+      page: () => const BookingScreen(),
+      binding: BookingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.shelf,
+      page: () => const ShelfScreen(),
+      binding: ShelfBinding(),
+    ),
+    GetPage(
       name: AppRoutes.schedule,
       page: () => const ScheduleScreen(),
       binding: ScheduleBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.checkin,
+      page: () => const CheckinScreen(),
+      binding: CheckinBinding(),
     ),
     GetPage(
       name: AppRoutes.settings,

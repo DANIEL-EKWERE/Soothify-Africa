@@ -5,8 +5,7 @@ import '../../../../data/models/session_offering.dart';
 class ScheduleController extends GetxController {
   List<SessionOffering> get offerings => SessionOffering.values;
 
-  /// Booking runs through Matching instructor, Communication method, Calendar
-  /// and Rating frames in the design; none are built.
-  void book(SessionOffering offering) =>
-      AppFeedback.info('Booking a ${offering.title.toLowerCase()} is not built yet.');
+  /// Booking runs through matching, the communication method, the call, then
+  /// rating and feedback — all one route, see [AppRoutes.booking].
+  void book(SessionOffering offering) => Get.toNamed(AppRoutes.booking);
 }

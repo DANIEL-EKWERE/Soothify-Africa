@@ -24,21 +24,23 @@ class CommunityWelcomeStep extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                // Illustration not exported; the design's 346x341 slot is held
-                // so the layout below it does not shift when the art lands.
+                // Exported from the frame itself (node 135:5765). It is a 3D
+                // render, not the flat illustration the intro carousel uses —
+                // the two are not interchangeable.
                 Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: appTheme.avatarBacking,
-                      borderRadius: BorderRadius.circular(12.h),
-                    ),
+                  child: Image.asset(
+                    ImageConstant.imgCommunityWelcome,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 SizedBox(height: 24.v),
+                // The Figma string carries a newline after "wellness", but
+                // the bundled Nunito Sans renders a few pixels wider than the
+                // design's instance, so honouring it wrapped the first line
+                // too and gave three ragged lines. Left to wrap naturally it
+                // lands on the design's two.
                 Text(
-                  'Connect, share, and explore wellness\n'
-                  ' topics with others',
+                  'Connect, share, and explore wellness topics with others',
                   textAlign: TextAlign.center,
                   style: CustomTextStyles.communityWelcomeBody,
                 ),

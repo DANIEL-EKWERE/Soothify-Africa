@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/app_export.dart';
-import '../shell/tabs/widgets/content_pills.dart';
 import 'controller/journal_controller.dart';
 
 /// Journal — Figma `135:2091`, the empty state.
@@ -39,8 +38,11 @@ class JournalScreen extends GetView<JournalController> {
             color: appTheme.journalAccent,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.edit_outlined,
-              size: 22.h, color: appTheme.onPrimary),
+          child: CustomImageView(
+            imagePath: ImageConstant.imgJournalCompose,
+            height: 22.h,
+            width: 22.h,
+          ),
         ),
       ),
       body: SafeArea(
@@ -81,7 +83,13 @@ class _EmptyState extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: 128.h),
-          Center(child: ArtworkPlaceholder(width: 73.h, height: 73.h)),
+          Center(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgJournalEmpty,
+              height: 73.h,
+              width: 73.h,
+            ),
+          ),
           SizedBox(height: 40.h),
           Text('No entries yet',
               textAlign: TextAlign.center,

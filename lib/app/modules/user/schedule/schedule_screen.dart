@@ -87,13 +87,13 @@ class _OfferingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Cover art was not exported; the design's 294x150 slot is held at a
-          // translucent white so the card still reads as designed.
-          Container(
-            height: 150.v,
-            decoration: BoxDecoration(
-              color: appTheme.onPrimary.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(8.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.h),
+            child: CustomImageView(
+              imagePath: ImageConstant.imgSessionCover,
+              height: 150.v,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
           SizedBox(height: 16.v),

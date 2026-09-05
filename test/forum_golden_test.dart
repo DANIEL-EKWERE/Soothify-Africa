@@ -15,6 +15,10 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/forum_golden_test.dart
+const _art = [
+  'assets/images/community/avatar_member.png',
+];
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -43,6 +47,8 @@ void main() {
       await pumpScreen(tester, const ForumScreen(), brightness: brightness);
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pumpAndSettle();
+
+      await precacheAll(tester, find.byType(ForumScreen), _art);
 
       await expectLater(find.byType(ForumScreen),
           matchesGoldenFile('goldens/forum_$name.png'));

@@ -92,19 +92,12 @@ class _AccountRow extends StatelessWidget {
             height: 55.h,
             child: Stack(
               children: [
-                Container(
-                  width: 55.h,
-                  height: 55.h,
-                  decoration: BoxDecoration(
-                    color: appTheme.avatarBacking,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  // Artwork not exported; the backing circle is the design's.
-                  child: Icon(
-                    Icons.person_outline,
-                    size: 28.h,
-                    color: appTheme.textPrimary,
+                ClipOval(
+                  child: CustomImageView(
+                    imagePath: ImageConstant.imgHomeAvatar,
+                    height: 55.h,
+                    width: 55.h,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 Positioned(
@@ -119,9 +112,10 @@ class _AccountRow extends StatelessWidget {
                       border: Border.all(color: appTheme.onPrimary, width: 0.8),
                     ),
                     alignment: Alignment.center,
-                    child: Icon(
-                      Icons.edit,
-                      size: 9.h,
+                    child: CustomImageView(
+                      imagePath: ImageConstant.icEditBadge,
+                      height: 9.h,
+                      width: 9.h,
                       color: appTheme.onPrimary,
                     ),
                   ),

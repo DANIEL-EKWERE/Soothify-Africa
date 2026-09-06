@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
-import 'package:soothifyafrica/app/modules/user/shell/tabs/widgets/ai_assist_button.dart';
+import 'package:soothifyafrica/app/widgets/ai_assist_overlay.dart';
+import 'package:soothifyafrica/app/widgets/ai_assist_button.dart';
 
 import 'helpers.dart';
 
@@ -14,6 +16,8 @@ void main() {
   setUp(() {
     PrefUtils.resetForTesting();
     SharedPreferences.setMockInitialValues({});
+    // A static observable, so Get.reset does not clear it between tests.
+    AiAssistOverlay.route.value = null;
   });
   tearDown(Get.reset);
 
@@ -108,8 +112,7 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('dropped mid-screen it snaps to the nearer edge',
-      (tester) async {
+  testWidgets('dropped mid-screen it snaps to the nearer edge', (tester) async {
     useDesignFrame(tester);
     await mount(tester);
 
@@ -123,7 +126,89 @@ void main() {
     final at = positionOf(tester);
     final maxX = 390 - 70;
     // Against one edge or the other, never left floating between them.
-    expect(at.dx < 1 || (at.dx - maxX).abs() < 1, isTrue,
-        reason: 'left at dx=${at.dx}, which is neither edge');
+    expect(
+      at.dx < 1 || (at.dx - maxX).abs() < 1,
+      isTrue,
+      reason: 'left at dx=${at.dx}, which is neither edge',
+    );
+  });
+
+  /// The overlay is what makes the button app-wide. Mounted inside the Home
+  /// tab it disappeared the moment anything else opened, and came back at its
+  /// default corner — which is what "not persistent across the app" meant.
+  group('the app-wide overlay', () {
+    Future<void> mountApp(WidgetTester tester, {String? at}) async {
+      AiAssistOverlay.route.value = at;
+      await tester.pumpWidget(
+        Sizer(
+          builder: (_, _, _) => GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: theme,
+            routingCallback: AiAssistOverlay.onRouting,
+            builder: (context, child) => AiAssistOverlay(child: child!),
+            getPages: [
+              GetPage(
+                name: AppRoutes.shell,
+                page: () => const Scaffold(body: Text('shell')),
+              ),
+              GetPage(
+                name: AppRoutes.settings,
+                page: () => const Scaffold(body: Text('settings')),
+              ),
+              GetPage(
+                name: AppRoutes.signin,
+                page: () => const Scaffold(body: Text('signin')),
+              ),
+            ],
+            initialRoute: at ?? AppRoutes.shell,
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    testWidgets('it stays out of onboarding and auth', (tester) async {
+      useDesignFrame(tester);
+      await mountApp(tester, at: AppRoutes.signin);
+
+      expect(find.byType(AiAssistButton), findsNothing);
+    });
+
+    testWidgets('it is there on an in-app screen', (tester) async {
+      useDesignFrame(tester);
+      await mountApp(tester, at: AppRoutes.shell);
+
+      expect(find.byType(AiAssistButton), findsOneWidget);
+    });
+
+    testWidgets('a push does not move it or remount it', (tester) async {
+      useDesignFrame(tester);
+      await mountApp(tester, at: AppRoutes.shell);
+
+      // Park it against the left edge, away from where it starts.
+      await tester.drag(find.byType(AiAssistButton), const Offset(-300, -200));
+      await tester.pump();
+      for (var i = 0; i < 12; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      final parked = tester.getTopLeft(find.byType(AiAssistButton));
+      expect(parked.dx, closeTo(0, 1), reason: 'should have gone left');
+
+      Get.toNamed(AppRoutes.settings);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('settings'), findsOneWidget);
+      expect(
+        find.byType(AiAssistButton),
+        findsOneWidget,
+        reason: 'the button must survive the push',
+      );
+      // Same x: a remount would have snapped it back to the right edge.
+      expect(
+        tester.getTopLeft(find.byType(AiAssistButton)).dx,
+        closeTo(parked.dx, 1),
+      );
+    });
   });
 }

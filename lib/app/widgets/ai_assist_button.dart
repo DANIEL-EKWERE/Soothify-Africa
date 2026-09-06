@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 
-import '../../../../../core/app_export.dart';
+import '../core/app_export.dart';
 
 /// The floating AI Therapy Assist button — 70x70, drawn from its export.
 ///
@@ -30,11 +30,7 @@ class AiAssistButton extends StatefulWidget {
   static const driftPeriod = Duration(milliseconds: 2400);
 
   /// Soft but decisive — overshoots a little, the way a chat head does.
-  static const spring = SpringDescription(
-    mass: 1,
-    stiffness: 520,
-    damping: 34,
-  );
+  static const spring = SpringDescription(mass: 1, stiffness: 520, damping: 34);
 
   @override
   State<AiAssistButton> createState() => _AiAssistButtonState();
@@ -49,8 +45,9 @@ class _AiAssistButtonState extends State<AiAssistButton>
 
   /// Drives the spring back to an edge. Unbounded because a spring overshoots
   /// past 1 before settling.
-  late final AnimationController _settle =
-      AnimationController.unbounded(vsync: this);
+  late final AnimationController _settle = AnimationController.unbounded(
+    vsync: this,
+  );
 
   /// Where the button sits. A notifier rather than setState so a drag repaints
   /// only the Positioned — calling setState per pointer move rebuilt the whole
@@ -65,8 +62,7 @@ class _AiAssistButtonState extends State<AiAssistButton>
   void initState() {
     super.initState();
     _settle.addListener(() {
-      _position.value =
-          Offset.lerp(_springFrom, _springTo, _settle.value);
+      _position.value = Offset.lerp(_springFrom, _springTo, _settle.value);
     });
   }
 
@@ -79,9 +75,9 @@ class _AiAssistButtonState extends State<AiAssistButton>
   }
 
   Offset get _resting => Offset(
-        widget.bounds.width - widget.size - 4.h,
-        widget.bounds.height - widget.size - 16.v,
-      );
+    widget.bounds.width - widget.size - 4.h,
+    widget.bounds.height - widget.size - 16.v,
+  );
 
   double get _maxX =>
       (widget.bounds.width - widget.size).clamp(0.0, double.infinity);

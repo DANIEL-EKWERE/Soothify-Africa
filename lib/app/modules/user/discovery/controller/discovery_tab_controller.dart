@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
 
+import '../../../../core/utils/filter_entry.dart';
 import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/feedback_utils.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../data/models/media_filter.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/models/subscription_plan.dart';
 import '../../../../data/repositories/content_repository.dart';
@@ -26,6 +28,10 @@ class DiscoveryTabController extends BaseController {
 
   final RxBool freeTrial = false.obs;
 
+  /// The same filter flow the libraries use; Discovery's glyph is the same
+  /// glyph.
+  final Rx<FilterSelection> filters = FilterSelection().obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -33,14 +39,15 @@ class DiscoveryTabController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
-        final results = await Future.wait([
-          _content.getRecent(),
-          _content.getByCategory('discovery-popular'),
-        ]);
-        recent.assignAll(results[0]);
-        popular.assignAll(results[1]);
-        plans.assignAll(await _subscriptions.getPlans());
-      });
+    final results = await Future.wait([
+      _content.getRecent(),
+      _content.getByCategory('discovery-popular'),
+    ]);
+    bool keep(MediaItem m) => filters.value.matchesDuration(m.durationSeconds);
+    recent.assignAll(results[0].where(keep));
+    popular.assignAll(results[1].where(keep));
+    plans.assignAll(await _subscriptions.getPlans());
+  });
 
   void selectPlan(String id) => selectedPlanId.value = id;
 
@@ -52,7 +59,12 @@ class DiscoveryTabController extends BaseController {
   void openShelf(String shelf) =>
       Get.toNamed(AppRoutes.shelf, arguments: shelf);
 
-  void openFilters() => AppFeedback.info('Filters are not built yet.');
+  Future<void> openFilters() async {
+    final applied = await openFilterSheets(filters.value);
+    if (applied == null) return;
+    filters.value = applied;
+    await load();
+  }
 
   /// The search field has its own frames in the design (Discovery/search,
   /// /search input, /searched result, /search/no result); none are built.

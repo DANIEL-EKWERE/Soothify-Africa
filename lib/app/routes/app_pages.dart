@@ -37,6 +37,9 @@ import '../modules/user/daily/binding/daily_binding.dart';
 import '../modules/user/daily/daily_screen.dart';
 import '../modules/user/daily/reminder_screen.dart';
 import '../modules/user/checkin/checkin_screen.dart';
+import '../modules/user/filters/binding/filters_binding.dart';
+import '../modules/user/filters/filters_screen.dart';
+import '../../app/data/models/media_filter.dart';
 import '../modules/user/library/binding/library_binding.dart';
 import '../modules/user/media/binding/media_binding.dart';
 import '../modules/user/media/media_screen.dart';
@@ -60,10 +63,7 @@ class AppPages {
   const AppPages._();
 
   static final List<GetPage> pages = [
-    GetPage(
-      name: AppRoutes.splash,
-      page: () => const SplashScreen(),
-    ),
+    GetPage(name: AppRoutes.splash, page: () => const SplashScreen()),
     GetPage(
       name: AppRoutes.intro,
       page: () => const IntroScreen(),
@@ -153,6 +153,24 @@ class AppPages {
       name: AppRoutes.media,
       page: () => const MediaScreen(),
       binding: MediaBinding(),
+    ),
+    // Three routes, one screen: the sheets differ only in their body, and
+    // FiltersBinding creates the shared controller on whichever is entered
+    // first.
+    GetPage(
+      name: AppRoutes.filterDuration,
+      page: () => const FiltersScreen(kind: FilterKind.duration),
+      binding: FiltersBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.filterMore,
+      page: () => const FiltersScreen(kind: FilterKind.more),
+      binding: FiltersBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.filterStyle,
+      page: () => const FiltersScreen(kind: FilterKind.style),
+      binding: FiltersBinding(),
     ),
     GetPage(
       name: AppRoutes.shelf,

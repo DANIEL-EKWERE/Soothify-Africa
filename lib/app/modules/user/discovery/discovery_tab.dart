@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/filter_glyph.dart';
 import '../../../data/models/media_item.dart';
 import 'controller/discovery_tab_controller.dart';
 import 'widgets/discovery_card.dart';
@@ -36,26 +37,32 @@ class DiscoveryTab extends GetView<DiscoveryTabController> {
               SizedBox(height: 24.v),
               const _SearchRow(),
               SizedBox(height: 21.v),
-              Obx(() => _Shelf(
-                    title: 'Recent',
-                    items: controller.recent.toList(),
-                    onTap: controller.open,
-                  )),
+              Obx(
+                () => _Shelf(
+                  title: 'Recent',
+                  items: controller.recent.toList(),
+                  onTap: controller.open,
+                ),
+              ),
               SizedBox(height: 40.v),
-              Obx(() => _Shelf(
-                    title: 'Popular',
-                    items: controller.popular.toList(),
-                    onTap: controller.open,
-                  )),
+              Obx(
+                () => _Shelf(
+                  title: 'Popular',
+                  items: controller.popular.toList(),
+                  onTap: controller.open,
+                ),
+              ),
               SizedBox(height: 40.v),
-              Obx(() => SubscriptionCard(
-                    plans: controller.plans.toList(),
-                    selectedPlanId: controller.selectedPlanId.value,
-                    freeTrial: controller.freeTrial.value,
-                    onPlanSelected: controller.selectPlan,
-                    onFreeTrialChanged: controller.toggleFreeTrial,
-                    onSubscribe: controller.subscribe,
-                  )),
+              Obx(
+                () => SubscriptionCard(
+                  plans: controller.plans.toList(),
+                  selectedPlanId: controller.selectedPlanId.value,
+                  freeTrial: controller.freeTrial.value,
+                  onPlanSelected: controller.selectPlan,
+                  onFreeTrialChanged: controller.toggleFreeTrial,
+                  onSubscribe: controller.subscribe,
+                ),
+              ),
             ],
           ),
         ),
@@ -109,13 +116,10 @@ class _SearchRow extends StatelessWidget {
           ),
         ),
         SizedBox(width: 19.h),
-        InkWell(
-          onTap: controller.openFilters,
-          child: CustomImageView(
-            imagePath: ImageConstant.icFilter,
-            height: 19.h,
-            width: 25.h,
-            color: appTheme.actionFill,
+        Obx(
+          () => FilterGlyph(
+            count: controller.filters.value.count,
+            onTap: controller.openFilters,
           ),
         ),
       ],
@@ -124,11 +128,7 @@ class _SearchRow extends StatelessWidget {
 }
 
 class _Shelf extends StatelessWidget {
-  const _Shelf({
-    required this.title,
-    required this.items,
-    required this.onTap,
-  });
+  const _Shelf({required this.title, required this.items, required this.onTap});
 
   final String title;
   final List<MediaItem> items;
@@ -151,8 +151,7 @@ class _Shelf extends StatelessWidget {
               ),
             ),
             InkWell(
-              onTap: () =>
-                  Get.find<DiscoveryTabController>().openShelf(title),
+              onTap: () => Get.find<DiscoveryTabController>().openShelf(title),
               child: Text('See All', style: CustomTextStyles.seeAll),
             ),
           ],
@@ -167,10 +166,8 @@ class _Shelf extends StatelessWidget {
             padding: EdgeInsets.zero,
             itemCount: items.length,
             separatorBuilder: (_, _) => SizedBox(width: 20.h),
-            itemBuilder: (context, i) => DiscoveryCard(
-              item: items[i],
-              onTap: () => onTap(items[i]),
-            ),
+            itemBuilder: (context, i) =>
+                DiscoveryCard(item: items[i], onTap: () => onTap(items[i])),
           ),
         ),
       ],

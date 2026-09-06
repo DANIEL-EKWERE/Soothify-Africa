@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/filter_glyph.dart';
 import '../../../data/models/library_section.dart';
 import '../../../data/models/media_item.dart';
 import '../discovery/widgets/discovery_card.dart';
@@ -30,22 +31,23 @@ class LibraryScreen extends GetView<LibraryController> {
               SizedBox(height: 27.v),
               // Rendered in the frame's own order: the blocks are not all
               // shelves, and Meditation interleaves a card between two of them.
-              Obx(() => Column(
-                    children: [
-                      for (final block in controller.section.blocks) ...[
-                        switch (block) {
-                          LibraryShelf() => _Shelf(
-                              title: block.title,
-                              items: controller.shelves[block.title] ??
-                                  const [],
-                            ),
-                          LibraryFeature() => _FeatureCard(block: block),
-                          LibraryPromo() => _PromoCard(block: block),
-                        },
-                        SizedBox(height: 32.v),
-                      ],
+              Obx(
+                () => Column(
+                  children: [
+                    for (final block in controller.section.blocks) ...[
+                      switch (block) {
+                        LibraryShelf() => _Shelf(
+                          title: block.title,
+                          items: controller.shelves[block.title] ?? const [],
+                        ),
+                        LibraryFeature() => _FeatureCard(block: block),
+                        LibraryPromo() => _PromoCard(block: block),
+                      },
+                      SizedBox(height: 32.v),
                     ],
-                  )),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -134,13 +136,10 @@ class _SearchRow extends StatelessWidget {
         ),
         SizedBox(width: 28.h),
         // The real filter — it had no action at all.
-        InkWell(
-          onTap: controller.openFilters,
-          child: CustomImageView(
-            imagePath: ImageConstant.icFilter,
-            height: 19.h,
-            width: 25.h,
-            color: appTheme.actionFill,
+        Obx(
+          () => FilterGlyph(
+            count: controller.filters.value.count,
+            onTap: controller.openFilters,
           ),
         ),
       ],
@@ -178,19 +177,30 @@ class _Shelf extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16.v),
-        SizedBox(
-          height: 166.v,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.zero,
-            itemCount: items.length,
-            separatorBuilder: (_, _) => SizedBox(width: 20.h),
-            itemBuilder: (context, i) => DiscoveryCard(
-              item: items[i],
-              onTap: () => controller.open(items[i]),
+        // A filter can empty a shelf outright. Without this the heading sits
+        // over 166 of blank and reads as a failed load.
+        if (items.isEmpty && !controller.filters.value.isEmpty)
+          SizedBox(
+            height: 166.v,
+            child: Text(
+              'Nothing here matches your filters.',
+              style: CustomTextStyles.emptyStateBody,
+            ),
+          )
+        else
+          SizedBox(
+            height: 166.v,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: items.length,
+              separatorBuilder: (_, _) => SizedBox(width: 20.h),
+              itemBuilder: (context, i) => DiscoveryCard(
+                item: items[i],
+                onTap: () => controller.open(items[i]),
+              ),
             ),
           ),
-        ),
       ],
     );
   }

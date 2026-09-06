@@ -7,6 +7,7 @@ import 'app/data/services/language_service.dart';
 import 'app/data/services/session_service.dart';
 import 'app/data/services/theme_service.dart';
 import 'app/routes/app_pages.dart';
+import 'app/widgets/ai_assist_overlay.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,9 @@ class SoothifyApp extends StatelessWidget {
             themeMode: Get.find<ThemeService>().mode.value,
             initialBinding: InitialBindings(),
             getPages: AppPages.pages,
+            // Tells the app-wide assist button which screen is on
+            // top, so it can stay out of onboarding and auth.
+            routingCallback: AiAssistOverlay.onRouting,
             builder: (context, child) {
               // Point the global palette at whichever ThemeData resolved here.
               // This runs on every theme change, manual or system, so
@@ -86,7 +90,9 @@ class SoothifyApp extends StatelessWidget {
                   data: MediaQuery.of(
                     context,
                   ).copyWith(textScaler: const TextScaler.linear(1.0)),
-                  child: child!,
+                  // Over the navigator, so one instance of the assist button
+                  // outlives every route change.
+                  child: AiAssistOverlay(child: child!),
                 ),
               );
             },

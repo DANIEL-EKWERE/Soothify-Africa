@@ -7,7 +7,6 @@ import '../../../../data/services/session_service.dart';
 import '../../../../data/services/theme_service.dart';
 import '../../../../widgets/gradient_text.dart';
 import 'home_tab_controller.dart';
-import 'widgets/ai_assist_button.dart';
 import 'widgets/content_pills.dart';
 import 'widgets/recommended_card.dart';
 
@@ -48,20 +47,9 @@ class HomeTab extends GetView<HomeTabController> {
                 ],
               ),
             ),
-            // LayoutBuilder so the button knows the area it may be dragged
-            // within; without it a drag could put it off-screen.
-            Positioned.fill(
-              child: LayoutBuilder(
-                builder: (context, constraints) => Stack(
-                  children: [
-                    AiAssistButton(
-                      onTap: controller.openAiAssist,
-                      bounds: constraints.biggest,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // The AI assist button is mounted app-wide in AiAssistOverlay,
+            // not here: parked on Home it used to disappear the moment any
+            // other screen opened.
           ],
         ),
       ),

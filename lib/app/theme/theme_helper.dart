@@ -81,6 +81,9 @@ class PrimaryColors {
     required this.periodToggleBorder,
     required this.planEmphasisFill,
     required this.topicChipBorder,
+    required this.filterChipFill,
+    required this.filterChipBorder,
+    required this.filterRule,
     required this.topicChipLabel,
     required this.rowBorder,
     required this.divider,
@@ -223,6 +226,16 @@ class PrimaryColors {
   final Color planEmphasisFill;
 
   /// An unselected topic chip's outline — #999999 at 30%.
+  /// A filter sheet's chip — an off-white fill inside a hairline of the body
+  /// ink, per the three filter frames. Unlike a Community topic chip, the
+  /// unselected state already carries an outline, so selection is shown by
+  /// filling the chip rather than by adding a border.
+  final Color filterChipFill;
+  final Color filterChipBorder;
+
+  /// The 2px rule between groups on More Filters.
+  final Color filterRule;
+
   final Color topicChipBorder;
 
   /// A topic chip's label — #1B1F26 at 72%.
@@ -246,27 +259,27 @@ class PrimaryColors {
 
   /// "Soothify Gradient - 01" — the auth screen header, 139.5 degrees.
   LinearGradient get authHeaderGradient => const LinearGradient(
-        begin: Alignment(-0.86, -0.51),
-        end: Alignment(0.86, 0.51),
-        colors: [Color(0xFF2F6FED), Color(0xFF274889)],
-        stops: [0.028, 0.531],
-      );
+    begin: Alignment(-0.86, -0.51),
+    end: Alignment(0.86, 0.51),
+    colors: [Color(0xFF2F6FED), Color(0xFF274889)],
+    stops: [0.028, 0.531],
+  );
 
   /// Mood Checker card fill. Direction is an assumption — a wide card most
   /// often runs left to right — so correct this if the design differs.
   LinearGradient get moodCardGradient => LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [moodCardStart, moodCardEnd],
-      );
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [moodCardStart, moodCardEnd],
+  );
 
   /// The active bottom-nav tab. A different pair from [titleGradient] —
   /// measured from the nav component itself.
   LinearGradient get navActiveGradient => const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFF4B84F6), Color(0xFF0A399A)],
-      );
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF4B84F6), Color(0xFF0A399A)],
+  );
 
   /// Profile "My stats" card — vertical, light at the top.
   ///
@@ -277,42 +290,42 @@ class PrimaryColors {
   /// and they are what hold the flat light band at the top and dark band at
   /// the bottom.
   LinearGradient get statsCardGradient => const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFF4B84F6), Color(0xFF0A399A)],
-        stops: [0.203, 0.839],
-      );
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF4B84F6), Color(0xFF0A399A)],
+    stops: [0.203, 0.839],
+  );
 
   /// The Schedule cards. Each offering has its own fill in the design: the
   /// therapy card reuses [navActiveGradient], and these two are its siblings.
   LinearGradient get meditationSessionGradient => const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFFF09D39), Color(0xFFCB6F00), Color(0xFFF1880A)],
-      );
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFF09D39), Color(0xFFCB6F00), Color(0xFFF1880A)],
+  );
 
   LinearGradient get balanceSessionGradient => const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0xFFF09D39), Color(0xFF0A399A)],
-      );
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFF09D39), Color(0xFF0A399A)],
+  );
 
   /// Splash / brand gradient, top-left to bottom-right.
   LinearGradient get brandGradient => LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [brandLight, brandDeep],
-      );
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [brandLight, brandDeep],
+  );
 
   /// Onboarding title fill. In light the design paints the text with a
   /// near-vertical gradient under a 20% black overlay, folded into the stops
   /// here so one shader reproduces it.
   LinearGradient get titleGradient => LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: titleGradientStops,
-        stops: const [0.0, 0.532],
-      );
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: titleGradientStops,
+    stops: const [0.0, 0.532],
+  );
 
   static const PrimaryColors light = PrimaryColors(
     brightness: Brightness.light,
@@ -370,6 +383,9 @@ class PrimaryColors {
     periodToggleBorder: Color(0xFFD7D7D7),
     planEmphasisFill: Color(0xFF0A399A),
     topicChipBorder: Color(0x4D999999),
+    filterChipFill: Color(0xFFFEFEFE),
+    filterChipBorder: Color(0xFF263238),
+    filterRule: Color(0xFF999999),
     topicChipLabel: Color(0xB81B1F26),
     rowBorder: Color(0xFFCCCCCC),
     divider: Color(0xFFEDE9E3),
@@ -439,6 +455,9 @@ class PrimaryColors {
     periodToggleBorder: Color(0x33FFFFFF),
     planEmphasisFill: Color(0xFF0A399A),
     topicChipBorder: Color(0x4DFFFFFF),
+    filterChipFill: Color(0xFF423F3F),
+    filterChipBorder: Color(0xFFFEFEFE),
+    filterRule: Color(0xFF5A5757),
     topicChipLabel: Color(0xDEFFFFFF),
     rowBorder: Color(0xFF4A4747),
     divider: Color(0xFF2A2828),
@@ -501,8 +520,9 @@ class ThemeHelper {
           foregroundColor: c.onPrimary,
           elevation: 0,
           minimumSize: Size.fromHeight(52.v),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.h)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.h),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -510,8 +530,9 @@ class ThemeHelper {
           foregroundColor: c.primary,
           side: BorderSide(color: c.cardBorder),
           minimumSize: Size.fromHeight(52.v),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.h)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.h),
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -539,14 +560,14 @@ class ColorSchemes {
   const ColorSchemes._();
 
   static ColorScheme of(PrimaryColors c) => ColorScheme(
-        brightness: c.brightness,
-        primary: c.soothifyBlue,
-        onPrimary: c.onPrimary,
-        secondary: c.accent,
-        onSecondary: c.textPrimary,
-        surface: c.surface,
-        onSurface: c.textPrimary,
-        error: c.error,
-        onError: c.onPrimary,
-      );
+    brightness: c.brightness,
+    primary: c.soothifyBlue,
+    onPrimary: c.onPrimary,
+    secondary: c.accent,
+    onSecondary: c.textPrimary,
+    surface: c.surface,
+    onSurface: c.textPrimary,
+    error: c.error,
+    onError: c.onPrimary,
+  );
 }

@@ -17,7 +17,7 @@ import '../../../../data/repositories/content_repository.dart';
 /// destinations, a "Recommended for you" list and a "Popular Content" row.
 class HomeTabController extends BaseController {
   HomeTabController(this._repository, {DateTime Function()? now})
-      : _now = now ?? DateTime.now;
+    : _now = now ?? DateTime.now;
 
   /// Injectable so the greeting does not make a golden stale by the hour.
   final DateTime Function() _now;
@@ -76,7 +76,4 @@ class HomeTabController extends BaseController {
       openMedia(item, source: source);
 
   void seeAllPopular() => AppFeedback.info('Popular Content is not built yet.');
-
-  void openAiAssist() =>
-      AppFeedback.info('AI Therapy Assist is not built yet.');
 }

@@ -4,6 +4,7 @@ class AppRoutes {
   const AppRoutes._();
 
   static const String splash = '/';
+
   /// "Welcome to Soothify" carousel, shown once before language selection.
   static const String intro = '/intro';
 
@@ -20,6 +21,7 @@ class AppRoutes {
   /// the designs cover only the client-side sign-in, so [login] establishes a
   /// user session and this stands in until practitioner auth is designed.
   static const String roleSelect = '/role';
+
   /// The 'what brings you to Soothify' questionnaire.
   static const String kyc = '/kyc';
 
@@ -59,6 +61,16 @@ class AppRoutes {
   static const String library = '/library';
   static const String schedule = '/schedule';
 
+  /// The three filter sheets behind a library's filter glyph. One route each
+  /// so no screen has to read its own kind out of the arguments; the
+  /// arguments carry only the library's current [FilterSelection], and the
+  /// applied selection comes back as the pop result.
+  ///
+  /// [filterDuration] is the entry point — it links through to the other two.
+  static const String filterDuration = '/filters/duration';
+  static const String filterMore = '/filters/more';
+  static const String filterStyle = '/filters/style';
+
   /// A shelf's "See All" grid. Takes the shelf name as its argument, so one
   /// route serves every shelf in the app.
   static const String shelf = '/shelf';
@@ -80,5 +92,4 @@ class AppRoutes {
 
   // Practitioner role — designs pending; routes reserved.
   static const String practitionerDashboard = '/practitioner';
-
 }

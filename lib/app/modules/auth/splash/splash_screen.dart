@@ -121,3 +121,12 @@ class SplashView extends StatelessWidget {
     );
   }
 }
+// noted another issue, the kyc screens, the grid card never get selected for the "next" button to get activated.
+
+// secondly the mood icon when clicked, eas supposed to toggle the theming of the app, but it doesn't.
+
+// thirdly the the ai therapy assist, doesn't get drawn to the edge of the screen when dragged and left at the middle of the screen.
+
+// cd "/home/daniel/Desktop/flutter apps/SoothifyAfrica/soothifyafrica" && flutter test -r compact 2>&1 | tail -c 200
+
+// what's the meaning of that command?

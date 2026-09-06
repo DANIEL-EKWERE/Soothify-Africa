@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/feedback_utils.dart';
 import '../../../../data/models/explore_destination.dart';
@@ -69,6 +70,10 @@ class HomeTabController extends BaseController {
         openBooking(WellnessTrack.schedule);
     }
   }
+
+  /// Any card on Home opens the item's detail.
+  void open(MediaItem item, {required String source}) =>
+      openMedia(item, source: source);
 
   void seeAllPopular() => AppFeedback.info('Popular Content is not built yet.');
 

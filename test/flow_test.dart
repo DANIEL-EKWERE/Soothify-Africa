@@ -6,6 +6,7 @@ import 'package:soothifyafrica/app/core/utils/initial_bindings.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/data/models/discussion.dart';
+import 'package:soothifyafrica/app/data/models/media_item.dart';
 import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/services/language_service.dart';
 import 'package:soothifyafrica/app/data/repositories/kyc_repository.dart';
@@ -161,7 +162,7 @@ void main() {
     // Routes that cannot resolve without an argument. Listed explicitly, and
     // covered instead by the test below, so a route added without arguments
     // is never skipped by accident.
-    const needsArguments = {AppRoutes.communityThread};
+    const needsArguments = {AppRoutes.communityThread, AppRoutes.media};
 
     for (final page in AppPages.pages) {
       // Parameterised routes need a value to resolve.
@@ -190,6 +191,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull,
         reason: 'route ${AppRoutes.communityThread}');
+
+    Get.toNamed(AppRoutes.media, arguments: const {
+      'item': MediaItem(
+        id: '1',
+        title: 'Serene Evenings',
+        type: MediaType.audio,
+        durationSeconds: 900,
+      ),
+      'source': 'Top Picks for you',
+    });
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull, reason: 'route ${AppRoutes.media}');
 
     // Drain whatever the last routes left running — the shell's mocks chain
     // several delayed calls — so nothing outlives the tree.

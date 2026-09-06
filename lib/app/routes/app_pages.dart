@@ -38,6 +38,8 @@ import '../modules/user/daily/daily_screen.dart';
 import '../modules/user/daily/reminder_screen.dart';
 import '../modules/user/checkin/checkin_screen.dart';
 import '../modules/user/library/binding/library_binding.dart';
+import '../modules/user/media/binding/media_binding.dart';
+import '../modules/user/media/media_screen.dart';
 import '../modules/user/shelf/binding/shelf_binding.dart';
 import '../modules/user/shelf/shelf_screen.dart';
 import '../modules/user/wellness_kyc/binding/wellness_kyc_binding.dart';
@@ -146,6 +148,11 @@ class AppPages {
       name: AppRoutes.booking,
       page: () => const BookingScreen(),
       binding: BookingBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.media,
+      page: () => const MediaScreen(),
+      binding: MediaBinding(),
     ),
     GetPage(
       name: AppRoutes.shelf,

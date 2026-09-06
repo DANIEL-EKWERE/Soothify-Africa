@@ -63,6 +63,11 @@ class AppRoutes {
   /// route serves every shelf in the app.
   static const String shelf = '/shelf';
 
+  /// A media item's detail — player plus written material. Takes
+  /// `{'item': MediaItem, 'source': String}` so the header can name the shelf
+  /// the card was tapped on.
+  static const String media = '/media';
+
   /// A section's pre-booking questionnaire. Takes a [WellnessTrack] argument;
   /// shown once per track, then skipped.
   static const String wellnessKyc = '/wellness-kyc';

@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/feedback_utils.dart';
 import '../../../../routes/app_routes.dart';
@@ -57,6 +58,6 @@ class DiscoveryTabController extends BaseController {
   /// /search input, /searched result, /search/no result); none are built.
   void openSearch() => AppFeedback.info('Search is not built yet.');
 
-  void open(MediaItem item) =>
-      AppFeedback.info('${item.title} is not built yet.');
+  void open(MediaItem item, {String source = 'Discovery'}) =>
+      openMedia(item, source: source);
 }

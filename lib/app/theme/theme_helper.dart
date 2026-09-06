@@ -45,6 +45,7 @@ class PrimaryColors {
     required this.exploreTileBorder,
     required this.pillDark,
     required this.lockCircle,
+    required this.lockGlyph,
     required this.bellBorder,
     required this.moodCardStart,
     required this.moodCardEnd,
@@ -132,6 +133,9 @@ class PrimaryColors {
   final Color exploreTileBorder;
   final Color pillDark;
   final Color lockCircle;
+
+  /// The padlock inside [lockCircle] — a pale blue-grey, not the body colour.
+  final Color lockGlyph;
   final Color bellBorder;
 
   /// The Mood Checker card's gradient. Not in the Figma JSON export — the
@@ -330,6 +334,7 @@ class PrimaryColors {
     exploreTileBorder: Color(0x1FEADDFF),
     pillDark: Color(0xFF484747),
     lockCircle: Color(0xFFECECEC),
+    lockGlyph: Color(0xFFC1C9DB),
     bellBorder: Color(0xFFCBD0D8),
     moodCardStart: Color(0xFF2C3FE3),
     moodCardEnd: Color(0xFF142088),
@@ -397,6 +402,7 @@ class PrimaryColors {
     exploreTileBorder: Color(0xFF4A4747),
     pillDark: Color(0xFF1E1D1D),
     lockCircle: Color(0xFF3C3939),
+    lockGlyph: Color(0xFF8A93A6),
     bellBorder: Color(0xFF4A4747),
     moodCardStart: Color(0xFF2C3FE3),
     moodCardEnd: Color(0xFF142088),

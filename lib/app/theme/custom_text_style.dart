@@ -729,6 +729,71 @@ class CustomTextStyles {
         color: appTheme.onPrimary,
       );
 
+  /// A media item's title on its detail screen — Nunito SemiBold 20.
+  static TextStyle get mediaTitle => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textPrimary,
+      );
+
+  /// Its rating, duration and description — Nunito Regular 14.
+  static TextStyle get mediaBody => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 20 / 14,
+        color: appTheme.textPrimary,
+      );
+
+  /// The instructor card's caption — Nunito Regular 11.
+  static TextStyle get mediaCaption => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 11.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.navInactive,
+      );
+
+  /// The instructor's name — Nunito SemiBold 14.
+  static TextStyle get mediaInstructor => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w600,
+        fontVariations: _semiBold,
+        color: appTheme.textPrimary,
+      );
+
+  /// The player's elapsed/total readout — Nunito Regular 10, white.
+  static TextStyle get playerTime => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.onPrimary,
+      );
+
+  /// "Add Note" — Nunito Sans ExtraBold 14, gradient filled.
+  static TextStyle get addNote => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w800,
+        fontVariations: const [FontVariation('wght', 800)],
+        color: appTheme.textPrimary,
+      );
+
+  /// The two facts at the foot — Nunito Sans Regular 16.
+  static TextStyle get mediaFact => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 21 / 16,
+        color: appTheme.textPrimary,
+      );
+
   /// Profile segmented control — Nunito Medium 10.
   static TextStyle get segmentLabel => TextStyle(
         fontFamily: fontNunito,

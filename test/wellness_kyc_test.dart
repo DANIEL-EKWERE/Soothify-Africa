@@ -152,4 +152,33 @@ void main() {
     await expectLater(find.byType(WellnessKycScreen),
         matchesGoldenFile('goldens/wellness_kyc_question.png'));
   });
+
+  testWidgets('each Next shows the following question', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    final c = WellnessKycController(WellnessTrack.meditation)..begin();
+    Get.put(c);
+
+    await pumpScreen(tester, const WellnessKycScreen());
+
+    // Walks the whole questionnaire. A const question widget with no fields
+    // is canonicalised, so the subtree never rebuilt and question one
+    // repeated forever — stepping through is the only way to catch that.
+    for (var i = 0; i < c.track.steps.length; i++) {
+      final step = c.track.steps[i];
+      expect(find.textContaining(step.question.split(' ').take(4).join(' ')),
+          findsOneWidget,
+          reason: 'step $i should show its own question');
+
+      c.choose(step.options.first);
+      await tester.pumpAndSettle();
+
+      if (i < c.track.steps.length - 1) {
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
+        expect(c.index.value, i + 1);
+      }
+    }
+  });
 }

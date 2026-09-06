@@ -40,11 +40,13 @@ class ImageConstant {
   static const String imgJournalCompose = '$_images/journal/compose_fab.png';
   static const String imgSessionCover = '$_images/schedule/session.png';
   static const String imgHomeAvatar = '$_images/home/avatar.png';
-  static const String imgFilter = '$_images/home/filter.png';
 
   static const String imgAiAssistIcon = '$_images/home/ai_assist.png';
 
   static const String icDarkMode = '$_icons/ic_dark_mode.svg';
+
+  static const String imgMediaInstructor = '$_images/media/instructor.png';
+  static const String imgMediaBadge = '$_images/media/badge.png';
 
   static const String icBell = '$_icons/ic_bell.svg';
   static const String icRefresh = '$_icons/ic_refresh.svg';

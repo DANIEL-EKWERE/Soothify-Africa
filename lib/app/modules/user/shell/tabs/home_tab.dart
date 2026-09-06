@@ -102,8 +102,9 @@ class _Header extends StatelessWidget {
                 // for most of the day, so it follows the clock.
                 Text(
                   Get.find<HomeTabController>().greeting,
-                  style: CustomTextStyles.homeGreeting
-                      .copyWith(color: appTheme.soothifyBlue),
+                  style: CustomTextStyles.homeGreeting.copyWith(
+                    color: appTheme.soothifyBlue,
+                  ),
                 )
               else
                 GradientText(
@@ -112,8 +113,10 @@ class _Header extends StatelessWidget {
                   style: CustomTextStyles.homeGreeting,
                 ),
               SizedBox(height: 1.h),
-              Text('How are you today?',
-                  style: CustomTextStyles.homeGreetingSub),
+              Text(
+                'How are you today?',
+                style: CustomTextStyles.homeGreetingSub,
+              ),
             ],
           ),
         ),
@@ -198,11 +201,11 @@ class _MoodCheckerCard extends StatelessWidget {
             ),
             SizedBox(width: 24.h),
             CustomImageView(
-            imagePath: ImageConstant.icArrowRight,
-            height: 20.h,
-            width: 20.h,
-            color: appTheme.onPrimary,
-          ),
+              imagePath: ImageConstant.icArrowRight,
+              height: 20.h,
+              width: 20.h,
+              color: appTheme.onPrimary,
+            ),
           ],
         ),
       ),
@@ -299,7 +302,10 @@ class _RecommendedSection extends StatelessWidget {
               for (final item in controller.recommended) ...[
                 RecommendedCard(
                   item: item,
-                  onTap: () => Get.toNamed(AppRoutes.recommendation),
+                  // A card opens the item; the section heading's "See All"
+                  // is what opens the full list.
+                  onTap: () =>
+                      controller.open(item, source: 'Recommended for you'),
                 ),
                 if (item != controller.recommended.last) SizedBox(height: 8.h),
               ],
@@ -354,43 +360,46 @@ class _PopularCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 159.h,
-      height: 166.h,
-      child: Stack(
-        children: [
-          ArtworkPlaceholder(
-            width: 159.h,
-            height: 166.h,
-            radius: 8.h,
-            assetPath: item.coverAsset,
-          ),
-          Positioned(
-            top: 8.h,
-            left: 8.h,
-            child: CategoryPill(label: item.title),
-          ),
-          Positioned(
-            left: 8.h,
-            right: 8.h,
-            bottom: 8.h,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                DarkPill(
-                  asset: ImageConstant.icPlay,
-                  label:
-                      '${item.duration.inMinutes.toString().padLeft(2, '0')}'
-                      ':00',
-                ),
-                DarkPill(asset: ImageConstant.icStar, label: '4.6'),
-              ],
+    return GestureDetector(
+      onTap: () =>
+          Get.find<HomeTabController>().open(item, source: 'Popular Content'),
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 159.h,
+        height: 166.h,
+        child: Stack(
+          children: [
+            ArtworkPlaceholder(
+              width: 159.h,
+              height: 166.h,
+              radius: 8.h,
+              assetPath: item.coverAsset,
             ),
-          ),
-        ],
+            Positioned(
+              top: 8.h,
+              left: 8.h,
+              child: CategoryPill(label: item.title),
+            ),
+            Positioned(
+              left: 8.h,
+              right: 8.h,
+              bottom: 8.h,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  DarkPill(
+                    asset: ImageConstant.icPlay,
+                    label:
+                        '${item.duration.inMinutes.toString().padLeft(2, '0')}'
+                        ':00',
+                  ),
+                  DarkPill(asset: ImageConstant.icStar, label: '4.6'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
-

@@ -64,7 +64,7 @@ class RecommendedCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 16.h),
-            _SideRail(isLocked: !item.isFree),
+            const _SideRail(),
           ],
         ),
       ),
@@ -114,14 +114,15 @@ class _Cover extends StatelessWidget {
 
 /// Heart above, lock below, 45 apart — the design's 29x94 rail.
 class _SideRail extends StatelessWidget {
-  const _SideRail({required this.isLocked});
-
-  final bool isLocked;
+  const _SideRail();
 
   @override
   Widget build(BuildContext context) {
+    // 29x94 with a 45 gap, measured — not spread across the card's full
+    // height, which pushed the heart and padlock to the outer edges.
     return SizedBox(
       width: 29.h,
+      height: 94.v,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -131,7 +132,9 @@ class _SideRail extends StatelessWidget {
             width: 20.h,
             color: appTheme.textPrimary,
           ),
-          if (isLocked)
+          // The design draws the padlock on every card — it is part of the
+          // card component, not a per-item state. If locking should follow
+          // MediaItem.isFree instead, this is the line to gate.
             Container(
               width: 29.h,
               height: 29.h,
@@ -142,9 +145,9 @@ class _SideRail extends StatelessWidget {
               ),
               child: CustomImageView(
                 imagePath: ImageConstant.icLock,
-                height: 14.h,
-                width: 14.h,
-                color: appTheme.textPrimary,
+                height: 15.h,
+                width: 15.h,
+                color: appTheme.lockGlyph,
               ),
             ),
         ],

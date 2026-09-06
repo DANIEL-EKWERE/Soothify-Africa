@@ -1,4 +1,5 @@
 import '../../../../core/app_export.dart';
+import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
@@ -24,6 +25,5 @@ class ShelfController extends BaseController {
         items.assignAll(await _repository.getShelfPage(shelf));
       });
 
-  void open(MediaItem item) =>
-      AppFeedback.info('${item.title} is not built yet.');
+  void open(MediaItem item) => openMedia(item, source: shelf);
 }

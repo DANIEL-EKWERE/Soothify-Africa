@@ -99,5 +99,9 @@ enum LibrarySection {
   /// Both frames use the same placeholder.
   String get searchHint => 'Let’s find your calm';
 
+  /// The section's own artwork, shown in its header — the same image Home's
+  /// Explore tile uses, so the two read as the same destination.
+  String get artPath => 'assets/images/explore/$id.png';
+
   Iterable<LibraryShelf> get shelves => blocks.whereType<LibraryShelf>();
 }

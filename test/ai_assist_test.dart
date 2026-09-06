@@ -65,9 +65,16 @@ void main() {
     final before = positionOf(tester);
     await tester.drag(find.byType(AiAssistButton), const Offset(-120, -200));
     await tester.pump();
+    // The spring overshoots before it settles, so give it longer than a
+    // fixed tween would need.
+    for (var i = 0; i < 12; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
     final after = positionOf(tester);
 
-    expect(after.dx, lessThan(before.dx));
+    // A short drag from the right-hand rest position stays nearer the right,
+    // so it settles back against that edge — moved vertically, not adrift.
+    expect(after.dx, closeTo(390 - 70, 1));
     expect(after.dy, lessThan(before.dy));
 
     // And it does not drift back: a dragged position is where the user put it.
@@ -99,5 +106,24 @@ void main() {
     await tester.pump();
 
     expect(taps, 1);
+  });
+
+  testWidgets('dropped mid-screen it snaps to the nearer edge',
+      (tester) async {
+    useDesignFrame(tester);
+    await mount(tester);
+
+    // Drag it towards the middle and let go.
+    await tester.drag(find.byType(AiAssistButton), const Offset(-160, -300));
+    await tester.pump();
+    for (var i = 0; i < 12; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    final at = positionOf(tester);
+    final maxX = 390 - 70;
+    // Against one edge or the other, never left floating between them.
+    expect(at.dx < 1 || (at.dx - maxX).abs() < 1, isTrue,
+        reason: 'left at dx=${at.dx}, which is neither edge');
   });
 }

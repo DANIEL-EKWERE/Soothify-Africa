@@ -80,11 +80,11 @@ class _Header extends StatelessWidget {
           ),
         ),
         // The design puts a filter glyph here; artwork was not exported.
+        // The section's own art, matching its Explore tile on Home.
         CustomImageView(
-          imagePath: ImageConstant.icFilter,
-          height: 16.h,
-          width: 20.h,
-          color: appTheme.actionFill,
+          imagePath: Get.find<LibraryController>().section.artPath,
+          height: 28.h,
+          width: 28.h,
         ),
       ],
     );
@@ -133,11 +133,15 @@ class _SearchRow extends StatelessWidget {
           ),
         ),
         SizedBox(width: 28.h),
-        CustomImageView(
-          imagePath: ImageConstant.icFilter,
-          height: 19.h,
-          width: 25.h,
-          color: appTheme.actionFill,
+        // The real filter — it had no action at all.
+        InkWell(
+          onTap: controller.openFilters,
+          child: CustomImageView(
+            imagePath: ImageConstant.icFilter,
+            height: 19.h,
+            width: 25.h,
+            color: appTheme.actionFill,
+          ),
         ),
       ],
     );

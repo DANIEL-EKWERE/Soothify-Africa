@@ -1,5 +1,6 @@
 import '../../../../core/app_export.dart';
 import '../../../../core/utils/wellness_entry.dart';
+import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../data/models/media_item.dart';
@@ -51,8 +52,12 @@ class LibraryController extends BaseController {
   /// nothing about Balance's.
   void openSessions() => openBooking(track);
 
-  void open(MediaItem item) =>
-      AppFeedback.info('${item.title} is not built yet.');
+  void open(MediaItem item, {String source = ''}) =>
+      openMedia(item, source: source.isEmpty ? section.title : source);
+
+  /// The filter screens have their own frames (Meditation/filter, More
+  /// Filter Screen, Style filter screen); none are built.
+  void openFilters() => AppFeedback.info('Filters are not built yet.');
 
   void openSearch() => AppFeedback.info('Search is not built yet.');
 }

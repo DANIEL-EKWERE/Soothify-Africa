@@ -18,20 +18,26 @@ class WellnessKycScreen extends GetView<WellnessKycController> {
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(
-        child: Obx(() => Padding(
-              padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _Header(title: controller.track.title),
-                  Expanded(
-                    child: controller.onIntro
-                        ? const _Intro()
-                        : const _Question(),
-                  ),
-                ],
-              ),
-            )),
+        child: Obx(
+          () => Padding(
+            padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _Header(title: controller.track.title),
+                Expanded(
+                  child: controller.onIntro
+                      ? const _Intro()
+                      // Keyed by step, and not const: a const _Question has
+                      // no fields, so every step produced the *same*
+                      // canonicalised widget and Flutter skipped the rebuild
+                      // — question one repeated forever.
+                      : _Question(step: controller.index.value),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -94,54 +100,64 @@ class _Intro extends StatelessWidget {
 }
 
 class _Question extends StatelessWidget {
-  const _Question();
+  const _Question({required this.step});
+
+  /// The index this question is showing. Held as a field so the widget
+  /// differs between steps and the subtree actually rebuilds.
+  final int step;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<WellnessKycController>();
-    final step = controller.step;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(height: 9.v),
-        GradientText(
-          step.question,
-          gradient: appTheme.authHeaderGradient,
-          style: CustomTextStyles.kycQuestion,
-        ),
-        if (step.multiSelect) ...[
-          SizedBox(height: 16.v),
+    final question = controller.track.steps[step];
+    // Reading the answers *here* is what subscribes this subtree to them. The
+    // screen's outer Obx only reads the step index, so choosing an option
+    // rebuilt nothing: no tile ever looked selected and Next stayed disabled.
+    return Obx(() {
+      controller.answers.length;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: 9.v),
           GradientText(
-            'You can select more than one option',
+            question.question,
             gradient: appTheme.authHeaderGradient,
-            style: CustomTextStyles.communityBody,
+            style: CustomTextStyles.kycQuestion,
           ),
-        ],
-        SizedBox(height: 48.v),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 20.h,
-              runSpacing: 20.v,
-              children: [
-                for (final option in step.options)
-                  _OptionTile(
-                    label: option,
-                    selected: controller.isSelected(option),
-                    onTap: () => controller.choose(option),
-                  ),
-              ],
+          if (question.multiSelect) ...[
+            SizedBox(height: 16.v),
+            GradientText(
+              'You can select more than one option',
+              gradient: appTheme.authHeaderGradient,
+              style: CustomTextStyles.communityBody,
+            ),
+          ],
+          SizedBox(height: 48.v),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 20.h,
+                runSpacing: 20.v,
+                children: [
+                  for (final option in question.options)
+                    _OptionTile(
+                      label: option,
+                      selected: controller.isSelected(option),
+                      onTap: () => controller.choose(option),
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
-        SizedBox(height: 24.v),
-        _NextButton(
-          label: controller.actionLabel,
-          enabled: controller.canAdvance,
-          onTap: controller.next,
-        ),
-      ],
-    );
+          SizedBox(height: 24.v),
+          _NextButton(
+            label: controller.actionLabel,
+            enabled: controller.canAdvance,
+            onTap: controller.next,
+          ),
+        ],
+      );
+    });
   }
 }
 

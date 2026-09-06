@@ -105,3 +105,14 @@ Future<void> precacheAll(
   });
   await tester.pumpAndSettle();
 }
+
+/// Turns off "reduce motion"-aware animations for a test.
+///
+/// Some screens carry a perpetual animation — the Home assist button drifts
+/// forever — and nothing waiting on a still frame can settle while one runs.
+/// Tests that need pumpAndSettle, or a deterministic golden, switch it off.
+void disableMotion(WidgetTester tester) {
+  tester.platformDispatcher.accessibilityFeaturesTestValue =
+      const FakeAccessibilityFeatures(disableAnimations: true);
+  addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+}

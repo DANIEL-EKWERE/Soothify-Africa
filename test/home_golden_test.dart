@@ -45,6 +45,7 @@ void main() {
   ]) {
     testWidgets('home, $name', (tester) async {
       useDesignFrame(tester);
+      disableMotion(tester);
       await loadAppFonts();
 
       Get.put(await ThemeService().init());

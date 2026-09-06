@@ -38,7 +38,7 @@ class _AiAssistButtonState extends State<AiAssistButton>
   late final AnimationController _float = AnimationController(
     vsync: this,
     duration: AiAssistButton.driftPeriod,
-  )..repeat(reverse: true);
+  );
 
   /// Where the user has dragged it to, from the top-left of [bounds]. Null
   /// until the first drag, so the button keeps its designed resting place.
@@ -79,6 +79,17 @@ class _AiAssistButtonState extends State<AiAssistButton>
   @override
   Widget build(BuildContext context) {
     final at = _position ?? _resting;
+
+    // Reduce motion stops the drift outright. A button that bobs forever is
+    // exactly the kind of movement that setting exists to switch off — and it
+    // is also what makes the widget never settle, so anything waiting on a
+    // still frame (a test, a screenshot) hangs on it.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      if (_float.isAnimating) _float.stop();
+      return Positioned(left: at.dx, top: at.dy, child: _button());
+    }
+    if (!_float.isAnimating) _float.repeat(reverse: true);
+
     return AnimatedBuilder(
       animation: _float,
       builder: (context, child) {
@@ -93,7 +104,11 @@ class _AiAssistButtonState extends State<AiAssistButton>
         final top = (at.dy + dy).clamp(0.0, maxY);
         return Positioned(left: at.dx, top: top, child: child!);
       },
-      child: GestureDetector(
+      child: _button(),
+    );
+  }
+
+  Widget _button() => GestureDetector(
         onTap: widget.onTap,
         onPanUpdate: _onDrag,
         onPanEnd: (_) => setState(() => _dragging = false),
@@ -104,7 +119,5 @@ class _AiAssistButtonState extends State<AiAssistButton>
           height: widget.size.h,
           width: widget.size.h,
         ),
-      ),
-    );
-  }
+      );
 }

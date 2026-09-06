@@ -41,6 +41,9 @@ void main() {
   }
 
   Future<String?> splashDestination(WidgetTester tester) async {
+    // Landing on the shell mounts the Home assist button, which drifts
+    // forever; nothing can settle while it runs.
+    disableMotion(tester);
     await bootServices();
 
     await tester.pumpWidget(
@@ -129,6 +132,7 @@ void main() {
     // Both bit here: /personalize "overflowed" vertically at 800x600 and
     // /signup horizontally without fonts, and neither is a real defect.
     useDesignFrame(tester);
+    disableMotion(tester);
     await loadAppFonts();
     // Navigates the way the app does, with Get.toNamed. Using initialRoute
     // per page would skip GetX bindings entirely — that is exactly the
@@ -146,7 +150,13 @@ void main() {
         ),
       ),
     );
-    await tester.pump();
+    // The splash starts its own sequence at initialRoute; letting it finish
+    // clears those timers before the loop navigates over the top of it.
+    await tester.pump(SplashScreen.brandHold + const Duration(seconds: 1));
+    for (var i = 0; i < SplashScreen.prompts.length; i++) {
+      await tester.pump(SplashScreen.breathHold + const Duration(seconds: 1));
+    }
+    await tester.pumpAndSettle();
 
     // Routes that cannot resolve without an argument. Listed explicitly, and
     // covered instead by the test below, so a route added without arguments
@@ -180,6 +190,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull,
         reason: 'route ${AppRoutes.communityThread}');
+
+    // Drain whatever the last routes left running — the shell's mocks chain
+    // several delayed calls — so nothing outlives the tree.
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 600));
+    }
+    await tester.pumpAndSettle();
   });
 
   testWidgets('signing up from Profile does not repeat the questionnaire',
@@ -191,6 +208,7 @@ void main() {
       'introSeen': true,
       'kycComplete': true,
     });
+    disableMotion(tester);
     await bootServices();
 
     final signup = SignupController(

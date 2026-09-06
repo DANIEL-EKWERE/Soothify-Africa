@@ -176,11 +176,14 @@ class _MoodCheckerCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            ArtworkPlaceholder(
-              width: 38.h,
+            // Straight image, not ArtworkPlaceholder: that paints a backing
+            // block so a missing cover cannot blank a card, which is right
+            // for artwork that fills its box but shows through a transparent
+            // icon as a pale square behind it.
+            CustomImageView(
+              imagePath: ImageConstant.imgMoodCheckerIcon,
               height: 38.h,
-              radius: 4.h,
-              assetPath: ImageConstant.imgMoodCheckerIcon,
+              width: 38.h,
             ),
             SizedBox(width: 15.h),
             Expanded(

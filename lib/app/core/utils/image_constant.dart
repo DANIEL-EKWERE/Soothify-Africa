@@ -44,6 +44,8 @@ class ImageConstant {
 
   static const String imgAiAssistIcon = '$_images/home/ai_assist.png';
 
+  static const String icDarkMode = '$_icons/ic_dark_mode.svg';
+
   static const String icBell = '$_icons/ic_bell.svg';
   static const String icRefresh = '$_icons/ic_refresh.svg';
   static const String icMenu = '$_icons/ic_menu.svg';

@@ -39,15 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // No status bar over the splash — the frame is edge to edge.
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _run();
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    super.dispose();
   }
 
   Future<void> _run() async {
@@ -87,29 +79,43 @@ class SplashView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showingBrand = step < 0;
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: AppDecoration.brandGradient,
-        alignment: Alignment.center,
-        // One crossfade for the whole sequence: the wordmark fades out as the
-        // first prompt fades in, and each prompt replaces the last.
-        child: AnimatedSwitcher(
-          duration: SplashScreen.fade,
-          child: showingBrand
-              ? SvgPicture.asset(
-                  ImageConstant.svgWordmark,
-                  key: const ValueKey('wordmark'),
-                  width: 194.h,
-                  semanticsLabel: 'Soothify',
-                )
-              : Text(
-                  SplashScreen.prompts[step],
-                  key: ValueKey(step),
-                  textAlign: TextAlign.center,
-                  style: CustomTextStyles.breathPrompt,
-                ),
+    // Transparent bar with light icons rather than a hidden one: hiding it
+    // makes the system paint a black band where it was, which is exactly the
+    // chrome the full-bleed splash is trying to avoid. Left transparent, the
+    // brand gradient runs to the top of the screen instead, and the icons go
+    // light because this is the app's one dark background.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: AppDecoration.brandGradient,
+          alignment: Alignment.center,
+          // One crossfade for the whole sequence: the wordmark fades out as
+          // the first prompt fades in, and each prompt replaces the last.
+          child: AnimatedSwitcher(
+            duration: SplashScreen.fade,
+            child: showingBrand
+                ? SvgPicture.asset(
+                    ImageConstant.svgWordmark,
+                    key: const ValueKey('wordmark'),
+                    width: 194.h,
+                    semanticsLabel: 'Soothify',
+                  )
+                : Text(
+                    SplashScreen.prompts[step],
+                    key: ValueKey(step),
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.breathPrompt,
+                  ),
+          ),
         ),
       ),
     );

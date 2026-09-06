@@ -8,9 +8,14 @@ import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/data/models/discussion.dart';
 import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/services/language_service.dart';
+import 'package:soothifyafrica/app/data/repositories/kyc_repository.dart';
 import 'package:soothifyafrica/app/data/services/session_service.dart';
+import 'package:soothifyafrica/app/modules/auth/signup/controller/signup_controller.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
+import 'package:soothifyafrica/app/modules/auth/splash/splash_screen.dart';
 import 'package:soothifyafrica/app/routes/app_pages.dart';
+
+import 'helpers.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 
@@ -47,12 +52,18 @@ void main() {
         ),
       ),
     );
-    // The splash holds for 600ms before routing. The extra second covers the
-    // shell landing case: its IndexedStack builds every tab at once, and the
-    // mock repositories behind Home and Discovery answer after a deliberate
-    // delay each, which pumpAndSettle does not advance.
-    await tester.pump(const Duration(milliseconds: 700));
-    await tester.pump(const Duration(milliseconds: 1000));
+    // The splash holds the wordmark, then runs a breathing prompt each — see
+    // SplashScreen's durations — so the whole sequence has to elapse before
+    // it routes. The extra pumps cover the shell landing case: its
+    // IndexedStack builds every tab at once, and the mocks behind them answer
+    // after a deliberate delay each, which pumpAndSettle does not advance.
+    await tester.pump(SplashScreen.brandHold + const Duration(seconds: 1));
+    for (var i = 0; i < SplashScreen.prompts.length; i++) {
+      await tester.pump(SplashScreen.breathHold + const Duration(seconds: 1));
+    }
+    for (var i = 0; i < 4; i++) {
+      await tester.pump(const Duration(milliseconds: 600));
+    }
     await tester.pumpAndSettle();
     return Get.currentRoute;
   }
@@ -110,6 +121,15 @@ void main() {
 
   testWidgets('every registered route builds when navigated to',
       (tester) async {
+    // Two things this test needs before it can judge a layout:
+    //   the design frame — at the default 800x600 surface a phone layout
+    //   legitimately overflows, which reads as a route defect; and
+    //   the real fonts — the fallback face renders markedly wider, so screens
+    //   that fit perfectly well report overflows that do not exist.
+    // Both bit here: /personalize "overflowed" vertically at 800x600 and
+    // /signup horizontally without fonts, and neither is a real defect.
+    useDesignFrame(tester);
+    await loadAppFonts();
     // Navigates the way the app does, with Get.toNamed. Using initialRoute
     // per page would skip GetX bindings entirely — that is exactly the
     // behaviour that left the splash stranded — so it would fail every
@@ -160,5 +180,51 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull,
         reason: 'route ${AppRoutes.communityThread}');
+  });
+
+  testWidgets('signing up from Profile does not repeat the questionnaire',
+      (tester) async {
+    // A guest answers the questionnaire during onboarding, then signs up from
+    // Profile later. Sending them back through KYC would make them redo work
+    // they had already done — sign-in has always checked, sign-up did not.
+    SharedPreferences.setMockInitialValues({
+      'introSeen': true,
+      'kycComplete': true,
+    });
+    await bootServices();
+
+    final signup = SignupController(
+      Get.find<SessionService>(),
+      Get.find<KycRepository>(),
+    );
+    signup.fullname.value = 'Dera';
+    signup.email.value = 'dera@example.com';
+    signup.password.value = 'Password1';
+    signup.confirm.value = 'Password1';
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          getPages: AppPages.pages,
+          initialRoute: AppRoutes.shell,
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 1200));
+    await tester.pumpAndSettle();
+
+    await signup.submit();
+    // Landing back on the shell rebuilds every tab, and their mocks chain
+    // several 400ms calls each — the whole cascade has to drain before the
+    // tree is disposed or the run fails on a pending timer.
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 600));
+    }
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, AppRoutes.shell);
+    // And they are no longer a guest.
+    expect(Get.find<SessionService>().isGuest, isFalse);
   });
 }

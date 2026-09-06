@@ -20,6 +20,9 @@ Future<void> main() async {
   await Get.putAsync(() => NetworkInfo().init(), permanent: true);
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Edge to edge, so the transparent status bar reveals the screen behind it
+  // rather than a system-painted band.
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   runApp(const SoothifyApp());
 }
@@ -51,12 +54,30 @@ class SoothifyApp extends StatelessWidget {
             // `appTheme` never lags what is painted.
             PrimaryColors.syncFrom(context);
 
+            // Transparent status bar with dark icons, so the app's own
+            // background runs to the top of the screen. The icon brightness
+            // follows the theme rather than being pinned dark: black glyphs
+            // on the dark palette's near-black background would vanish.
+            final dark = Theme.of(context).brightness == Brightness.dark;
+
             // Pin text scaling so the Figma layouts stay predictable.
             // Revisit once accessibility sizing is designed for.
-            return MediaQuery(
-              data: MediaQuery.of(context)
-                  .copyWith(textScaler: const TextScaler.linear(1.0)),
-              child: child!,
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                // Android reads the icon brightness; iOS reads the bar's.
+                statusBarIconBrightness:
+                    dark ? Brightness.light : Brightness.dark,
+                statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+                systemNavigationBarColor: Colors.transparent,
+                systemNavigationBarIconBrightness:
+                    dark ? Brightness.light : Brightness.dark,
+              ),
+              child: MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: const TextScaler.linear(1.0)),
+                child: child!,
+              ),
             );
           },
         );

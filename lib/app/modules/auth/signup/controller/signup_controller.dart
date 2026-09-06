@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/user_role.dart';
+import '../../../../data/repositories/kyc_repository.dart';
 import '../../../../data/services/session_service.dart';
 
 /// The password rules the design surfaces as chips beneath the field.
@@ -23,9 +24,10 @@ enum PasswordRule {
 }
 
 class SignupController extends BaseController {
-  SignupController(this._session);
+  SignupController(this._session, this._kyc);
 
   final SessionService _session;
+  final KycRepository _kyc;
 
   final fullnameController = TextEditingController();
   final emailController = TextEditingController();
@@ -84,7 +86,13 @@ class SignupController extends BaseController {
       await _session.setRole(UserRole.user);
       return true;
     });
-    if (ok == true) Get.offAllNamed(AppRoutes.kyc);
+    if (ok != true) return;
+
+    // Guests reach sign-up from Profile having already answered the
+    // questionnaire during onboarding, so sending everyone to KYC would make
+    // them repeat it. Signing in has always checked; signing up now does too.
+    final complete = await _kyc.isComplete();
+    Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }
 
   void goToSignIn() => Get.offAllNamed(AppRoutes.signin);

@@ -30,7 +30,10 @@ void main() {
       useDesignFrame(tester);
       await loadAppFonts();
       Get.put(await SessionService().init());
-      Get.put(SignupController(Get.find<SessionService>()));
+      Get.put(SignupController(
+        Get.find<SessionService>(),
+        LocalKycRepository(),
+      ));
 
       await pumpScreen(tester, const SignupScreen(), brightness: brightness);
       await precacheAll(tester, find.byType(SignupScreen), icons);

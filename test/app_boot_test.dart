@@ -41,7 +41,12 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
 
     // The splash holds for 600ms, then routes.
-    await tester.pump(const Duration(milliseconds: 700));
+    // The splash runs the wordmark, then a breathing prompt each, before it
+    // routes — see SplashScreen's durations.
+    await tester.pump(SplashScreen.brandHold + const Duration(seconds: 1));
+    for (var i = 0; i < SplashScreen.prompts.length; i++) {
+      await tester.pump(SplashScreen.breathHold + const Duration(seconds: 1));
+    }
     await tester.pumpAndSettle();
 
     expect(find.byType(SplashScreen), findsNothing,

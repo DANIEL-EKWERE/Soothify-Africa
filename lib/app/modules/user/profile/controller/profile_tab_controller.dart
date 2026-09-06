@@ -8,15 +8,12 @@ import '../../../../data/repositories/profile_repository.dart';
 
 /// Backs the Profile tab — Figma "Profile/dashboard" (135:8098).
 class ProfileTabController extends BaseController {
-  ProfileTabController(this._repository, {SessionService? session})
-      : _session = session;
+  ProfileTabController(this._repository, this._session);
 
-  /// Null in tests that only exercise the signed-in views; the service is
-  /// resolved lazily so those do not have to register it.
-  final SessionService? _session;
+  final SessionService _session;
 
-  bool get isGuest =>
-      (_session ?? Get.find<SessionService>()).isGuest;
+  /// Browsing without an account — Profile offers sign-up instead of stats.
+  bool get isGuest => _session.isGuest;
 
   final ProfileRepository _repository;
 

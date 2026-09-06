@@ -719,6 +719,16 @@ class CustomTextStyles {
         color: appTheme.textPrimary,
       );
 
+  /// The splash's breathing prompts — white on the brand gradient.
+  static TextStyle get breathPrompt => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 28.fSize,
+        fontWeight: FontWeight.w300,
+        fontVariations: const [FontVariation('wght', 300)],
+        letterSpacing: 1.2,
+        color: appTheme.onPrimary,
+      );
+
   /// Profile segmented control — Nunito Medium 10.
   static TextStyle get segmentLabel => TextStyle(
         fontFamily: fontNunito,

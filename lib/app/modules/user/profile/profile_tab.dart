@@ -88,8 +88,14 @@ class _Header extends StatelessWidget {
     // Avatar left, title centred in the remaining width — the design's 92px
     // gap is what centring the 110-wide label produces, so it is expressed as
     // centring rather than pinned, and survives a longer title.
+    final controller = Get.find<ProfileTabController>();
     return Row(
       children: [
+        // No avatar for a guest: the unsigned frame (135:8494) shows only the
+        // title, and a personal photo would be a lie about who is signed in.
+        if (controller.isGuest)
+          SizedBox(width: 40.h)
+        else
         // The Settings frame is named "Profile/setting", so it belongs under
         // Profile — but no frame shows how it opens. The avatar is the
         // inferred entry point; confirm with the designer, because otherwise

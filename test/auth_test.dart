@@ -27,7 +27,7 @@ void main() {
     late SignupController c;
 
     setUp(() async {
-      c = SignupController(await SessionService().init());
+      c = SignupController(await SessionService().init(), LocalKycRepository());
     });
 
     test('Create Account stays blocked until every field is valid', () {

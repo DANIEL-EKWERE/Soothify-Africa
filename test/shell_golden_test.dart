@@ -60,8 +60,13 @@ void main() {
       // date the moment a tab is added.
       ShellBinding().dependencies();
       // ...then pin Home's clock. The greeting is time of day, so a golden
-      // recorded in the morning fails in the evening. Only this one
-      // registration is overridden; the rest stay as the binding made them.
+      // recorded in the morning fails in the afternoon.
+      //
+      // The delete matters: the binding has already registered a lazy
+      // HomeTabController, and putting another over it did not take — the tab
+      // kept finding the binding's, on the real clock. That made this test
+      // pass only before noon, which is why it went unnoticed.
+      Get.delete<HomeTabController>();
       Get.put(HomeTabController(Get.find<ContentRepository>(),
           now: fixedMorning));
 
@@ -76,9 +81,6 @@ void main() {
       // The clock is pinned to 09:00, so this must be the morning greeting.
       // Without the assertion a broken pin only shows up as a golden that
       // passes in the morning and fails after lunch.
-      // ignore: avoid_print
-      print('TEXTS: ' + tester.widgetList<Text>(find.byType(Text))
-          .map((t) => t.data).where((d) => d != null).take(12).join(' | '));
       expect(find.text('Good morning'), findsOneWidget);
 
       await expectLater(find.byType(ShellScreen),

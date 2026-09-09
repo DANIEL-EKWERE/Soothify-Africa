@@ -92,9 +92,12 @@ void main() {
     expect(find.text('Pilates & Core'), findsOneWidget);
     expect(find.textContaining('Tell us a little about yourself'),
         findsOneWidget);
+    // The frame gives the intro no button and nothing that says the screen
+    // itself is the target, so a hint has to.
+    expect(find.text('Tap anywhere to continue'), findsOneWidget);
 
-    // The frame gives the intro no button, so the screen itself advances.
-    await tester.tap(find.textContaining('Tell us a little about yourself'));
+    // Tapping the hint counts: the whole screen advances, not just the copy.
+    await tester.tap(find.text('Tap anywhere to continue'));
     await tester.pumpAndSettle();
 
     expect(controller.onIntro, isFalse);
@@ -180,5 +183,35 @@ void main() {
         expect(c.index.value, i + 1);
       }
     }
+  });
+
+  testWidgets('every track that opens on an intro tells the user to tap',
+      (tester) async {
+    for (final track in WellnessTrack.values.where((t) => t.hasIntro)) {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      await PrefUtils().init();
+      Get.lazyPut(() => WellnessKycController(track));
+
+      await pumpScreen(tester, const WellnessKycScreen());
+
+      expect(find.text('Tap anywhere to continue'), findsOneWidget,
+          reason: '${track.title} opens on an intro with no affordance');
+
+      Get.reset();
+    }
+  });
+
+  testWidgets('the hint is gone once the questions start', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    Get.lazyPut(() => WellnessKycController(WellnessTrack.meditation));
+
+    await pumpScreen(tester, const WellnessKycScreen());
+    Get.find<WellnessKycController>().begin();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tap anywhere to continue'), findsNothing);
   });
 }

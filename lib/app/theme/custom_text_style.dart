@@ -379,10 +379,11 @@ class CustomTextStyles {
   /// uses.
   static TextStyle get notificationTime => TextStyle(
         fontFamily: fontNunitoSans,
-        fontSize: 12.fSize,
+        // 11.5 measured: "1 day ago" fills 42.5 in the frame.
+        fontSize: 11.5.fSize,
         fontWeight: FontWeight.w400,
         fontVariations: _regular,
-        height: 16 / 12,
+        height: 16 / 11.5,
         color: appTheme.textPrimary,
       );
 

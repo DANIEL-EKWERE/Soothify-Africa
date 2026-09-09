@@ -211,7 +211,7 @@ class _Social extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        SizedBox(width: 10.h),
+        SizedBox(width: 6.h),
         Text(
           notification.ago(now),
           style: CustomTextStyles.notificationTime,
@@ -244,10 +244,13 @@ class _ReminderCard extends StatelessWidget {
                 const _UnreadDot(),
                 SizedBox(width: 9.h),
               ],
+              // Navy line art, cropped from a light-mode frame — tinted so
+              // it does not disappear against the dark palette.
               CustomImageView(
                 imagePath: notification.iconAsset,
                 height: 21.h,
                 width: 21.h,
+                color: appTheme.brandInk,
               ),
               SizedBox(width: 10.h),
               Text(
@@ -297,6 +300,7 @@ class _Digest extends StatelessWidget {
               imagePath: notification.iconAsset,
               height: 22.h,
               width: 22.h,
+              color: appTheme.brandInk,
             ),
             SizedBox(width: 13.h),
             Expanded(

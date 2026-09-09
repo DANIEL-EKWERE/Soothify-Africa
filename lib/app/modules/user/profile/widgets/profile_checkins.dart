@@ -4,9 +4,12 @@ import '../../../../core/app_export.dart';
 import '../../../../data/models/checkin_kind.dart';
 import '../controller/profile_tab_controller.dart';
 
-/// The Check-Ins tab — Figma "Profile/mood checkin" (135:8202).
+/// The Check-Ins tab — Figma "Profile/mood checkin" (page 124:2,
+/// `176:34213`).
 ///
-/// Four identical cards; the design differs only in each heading.
+/// Four identical cards; the design differs only in each badge and heading.
+/// Everything in a card is centred, and the card is 246 tall — the earlier
+/// build left-aligned the text and drew no badge at all.
 class ProfileCheckins extends StatelessWidget {
   const ProfileCheckins({super.key});
 
@@ -34,24 +37,40 @@ class _CheckinCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 24.h, vertical: 24.v),
+      // Measured off the frame: badge at 27.5, title 85.5, blurb 112.5,
+      // button 162.5 (47.5 tall, inset 43).
+      padding: EdgeInsets.symmetric(horizontal: 43.h, vertical: 27.5.v),
       decoration: BoxDecoration(
         color: appTheme.surface,
         borderRadius: BorderRadius.circular(16.h),
         border: Border.all(color: appTheme.optionBorder),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(kind.title, style: CustomTextStyles.statsHeading),
-          SizedBox(height: 5.v),
-          Text(kind.blurb, style: CustomTextStyles.emptyStateBody),
-          SizedBox(height: 26.v),
+          CustomImageView(
+            imagePath: kind.iconAsset,
+            height: 38.h,
+            width: 38.h,
+          ),
+          SizedBox(height: 20.v),
+          Text(
+            kind.title,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.statsHeading,
+          ),
+          SizedBox(height: 12.v),
+          Text(
+            kind.blurb,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.emptyStateBody,
+          ),
+          SizedBox(height: 19.v),
           InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(8.h),
             child: Container(
-              height: 44.v,
+              height: 47.5.v,
+              width: double.infinity,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: appTheme.actionFill,

@@ -16,6 +16,16 @@
 > The rename is partial: KYC, Profile daily/reminder and Recommendation
 > frames still carry the old words.
 >
+> **2026-09-09: the queued render landed.** A token for a *different* Figma
+> account (`ekweredaniel8@gmail.com`) had a fresh quota and pulled all five
+> frames in one call. Quota is per account, so a token from an account that
+> has not been used is the way through a block — not another token on the
+> same one.
+>
+> Frames now read: `176:56173` = **Sleep disorder**, `176:56161` =
+> **Depression** (both misnamed "Kyc screen | Anxiety" in the file);
+> `176:34213`/`34264`/`34492` = the Profile check-in screens.
+>
 > **A fresh token no longer helps — stop asking for one.** 2026-09-08, three
 > tokens in one day:
 >

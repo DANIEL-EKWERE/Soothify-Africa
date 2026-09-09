@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/checkin_kind.dart';
+import 'package:soothifyafrica/app/data/repositories/kyc_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/local_kyc_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/local_mood_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mood_repository.dart';
 import 'package:soothifyafrica/app/modules/user/checkin/checkin_screen.dart';
@@ -90,7 +92,13 @@ void main() {
     await PrefUtils().init();
     final repo = LocalMoodRepository(now: now);
     Get.put<MoodRepository>(repo);
-    Get.put(CheckinController(repo, CheckinKind.mood, now: now));
+    Get.put<KycRepository>(LocalKycRepository());
+    Get.put(CheckinController(
+      repo,
+      Get.find<KycRepository>(),
+      CheckinKind.mood,
+      now: now,
+    ));
 
     await pumpScreen(tester, const CheckinScreen());
     await tester.pumpAndSettle();

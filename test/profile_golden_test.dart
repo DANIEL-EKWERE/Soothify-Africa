@@ -43,6 +43,10 @@ const _art = [
   'assets/images/profile/ic_settings_gear.png',
   'assets/images/profile/ic_person.png',
   'assets/images/home/avatar.png',
+  'assets/images/checkin/ic_mood.png',
+  'assets/images/checkin/ic_journal.png',
+  'assets/images/explore/meditation.png',
+  'assets/images/explore/balance.png',
 ];
 
 void main() {

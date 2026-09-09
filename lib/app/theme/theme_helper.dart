@@ -90,6 +90,8 @@ class PrimaryColors {
     required this.segmentTrack,
     required this.segmentTrackBorder,
     required this.calendarCardBorder,
+    required this.dayEmpty,
+    required this.entryCardBorder,
     required this.daySelected,
     required this.moodTrackActive,
     required this.moodTrackInactive,
@@ -256,6 +258,12 @@ class PrimaryColors {
   /// hairline, the chosen segment filled with [actionFill].
   final Color segmentTrack;
   final Color segmentTrackBorder;
+
+  /// A mood check-in day with nothing recorded against it.
+  final Color dayEmpty;
+
+  /// The blue-grey hairline around a single check-in entry's card.
+  final Color entryCardBorder;
 
   /// The hairline around the History calendar's card.
   final Color calendarCardBorder;
@@ -438,6 +446,8 @@ class PrimaryColors {
     segmentTrack: Color(0xFFFEFEFE),
     segmentTrackBorder: Color(0xFFEAEAEA),
     calendarCardBorder: Color(0xFFD8D8D8),
+    dayEmpty: Color(0xFFEAE7E3),
+    entryCardBorder: Color(0xFF778AB2),
     daySelected: Color(0xFFFF9500),
     moodTrackActive: Color(0xFF638FE8),
     moodTrackInactive: Color(0xFFDADADA),
@@ -523,6 +533,8 @@ class PrimaryColors {
     segmentTrack: Color(0xFF423F3F),
     segmentTrackBorder: Color(0xFF3A3838),
     calendarCardBorder: Color(0xFF3A3838),
+    dayEmpty: Color(0xFF35322F),
+    entryCardBorder: Color(0xFF4A5875),
     daySelected: Color(0xFFFF9500),
     moodTrackActive: Color(0xFF4079EA),
     moodTrackInactive: Color(0xFFDADADA),

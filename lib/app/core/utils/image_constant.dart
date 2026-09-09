@@ -95,6 +95,15 @@ class ImageConstant {
   static const String icHeartFilled =
       '$_images/notifications/ic_heart_filled.png';
 
+  /// The Check-Ins cards' badges and the header glyphs on the mood check-in
+  /// screens, cropped from the rendered frames. Daily Meditation and Daily
+  /// Balance reuse the Explore tiles — the frame draws exactly those.
+  static const String icCheckinMood = '$_images/checkin/ic_mood.png';
+  static const String icCheckinJournal = '$_images/checkin/ic_journal.png';
+  static const String icMoreVertical = '$_images/checkin/ic_more_vertical.png';
+  static const String icCalendarSearch =
+      '$_images/checkin/ic_calendar_search.png';
+
   static const String imgSignupClock = '$_images/profile/signup_clock.png';
   static const String imgSignupCalendar = '$_images/profile/signup_calendar.png';
   static const String imgSignupMind = '$_images/profile/signup_mind.png';

@@ -77,7 +77,9 @@ class KycQuestion {
       prompt: 'What brings you to Soothify?',
       subtitle: _multiHint,
       // Illustrations on a flooded background, not the emoji tiles the older
-      // file drew. Colours sampled from the frames.
+      // file drew. Colours sampled from the four frames: the progress accent
+      // contrasts the flood rather than matching it — amber on every ground
+      // except the amber one, which takes blue.
       input: KycInput.carousel,
       options: [
         KycOption('stress', 'Stress',
@@ -88,12 +90,16 @@ class KycQuestion {
             illustration: 'assets/images/concerns/anxiety_figure.png',
             backgroundArgb: 0xFF7B7FE8,
             accentArgb: 0xFFFFAE24),
-        // The remaining two frames (`176:56161`, `176:56173`, both misnamed
-        // "Anxiety") have not been rendered — the Figma image endpoint is
-        // rate-limited. Until they are, these two carry no illustration and
-        // fall back to the brand background.
-        KycOption('sleep_disorder', 'Sleep disorder'),
-        KycOption('depression', 'Depression'),
+        // `176:56173` and `176:56161`, both misnamed "Kyc screen | Anxiety"
+        // in the file — the names are duplicates, the artwork is not.
+        KycOption('sleep_disorder', 'Sleep disorder',
+            illustration: 'assets/images/concerns/sleep_disorder_figure.png',
+            backgroundArgb: 0xFF465A8C,
+            accentArgb: 0xFFFFAE24),
+        KycOption('depression', 'Depression',
+            illustration: 'assets/images/concerns/depression_figure.png',
+            backgroundArgb: 0xFF626A8A,
+            accentArgb: 0xFFFFAE24),
       ],
     ),
     const KycQuestion(

@@ -257,11 +257,16 @@ class _ExploreTile extends StatelessWidget {
                 border: Border.all(color: appTheme.exploreTileBorder),
                 borderRadius: BorderRadius.circular(8.h),
               ),
-              child: ArtworkPlaceholder(
-                width: destination.artSize.h,
-                height: destination.artSize.h,
-                radius: 8.h,
-                assetPath: destination.assetPath,
+              // Flies into the library's header art. The tag is the
+              // destination, so the three tiles can never collide.
+              child: Hero(
+                tag: 'explore-${destination.name}',
+                child: ArtworkPlaceholder(
+                  width: destination.artSize.h,
+                  height: destination.artSize.h,
+                  radius: 8.h,
+                  assetPath: destination.assetPath,
+                ),
               ),
             ),
             SizedBox(height: 8.h),

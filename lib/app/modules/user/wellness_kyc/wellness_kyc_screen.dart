@@ -93,8 +93,72 @@ class _Intro extends StatelessWidget {
             gradient: appTheme.authHeaderGradient,
             style: CustomTextStyles.kycQuestion,
           ),
+          // The whole screen is the button, and nothing in the frame says so.
+          // Without this the intro is a dead end for anyone who does not
+          // think to tap it.
+          SizedBox(height: 28.v),
+          const Align(
+            alignment: Alignment.center,
+            child: _TapHint(),
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// "Tap anywhere to continue", breathing gently so the eye finds it.
+///
+/// Reduce-motion holds it at full strength rather than pulsing — the hint
+/// still has to be readable, so it settles bright rather than dim.
+class _TapHint extends StatefulWidget {
+  const _TapHint();
+
+  @override
+  State<_TapHint> createState() => _TapHintState();
+}
+
+class _TapHintState extends State<_TapHint>
+    with SingleTickerProviderStateMixin {
+  // Built here rather than lazily: a field the build skips under
+  // reduce-motion would be constructed by dispose() and throw looking up its
+  // ticker.
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1600),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Text(
+      'Tap anywhere to continue',
+      textAlign: TextAlign.center,
+      style: CustomTextStyles.tapHint,
+    );
+
+    if (MediaQuery.disableAnimationsOf(context)) {
+      if (_pulse.isAnimating) _pulse.stop();
+      return text;
+    }
+    if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
+
+    return FadeTransition(
+      opacity: Tween<double>(begin: 0.45, end: 1).animate(
+        CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
+      ),
+      child: text,
     );
   }
 }

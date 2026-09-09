@@ -429,6 +429,16 @@ class CustomTextStyles {
         height: 27 / 20,
       );
 
+  /// "Tap anywhere to continue" under a wellness questionnaire's intro.
+  static TextStyle get tapHint => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w500,
+        fontVariations: const [FontVariation('wght', 500)],
+        height: 19 / 14,
+        color: appTheme.textSecondary,
+      );
+
   /// AI Hub — the grey caption over each readout.
   static TextStyle get aiStatLabel => TextStyle(
         fontFamily: fontNunitoSans,

@@ -66,11 +66,17 @@ void useDesignFrame(WidgetTester tester) {
 /// Mounts [child] the way `main.dart` does — inside a [Sizer], with both
 /// themes registered — so screens resolve fonts, sizing and palette exactly as
 /// they will at runtime.
+/// Set [motion] to true only for a test that is checking an animation. The
+/// default switches motion off, because [pumpScreen] ends in `pumpAndSettle`
+/// and anything that repeats forever — a skeleton's shimmer, the assist
+/// button's drift — never gives it a still frame to stop on.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget child, {
   Brightness brightness = Brightness.light,
+  bool motion = false,
 }) async {
+  if (!motion) disableMotion(tester);
   await tester.pumpWidget(
     Sizer(
       builder: (_, _, _) => GetMaterialApp(

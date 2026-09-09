@@ -172,10 +172,10 @@ class _AiAssistButtonState extends State<AiAssistButton>
         onPanStart: _onStart,
         onPanUpdate: _onUpdate,
         onPanEnd: _onEnd,
-        // The export is the whole button — white disc, shadow and glyph — so
+        // The export is the whole button — gradient disc, shadow and orb — so
         // it is drawn at full size rather than as a glyph inside a circle.
         child: CustomImageView(
-          imagePath: ImageConstant.imgAiAssistIcon,
+          imagePath: ImageConstant.icAiAssist,
           height: widget.size.h,
           width: widget.size.h,
         ),

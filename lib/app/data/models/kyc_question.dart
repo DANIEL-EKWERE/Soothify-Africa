@@ -69,7 +69,7 @@ class KycQuestion {
   bool get isMulti =>
       input == KycInput.multi || input == KycInput.carousel;
 
-  static const String _multiHint = 'You Can Select More Than One Option';
+  static const String _multiHint = 'You can select more than one option';
 
   static final List<KycQuestion> all = [
     const KycQuestion(

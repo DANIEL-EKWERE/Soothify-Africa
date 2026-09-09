@@ -91,10 +91,14 @@ class _Player extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: CustomImageView(
-              imagePath: controller.item.coverAsset,
-              fit: BoxFit.cover,
-              radius: BorderRadius.circular(8.h),
+            // The far end of the grid card's flight.
+            child: Hero(
+              tag: 'cover-${controller.item.id}',
+              child: CustomImageView(
+                imagePath: controller.item.coverAsset,
+                fit: BoxFit.cover,
+                radius: BorderRadius.circular(8.h),
+              ),
             ),
           ),
           // The frame darkens the art by 40% so the controls stay legible

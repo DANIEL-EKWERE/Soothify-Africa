@@ -54,6 +54,14 @@ class SoothifyApp extends StatelessWidget {
             themeMode: Get.find<ThemeService>().mode.value,
             initialBinding: InitialBindings(),
             getPages: AppPages.pages,
+            // One transition for the whole app. Pushes slide in from the
+            // right and fade at the same time — directional enough to say
+            // "deeper in", soft enough for a wellness app. Individual routes
+            // override it in AppPages where they read as sheets rather than
+            // pages.
+            defaultTransition: Transition.rightToLeftWithFade,
+            transitionDuration: const Duration(milliseconds: 280),
+
             // Tells the app-wide assist button which screen is on
             // top, so it can stay out of onboarding and auth.
             routingCallback: AiAssistOverlay.onRouting,

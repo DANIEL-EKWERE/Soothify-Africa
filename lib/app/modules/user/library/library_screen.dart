@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../widgets/filter_glyph.dart';
 import '../../../data/models/library_section.dart';
 import '../../../data/models/media_item.dart';
+import '../../../widgets/skeleton.dart';
 import '../discovery/widgets/discovery_card.dart';
 import 'controller/library_controller.dart';
 
@@ -82,11 +83,15 @@ class _Header extends StatelessWidget {
           ),
         ),
         // The design puts a filter glyph here; artwork was not exported.
-        // The section's own art, matching its Explore tile on Home.
-        CustomImageView(
-          imagePath: Get.find<LibraryController>().section.artPath,
-          height: 28.h,
-          width: 28.h,
+        // The section's own art, matching its Explore tile on Home — and the
+        // other end of that tile's flight.
+        Hero(
+          tag: 'explore-${Get.find<LibraryController>().section.id}',
+          child: CustomImageView(
+            imagePath: Get.find<LibraryController>().section.artPath,
+            height: 28.h,
+            width: 28.h,
+          ),
         ),
       ],
     );
@@ -177,9 +182,26 @@ class _Shelf extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16.v),
+        // Still loading: hold the shelf's shape rather than collapsing it,
+        // so the page does not jump when the cards land.
+        if (items.isEmpty && controller.isLoading.value)
+          SizedBox(
+            height: 166.v,
+            child: SkeletonShimmer(
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 3,
+                separatorBuilder: (_, _) => SizedBox(width: 20.h),
+                itemBuilder: (_, _) =>
+                    const Skeleton(width: 159, height: 166),
+              ),
+            ),
+          )
         // A filter can empty a shelf outright. Without this the heading sits
         // over 166 of blank and reads as a failed load.
-        if (items.isEmpty && !controller.filters.value.isEmpty)
+        else if (items.isEmpty && !controller.filters.value.isEmpty)
           SizedBox(
             height: 166.v,
             child: Text(

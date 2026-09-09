@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/media_item.dart';
+import '../../../widgets/skeleton.dart';
 import 'controller/shelf_controller.dart';
 
 /// A shelf's full page — Figma "Balance Content" (135:20135).
@@ -46,20 +47,28 @@ class ShelfScreen extends GetView<ShelfController> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: controller.load,
-                child: Obx(() => GridView.builder(
-                      padding: EdgeInsets.fromLTRB(24.h, 36.v, 24.h, 32.v),
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.h,
-                        mainAxisSpacing: 24.v,
-                        // 163 wide by 174 tall, as measured.
-                        childAspectRatio: 163 / 174,
-                      ),
-                      itemCount: controller.items.length,
-                      itemBuilder: (context, i) =>
-                          _GridCard(item: controller.items[i]),
-                    )),
+                child: Obx(() {
+                  final loading = controller.isLoading.value &&
+                      controller.items.isEmpty;
+                  final grid = GridView.builder(
+                    padding: EdgeInsets.fromLTRB(24.h, 36.v, 24.h, 32.v),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16.h,
+                      mainAxisSpacing: 24.v,
+                      // 163 wide by 174 tall, as measured.
+                      childAspectRatio: 163 / 174,
+                    ),
+                    itemCount: loading ? 6 : controller.items.length,
+                    itemBuilder: (context, i) => loading
+                        ? const Skeleton(width: 163, height: 174)
+                        : ContentReveal(
+                            delay: Duration(milliseconds: 50 * i),
+                            child: _GridCard(item: controller.items[i]),
+                          ),
+                  );
+                  return loading ? SkeletonShimmer(child: grid) : grid;
+                }),
               ),
             ),
           ],
@@ -94,10 +103,16 @@ class _GridCard extends StatelessWidget {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: CustomImageView(
-                    imagePath: item.coverAsset,
-                    fit: BoxFit.cover,
-                    radius: BorderRadius.circular(8.h),
+                  // Grows into the detail screen's cover. Safe to key on the
+                  // id alone here: a grid lists each item once, so two Heroes
+                  // can never share a tag on this screen.
+                  child: Hero(
+                    tag: 'cover-${item.id}',
+                    child: CustomImageView(
+                      imagePath: item.coverAsset,
+                      fit: BoxFit.cover,
+                      radius: BorderRadius.circular(8.h),
+                    ),
                   ),
                 ),
                 Positioned(

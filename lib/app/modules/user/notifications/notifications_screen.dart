@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/app_notification.dart';
 import '../../../widgets/gradient_text.dart';
+import '../../../widgets/skeleton.dart';
 import 'controller/notifications_controller.dart';
 
 /// The notification feed — Figma "Notification" (page 124:2, `176:24737`).
@@ -38,6 +39,26 @@ class NotificationsScreen extends GetView<NotificationsController> {
                 onRefresh: controller.load,
                 child: Obx(() {
                   final items = controller.visible;
+                  if (items.isEmpty && controller.isLoading.value) {
+                    return SkeletonShimmer(
+                      child: ListView.separated(
+                        padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 6,
+                        separatorBuilder: (_, _) => SizedBox(height: 30.v),
+                        itemBuilder: (_, _) => Row(
+                          children: [
+                            const Skeleton(
+                                width: 28, height: 28, radius: 14),
+                            SizedBox(width: 16.h),
+                            const Skeleton.text(width: 180),
+                            const Spacer(),
+                            const Skeleton.text(width: 60, height: 10),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
                   if (items.isEmpty) {
                     return ListView(
                       children: [
@@ -54,9 +75,12 @@ class NotificationsScreen extends GetView<NotificationsController> {
                     padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
                     itemCount: items.length,
                     separatorBuilder: (_, _) => SizedBox(height: 30.v),
-                    itemBuilder: (context, i) => _Entry(
-                      notification: items[i],
-                      now: controller.now,
+                    itemBuilder: (context, i) => ContentReveal(
+                      delay: Duration(milliseconds: 45 * i),
+                      child: _Entry(
+                        notification: items[i],
+                        now: controller.now,
+                      ),
                     ),
                   );
                 }),

@@ -166,25 +166,31 @@ class AppPages {
       page: () => const NotificationsScreen(),
       binding: NotificationsBinding(),
     ),
+    // The hub is summoned by a floating button rather than reached by going
+    // deeper, so it rises instead of sliding across.
     GetPage(
       name: AppRoutes.aiHub,
       page: () => const AiHubScreen(),
       binding: AiHubBinding(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: AppRoutes.filterDuration,
       page: () => const FiltersScreen(kind: FilterKind.duration),
       binding: FiltersBinding(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: AppRoutes.filterMore,
       page: () => const FiltersScreen(kind: FilterKind.more),
       binding: FiltersBinding(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: AppRoutes.filterStyle,
       page: () => const FiltersScreen(kind: FilterKind.style),
       binding: FiltersBinding(),
+      transition: Transition.downToUp,
     ),
     GetPage(
       name: AppRoutes.shelf,
@@ -221,8 +227,10 @@ class AppPages {
       page: () => const MoodCheckerScreen(),
       binding: MoodCheckerBinding(),
     ),
+    // A celebration, not a destination: it fades up rather than sliding.
     GetPage(
       name: AppRoutes.moodRecord,
+      transition: Transition.fadeIn,
       page: () => const MoodRecordScreen(),
       binding: MoodRecordBinding(),
     ),

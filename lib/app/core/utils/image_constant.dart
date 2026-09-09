@@ -41,7 +41,9 @@ class ImageConstant {
   static const String imgSessionCover = '$_images/schedule/session.png';
   static const String imgHomeAvatar = '$_images/home/avatar.png';
 
-  static const String imgAiAssistIcon = '$_images/home/ai_assist.png';
+  /// The floating AI assist button, exported whole — gradient disc, shadow
+  /// and orb — so it is drawn at full size, not as a glyph in a circle.
+  static const String icAiAssist = '$_icons/ic_ai_assist.svg';
 
   static const String icDarkMode = '$_icons/ic_dark_mode.svg';
 

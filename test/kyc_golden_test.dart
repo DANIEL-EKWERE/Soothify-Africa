@@ -17,10 +17,11 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(Get.reset);
 
-  /// Every asset any question can show, so no row renders blank.
+  /// Every asset any question can show, so nothing renders blank — the row
+  /// icons and the concerns carousel's illustrations.
   Iterable<String> allIcons() => KycQuestion.all
       .expand((q) => q.options)
-      .map((o) => o.assetPath)
+      .expand((o) => [o.assetPath, o.illustration])
       .whereType<String>();
 
   Future<KycController> arrange(

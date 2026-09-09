@@ -8,10 +8,24 @@ enum KycInput {
 
   /// A scrolling wheel of values, always with something selected.
   wheel,
+
+  /// A full-bleed swipeable carousel of illustrations, one per option, on the
+  /// focused option's own background colour. Multi-select, like [multi].
+  ///
+  /// Only "What brings you to Soothify?" uses it — Figma "Kyc screen | Stress"
+  /// (`176:23723`) and "| Anxiety" (`176:56150`).
+  carousel,
 }
 
 class KycOption {
-  const KycOption(this.value, this.label, {this.assetPath});
+  const KycOption(
+    this.value,
+    this.label, {
+    this.assetPath,
+    this.illustration,
+    this.backgroundArgb,
+    this.accentArgb,
+  });
 
   /// Persisted and sent to the API; never displayed.
   final String value;
@@ -20,6 +34,15 @@ class KycOption {
 
   /// 30x30 icon shown at the head of the row, where the design has one.
   final String? assetPath;
+
+  /// [KycInput.carousel] only — the full character illustration, the colour
+  /// the screen floods behind it, and the colour its progress bar fills with.
+  ///
+  /// Held as ARGB ints so the data layer stays free of Flutter types, as the
+  /// other models here do.
+  final String? illustration;
+  final int? backgroundArgb;
+  final int? accentArgb;
 }
 
 /// One step of the KYC questionnaire.
@@ -42,7 +65,9 @@ class KycQuestion {
   final List<KycOption> options;
   final KycInput input;
 
-  bool get isMulti => input == KycInput.multi;
+  /// Carousel answers toggle the same way the tile list's do.
+  bool get isMulti =>
+      input == KycInput.multi || input == KycInput.carousel;
 
   static const String _multiHint = 'You Can Select More Than One Option';
 
@@ -51,16 +76,24 @@ class KycQuestion {
       id: 'concerns',
       prompt: 'What brings you to Soothify?',
       subtitle: _multiHint,
-      input: KycInput.multi,
+      // Illustrations on a flooded background, not the emoji tiles the older
+      // file drew. Colours sampled from the frames.
+      input: KycInput.carousel,
       options: [
         KycOption('stress', 'Stress',
-            assetPath: 'assets/images/concerns/stress.png'),
+            illustration: 'assets/images/concerns/stress_figure.png',
+            backgroundArgb: 0xFFF9980F,
+            accentArgb: 0xFF4679ED),
         KycOption('anxiety', 'Anxiety',
-            assetPath: 'assets/images/concerns/anxiety.png'),
-        KycOption('sleep_disorder', 'Sleep disorder',
-            assetPath: 'assets/images/concerns/sleep_disorder.png'),
-        KycOption('depression', 'Depression',
-            assetPath: 'assets/images/concerns/depression.png'),
+            illustration: 'assets/images/concerns/anxiety_figure.png',
+            backgroundArgb: 0xFF7B7FE8,
+            accentArgb: 0xFFFFAE24),
+        // The remaining two frames (`176:56161`, `176:56173`, both misnamed
+        // "Anxiety") have not been rendered — the Figma image endpoint is
+        // rate-limited. Until they are, these two carry no illustration and
+        // fall back to the brand background.
+        KycOption('sleep_disorder', 'Sleep disorder'),
+        KycOption('depression', 'Depression'),
       ],
     ),
     const KycQuestion(

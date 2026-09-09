@@ -7,6 +7,7 @@ import '../../../widgets/gradient_text.dart';
 import '../../../widgets/step_progress_bar.dart';
 import 'controller/kyc_controller.dart';
 import 'widgets/age_wheel.dart';
+import 'widgets/kyc_concern_carousel.dart';
 import 'widgets/kyc_option_tile.dart';
 
 /// The KYC questionnaire — Figma section "Mobile / KYC".
@@ -27,6 +28,20 @@ class KycScreen extends GetView<KycController> {
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      // The concerns step is a screen of its own shape — full-bleed colour,
+      // no side padding, its own progress accent — so it replaces the body
+      // rather than living inside the shared column.
+      if (controller.question.input == KycInput.carousel) {
+        return Scaffold(
+          body: KycConcernCarousel(question: controller.question),
+        );
+      }
+      return _standard();
+    });
+  }
+
+  Widget _standard() {
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(

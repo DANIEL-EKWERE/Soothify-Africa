@@ -21,6 +21,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.leftIcon,
     this.margin,
     this.width,
+    this.labelStyle,
   });
 
   final String text;
@@ -31,6 +32,10 @@ class CustomElevatedButton extends StatelessWidget {
   final Widget? leftIcon;
   final EdgeInsetsGeometry? margin;
   final double? width;
+
+  /// Overrides the white label — a button drawn on a light fill needs dark
+  /// text, which [CustomTextStyles.buttonLabel] cannot give it.
+  final TextStyle? labelStyle;
 
   bool get _interactive => isEnabled && !isLoading && onPressed != null;
 
@@ -74,7 +79,7 @@ class CustomElevatedButton extends StatelessWidget {
                     child: Text(
                       text,
                       overflow: TextOverflow.ellipsis,
-                      style: CustomTextStyles.buttonLabel,
+                      style: labelStyle ?? CustomTextStyles.buttonLabel,
                     ),
                   ),
                 ],

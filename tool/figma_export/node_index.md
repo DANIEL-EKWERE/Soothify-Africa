@@ -1,3 +1,81 @@
+# Node index
+
+> **2026-09-08 — the design moved.** It now lives in file
+> `NJjQwgwMr44oDKuaaHHKbn`, page **`124:2`** ("Page 2"), 801 frames. Node ids
+> were reassigned in the move, so every id below (`135:*`) is from the old
+> page `133:201` and no longer resolves. The new page's full frame index —
+> names, ids, sizes, canvas positions — is cached in
+> `page_124_2_index.txt`; use it to map an old screen to its new id.
+>
+> The moved file is a superset: it carries onboarding, auth, a community
+> manager role, an AI Hub, corporate billing and much else the old page
+> never had. It also stacks two revisions — the current one is `y < 48000`.
+>
+> **Renamed in the new file:** Meditation → **Pilates & Core**,
+> Balance → **Stretch & Restore**, Schedule → **Book a licensed Expert**.
+> The rename is partial: KYC, Profile daily/reminder and Recommendation
+> frames still carry the old words.
+>
+> **A fresh token no longer helps — stop asking for one.** 2026-09-08, three
+> tokens in one day:
+>
+> | token | result |
+> |---|---|
+> | 1 | one call, then blocked ~4.6 days |
+> | 2 | one call (the page index), then blocked ~6.7h |
+> | 3 | **zero** calls; the block went *up* to ~1.3 days |
+>
+> The limit is enforced on the Figma account and plan, not on the token, and
+> retrying appears to extend the penalty rather than reset it. A 429 (not a
+> 403) means the token authenticates fine — the account is simply out of
+> budget. Do not burn the user's time collecting more tokens, and do not
+> retry the API to "check": that is what pushed 5.7h back up to 1.3 days.
+>
+> **Use an export instead.** Either a plugin JSON export (see README.md), or
+> simply PNGs — select the frames in Figma, right-click, Export, PNG at 2x.
+> Frame sizes and positions are already known from `page_124_2_index.txt`, so
+> renders are enough to read structure and copy off.
+>
+> **Frames still wanted, in priority order:**
+>
+> | what | frame name | id |
+> |---|---|---|
+> | mood checker | `Mood checker/male/ feeling down` | 176:31360 |
+> | mood checker | `Mood checker/male/happy` | 176:31381 |
+> | mood checker | `Mood checker/female/ feeling down` | 176:31453 |
+> | mood checker | `Mood record` | 176:31537 |
+> | profile | `Profile/dashboard` | 176:34109 |
+> | profile | `Profile/history` | 176:34144 |
+> | profile | `Profile/unsigned/not logged in` | 176:34542 |
+> | assist button | `AI Hub | Unexpanded` | 176:56425 |
+> | assist button | `AI Hub | Expanded | Chat` | 176:56395 |
+>
+> (The mood-checker and Profile frames are the ones on the *current* rows —
+> canvas y around 6417/7410 and 2990 respectively, not the copies further
+> down the page.)
+>
+> **The one call to spend a fresh token on.** Each new token has bought
+> exactly one request before the 429. Do NOT re-fetch the page index — it is
+> already cached in `page_124_2_index.txt`. Run this, and nothing else, first:
+>
+> ```
+> tool/figma.py nodes 176:31360 176:31381 176:31537 176:34109 176:34542 176:34144
+> ```
+>
+> That is the current mood checker (male down, male happy, Mood record) and
+> Profile (dashboard, unsigned, history) — the two flows that still have
+> unanswered questions. Roughly the size of the page-index call, which is the
+> largest request known to succeed on this account.
+>
+> Next in line if a second call ever lands: the AI Hub, `176:56425`
+> (Unexpanded) and `176:56395` (Expanded | Chat) — newly designed screens for
+> the assist button, which is still a stub.
+>
+> **Quota, the hard way:** a `depth=1` fetch of the page is ~1.2MB and spends
+> this account's entire remaining REST quota in a single call — twice now, on
+> two different tokens. Fetch the frames you need FIRST, batched into one
+> call, and pull the page index only when there is quota to spare.
+
 # Figma node index
 
 File `NJjQwgwMr44oDKuaaHHKbn`, page `133:201` ("Page 3"), 357 frames.
@@ -75,9 +153,16 @@ Thread variants (`135:6531`, `135:6599`) and the community moderation screens
 (`135:5128`–`135:6456`, a separate manager role);
 Profile history and check-ins (`135:8133`, `135:8202`, `135:8481`, `135:8515`);
 Profile reminders (`135:8888`–`135:9181`); Notification (`135:8045`);
-Meditation and Balance filters (`135:12427`, `135:12573`, `135:19379`,
-`135:19491`); Balance KYC (`135:19200`+); Schedule booking flow
+Balance KYC (`135:19200`+); Schedule booking flow
 (`135:20803`–`135:21767`); Article (`135:22150`).
+
+## Built since
+
+The six filter frames — Meditation's `135:12427` / `135:12573` / `135:12833`
+and Balance's `135:19379` / `135:19491` / `135:20011`. Balance's are identical
+to Meditation's in every string and measurement, so one module serves both.
+Measurements and the decisions taken where the frames are silent are in
+`filter_spec.md`.
 
 ## Access
 

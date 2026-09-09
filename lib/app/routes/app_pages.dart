@@ -37,6 +37,10 @@ import '../modules/user/daily/binding/daily_binding.dart';
 import '../modules/user/daily/daily_screen.dart';
 import '../modules/user/daily/reminder_screen.dart';
 import '../modules/user/checkin/checkin_screen.dart';
+import '../modules/user/ai_hub/ai_hub_screen.dart';
+import '../modules/user/notifications/binding/notifications_binding.dart';
+import '../modules/user/notifications/notifications_screen.dart';
+import '../modules/user/ai_hub/binding/ai_hub_binding.dart';
 import '../modules/user/filters/binding/filters_binding.dart';
 import '../modules/user/filters/filters_screen.dart';
 import '../../app/data/models/media_filter.dart';
@@ -157,6 +161,16 @@ class AppPages {
     // Three routes, one screen: the sheets differ only in their body, and
     // FiltersBinding creates the shared controller on whichever is entered
     // first.
+    GetPage(
+      name: AppRoutes.notifications,
+      page: () => const NotificationsScreen(),
+      binding: NotificationsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.aiHub,
+      page: () => const AiHubScreen(),
+      binding: AiHubBinding(),
+    ),
     GetPage(
       name: AppRoutes.filterDuration,
       page: () => const FiltersScreen(kind: FilterKind.duration),

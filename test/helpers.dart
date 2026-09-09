@@ -106,6 +106,14 @@ Future<void> precacheAll(
   await tester.pumpAndSettle();
 }
 
+/// A pinned clock for goldens.
+///
+/// Home greets by time of day, so a golden recorded in the morning fails that
+/// evening — which is exactly what happened. [HomeTabController] already takes
+/// an injectable clock for this; the golden tests just never passed one.
+/// Pinned to a morning hour because the frame prints "Good morning".
+DateTime fixedMorning() => DateTime(2026, 1, 1, 9);
+
 /// Turns off "reduce motion"-aware animations for a test.
 ///
 /// Some screens carry a perpetual animation — the Home assist button drifts

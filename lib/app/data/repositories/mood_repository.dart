@@ -9,7 +9,8 @@ abstract class MoodRepository {
   /// Most recent first.
   Future<List<MoodEntry>> history({int limit = 50});
 
-  Future<MoodEntry> record(Mood mood, {String note = ''});
+  /// [score] is the slider's position, 0 (Awful) to 1 (Awesome).
+  Future<MoodEntry> record(double score, {String note = ''});
 
   /// Entries falling on the days from [from] to [to] inclusive. Used by the
   /// mood-record week strip.

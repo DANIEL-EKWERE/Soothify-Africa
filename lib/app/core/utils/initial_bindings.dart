@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import '../../data/repositories/content_repository.dart';
 import '../../data/repositories/local_kyc_repository.dart';
 import '../../data/repositories/mock_content_repository.dart';
+import '../../data/repositories/mock_notification_repository.dart';
 import '../../data/repositories/mood_repository.dart';
+import '../../data/repositories/notification_repository.dart';
 import '../../data/repositories/kyc_repository.dart';
 import '../../data/repositories/local_mood_repository.dart';
 import '../../data/repositories/local_profile_repository.dart';
@@ -42,6 +44,10 @@ class InitialBindings extends Bindings {
     );
     Get.lazyPut<SubscriptionRepository>(
       () => MockSubscriptionRepository(),
+      fenix: true,
+    );
+    Get.lazyPut<NotificationRepository>(
+      () => MockNotificationRepository(),
       fenix: true,
     );
   }

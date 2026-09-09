@@ -68,6 +68,8 @@ flutter:
   assets:
     - assets/images/
     - assets/images/moods/
+    - assets/images/mood/
+    - assets/images/notifications/
     - assets/images/auth/
     - assets/images/concerns/
     - assets/images/goals/

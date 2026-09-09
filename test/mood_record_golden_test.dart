@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 
-import 'package:soothifyafrica/app/data/models/mood.dart';
 import 'package:soothifyafrica/app/data/repositories/local_mood_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mood_repository.dart';
 import 'package:soothifyafrica/app/modules/user/mood_record/controller/mood_record_controller.dart';
@@ -41,7 +40,7 @@ void main() {
       final repo = LocalMoodRepository(now: now);
       // A logged day so the strip, the card and the headline all show their
       // populated state rather than an empty week.
-      await repo.record(Mood.calm);
+      await repo.record(0.75);
 
       Get.put<MoodRepository>(repo);
       Get.put(MoodRecordController(repo, now: now)..name.value = 'Rita');
@@ -49,11 +48,6 @@ void main() {
       await pumpScreen(tester, const MoodRecordScreen(),
           brightness: brightness);
       await tester.pumpAndSettle();
-      await precacheAll(
-        tester,
-        find.byType(MoodRecordScreen),
-        Mood.values.map((m) => m.assetPath),
-      );
 
       await expectLater(find.byType(MoodRecordScreen),
           matchesGoldenFile('goldens/mood_record_$name.png'));

@@ -358,6 +358,182 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
+  /// A notification line — the actor is bold, the rest regular. Both come
+  /// from the same size so they sit on one baseline.
+  static TextStyle get notificationText => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 15.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 20 / 15,
+        color: appTheme.textPrimary,
+      );
+
+  static TextStyle get notificationActor =>
+      notificationText.copyWith(
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+      );
+
+  /// "45 minutes ago". Dark in this frame, not the grey the carded variant
+  /// uses.
+  static TextStyle get notificationTime => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 12.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 16 / 12,
+        color: appTheme.textPrimary,
+      );
+
+  /// "Reminder" on its card.
+  static TextStyle get notificationCardTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 17.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 23 / 17,
+        color: appTheme.textPrimary,
+      );
+
+  /// "Your Weekly Mindful Quotes".
+  static TextStyle get notificationDigestTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 18.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 25 / 18,
+        color: appTheme.textPrimary,
+      );
+
+  /// A filter chip's label; [notificationChipSelected] once chosen.
+  static TextStyle get notificationChip => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 12.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.textPrimary,
+      );
+
+  static TextStyle get notificationChipSelected =>
+      notificationChip.copyWith(color: appTheme.onPrimary);
+
+  /// The screen title, painted with the app's title gradient like the other
+  /// gradient headings.
+  static TextStyle get notificationTitle => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 27 / 20,
+      );
+
+  /// AI Hub — the grey caption over each readout.
+  static TextStyle get aiStatLabel => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 12.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 16 / 12,
+        color: appTheme.aiStatLabel,
+      );
+
+  /// AI Hub — the readout itself.
+  static TextStyle get aiStatValue => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 15.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 20 / 15,
+        color: appTheme.aiStatValue,
+      );
+
+  /// "Select Environment Vibe".
+  static TextStyle get aiSectionLabel => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 19 / 14,
+        color: appTheme.textPrimary,
+      );
+
+  /// A segment's label; [aiSegmentSelected] once it is the chosen one.
+  static TextStyle get aiSegmentLabel => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.aiStatValue,
+      );
+
+  static TextStyle get aiSegmentSelected =>
+      aiSegmentLabel.copyWith(color: appTheme.onPrimary);
+
+  /// "Tap Droplet or Chat to Expand", on its pill over the scene.
+  static TextStyle get aiPanelHint => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 10.fSize,
+        fontWeight: FontWeight.w500,
+        fontVariations: const [FontVariation('wght', 500)],
+        height: 14 / 10,
+        color: appTheme.onPrimary,
+      );
+
+  /// "Wellness Guide" over the expanded scene.
+  static TextStyle get guideName => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 20.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 27 / 20,
+        color: appTheme.onPrimary,
+      );
+
+  /// A chat bubble's text. The guide's bubbles are white with dark ink; the
+  /// user's are blue with white.
+  static TextStyle get guideBubble => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 15.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 21 / 15,
+        color: appTheme.aiStatValue,
+      );
+
+  static TextStyle get guideBubbleOwn =>
+      guideBubble.copyWith(color: appTheme.onPrimary);
+
+  /// "Ask anything..." in the composer.
+  static TextStyle get guideComposerHint => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 15.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        color: appTheme.hintText,
+      );
+
+  /// The pitch inside the guest sign-up card — Nunito Sans Bold 16, white.
+  static TextStyle get signupPitch => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 16.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 22 / 16,
+        color: appTheme.onPrimary,
+      );
+
+  /// "Awful" / "Awesome" under the Mood Checker slider — Nunito Sans
+  /// Regular 14 in the brand blue.
+  static TextStyle get moodScaleEnd => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 14.fSize,
+        fontWeight: FontWeight.w400,
+        fontVariations: _regular,
+        height: 18.2 / 14,
+        color: appTheme.moodThumb,
+      );
+
   /// A filter sheet's heading — "Duration", "More Filters", "Style".
   /// Nunito Sans Bold 16.
   static TextStyle get filterHeading => TextStyle(

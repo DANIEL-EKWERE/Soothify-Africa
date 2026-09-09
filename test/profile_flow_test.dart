@@ -30,14 +30,14 @@ void main() {
     // The Balance frames reuse Meditation's wording verbatim; the empty state
     // and reminder must name the habit you actually opened.
     final balance = DailyController(CheckinKind.balance, now: now);
-    expect(balance.title, 'Daily Balance');
-    expect(balance.startLabel, 'Start Daily Balance');
-    expect(balance.emptyState, contains('Daily Balance'));
-    expect(balance.emptyState, isNot(contains('Meditation')));
-    expect(balance.reminderTitle, 'Balance Check-In');
+    expect(balance.title, 'Daily Stretch & Restore');
+    expect(balance.startLabel, 'Start Daily Stretch & Restore');
+    expect(balance.emptyState, contains('Daily Stretch & Restore'));
+    expect(balance.emptyState, isNot(contains('Pilates & Core')));
+    expect(balance.reminderTitle, 'Stretch & Restore Check-In');
 
     final meditation = DailyController(CheckinKind.meditation, now: now);
-    expect(meditation.reminderTitle, 'Meditation Check-In');
+    expect(meditation.reminderTitle, 'Pilates & Core Check-In');
   });
 
   test('a reminder needs at least one day', () {
@@ -56,8 +56,8 @@ void main() {
 
     await pumpScreen(tester, const DailyScreen());
 
-    expect(find.text('Daily Balance'), findsOneWidget);
-    expect(find.text('Start Daily Balance'), findsOneWidget);
+    expect(find.text('Daily Stretch & Restore'), findsOneWidget);
+    expect(find.text('Start Daily Stretch & Restore'), findsOneWidget);
     expect(find.text('August 2024'), findsOneWidget);
 
     await expectLater(find.byType(DailyScreen),
@@ -71,7 +71,7 @@ void main() {
     Get.put(c);
 
     await pumpScreen(tester, const ReminderScreen());
-    expect(find.text('Meditation Check-In'), findsOneWidget);
+    expect(find.text('Pilates & Core Check-In'), findsOneWidget);
     expect(find.text('9:00'), findsOneWidget);
 
     c.toggleDay(DateTime.monday);

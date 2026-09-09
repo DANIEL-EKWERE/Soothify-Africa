@@ -87,6 +87,13 @@ class AppRoutes {
   /// Matching, call, rating and feedback — everything after Schedule.
   static const String booking = '/schedule/booking';
 
+  /// The notification feed, reached from the bell on Home.
+  static const String notifications = '/notifications';
+
+  /// AI Therapy Assist — the floating button's destination. One route for
+  /// both frames: the panel expands into the chat in place.
+  static const String aiHub = '/ai-hub';
+
   static const String moodChecker = '/mood';
   static const String moodRecord = '/mood/record';
 

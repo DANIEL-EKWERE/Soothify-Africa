@@ -92,7 +92,7 @@ void main() {
     expect(find.text('Sleep Stories'), findsOneWidget);
     expect(find.text('Calm narratives to help you sleep better'),
         findsOneWidget);
-    expect(find.text('Meditation sessions'), findsOneWidget);
+    expect(find.text('Pilates & Core sessions'), findsOneWidget);
     expect(find.text('Speak with a meditation therapist'), findsOneWidget);
   });
 

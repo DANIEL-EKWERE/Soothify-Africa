@@ -9,7 +9,7 @@ class MediaItem {
     required this.type,
     required this.durationSeconds,
     this.subtitle = '',
-    this.tag = 'Meditation',
+    this.tag = 'Pilates & Core',
     this.description = '',
     this.coverUrl = '',
     this.coverAsset = '',
@@ -25,7 +25,7 @@ class MediaItem {
   final String title;
   final String subtitle;
 
-  /// The white pill over the cover art — "Meditation", "Voice over",
+  /// The white pill over the cover art — "Pilates & Core", "Voice over",
   /// "Sound effect". Per item, not derived from the media type.
   final String tag;
   final String description;
@@ -83,7 +83,7 @@ class MediaItem {
         id: '${json['id']}',
         title: json['title'] as String? ?? '',
         subtitle: json['subtitle'] as String? ?? '',
-        tag: json['tag'] as String? ?? 'Meditation',
+        tag: json['tag'] as String? ?? 'Pilates & Core',
         description: json['description'] as String? ?? '',
         type: MediaType.values.firstWhere(
           (t) => t.name == json['media_type'],

@@ -91,10 +91,26 @@ class _Header extends StatelessWidget {
     final controller = Get.find<ProfileTabController>();
     return Row(
       children: [
-        // No avatar for a guest: the unsigned frame (135:8494) shows only the
-        // title, and a personal photo would be a lie about who is signed in.
+        // A guest gets the gear, not an avatar: the unsigned frame puts a
+        // settings icon here, and a personal photo would be a lie about who
+        // is signed in. It also settles how Settings is reached — the frame
+        // shows the entry point that no signed-in frame does.
         if (controller.isGuest)
-          SizedBox(width: 40.h)
+          SizedBox(
+            width: 40.h,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: () => Get.toNamed(AppRoutes.settings),
+                child: CustomImageView(
+                  imagePath: ImageConstant.icSettingsGear,
+                  height: 20.h,
+                  width: 20.h,
+                  color: appTheme.textPrimary,
+                ),
+              ),
+            ),
+          )
         else
         // The Settings frame is named "Profile/setting", so it belongs under
         // Profile — but no frame shows how it opens. The avatar is the
@@ -266,14 +282,14 @@ class _StatRow extends StatelessWidget {
       children: [
         _Stat(
           asset: ImageConstant.imgStatMeditation,
-          label: 'Meditation minutes',
+          label: 'Pilates & Core minutes',
           value: stats.meditationMinutes,
           width: 95,
         ),
         SizedBox(width: 4.h),
         _Stat(
           asset: ImageConstant.imgStatBalance,
-          label: 'Balance minutes',
+          label: 'Stretch & Restore minutes',
           value: stats.balanceMinutes,
           width: 76,
         ),
@@ -311,10 +327,14 @@ class _Stat extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // The exports are black line art. On the card's deep blue they read
+          // as nothing at all, which is why only the camera showed: tint them
+          // to the card's own foreground.
           CustomImageView(
             imagePath: asset,
             height: 20.h,
             width: 20.h,
+            color: appTheme.onPrimary,
           ),
           SizedBox(height: 8.v),
           // Fixed at the design's 28 — two lines — so the values below sit on

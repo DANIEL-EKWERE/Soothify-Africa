@@ -159,6 +159,10 @@ void main() {
                 name: AppRoutes.signin,
                 page: () => const Scaffold(body: Text('signin')),
               ),
+              GetPage(
+                name: AppRoutes.aiHub,
+                page: () => const Scaffold(body: Text('ai hub')),
+              ),
             ],
             initialRoute: at ?? AppRoutes.shell,
           ),
@@ -210,5 +214,20 @@ void main() {
         closeTo(parked.dx, 1),
       );
     });
+
+    testWidgets('tapping it opens the AI Hub, and it steps aside there',
+        (tester) async {
+      useDesignFrame(tester);
+      await mountApp(tester, at: AppRoutes.shell);
+
+      await tester.tap(find.byType(AiAssistButton));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('ai hub'), findsOneWidget);
+      // The hub is the button's own destination, so it must not float over it.
+      expect(find.byType(AiAssistButton), findsNothing);
+    });
+
   });
 }

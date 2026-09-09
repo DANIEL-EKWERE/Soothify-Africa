@@ -52,7 +52,8 @@ void main() {
       Get.put<ContentRepository>(MockContentRepository());
       // The header branches on guest vs signed in.
       Get.put(await SessionService().init());
-      Get.put(HomeTabController(Get.find<ContentRepository>()));
+      Get.put(HomeTabController(Get.find<ContentRepository>(),
+          now: fixedMorning));
 
       await pumpScreen(tester, const HomeTab(), brightness: brightness);
       // The mock repository answers after a deliberate delay. pumpAndSettle
@@ -62,6 +63,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
       await precacheAll(tester, find.byType(HomeTab), _covers);
+
+      // The clock is pinned to 09:00, so this must be the morning greeting.
+      // Without the assertion a broken pin only shows up as a golden that
+      // passes in the morning and fails after lunch.
+      expect(find.text('Good morning'), findsOneWidget);
 
       await expectLater(
           find.byType(HomeTab), matchesGoldenFile('goldens/home_$name.png'));

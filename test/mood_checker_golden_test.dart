@@ -7,6 +7,8 @@ import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 
 import 'package:soothifyafrica/app/data/models/mood.dart';
 import 'package:soothifyafrica/app/data/repositories/local_mood_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/kyc_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/local_kyc_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mood_repository.dart';
 import 'package:soothifyafrica/app/modules/user/mood_checker/controller/mood_checker_controller.dart';
 import 'package:soothifyafrica/app/modules/user/mood_checker/mood_checker_screen.dart';
@@ -31,14 +33,19 @@ void main() {
       await loadAppFonts();
 
       Get.put<MoodRepository>(LocalMoodRepository());
-      Get.put(MoodCheckerController(Get.find<MoodRepository>()));
+      Get.put<KycRepository>(LocalKycRepository());
+      Get.put(MoodCheckerController(
+        Get.find<MoodRepository>(),
+        Get.find<KycRepository>(),
+      ));
 
       await pumpScreen(tester, const MoodCheckerScreen(),
           brightness: brightness);
       await precacheAll(
         tester,
         find.byType(MoodCheckerScreen),
-        Mood.values.map((m) => m.assetPath),
+        // Every face, so a drag never renders an undecoded box.
+        MoodFigure.values.expand((f) => f.allArt),
       );
 
       await expectLater(find.byType(MoodCheckerScreen),

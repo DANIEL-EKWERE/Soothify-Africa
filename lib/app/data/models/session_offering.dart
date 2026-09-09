@@ -1,8 +1,8 @@
 /// One bookable session type on the Schedule screen.
 enum SessionOffering {
   therapy('therapy', 'Therapy sessions'),
-  meditation('meditation', 'Meditation session'),
-  balance('balance', 'Balance sessions');
+  meditation('meditation', 'Pilates & Core session'),
+  balance('balance', 'Stretch & Restore sessions');
 
   const SessionOffering(this.id, this.title);
 

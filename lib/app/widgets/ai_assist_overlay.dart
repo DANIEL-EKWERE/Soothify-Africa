@@ -25,6 +25,9 @@ class AiAssistOverlay extends StatelessWidget {
     AppRoutes.signin,
     AppRoutes.roleSelect,
     AppRoutes.kyc,
+    // The hub is the button's own destination; it has no business
+    // floating over it.
+    AppRoutes.aiHub,
   };
 
   /// The route on top, kept as an observable so the overlay can react to a
@@ -70,5 +73,9 @@ class AiAssistOverlay extends StatelessWidget {
   }
 }
 
-/// What the button does. Its own screen is not in the design yet.
-void openAiAssist() => AppFeedback.info('AI Therapy Assist is not built yet.');
+/// What the button does — the AI Hub, Figma `176:56425` / `176:56395`.
+void openAiAssist() {
+  // Tapping it again while the hub is open would stack a second copy.
+  if (Get.currentRoute == AppRoutes.aiHub) return;
+  Get.toNamed(AppRoutes.aiHub);
+}

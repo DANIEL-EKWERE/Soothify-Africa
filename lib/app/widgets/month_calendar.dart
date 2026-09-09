@@ -16,6 +16,7 @@ class MonthCalendar extends StatelessWidget {
     required this.onSelected,
     this.marked = const {},
     this.compactWeekdays = false,
+    this.selectedColor,
   });
 
   final DateTime month;
@@ -29,6 +30,10 @@ class MonthCalendar extends StatelessWidget {
   /// The daily-habit frames label the columns with single letters rather than
   /// "Mon".."Sun".
   final bool compactWeekdays;
+
+  /// Fill behind the chosen day. Defaults to the brand blue every calendar
+  /// but Profile/History uses; that frame selects in orange.
+  final Color? selectedColor;
 
   static const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const _months = [
@@ -88,7 +93,9 @@ class MonthCalendar extends StatelessWidget {
                 margin: EdgeInsets.all(2.h),
                 decoration: BoxDecoration(
                   color:
-                      isSelected ? appTheme.actionFill : appTheme.transparent,
+                      isSelected
+                          ? (selectedColor ?? appTheme.actionFill)
+                          : appTheme.transparent,
                   shape: BoxShape.circle,
                 ),
                 child: Column(

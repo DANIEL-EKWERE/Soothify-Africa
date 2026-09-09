@@ -89,7 +89,7 @@ void main() {
     final controller = Get.find<WellnessKycController>();
 
     expect(controller.onIntro, isTrue);
-    expect(find.text('Meditation'), findsOneWidget);
+    expect(find.text('Pilates & Core'), findsOneWidget);
     expect(find.textContaining('Tell us a little about yourself'),
         findsOneWidget);
 

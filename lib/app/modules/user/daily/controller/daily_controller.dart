@@ -26,15 +26,15 @@ class DailyController extends GetxController {
 
   String get title => kind.title;
 
-  /// "Start Daily Meditation" / "Start Daily Balance".
+  /// "Start Daily Pilates & Core" / "Start Daily Stretch & Restore".
   String get startLabel => 'Start ${kind.title}';
 
-  /// The Balance frame reuses the Meditation wording verbatim; the habit's own
+  /// The Stretch & Restore frame reuses the Pilates & Core wording verbatim; the habit's own
   /// name is substituted so the empty state does not name the wrong one.
   String get emptyState =>
       'You haven’t completed any ${kind.title}\nyet.';
 
-  /// "Meditation Check-In" / "Balance Check-In".
+  /// "Pilates & Core Check-In" / "Stretch & Restore Check-In".
   String get reminderTitle =>
       '${kind.title.replaceFirst('Daily ', '')} Check-In';
 

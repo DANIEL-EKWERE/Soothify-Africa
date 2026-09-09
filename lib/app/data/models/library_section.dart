@@ -38,7 +38,7 @@ class LibraryFeature extends LibraryBlock {
   final String asset;
 }
 
-/// The closing promo card — "Meditation sessions" / "Balance sessions".
+/// The closing promo card — "Pilates & Core sessions" / "Stretch & Restore sessions".
 ///
 /// No section heading above it, a smaller icon, and radius 8 rather than 12.
 class LibraryPromo extends LibraryBlock {
@@ -53,7 +53,7 @@ class LibraryPromo extends LibraryBlock {
   final String body;
   final String asset;
 
-  /// 50 on Meditation, 56 on Balance.
+  /// 50 on Pilates & Core, 56 on Stretch & Restore.
   final double iconSize;
 }
 
@@ -62,7 +62,7 @@ class LibraryPromo extends LibraryBlock {
 /// Meditation (Figma 135:11744) and Balance (135:20551) are the same frame
 /// with different copy and blocks, so they share one screen.
 enum LibrarySection {
-  meditation('meditation', 'Meditation', [
+  meditation('meditation', 'Pilates & Core', [
     LibraryShelf('Voice Overs', 'voice-overs'),
     LibraryFeature(
       heading: 'Sleep Stories',
@@ -72,17 +72,17 @@ enum LibrarySection {
     ),
     LibraryShelf('Sound Effects', 'sound-effects'),
     LibraryPromo(
-      title: 'Meditation sessions',
+      title: 'Pilates & Core sessions',
       body: 'Speak with a meditation therapist',
       asset: 'assets/images/library/meditation_session.png',
       iconSize: 50,
     ),
   ]),
-  balance('balance', 'Balance', [
+  balance('balance', 'Stretch & Restore', [
     LibraryShelf('Yoga flow', 'yoga-flow'),
     LibraryShelf('Sounds', 'sounds'),
     LibraryPromo(
-      title: 'Balance sessions',
+      title: 'Stretch & Restore sessions',
       // The design's own leading space is dropped; it is a typo, not spacing.
       body: 'Schedule a wellness session with a coach today',
       asset: 'assets/images/library/balance_session.png',

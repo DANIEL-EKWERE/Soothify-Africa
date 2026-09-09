@@ -81,6 +81,19 @@ class PrimaryColors {
     required this.periodToggleBorder,
     required this.planEmphasisFill,
     required this.topicChipBorder,
+    required this.unreadDot,
+    required this.notificationCardBorder,
+    required this.chipOutline,
+    required this.aiStatLabel,
+    required this.aiStatValue,
+    required this.aiDivider,
+    required this.segmentTrack,
+    required this.segmentTrackBorder,
+    required this.calendarCardBorder,
+    required this.daySelected,
+    required this.moodTrackActive,
+    required this.moodTrackInactive,
+    required this.moodThumb,
     required this.filterChipFill,
     required this.filterChipBorder,
     required this.filterRule,
@@ -225,7 +238,39 @@ class PrimaryColors {
   /// barely legible.
   final Color planEmphasisFill;
 
-  /// An unselected topic chip's outline — #999999 at 30%.
+  /// The red mark on an unread notification.
+  final Color unreadDot;
+
+  /// The hairline around the Reminder card, and around an unchosen filter
+  /// chip.
+  final Color notificationCardBorder;
+  final Color chipOutline;
+
+  /// The AI Hub's stat row — a grey caption over a near-black value — and the
+  /// rule beneath it.
+  final Color aiStatLabel;
+  final Color aiStatValue;
+  final Color aiDivider;
+
+  /// The "Select Environment Vibe" segmented control: a white track with a
+  /// hairline, the chosen segment filled with [actionFill].
+  final Color segmentTrack;
+  final Color segmentTrackBorder;
+
+  /// The hairline around the History calendar's card.
+  final Color calendarCardBorder;
+
+  /// The circle behind the chosen day on the History calendar — the design's
+  /// orange, not the blue every other calendar in the app selects with.
+  final Color daySelected;
+
+  /// The Mood Checker slider — measured off the frames. The filled side is a
+  /// softer blue than the handle, and the empty side is the same grey in both
+  /// themes.
+  final Color moodTrackActive;
+  final Color moodTrackInactive;
+  final Color moodThumb;
+
   /// A filter sheet's chip — an off-white fill inside a hairline of the body
   /// ink, per the three filter frames. Unlike a Community topic chip, the
   /// unselected state already carries an outline, so selection is shown by
@@ -236,6 +281,7 @@ class PrimaryColors {
   /// The 2px rule between groups on More Filters.
   final Color filterRule;
 
+  /// An unselected topic chip's outline — #999999 at 30%.
   final Color topicChipBorder;
 
   /// A topic chip's label — #1B1F26 at 72%.
@@ -383,6 +429,19 @@ class PrimaryColors {
     periodToggleBorder: Color(0xFFD7D7D7),
     planEmphasisFill: Color(0xFF0A399A),
     topicChipBorder: Color(0x4D999999),
+    unreadDot: Color(0xFFF45A4F),
+    notificationCardBorder: Color(0xFFE6EBEE),
+    chipOutline: Color(0xFFECEDED),
+    aiStatLabel: Color(0xFF72737A),
+    aiStatValue: Color(0xFF1B1F26),
+    aiDivider: Color(0xFFEBF1F5),
+    segmentTrack: Color(0xFFFEFEFE),
+    segmentTrackBorder: Color(0xFFEAEAEA),
+    calendarCardBorder: Color(0xFFD8D8D8),
+    daySelected: Color(0xFFFF9500),
+    moodTrackActive: Color(0xFF638FE8),
+    moodTrackInactive: Color(0xFFDADADA),
+    moodThumb: Color(0xFF2F6FED),
     filterChipFill: Color(0xFFFEFEFE),
     filterChipBorder: Color(0xFF263238),
     filterRule: Color(0xFF999999),
@@ -455,6 +514,19 @@ class PrimaryColors {
     periodToggleBorder: Color(0x33FFFFFF),
     planEmphasisFill: Color(0xFF0A399A),
     topicChipBorder: Color(0x4DFFFFFF),
+    unreadDot: Color(0xFFF45A4F),
+    notificationCardBorder: Color(0xFF33383B),
+    chipOutline: Color(0xFF3A3838),
+    aiStatLabel: Color(0xFF9AA0A6),
+    aiStatValue: Color(0xFFFEFEFE),
+    aiDivider: Color(0xFF2A2828),
+    segmentTrack: Color(0xFF423F3F),
+    segmentTrackBorder: Color(0xFF3A3838),
+    calendarCardBorder: Color(0xFF3A3838),
+    daySelected: Color(0xFFFF9500),
+    moodTrackActive: Color(0xFF4079EA),
+    moodTrackInactive: Color(0xFFDADADA),
+    moodThumb: Color(0xFF2F6FED),
     filterChipFill: Color(0xFF423F3F),
     filterChipBorder: Color(0xFFFEFEFE),
     filterRule: Color(0xFF5A5757),

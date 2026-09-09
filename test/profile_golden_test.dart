@@ -12,6 +12,8 @@ import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/modules/user/profile/controller/profile_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/profile/profile_tab.dart';
 
+import 'package:soothifyafrica/app/theme/theme_helper.dart';
+
 import 'helpers.dart';
 
 /// Regenerate with:
@@ -27,6 +29,21 @@ class _FakeProfileRepository implements ProfileRepository {
   @override
   Future<ProfileStats> getStats() async => ProfileStats.empty;
 }
+
+/// PNGs only: precacheImage decodes raster data and rejects an SVG. Without
+/// these the profile goldens recorded blank boxes where the stat glyphs and
+/// the sign-up card's icons should be — which is how the black-on-blue stat
+/// icons went unnoticed.
+const _art = [
+  'assets/images/profile/stat_meditation.png',
+  'assets/images/profile/stat_balance.png',
+  'assets/images/profile/signup_clock.png',
+  'assets/images/profile/signup_calendar.png',
+  'assets/images/profile/signup_mind.png',
+  'assets/images/profile/ic_settings_gear.png',
+  'assets/images/profile/ic_person.png',
+  'assets/images/home/avatar.png',
+];
 
 void main() {
   setUp(() {
@@ -45,6 +62,7 @@ void main() {
       Get.put(ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false)));
 
       await pumpScreen(tester, const ProfileTab(), brightness: brightness);
+      await precacheAll(tester, find.byType(ProfileTab), _art);
 
       await expectLater(find.byType(ProfileTab),
           matchesGoldenFile('goldens/profile_$name.png'));
@@ -107,9 +125,44 @@ void main() {
     expect(find.text('My stats'), findsNothing);
     expect(find.text('Dashboard'), findsNothing);
     expect(find.textContaining('Create an account'), findsOneWidget);
-    expect(find.text('Sign up or Log in'), findsOneWidget);
+    expect(find.text('Sign up'), findsOneWidget);
+    // The gear is a guest's way into Settings — the only frame that shows one.
+    expect(find.text('Unlock Soothify Pro'), findsOneWidget);
 
+    await precacheAll(tester, find.byType(ProfileTab), _art);
     await expectLater(find.byType(ProfileTab),
         matchesGoldenFile('goldens/profile_unsigned.png'));
+  });
+
+  testWidgets('History picks a day in orange, and has no confirm button',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final controller = ProfileTabController(
+      _FakeProfileRepository(),
+      _FakeSession(guest: false),
+    );
+    Get.put(controller);
+
+    await pumpScreen(tester, const ProfileTab());
+    controller.section.value = ProfileSection.history;
+    await tester.pumpAndSettle();
+
+    expect(find.text('My Calendar'), findsOneWidget);
+    // The frame has no confirm button under the calendar; an earlier build
+    // added a permanently disabled "Select date" that led nowhere.
+    expect(find.text('Select date'), findsNothing);
+
+    await tester.tap(find.text('14'));
+    await tester.pumpAndSettle();
+
+    expect(controller.selectedDate.value, DateTime(2024, 8, 14));
+    // Orange, not the blue every other calendar in the app selects with.
+    final filled = tester
+        .widgetList<Container>(find.byType(Container))
+        .where((c) =>
+            (c.decoration as BoxDecoration?)?.color == PrimaryColors.light.daySelected);
+    expect(filled, isNotEmpty,
+        reason: 'the chosen day should be filled with daySelected');
   });
 }

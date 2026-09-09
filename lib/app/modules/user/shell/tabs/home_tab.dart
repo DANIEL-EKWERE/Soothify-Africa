@@ -126,6 +126,9 @@ class _Header extends StatelessWidget {
         ),
         SizedBox(width: 8.h),
         GestureDetector(
+          // The bell had no action at all — a dead control on every build so
+          // far. It is what opens the notification feed.
+          onTap: () => Get.toNamed(AppRoutes.notifications),
           child: Container(
             width: 44.h,
             height: 44.h,
@@ -262,11 +265,14 @@ class _ExploreTile extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8.h),
+            // Two lines, not one: the renamed destinations are far longer
+            // than the words the frame was drawn with, and "Book a licensed
+            // Expert" ellipsised to "Book a licensed Ex..." on one line.
             Text(
               destination.label,
               textAlign: TextAlign.center,
               style: CustomTextStyles.exploreLabel,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
           ],

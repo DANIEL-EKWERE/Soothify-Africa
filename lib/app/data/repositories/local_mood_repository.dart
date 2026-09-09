@@ -48,7 +48,7 @@ class LocalMoodRepository implements MoodRepository {
   }
 
   @override
-  Future<MoodEntry> record(Mood mood, {String note = ''}) async {
+  Future<MoodEntry> record(double score, {String note = ''}) async {
     final all = await _readAll();
     final now = _now();
 
@@ -57,7 +57,7 @@ class LocalMoodRepository implements MoodRepository {
 
     final entry = MoodEntry(
       id: now.microsecondsSinceEpoch.toString(),
-      mood: mood,
+      score: score,
       recordedAt: now,
       note: note,
     );

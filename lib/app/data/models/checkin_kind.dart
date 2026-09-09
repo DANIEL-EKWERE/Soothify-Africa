@@ -5,8 +5,8 @@
 enum CheckinKind {
   mood('Mood Check-Ins'),
   journal('Journal Check-Ins'),
-  meditation('Daily Meditation'),
-  balance('Daily Balance');
+  meditation('Daily Pilates & Core'),
+  balance('Daily Stretch & Restore');
 
   const CheckinKind(this.title);
 

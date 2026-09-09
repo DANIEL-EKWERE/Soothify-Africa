@@ -53,7 +53,7 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Schedule',
+            'Book a licensed Expert',
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),

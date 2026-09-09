@@ -50,7 +50,7 @@ class CheckinScreen extends GetView<CheckinController> {
                       if (controller.entry.value != null) ...[
                         _EntryCard(
                           when: controller.entry.value!.recordedAt,
-                          label: controller.entry.value!.mood.label,
+                          label: controller.entry.value!.level.label,
                         ),
                         SizedBox(height: 32.v),
                       ],

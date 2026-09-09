@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
-import 'package:soothifyafrica/app/data/models/mood.dart';
 import 'package:soothifyafrica/app/data/repositories/local_mood_repository.dart';
 import 'package:soothifyafrica/app/modules/user/mood_record/controller/mood_record_controller.dart';
 
@@ -21,16 +20,16 @@ void main() {
   group('LocalMoodRepository.between', () {
     test('includes an entry recorded on a boundary day', () async {
       final repo = LocalMoodRepository(now: now);
-      await repo.record(Mood.happy);
+      await repo.record(0.85);
 
       final found = await repo.between(wednesday, wednesday);
       expect(found, hasLength(1));
-      expect(found.single.mood, Mood.happy);
+      expect(found.single.score, closeTo(0.85, 1e-9));
     });
 
     test('excludes days outside the range', () async {
       final repo = LocalMoodRepository(now: now);
-      await repo.record(Mood.sad);
+      await repo.record(0.10);
 
       final lastWeek = wednesday.subtract(const Duration(days: 7));
       expect(await repo.between(lastWeek, lastWeek), isEmpty);
@@ -51,7 +50,7 @@ void main() {
 
     test('marks only the days that have a check-in', () async {
       final repo = LocalMoodRepository(now: now);
-      await repo.record(Mood.calm);
+      await repo.record(0.75);
 
       final c = MoodRecordController(repo, now: now)..onInit();
       await Future<void>.delayed(const Duration(milliseconds: 20));

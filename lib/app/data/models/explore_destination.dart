@@ -5,15 +5,15 @@
 /// section in the design ("HOME SCREEN --> Meditation", "--> Schedule",
 /// "--> balance"), so the routes land as those screens are built.
 enum ExploreDestination {
-  meditation('Meditation', 'assets/images/explore/meditation.png', 56),
-  scheduleSession('Schedule Session', 'assets/images/explore/schedule.png', 56),
-  balance('Balance', 'assets/images/explore/balance.png', 64);
+  meditation('Pilates & Core', 'assets/images/explore/meditation.png', 56),
+  scheduleSession('Book a licensed Expert', 'assets/images/explore/schedule.png', 56),
+  balance('Stretch & Restore', 'assets/images/explore/balance.png', 64);
 
   const ExploreDestination(this.label, this.assetPath, this.artSize);
 
   final String label;
   final String assetPath;
 
-  /// Balance's illustration is drawn larger than the other two.
+  /// Stretch & Restore's illustration is drawn larger than the other two.
   final double artSize;
 }

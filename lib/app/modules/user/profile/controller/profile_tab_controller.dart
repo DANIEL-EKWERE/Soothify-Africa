@@ -29,14 +29,6 @@ class ProfileTabController extends BaseController {
 
   void selectDate(DateTime date) => selectedDate.value = date;
 
-  void confirmDate() {
-    final date = selectedDate.value;
-    if (date == null) return;
-    // Nothing records sessions yet, so there is no history to open — the
-    // frame's own empty state says as much.
-    AppFeedback.info('No sessions on ${date.day}/${date.month} yet.');
-  }
-
   /// Mood and Journal open a calendar of past entries; the two daily habits
   /// have their own screen, with a reminder behind it.
   void openCheckin(CheckinKind kind) => Get.toNamed(

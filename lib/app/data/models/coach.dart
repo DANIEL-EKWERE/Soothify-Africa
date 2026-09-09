@@ -51,7 +51,7 @@ class Coach {
       'Pop music lover',
       'Enjoys being active and spending time with friends',
     ],
-    expertise: ['Yoga', 'Meditation'],
+    expertise: ['Yoga', 'Pilates & Core'],
     videoTitles: ['Unshakeable', 'Unshakeable', 'Unshakeable'],
   );
 }

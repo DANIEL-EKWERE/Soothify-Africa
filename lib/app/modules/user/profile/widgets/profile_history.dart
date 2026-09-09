@@ -4,10 +4,19 @@ import '../../../../core/app_export.dart';
 import '../../../../widgets/month_calendar.dart';
 import '../controller/profile_tab_controller.dart';
 
-/// The History tab — Figma "Profile/history" (135:8133).
+/// The History tab — Figma "Profile/history" (page 124:2, `176:34144`).
 ///
-/// A month calendar over an empty state. Nothing records sessions yet, so the
-/// empty state is the honest view rather than a seeded history.
+/// The month grid sits inside a white card with a hairline, and the chosen day
+/// is filled orange rather than the blue the app's other calendars use.
+/// Nothing records sessions yet, so the empty state below is the honest view
+/// rather than a seeded history.
+///
+/// The frame has no "Select date" button — the earlier build added one, and a
+/// disabled button under an empty calendar read as a dead end.
+///
+/// Note on the frame's own calendar: it prints 1 August 2024 under Monday,
+/// but that was a Thursday. The grid here is correct; do not "fix" it to match
+/// the render.
 class ProfileHistory extends StatelessWidget {
   const ProfileHistory({super.key});
 
@@ -18,51 +27,28 @@ class ProfileHistory extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text('My Calendar', style: CustomTextStyles.statsHeading),
-            SizedBox(height: 32.v),
-            MonthCalendar(
-              month: controller.month.value,
-              selected: controller.selectedDate.value,
-              onSelected: controller.selectDate,
+            SizedBox(height: 19.v),
+            Container(
+              padding: EdgeInsets.fromLTRB(22.h, 24.v, 22.h, 24.v),
+              decoration: BoxDecoration(
+                color: appTheme.surface,
+                borderRadius: BorderRadius.circular(12.h),
+                border: Border.all(color: appTheme.calendarCardBorder),
+              ),
+              child: MonthCalendar(
+                month: controller.month.value,
+                selected: controller.selectedDate.value,
+                onSelected: controller.selectDate,
+                selectedColor: appTheme.daySelected,
+              ),
             ),
-            SizedBox(height: 44.v),
+            SizedBox(height: 28.v),
             Text(
               'Your history will show here after your first\nsession.',
               textAlign: TextAlign.center,
               style: CustomTextStyles.emptyStateBody,
             ),
-            SizedBox(height: 24.v),
-            _SelectDateButton(
-              enabled: controller.selectedDate.value != null,
-              onTap: controller.confirmDate,
-            ),
           ],
         ));
-  }
-}
-
-class _SelectDateButton extends StatelessWidget {
-  const _SelectDateButton({required this.enabled, required this.onTap});
-
-  final bool enabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(8.h),
-      child: Container(
-        height: 52.v,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: enabled ? appTheme.actionFill : appTheme.actionFillDisabled,
-          borderRadius: BorderRadius.circular(8.h),
-        ),
-        child: Text(
-          'Select date',
-          style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
-        ),
-      ),
-    );
   }
 }

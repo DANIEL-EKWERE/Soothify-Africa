@@ -80,6 +80,26 @@ class ImageConstant {
   static const String icReply = '$_icons/ic_reply.svg';
   static const String icLocation = '$_icons/ic_location.svg';
   static const String icLiveSession = '$_icons/ic_live_session.svg';
+  /// The three white line icons inside the guest sign-up card, and the gear
+  /// and person glyphs beside it — cropped from the rendered frame, because
+  /// the /nodes endpoint that would give their own ids is rate-limited.
+  /// Notification feed art, cropped from the rendered frame — the /nodes
+  /// endpoint that would give these their own ids is rate-limited. The frame
+  /// gives two of its three people the same portrait.
+  static const String imgAvatarMale = '$_images/notifications/avatar_male.png';
+  static const String imgAvatarFemale =
+      '$_images/notifications/avatar_female.png';
+  static const String icReminder = '$_images/notifications/ic_reminder.png';
+  /// The digest's heart is solid in the frame; [icHeart] is the outline
+  /// the media cards use.
+  static const String icHeartFilled =
+      '$_images/notifications/ic_heart_filled.png';
+
+  static const String imgSignupClock = '$_images/profile/signup_clock.png';
+  static const String imgSignupCalendar = '$_images/profile/signup_calendar.png';
+  static const String imgSignupMind = '$_images/profile/signup_mind.png';
+  static const String icSettingsGear = '$_images/profile/ic_settings_gear.png';
+  static const String icPerson = '$_images/profile/ic_person.png';
   static const String imgStatMeditation = '$_images/profile/stat_meditation.png';
   static const String imgStatBalance = '$_images/profile/stat_balance.png';
 

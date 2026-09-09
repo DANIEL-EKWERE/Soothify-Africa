@@ -21,7 +21,7 @@ class WellnessKycStep {
 /// Which section's questionnaire is running.
 enum WellnessTrack {
   meditation(
-    'Meditation',
+    'Pilates & Core',
     [
       WellnessKycStep(
         question:
@@ -73,7 +73,7 @@ enum WellnessTrack {
     ],
   ),
   balance(
-    'Balance',
+    'Stretch & Restore',
     [
       WellnessKycStep(
         question: 'What’s your level of experience with yoga?',
@@ -119,7 +119,7 @@ enum WellnessTrack {
     hasIntro: false,
   ),
   schedule(
-    'Schedule',
+    'Book a licensed Expert',
     [
       WellnessKycStep(
         question: 'What type of wellness sessions are you interested in?',

@@ -13,6 +13,7 @@ import 'package:soothifyafrica/app/data/repositories/profile_repository.dart';
 import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/shell/binding/shell_binding.dart';
+import 'package:soothifyafrica/app/modules/user/shell/tabs/home_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/shell/shell_screen.dart';
 
 import 'helpers.dart';
@@ -58,6 +59,11 @@ void main() {
       // registered here too, and a hand-written list silently drifts out of
       // date the moment a tab is added.
       ShellBinding().dependencies();
+      // ...then pin Home's clock. The greeting is time of day, so a golden
+      // recorded in the morning fails in the evening. Only this one
+      // registration is overridden; the rest stay as the binding made them.
+      Get.put(HomeTabController(Get.find<ContentRepository>(),
+          now: fixedMorning));
 
       await pumpScreen(tester, const ShellScreen(), brightness: brightness);
       // Let every tab's mock latency elapse — the IndexedStack builds all
@@ -66,6 +72,11 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1200));
       await tester.pumpAndSettle();
       await precacheAll(tester, find.byType(ShellScreen), _art);
+
+      // The clock is pinned to 09:00, so this must be the morning greeting.
+      // Without the assertion a broken pin only shows up as a golden that
+      // passes in the morning and fails after lunch.
+      expect(find.text('Good morning'), findsOneWidget);
 
       await expectLater(find.byType(ShellScreen),
           matchesGoldenFile('goldens/shell_$name.png'));

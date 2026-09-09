@@ -11,7 +11,6 @@ import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dar
 import 'package:soothifyafrica/app/modules/user/library/controller/library_controller.dart';
 import 'package:soothifyafrica/app/modules/user/library/library_screen.dart';
 import 'package:soothifyafrica/app/routes/app_pages.dart';
-import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/data/models/media_filter.dart';
 import 'package:soothifyafrica/app/modules/user/filters/controller/filters_controller.dart';

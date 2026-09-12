@@ -1,3 +1,5 @@
+import 'explore_destination.dart';
+
 /// One block on a library screen.
 ///
 /// The frames are not a uniform list of shelves: Meditation puts a Sleep
@@ -100,8 +102,16 @@ enum LibrarySection {
   String get searchHint => 'Let’s find your calm';
 
   /// The section's own artwork, shown in its header — the same image Home's
-  /// Explore tile uses, so the two read as the same destination.
-  String get artPath => 'assets/images/explore/$id.png';
+  /// Explore tile uses, so the two read as the same destination and the Hero
+  /// between them flies one object rather than swapping a photo for a badge.
+  ///
+  /// Taken from the tile rather than spelt out here: that is what let the two
+  /// drift apart once already, when the tiles became photographs and this
+  /// stayed on the old badge.
+  String get artPath => switch (this) {
+        LibrarySection.meditation => ExploreDestination.meditation.assetPath,
+        LibrarySection.balance => ExploreDestination.balance.assetPath,
+      };
 
   Iterable<LibraryShelf> get shelves => blocks.whereType<LibraryShelf>();
 }

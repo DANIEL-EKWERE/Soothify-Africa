@@ -87,10 +87,16 @@ class _Header extends StatelessWidget {
         // other end of that tile's flight.
         Hero(
           tag: 'explore-${Get.find<LibraryController>().section.id}',
-          child: CustomImageView(
-            imagePath: Get.find<LibraryController>().section.artPath,
-            height: 28.h,
-            width: 28.h,
+          // A photograph now, like the tile it flies in from — clipped, since
+          // a hard-cornered photo at this size reads as a stray thumbnail.
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6.h),
+            child: CustomImageView(
+              imagePath: Get.find<LibraryController>().section.artPath,
+              height: 28.h,
+              width: 28.h,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ],

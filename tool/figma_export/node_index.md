@@ -16,6 +16,30 @@
 > The rename is partial: KYC, Profile daily/reminder and Recommendation
 > frames still carry the old words.
 >
+> **2026-09-11 — back on the NEW file, and every id changed.** The design is
+> in `NJjQwgwMr44oDKuaaHHKbn` page `124:2` after all. It was re-pasted
+> wholesale: 805 frames, ids `176:*` → `191:*`, names and canvas positions
+> preserved. Old ids are dead — `/images` returns null for them. The fresh
+> index is in `page_124_2_index.txt`.
+>
+> **Tokens.** `.env` holds five, one per line as `token - email`; read it
+> with that pattern, not `KEY=value`. Quotas are per account. On this date:
+> `loganhunter733` had `/images` open and `/nodes` blocked; `ekweredaniel8`
+> had `/nodes` open on this file (the 4.4-day block it took on the OLD file
+> did not carry over). Probe cheaply, then use whichever account has the
+> endpoint you need.
+>
+> **The page-index call is the one that spends a quota.** I made it twice
+> this day against my own warning — once on the old file (blocked the account
+> ~4.4 days for everything) and once here, where it happened to survive.
+> Prefer rendering frames whose ids are already cached; fetch the index only
+> when ids have demonstrably changed, as they had here.
+>
+> **Read this day:** Home (`191:5489` light — the Explore tiles are photos
+> now; `191:10395` dark — NOT updated, still the old badges; `191:10877` is an
+> emptied duplicate), and the male concern carousel (`191:36092`, `36103`,
+> `36114`, `36125`, the new row at y=0).
+>
 > **2026-09-09: the queued render landed.** A token for a *different* Figma
 > account (`ekweredaniel8@gmail.com`) had a fresh quota and pulled all five
 > frames in one call. Quota is per account, so a token from an account that

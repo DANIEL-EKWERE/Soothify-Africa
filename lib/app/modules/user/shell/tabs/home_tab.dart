@@ -248,28 +248,23 @@ class _ExploreTile extends StatelessWidget {
         width: 100.h,
         child: Column(
           children: [
-            Container(
-              height: 90.h,
-              width: 100.h,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: appTheme.surface,
-                border: Border.all(color: appTheme.exploreTileBorder),
-                borderRadius: BorderRadius.circular(8.h),
-              ),
-              // Flies into the library's header art. The tag is the
-              // destination, so the three tiles can never collide.
-              child: Hero(
-                tag: 'explore-${destination.name}',
-                child: ArtworkPlaceholder(
-                  width: destination.artSize.h,
-                  height: destination.artSize.h,
-                  radius: 8.h,
-                  assetPath: destination.assetPath,
-                ),
+            // The photo is the tile: no card, no border, no badge inside a
+            // box — the frame fills the 100x90 edge to edge.
+            //
+            // Flies into the library's header art. The tag is the
+            // destination, so the three tiles can never collide.
+            Hero(
+              tag: 'explore-${destination.name}',
+              // Covers and clips on its own, and keeps a flat block beneath
+              // so a photo that is still decoding never leaves a hole.
+              child: ArtworkPlaceholder(
+                width: 100.h,
+                height: 90.h,
+                radius: 8.h,
+                assetPath: destination.assetPath,
               ),
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 9.h),
             // Two lines, not one: the renamed destinations are far longer
             // than the words the frame was drawn with, and "Book a licensed
             // Expert" ellipsised to "Book a licensed Ex..." on one line.

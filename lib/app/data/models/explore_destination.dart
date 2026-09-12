@@ -5,15 +5,21 @@
 /// section in the design ("HOME SCREEN --> Meditation", "--> Schedule",
 /// "--> balance"), so the routes land as those screens are built.
 enum ExploreDestination {
-  meditation('Pilates & Core', 'assets/images/explore/meditation.png', 56),
-  scheduleSession('Book a licensed Expert', 'assets/images/explore/schedule.png', 56),
-  balance('Stretch & Restore', 'assets/images/explore/balance.png', 64);
+  // Photographs now, filling the tile — Figma "Home screen/signed in"
+  // (page 124:2, `191:5489`). The illustrated badges the tiles used to carry
+  // are still used elsewhere (the Check-Ins cards, the library header), so
+  // they stay under their old names and these are new files.
+  meditation('Pilates & Core', 'assets/images/explore/pilates_core.jpg'),
+  scheduleSession(
+    'Book a Licensed Expert',
+    'assets/images/explore/book_expert.jpg',
+  ),
+  balance('Stretch & Restore', 'assets/images/explore/stretch_restore.jpg');
 
-  const ExploreDestination(this.label, this.assetPath, this.artSize);
+  const ExploreDestination(this.label, this.assetPath);
 
   final String label;
-  final String assetPath;
 
-  /// Stretch & Restore's illustration is drawn larger than the other two.
-  final double artSize;
+  /// A photo that covers the 100x90 tile.
+  final String assetPath;
 }

@@ -53,7 +53,7 @@ void main() {
       final c = HomeTabController(MockContentRepository());
       expect(
         c.explore.map((d) => d.label),
-        ['Pilates & Core', 'Book a licensed Expert', 'Stretch & Restore'],
+        ['Pilates & Core', 'Book a Licensed Expert', 'Stretch & Restore'],
       );
     });
 

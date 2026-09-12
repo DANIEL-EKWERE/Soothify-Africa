@@ -67,7 +67,7 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Book a licensed Expert',
+            'Book a Licensed Expert',
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),

@@ -119,7 +119,7 @@ enum WellnessTrack {
     hasIntro: false,
   ),
   schedule(
-    'Book a licensed Expert',
+    'Book a Licensed Expert',
     [
       WellnessKycStep(
         question: 'What type of wellness sessions are you interested in?',

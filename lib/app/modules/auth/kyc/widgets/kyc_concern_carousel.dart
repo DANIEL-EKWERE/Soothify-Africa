@@ -115,6 +115,11 @@ class _KycConcernCarouselState extends State<KycConcernCarousel> {
                   itemBuilder: (context, i) => Obx(
                     () => _Figure(
                       option: options[i],
+                      // The gender step comes first precisely so this can be
+                      // answered by now.
+                      artPath: options[i].illustrationFor(
+                        controller.answers['gender']?.firstOrNull,
+                      ),
                       focused: i == _focused,
                       selected: controller.current.contains(options[i].value),
                       onTap: () => controller.choose(options[i]),
@@ -170,12 +175,16 @@ class _KycConcernCarouselState extends State<KycConcernCarousel> {
 class _Figure extends StatelessWidget {
   const _Figure({
     required this.option,
+    required this.artPath,
     required this.focused,
     required this.selected,
     required this.onTap,
   });
 
   final KycOption option;
+
+  /// Already resolved for the user's gender.
+  final String? artPath;
   final bool focused;
   final bool selected;
   final VoidCallback onTap;
@@ -208,8 +217,8 @@ class _Figure extends StatelessWidget {
                 ),
                 child: SizedBox(height: 224.v, width: 224.v),
               ),
-            if (option.illustration != null)
-              Image.asset(option.illustration!, fit: BoxFit.contain)
+            if (artPath != null)
+              Image.asset(artPath!, fit: BoxFit.contain)
             else
               // Artwork pending a render; the label below still names it.
               const SizedBox.shrink(),

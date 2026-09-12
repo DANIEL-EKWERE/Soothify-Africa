@@ -23,6 +23,7 @@ class KycOption {
     this.label, {
     this.assetPath,
     this.illustration,
+    this.illustrationMale,
     this.backgroundArgb,
     this.accentArgb,
   });
@@ -41,8 +42,20 @@ class KycOption {
   /// Held as ARGB ints so the data layer stays free of Flutter types, as the
   /// other models here do.
   final String? illustration;
+
+  /// The male counterpart of [illustration] — the frames draw the carousel
+  /// twice, once per figure (`191:36092`-`191:36125` are his). Null falls
+  /// back to the female art.
+  final String? illustrationMale;
+
   final int? backgroundArgb;
   final int? accentArgb;
+
+  /// Which illustration to draw for the gender the user gave a step earlier.
+  /// Anything that is not an explicit "male" — female, non-binary,
+  /// undisclosed — gets the female set, as the Mood Checker does.
+  String? illustrationFor(String? gender) =>
+      gender == 'male' ? (illustrationMale ?? illustration) : illustration;
 }
 
 /// One step of the KYC questionnaire.
@@ -72,6 +85,19 @@ class KycQuestion {
   static const String _multiHint = 'You can select more than one option';
 
   static final List<KycQuestion> all = [
+    // First, before the concerns carousel: its answer decides whether the
+    // carousel draws the male or the female set of illustrations, so it has
+    // to be known by the time that step is reached.
+    const KycQuestion(
+      id: 'gender',
+      prompt: 'What is your gender?',
+      options: [
+        KycOption('male', 'Male'),
+        KycOption('female', 'Female'),
+        KycOption('non_binary', 'Non binary'),
+        KycOption('undisclosed', 'Rather not say'),
+      ],
+    ),
     const KycQuestion(
       id: 'concerns',
       prompt: 'What brings you to Soothify?',
@@ -84,20 +110,24 @@ class KycQuestion {
       options: [
         KycOption('stress', 'Stress',
             illustration: 'assets/images/concerns/stress_figure.png',
+            illustrationMale: 'assets/images/concerns/stress_figure_male.png',
             backgroundArgb: 0xFFF9980F,
             accentArgb: 0xFF4679ED),
         KycOption('anxiety', 'Anxiety',
             illustration: 'assets/images/concerns/anxiety_figure.png',
+            illustrationMale: 'assets/images/concerns/anxiety_figure_male.png',
             backgroundArgb: 0xFF7B7FE8,
             accentArgb: 0xFFFFAE24),
         // `176:56173` and `176:56161`, both misnamed "Kyc screen | Anxiety"
         // in the file — the names are duplicates, the artwork is not.
         KycOption('sleep_disorder', 'Sleep disorder',
             illustration: 'assets/images/concerns/sleep_disorder_figure.png',
+            illustrationMale: 'assets/images/concerns/sleep_disorder_figure_male.png',
             backgroundArgb: 0xFF465A8C,
             accentArgb: 0xFFFFAE24),
         KycOption('depression', 'Depression',
             illustration: 'assets/images/concerns/depression_figure.png',
+            illustrationMale: 'assets/images/concerns/depression_figure_male.png',
             backgroundArgb: 0xFF626A8A,
             accentArgb: 0xFFFFAE24),
       ],
@@ -137,16 +167,6 @@ class KycQuestion {
             assetPath: 'assets/images/goals/peace.png'),
         KycOption('something_else', 'Something else',
             assetPath: 'assets/images/goals/something_else.png'),
-      ],
-    ),
-    const KycQuestion(
-      id: 'gender',
-      prompt: 'What is your gender?',
-      options: [
-        KycOption('male', 'Male'),
-        KycOption('female', 'Female'),
-        KycOption('non_binary', 'Non binary'),
-        KycOption('undisclosed', 'Rather not say'),
       ],
     ),
     KycQuestion(

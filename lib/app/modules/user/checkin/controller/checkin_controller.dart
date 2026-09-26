@@ -95,7 +95,7 @@ class CheckinController extends BaseController {
     for (final e in levels.entries) {
       if (DateUtils.isSameDay(e.key, day)) return e.value;
     }
-    return MoodLevel.good;
+    return MoodLevel.neutral;
   }
 
 

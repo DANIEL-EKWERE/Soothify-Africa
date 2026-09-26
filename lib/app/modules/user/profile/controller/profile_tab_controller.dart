@@ -29,11 +29,18 @@ class ProfileTabController extends BaseController {
 
   void selectDate(DateTime date) => selectedDate.value = date;
 
-  /// Mood and Journal open a calendar of past entries; the two daily habits
-  /// have their own screen, with a reminder behind it.
+  /// Mood opens a calendar of past check-ins; the two daily habits have their
+  /// own screen, with a reminder behind it.
+  ///
+  /// Journal opens the Journal itself. Its `Profile/journal checkin` frames
+  /// turn out to be pixel-identical to the `Journal` ones — the two rows are
+  /// the same screens under two names — and the check-in calendar had nothing
+  /// to draw for this kind, so it was a permanently empty month. This is also
+  /// the only way into the Journal: nothing else routed to it.
   void openCheckin(CheckinKind kind) => Get.toNamed(
         switch (kind) {
-          CheckinKind.mood || CheckinKind.journal => AppRoutes.checkin,
+          CheckinKind.mood => AppRoutes.checkin,
+          CheckinKind.journal => AppRoutes.journal,
           CheckinKind.meditation || CheckinKind.balance => AppRoutes.daily,
         },
         arguments: kind,

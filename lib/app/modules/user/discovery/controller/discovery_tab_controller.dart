@@ -7,6 +7,7 @@ import '../../../../core/utils/feedback_utils.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/models/media_filter.dart';
 import '../../../../data/models/media_item.dart';
+import '../../../../data/models/subscription_offer.dart';
 import '../../../../data/models/subscription_plan.dart';
 import '../../../../data/repositories/content_repository.dart';
 import '../../../../data/repositories/subscription_repository.dart';
@@ -53,7 +54,11 @@ class DiscoveryTabController extends BaseController {
 
   void toggleFreeTrial(bool value) => freeTrial.value = value;
 
-  void subscribe() => AppFeedback.info('Checkout is not built yet.');
+  /// The pop-up is the pitch the design puts behind this — `259:59011`.
+  void subscribe() => Get.toNamed(
+        AppRoutes.subscriptionOffer,
+        arguments: SubscriptionOffer.trial,
+      );
 
   /// Each shelf's "See All" opens the same grid, named by its heading.
   void openShelf(String shelf) =>

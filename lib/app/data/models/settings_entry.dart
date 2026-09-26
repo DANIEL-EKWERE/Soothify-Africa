@@ -11,6 +11,12 @@ enum SettingsEntry {
   privacyPolicy('Privacy Policy', 'ic_settings_privacy'),
   terms('Terms & Conditions', 'ic_settings_terms'),
   about('About Us', 'ic_settings_about'),
+  // Not a row the Settings frame draws. The "Become an Expert" flow
+  // (`259:59132` onward) has no entry point anywhere in the file, and this is
+  // the app's list of account-level actions, so it goes here. The glyph is
+  // borrowed from the rating star; there is no exported one for it, and the
+  // live-session camcorder read as "video" rather than "expert".
+  becomeExpert('Become an Expert', 'ic_star'),
   logout('Logout', 'ic_settings_logout');
 
   const SettingsEntry(this.label, this._icon);

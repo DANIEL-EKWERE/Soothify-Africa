@@ -56,16 +56,14 @@ class MoodCheckerController extends BaseController {
 
   void setScore(double value) => score.value = value.clamp(0.0, 1.0);
 
-  /// The design's only action is "Add Detail". There is no frame behind it —
-  /// no note composer is drawn anywhere for this flow — so it commits the
-  /// score and moves on to the records screen, which is where the old flow
-  /// ended and whose copy ("Nice job today") follows from it.
+  /// "Add Detail" commits the score and opens what the app offers back for
+  /// that mood; the day's check-in follows from there.
   Future<void> submit() async {
     if (isSaving.value) return;
     isSaving.value = true;
     final entry = await guard(() => _repository.record(score.value));
     isSaving.value = false;
     if (entry == null) return;
-    await Get.toNamed(AppRoutes.moodRecord);
+    await Get.toNamed(AppRoutes.moodRecommendation, arguments: level);
   }
 }

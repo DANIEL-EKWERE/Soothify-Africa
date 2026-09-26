@@ -87,6 +87,9 @@ class PrimaryColors {
     required this.aiStatLabel,
     required this.aiStatValue,
     required this.aiDivider,
+    required this.policyPanel,
+    required this.expertIntroInk,
+    required this.successInk,
     required this.segmentTrack,
     required this.segmentTrackBorder,
     required this.calendarCardBorder,
@@ -255,6 +258,16 @@ class PrimaryColors {
   final Color aiStatLabel;
   final Color aiStatValue;
   final Color aiDivider;
+
+  /// The pale panel behind the booking screen's cancellation policy.
+  final Color policyPanel;
+
+  /// The dark end of the expert intro's title run, which is steeper than the
+  /// app's [titleGradient].
+  final Color expertIntroInk;
+
+  /// Type on a wash of [success] — the joining screen's hint panel.
+  final Color successInk;
 
   /// The "Select Environment Vibe" segmented control: a white track with a
   /// hairline, the chosen segment filled with [actionFill].
@@ -449,6 +462,9 @@ class PrimaryColors {
     aiStatLabel: Color(0xFF72737A),
     aiStatValue: Color(0xFF1B1F26),
     aiDivider: Color(0xFFEBF1F5),
+    policyPanel: Color(0xFFEDF6FE),
+    expertIntroInk: Color(0xFF274889),
+    successInk: Color(0xFF07661F),
     segmentTrack: Color(0xFFFEFEFE),
     segmentTrackBorder: Color(0xFFEAEAEA),
     calendarCardBorder: Color(0xFFD8D8D8),
@@ -538,6 +554,13 @@ class PrimaryColors {
     aiStatLabel: Color(0xFF9AA0A6),
     aiStatValue: Color(0xFFFEFEFE),
     aiDivider: Color(0xFF2A2828),
+    // The dark frame draws no policy panel; this follows the same 12%-blue
+    // treatment the trial banner uses on charcoal.
+    policyPanel: Color(0x1F2F6FED),
+    // Lifted off the light value so the run stays legible on charcoal.
+    expertIntroInk: Color(0xFF7FA8FF),
+    // Lifted so it reads on the same 8% wash over charcoal.
+    successInk: Color(0xFF5FD37C),
     segmentTrack: Color(0xFF423F3F),
     segmentTrackBorder: Color(0xFF3A3838),
     calendarCardBorder: Color(0xFF3A3838),

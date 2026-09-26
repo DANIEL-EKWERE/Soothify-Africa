@@ -5,6 +5,7 @@ The Figma MCP server is capped at 6 calls/month on the Starter plan; this uses
 a personal access token instead, which has no such limit.
 
   tool/figma.py nodes  <id> ...   save node JSON to tool/.figma_cache/
+  tool/figma.py filenodes <id> .. same, via /files?ids= (a separate quota)
   tool/figma.py render <id> ...   render PNGs at 2x
   tool/figma.py spec   <id>       print positions, styles and fills
 
@@ -66,6 +67,33 @@ def api(path, attempts=6):
 
 def _path(nid):
     return CACHE / f"node_{nid.replace(':', '_')}.json"
+
+
+def file_nodes(ids):
+    """Fetch node JSON through /files?ids= instead of /nodes.
+
+    A third budget, separate from both /nodes and /images, and in practice the
+    last one to block — see tool/figma_export/README.md. Returns the same
+    documents, so the cache files are interchangeable.
+    """
+    CACHE.mkdir(parents=True, exist_ok=True)
+    data = api(f"files/{KEY}?ids={urllib.parse.quote(','.join(ids))}")
+    want, found = set(ids), {}
+
+    def walk(n):
+        if n.get("id") in want:
+            found[n["id"]] = n
+            return
+        for c in n.get("children") or []:
+            walk(c)
+
+    walk(data["document"])
+    for i in ids:
+        if i not in found:
+            print(f"  !! {i} not returned"); continue
+        p = _path(i)
+        p.write_text(json.dumps(found[i], indent=1))
+        print(f"  {i:>13} {p.stat().st_size/1024:7.1f} KB  {found[i]['name']}")
 
 
 def nodes(ids, depth=None):
@@ -190,5 +218,6 @@ def spec(nid):
 
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
-    {"nodes": nodes, "render": render, "icons": icons}.get(
+    {"nodes": nodes, "filenodes": file_nodes,
+     "render": render, "icons": icons}.get(
         cmd, lambda a: spec(a[0]))(args)

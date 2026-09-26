@@ -439,6 +439,17 @@ class CustomTextStyles {
         color: appTheme.textSecondary,
       );
 
+  /// The opening line on a mood recommendation — Nunito Sans Bold 18 over
+  /// three lines at a 21 pitch.
+  static TextStyle get moodRecommendationIntro => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 18.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 21 / 18,
+        color: appTheme.textPrimary,
+      );
+
   /// AI Hub — the grey caption over each readout.
   static TextStyle get aiStatLabel => TextStyle(
         fontFamily: fontNunitoSans,
@@ -1379,6 +1390,822 @@ class CustomTextStyles {
     fontWeight: FontWeight.w800,
     fontVariations: const [FontVariation('wght', 800)],
     color: c.onPrimary,
+  );
+
+  // --- Personal Journal (259:36946 empty, 259:36965 populated) ---
+
+  /// The two-way tab over the list. Bold 16; the chosen half is painted on
+  /// the navy gradient, so it takes [onPrimary] rather than a second style.
+  static TextStyle get journalTab => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get journalTabSelected =>
+      journalTab.copyWith(color: appTheme.onPrimary);
+
+  /// An entry card: the date line, the heading, then the note itself.
+  static TextStyle get journalEntryDate => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.textSecondary,
+  );
+
+  static TextStyle get journalEntryTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get journalEntryBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16 / 14,
+    color: appTheme.textSecondary,
+  );
+
+  // --- Expert Recommendation tab (259:60842) ---
+
+  static TextStyle get expertName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertMeta => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.textSecondary,
+  );
+
+  static TextStyle get expertNoteLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertNoteBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// The blue "Video" kicker over a recommended piece of content.
+  static TextStyle get expertContentKind => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get expertContentTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Article reader (259:58647 Pilates & Core, 259:58687 Stretch) ---
+
+  /// Two lines at a 32 pitch, ending clear of the rating.
+  static TextStyle get articleTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get articleRating => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.textPrimary,
+  );
+
+  /// Body copy — seven lines at a 19 pitch in the frame.
+  static TextStyle get articleBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The blue runs inside the closing call to action.
+  static TextStyle get articleLink =>
+      articleBody.copyWith(color: appTheme.soothifyBlue);
+
+  // --- Booking payment (259:58862 therapist, 259:58919 / 259:58941) ---
+
+  /// "Ready for your session with ..." — painted on [titleGradient], which is
+  /// what the sampled #234D9F -> #1F3A6E run turned out to be.
+  static TextStyle get paymentHeadline => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 26 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentSubtitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get planOptionTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get planOptionPrice => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  /// "/50-minute session" — the grey run after the figure.
+  static TextStyle get planOptionUnit => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.hintText,
+  );
+
+  static TextStyle get policyTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get policyBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 14.5 / 13,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get policyLink => policyBody.copyWith(
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    decoration: TextDecoration.underline,
+    decorationColor: appTheme.soothifyBlue,
+  );
+
+  /// The centred line under "Proceed to Payment" on the two track frames.
+  static TextStyle get paymentFootnote => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.5 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// The one line inside the payment-success card.
+  static TextStyle get paymentSuccess => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Become an Expert (259:59132 intro, 259:59145 onward the form) ---
+
+  /// "Join the Soothify Expert Network" — painted on the intro's own
+  /// #2F6FED -> #274889 run, which is steeper than the app's titleGradient.
+  static TextStyle get expertIntroTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32.7 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertIntroBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// A form question. The frame sets two of the seven at 700 and the rest at
+  /// 600 — an oversight, not a distinction; all are drawn at 600 here.
+  static TextStyle get expertFormLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Add file" — the small blue label on the upload chip.
+  static TextStyle get expertAddFile => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get expertSubmittedTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertSubmittedBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Expert Recommendation, the Journal's second tab (259:60761) ---
+
+  /// "Recent Live Sessions" / "Earlier Sessions".
+  static TextStyle get expertGroupHeading => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  /// The red "New" pill on an unread session.
+  static TextStyle get expertNewBadge => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 13.6 / 10,
+    color: appTheme.unreadDot,
+  );
+
+  /// The unread count sitting on the tab itself.
+  static TextStyle get expertTabCount => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.onPrimary,
+  );
+
+  /// A session card: the expert, then the service and the date beneath.
+  static TextStyle get sessionCardName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get sessionCardMeta => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  /// The note the expert left, inside its pale panel.
+  static TextStyle get sessionCardNote => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary.withValues(alpha: 0.88),
+  );
+
+  /// "Watch video" / "Read Article" / "Listen".
+  static TextStyle get sessionCardAction => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Expert role (259:59239 dashboard, and the row of frames beside it) ---
+
+  /// "Welcome back," above the expert's name.
+  static TextStyle get expertGreeting => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w300,
+    fontVariations: const [FontVariation('wght', 300)],
+    height: 16.4 / 12,
+    color: appTheme.textBlack,
+  );
+
+  /// The name itself, painted on the expert intro's #2F6FED -> #274889 run.
+  static TextStyle get expertName2 => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 27.3 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertGreetingSub => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textBlack,
+  );
+
+  /// A section heading — "Upcoming Sessions", "Quick Actions".
+  static TextStyle get expertSection => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertSeeAll => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 18.2 / 14,
+    letterSpacing: -0.2,
+    color: appTheme.soothifyBlue,
+  );
+
+  /// A session card: the client, then what and when, then its action chip.
+  static TextStyle get expertCardName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 18.2 / 14,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertCardMeta => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get expertCardAction => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.soothifyBlue,
+  );
+
+  /// The earnings card on the dashboard, on the brand gradient.
+  static TextStyle get expertEarningsCaption => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.onPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get expertEarningsAmount => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32 / 24,
+    color: appTheme.onPrimary,
+  );
+
+  /// A Quick Action tile.
+  static TextStyle get expertActionTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 18.2 / 14,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertActionBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  /// The Earnings screen's own figures and captions.
+  static TextStyle get expertBalanceAmount => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertBalanceCaption => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  /// A "Next automatic payout" / "Payout method" row.
+  static TextStyle get expertRowLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertPayoutAmount => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 20.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertPayoutDate => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The intro line under an expert screen's title.
+  static TextStyle get expertBlurb => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 22 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// An availability row: the weekday, its date, and the hours.
+  static TextStyle get expertSlotDay => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get expertSlotDetail => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// A session-notes mood chip — "Good progress", "Steady", "Needs
+  /// follow-up".
+  static TextStyle get expertNoteChip => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 13.6 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Payouts (259:59559 withdrawal, 259:59463 method) ---
+
+  /// The big centred figure on the withdrawal screen.
+  static TextStyle get withdrawAmount => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 32.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 43.6 / 32,
+    color: appTheme.textPrimary,
+  );
+
+  /// The blue line in the pill beneath it.
+  static TextStyle get withdrawPrompt => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 19.1 / 14,
+    color: appTheme.soothifyBlue,
+  );
+
+  /// A compact destination tile.
+  static TextStyle get destinationTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get destinationSubtitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 8.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 10.9 / 8,
+    color: appTheme.textPrimary,
+  );
+
+  /// A full payout-method card.
+  static TextStyle get payoutMethodTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get payoutMethodBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  /// The Paystack assurance panel, and its wordmark.
+  static TextStyle get payoutAssurance => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get payoutProcessor => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w900,
+    fontVariations: const [FontVariation('wght', 900)],
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Subscription pop-up (259:59011 trial, 259:58598 discounted year) ---
+
+  static TextStyle get restorePurchase => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get offerTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 26 / 20,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get offerBlurb => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21 / 14,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary,
+  );
+
+  /// The label on the pop-up's ghost action.
+  static TextStyle get offerAction => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    color: appTheme.soothifyBlue,
+  );
+
+  /// A billing-period card.
+  static TextStyle get offerCardTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get offerCardNote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  /// The Feature / Free / Premium header.
+  static TextStyle get offerColumn => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21 / 14,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get offerFeature => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 11.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 14.3 / 11,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Availability editor (259:60077, 259:60133) ---
+
+  /// A wheel row. The frame dims every row but the middle one.
+  static TextStyle get slotWheel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 32.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 48 / 32,
+    color: appTheme.textPrimary.withValues(alpha: 0.35),
+  );
+
+  static TextStyle get slotWheelFocused =>
+      slotWheel.copyWith(color: appTheme.textPrimary);
+
+  static TextStyle get slotRepeat => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The single capital inside a day circle. The frame sets these in
+  /// Poppins, which the app does not bundle.
+  static TextStyle get slotDayLetter => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 15 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  // --- Joining a session (259:59996) ---
+
+  static TextStyle get joiningHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get joiningBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get joiningCaption => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 13 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get joiningValue => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 16 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  /// The green hint panel. Its own deep green, not the app's success token —
+  /// that one is the disc fill, and this is type on a wash of it.
+  static TextStyle get joiningHint => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 16.4 / 12,
+    color: appTheme.successInk,
+  );
+
+  static TextStyle get joiningControl => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
   );
 
   static TextTheme textThemeFor(PrimaryColors c) => TextTheme(

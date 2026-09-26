@@ -19,7 +19,7 @@ import 'helpers.dart';
 const _art = [
   'assets/images/mood/female_awful.png',
   'assets/images/mood/female_low.png',
-  'assets/images/mood/female_good.png',
+  'assets/images/mood/female_content.png',
   'assets/images/mood/female_awesome.png',
   'assets/images/checkin/ic_more_vertical.png',
   'assets/images/checkin/ic_calendar_search.png',
@@ -41,7 +41,8 @@ void main() {
     await PrefUtils().init();
 
     final repo = LocalMoodRepository(now: () => DateTime(2024, 8, 2, 12, 1));
-    await repo.record(0.1);   // an "Awful" day, as the frame marks the 2nd
+    // The bottom of the scale, as the frame marks the 2nd.
+    await repo.record(MoodLevel.awful.representativeScore);
 
     Get.put<MoodRepository>(repo);
     Get.put<KycRepository>(LocalKycRepository());

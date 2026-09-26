@@ -6,18 +6,47 @@
 /// design; the steps in between are told entirely by the artwork.
 library;
 
-/// The four illustrations the slider moves through.
+/// The ten moods the slider moves through — Figma "Mood checker" and the
+/// `Recommendation | <mood>` frames on page 124:2.
 ///
-/// [label] is shown only in the check-in history, which needs a word for a
-/// past entry. "Awful" and "Awesome" are the design's own; "Low" and "Good"
-/// are ours, because the frames label nothing in between.
+/// It was four until 2026-09-26, with two of the names ours because the
+/// frames only labelled the ends. The design now names all ten and writes a
+/// line of copy for each, so none of this is invented any more.
 enum MoodLevel {
-  awful('awful', 'Awful'),
-  low('low', 'Low'),
-  good('good', 'Good'),
-  awesome('awesome', 'Awesome');
+  awful('awful', 'Awful',
+      "Ah, today feels heavy. I'm really sorry you're dealing with this. "
+      'Take it slow. Here are a few things that might help ease the weight '
+      'a bit.'),
+  drained('drained', 'Drained',
+      "You're running on empty, huh? That's completely valid. Hit pause for "
+      'a second and check out these gentle picks to help you recharge'),
+  anxious('anxious', 'Anxious',
+      'Brain moving a million miles an hour? Let’s take a deep breath '
+      'together. Here are a few calming things to help quiet the noise'),
+  low('low', 'Low',
+      'Some days just feel a bit gray, and you don’t have to fake being '
+      'okay. Sit with these for a little bit, no pressure at all'),
+  // The frame's tab reads "Neutra" — a truncation, not a word.
+  neutral('neutral', 'Neutral',
+      'Just coasting through the middle today? Nothing wrong with that. '
+      'Here are a few nice little things to match your vibe.'),
+  reflective('reflective', 'Reflective',
+      'In your head today, huh? Embrace it. Here are some thoughtful reads '
+      'and sounds to keep you company while you think.'),
+  content('content', 'Content',
+      'Sitting pretty and at peace today? We love to see it. Here are a few '
+      'cozy picks to keep your day flowing nicely.'),
+  energized('energized', 'Energized',
+      'Okay, look at you! Got that spark going today. Let’s channel that '
+      'good energy into something fun.'),
+  joyful('joyful', 'Joyful',
+      "You're glowing today! It’s so good to see you feeling this good. "
+      'Here are some great picks to ride this wave.'),
+  awesome('awesome', 'Awesome',
+      'Absolute top form today! Love that for you. Dive into these and keep '
+      'the good energy rolling.');
 
-  const MoodLevel(this.key, this.label);
+  const MoodLevel(this.key, this.label, this.recommendationIntro);
 
   /// Stable identifier — what gets persisted and sent to the API. Never
   /// display this; it must stay constant even if the label is reworded.
@@ -25,27 +54,22 @@ enum MoodLevel {
 
   final String label;
 
-  /// Where each illustration takes over, read off the handle positions in the
-  /// frames: the artwork changed at roughly 20%, 45% and 70% of the track,
-  /// not at even quarters.
-  static const _thresholds = [0.20, 0.45, 0.70];
+  /// What the recommendation screen says above its picks, in the design's
+  /// own words. Each mood gets its own; they are not interchangeable.
+  final String recommendationIntro;
 
+  /// Ten even bands across the track. The four-level scale had measured
+  /// thresholds because the frames parked the handle in four places; with ten
+  /// named stops an even split is what the slider can actually express.
   static MoodLevel forScore(double score) {
-    final s = score.clamp(0.0, 1.0);
-    for (var i = 0; i < _thresholds.length; i++) {
-      if (s < _thresholds[i]) return MoodLevel.values[i];
-    }
-    return MoodLevel.awesome;
+    final i = (score.clamp(0.0, 1.0) * values.length).floor();
+    return values[i.clamp(0, values.length - 1)];
   }
 
   /// The middle of this level's band — where the handle sits when a saved
-  /// entry is reopened and only the level survived.
-  double get representativeScore => switch (this) {
-        MoodLevel.awful => 0.10,
-        MoodLevel.low => 0.32,
-        MoodLevel.good => 0.57,
-        MoodLevel.awesome => 0.85,
-      };
+  /// entry is reopened.
+  double get representativeScore =>
+      (index + 0.5) / values.length;
 
   static MoodLevel? fromKey(String? key) {
     if (key == null) return null;
@@ -73,13 +97,31 @@ enum MoodFigure {
   static MoodFigure fromKycAnswer(String? answer) =>
       answer == 'male' ? MoodFigure.male : MoodFigure.female;
 
-  String artFor(MoodLevel level) {
-    // The male set has no distinct "awesome" — the design's two right-hand
-    // frames are the same illustration.
-    final step = (this == MoodFigure.male && level == MoodLevel.awesome)
-        ? MoodLevel.good
-        : level;
-    return 'assets/images/mood/${key}_${step.key}.png';
+  String artFor(MoodLevel level) =>
+      'assets/images/mood/${key}_${_drawn(level).key}.png';
+
+  /// Which of the shipped figures actually stands in for [level].
+  ///
+  /// The design has ten moods per figure; four female and three male are
+  /// exported so far, so the rest borrow their nearest neighbour. Delete this
+  /// and the map below the moment the twenty real files land — `artFor` then
+  /// resolves each mood to its own art with no other change.
+  MoodLevel _drawn(MoodLevel level) {
+    final have = this == MoodFigure.male
+        ? const {MoodLevel.awful, MoodLevel.low, MoodLevel.awesome}
+        : const {
+            MoodLevel.awful,
+            MoodLevel.low,
+            MoodLevel.content,
+            MoodLevel.awesome,
+          };
+    if (have.contains(level)) return level;
+    return switch (level) {
+      MoodLevel.drained || MoodLevel.anxious => MoodLevel.awful,
+      MoodLevel.neutral || MoodLevel.reflective => MoodLevel.low,
+      MoodLevel.energized || MoodLevel.joyful => MoodLevel.awesome,
+      _ => MoodLevel.low,
+    };
   }
 
   /// Every asset this figure can show, for precaching so dragging the slider
@@ -123,9 +165,10 @@ class MoodEntry {
         note: json['note'] as String? ?? '',
       );
 
-  /// The nine old moods, placed on the new scale. Approximate by nature —
-  /// there is no true mapping from "Fearful" to a number — but it keeps a
-  /// user's streak and calendar intact instead of dropping their history.
+  /// The nine emoji moods that predate the slider, placed on the scale.
+  /// Approximate by nature — there is no true mapping from "Fearful" to a
+  /// number — but it keeps a user's streak and calendar intact instead of
+  /// dropping their history.
   static double _legacyScore(String? mood) => switch (mood) {
         'happy' => 0.85,
         'calm' => 0.75,

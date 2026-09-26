@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/app_export.dart';
+import '../../../../data/models/expert_application.dart';
+
+/// Runs the "Become an Expert" application — Figma `259:59132` (the intro),
+/// `259:59145`, `259:59179`, `259:59198` (the three form steps) and
+/// `259:59229` (submitted).
+///
+/// One controller rather than a route per step: the frames share a header and
+/// a progress bar and run strictly in order, so a back press should step back
+/// through the form rather than unwind a route stack the applicant never
+/// chose to build. Same reasoning as [BookingController].
+class ExpertApplicationController extends GetxController {
+  final Rx<ExpertApplicationStep> step = ExpertApplicationStep.profile.obs;
+
+  /// Set once the application has been sent; the form gives way to the
+  /// acknowledgement.
+  final RxBool submitted = false.obs;
+
+  // Step 1 — who they are.
+  final Rxn<ExpertField> field = Rxn<ExpertField>();
+  final name = TextEditingController();
+  final experience = TextEditingController();
+  final about = TextEditingController();
+  final portfolio = TextEditingController();
+
+  // Step 2 — what they can run a session in. The question asks which
+  // languages they are fluent in, plural, so more than one can be chosen.
+  final RxSet<ExpertLanguage> languages = <ExpertLanguage>{}.obs;
+
+  // Step 3 — proof.
+  final licenceNumber = TextEditingController();
+  final insurance = TextEditingController();
+
+  /// Which documents have been attached. No file picker is wired, so this
+  /// stays empty and [attach] says so rather than pretending.
+  final RxSet<ExpertDocument> attached = <ExpertDocument>{}.obs;
+
+  /// Redraws the step when a field is typed into, so the button can enable
+  /// itself. Text controllers are not observables.
+  @override
+  void onInit() {
+    super.onInit();
+    for (final c in [name, experience, about, portfolio, licenceNumber]) {
+      c.addListener(_touched);
+    }
+  }
+
+  final RxInt _revision = 0.obs;
+
+  void _touched() => _revision.value++;
+
+  @override
+  void onClose() {
+    for (final c in [
+      name,
+      experience,
+      about,
+      portfolio,
+      licenceNumber,
+      insurance,
+    ]) {
+      c.dispose();
+    }
+    super.onClose();
+  }
+
+  int get stepNumber => step.value.index + 1;
+
+  int get totalSteps => ExpertApplicationStep.values.length;
+
+  /// Whether the step's required answers are all given.
+  ///
+  /// The frames draw every "Next" in the enabled fill, so they do not say
+  /// what is required. The asterisks on the two uploads do, and a question
+  /// with no answer cannot advance — that is the rule the rest of the app's
+  /// questionnaires already use.
+  bool get canAdvance {
+    // Touching a text field bumps this, which is what re-evaluates the getter.
+    _revision.value;
+    return switch (step.value) {
+      ExpertApplicationStep.profile => field.value != null &&
+          name.text.trim().isNotEmpty &&
+          experience.text.trim().isNotEmpty,
+      ExpertApplicationStep.languages => languages.isNotEmpty,
+      ExpertApplicationStep.credentials =>
+        licenceNumber.text.trim().isNotEmpty,
+    };
+  }
+
+  void choose(ExpertField value) => field.value = value;
+
+  void toggleLanguage(ExpertLanguage value) {
+    if (!languages.remove(value)) languages.add(value);
+  }
+
+  bool isSelected(ExpertLanguage value) => languages.contains(value);
+
+  /// No file picker is wired. Saying so beats a chip that appears to have
+  /// taken a document the application will never carry.
+  void attach(ExpertDocument document) =>
+      AppFeedback.info('Attaching a file is not built yet.');
+
+  /// "Start Application" on the intro.
+  void start() => Get.toNamed(AppRoutes.expertApplicationForm);
+
+  void next() {
+    if (!canAdvance) return;
+    final i = step.value.index;
+    if (i < ExpertApplicationStep.values.length - 1) {
+      step.value = ExpertApplicationStep.values[i + 1];
+      return;
+    }
+    // Nothing receives an application yet. The acknowledgement is shown
+    // because the design draws it, and it promises only a review — it does
+    // not claim the application was transmitted.
+    submitted.value = true;
+  }
+
+  /// Steps back through the form; leaves the route from the first step.
+  void back() {
+    final i = step.value.index;
+    if (i == 0) {
+      Get.back();
+      return;
+    }
+    step.value = ExpertApplicationStep.values[i - 1];
+  }
+
+  /// "Continue" on the acknowledgement — back to the app, with the form
+  /// closed behind it so it cannot be walked back into.
+  void done() => Get.until((route) => Get.currentRoute == AppRoutes.shell);
+}

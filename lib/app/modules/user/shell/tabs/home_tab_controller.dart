@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 
 import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
-import '../../../../core/utils/feedback_utils.dart';
 import '../../../../data/models/explore_destination.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../core/utils/wellness_entry.dart';
@@ -75,5 +74,9 @@ class HomeTabController extends BaseController {
   void open(MediaItem item, {required String source}) =>
       openMedia(item, source: source);
 
-  void seeAllPopular() => AppFeedback.info('Popular Content is not built yet.');
+  /// Home's Popular Content row is the one "See All" in the app with nothing
+  /// behind it. It opens the Videos catalogue (`259:60948`), which is the
+  /// full browse page for this kind of card — the frames draw no entry point
+  /// for that screen, so this placement is a decision, not the design's.
+  void seeAllPopular() => Get.toNamed(AppRoutes.videos);
 }

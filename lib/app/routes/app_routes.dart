@@ -87,6 +87,33 @@ class AppRoutes {
   /// Matching, call, rating and feedback — everything after Schedule.
   static const String booking = '/schedule/booking';
 
+  /// One written piece. Takes an [Article]; one route serves both, as the
+  /// two frames differ only in their words.
+  static const String article = '/article';
+
+  /// The video library — a shelf per category, each with its own See All.
+  static const String videos = '/videos';
+
+  /// Choosing a plan and paying for a booked session. Takes a
+  /// [SessionOffering], which carries the two prices and whether the
+  /// cancellation policy is spelled out.
+  static const String bookingPayment = '/schedule/payment';
+
+  /// The receipt. Takes the same [SessionOffering].
+  static const String paymentSuccess = '/schedule/payment/success';
+
+  /// Applying to practise on Soothify. The intro, then the form, which runs
+  /// its three steps and the acknowledgement in one route.
+  static const String expertApplication = '/expert/apply';
+  static const String expertApplicationForm = '/expert/apply/form';
+
+  /// One recommendation an expert left, opened from the Journal's second tab.
+  static const String journalRecommendation = '/journal/recommendation';
+
+  /// The subscription pitch. Takes a [SubscriptionOffer]; one route serves
+  /// both frames.
+  static const String subscriptionOffer = '/subscribe';
+
   /// The notification feed, reached from the bell on Home.
   static const String notifications = '/notifications';
 
@@ -95,8 +122,33 @@ class AppRoutes {
   static const String aiHub = '/ai-hub';
 
   static const String moodChecker = '/mood';
+  /// What the app offers back for the mood just recorded. Takes a
+  /// [MoodLevel] argument; one route serves all ten.
+  static const String moodRecommendation = '/mood/recommendation';
+
   static const String moodRecord = '/mood/record';
 
-  // Practitioner role — designs pending; routes reserved.
+  // Expert (practitioner) role — Figma's own row of frames at y=4085.
+  /// The expert shell holding its five bottom-nav tabs.
   static const String practitionerDashboard = '/practitioner';
+
+  /// "Update Availability", from the dashboard's Quick Actions.
+  static const String expertAvailability = '/practitioner/availability';
+
+  /// One window's hours and days. Takes an [AvailabilitySlot].
+  static const String expertSlotEditor = '/practitioner/availability/slot';
+
+  /// One session's notes. Takes an [ExpertSession]; the frame is titled after
+  /// the client, so a session has to be chosen before it opens.
+  static const String expertSessionNotes = '/practitioner/notes';
+
+  /// Withdrawing: the amount, then where it goes.
+  static const String expertWithdraw = '/practitioner/withdraw';
+  static const String expertPayoutMethod = '/practitioner/payout-method';
+
+  /// The expert's pre-call screen. Takes an [ExpertSession].
+  static const String expertJoinSession = '/practitioner/join';
+
+  /// The full payout history, behind Earnings' "See All".
+  static const String expertPayouts = '/practitioner/payouts';
 }

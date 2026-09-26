@@ -1,6 +1,7 @@
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/app_notification.dart';
+import '../../../../data/models/article.dart';
 import '../../../../data/repositories/notification_repository.dart';
 
 /// Backs the notification feed — Figma "Notification" (`176:24737`).
@@ -38,8 +39,11 @@ class NotificationsController extends BaseController {
 
   void select(NotificationFilter value) => filter.value = value;
 
-  /// The frame gives the article row a "Read" link. Nothing behind it yet —
-  /// the Article frame is in the file but not built.
+  /// The frame gives the article row a "Read" link.
+  ///
+  /// The notification names no particular article — it reads "New article
+  /// posted" — and the file holds two, so this opens the Pilates & Core one.
+  /// When the feed carries an id, it goes in the arguments instead.
   void openAction(AppNotification notification) =>
-      AppFeedback.info('Articles are not built yet.');
+      Get.toNamed(AppRoutes.article, arguments: Article.core);
 }

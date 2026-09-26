@@ -11,7 +11,9 @@ import 'package:soothifyafrica/app/data/models/mood.dart';
 import 'package:soothifyafrica/app/routes/app_pages.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/kyc_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/local_kyc_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/local_mood_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mood_repository.dart';
@@ -64,24 +66,54 @@ void main() {
   MoodCheckerController putController(MoodRepository repo) {
     Get.put<MoodRepository>(repo);
     Get.put<KycRepository>(LocalKycRepository());
+    // Committing a mood now opens the recommendation, whose binding resolves
+    // content — so the flow needs a repository even from the checker's tests.
+    Get.put<ContentRepository>(MockContentRepository());
     return Get.put(MoodCheckerController(repo, Get.find<KycRepository>()));
   }
 
   group('MoodLevel', () {
-    test('the slider crosses into a new face at the design thresholds', () {
+    test('ten even bands across the track', () {
+      expect(MoodLevel.values, hasLength(10));
       expect(MoodLevel.forScore(0.0), MoodLevel.awful);
-      expect(MoodLevel.forScore(0.19), MoodLevel.awful);
-      expect(MoodLevel.forScore(0.20), MoodLevel.low);
-      expect(MoodLevel.forScore(0.44), MoodLevel.low);
-      expect(MoodLevel.forScore(0.45), MoodLevel.good);
-      expect(MoodLevel.forScore(0.69), MoodLevel.good);
-      expect(MoodLevel.forScore(0.70), MoodLevel.awesome);
+      expect(MoodLevel.forScore(0.09), MoodLevel.awful);
+      expect(MoodLevel.forScore(0.10), MoodLevel.drained);
+      expect(MoodLevel.forScore(0.45), MoodLevel.neutral);
+      expect(MoodLevel.forScore(0.55), MoodLevel.reflective);
       expect(MoodLevel.forScore(1.0), MoodLevel.awesome);
     });
 
     test('out-of-range scores clamp rather than throw', () {
       expect(MoodLevel.forScore(-5), MoodLevel.awful);
       expect(MoodLevel.forScore(42), MoodLevel.awesome);
+    });
+
+    test('a level round-trips through its own representative score', () {
+      for (final l in MoodLevel.values) {
+        expect(MoodLevel.forScore(l.representativeScore), l,
+            reason: '${l.label} does not land back on itself');
+      }
+    });
+
+    test('every mood carries the copy its own frame prints', () {
+      for (final l in MoodLevel.values) {
+        expect(l.recommendationIntro, isNotEmpty, reason: l.label);
+      }
+      // Each is written for that mood; none is a shared fallback.
+      expect(
+        MoodLevel.values.map((l) => l.recommendationIntro).toSet(),
+        hasLength(MoodLevel.values.length),
+      );
+      expect(MoodLevel.awful.recommendationIntro,
+          startsWith('Ah, today feels heavy.'));
+      expect(MoodLevel.awesome.recommendationIntro,
+          startsWith('Absolute top form today!'));
+    });
+
+    test('the keys are stable identifiers, not labels', () {
+      expect(MoodLevel.neutral.key, 'neutral');
+      // The frame's tab says "Neutra"; the word is Neutral.
+      expect(MoodLevel.neutral.label, 'Neutral');
     });
   });
 
@@ -93,14 +125,23 @@ void main() {
       expect(MoodFigure.fromKycAnswer(null), MoodFigure.female);
     });
 
-    test('the male set reuses one illustration for its top two steps', () {
-      // The design draws only three male faces across four handle positions.
-      expect(
-        MoodFigure.male.artFor(MoodLevel.awesome),
-        MoodFigure.male.artFor(MoodLevel.good),
-      );
-      expect(MoodFigure.male.allArt, hasLength(3));
+    test('every mood resolves to art that exists', () {
+      // Ten moods per figure are designed; four female and three male are
+      // exported, so the rest borrow a neighbour until the real files land.
+      for (final f in MoodFigure.values) {
+        for (final l in MoodLevel.values) {
+          expect(f.artFor(l), startsWith('assets/images/mood/${f.key}_'));
+        }
+      }
       expect(MoodFigure.female.allArt, hasLength(4));
+      expect(MoodFigure.male.allArt, hasLength(3));
+    });
+
+    test('the extremes keep their own faces rather than borrowing', () {
+      for (final f in MoodFigure.values) {
+        expect(f.artFor(MoodLevel.awful), endsWith('_awful.png'));
+        expect(f.artFor(MoodLevel.awesome), endsWith('_awesome.png'));
+      }
     });
   });
 
@@ -114,7 +155,9 @@ void main() {
 
       expect(today, isNotNull);
       expect(today!.score, closeTo(0.8, 1e-9));
-      expect(today.level, MoodLevel.awesome);
+      // Asserted by position on the scale, not by name: the band a score
+      // lands in moved once already, when four levels became ten.
+      expect(today.level.index, greaterThan(MoodLevel.neutral.index));
     });
 
     test('re-checking replaces today\'s entry rather than stacking', () async {
@@ -137,14 +180,14 @@ void main() {
         'mood': 'happy',
         'recorded_at': '2026-01-02T10:00:00Z',
       });
-      expect(legacy.level, MoodLevel.awesome);
+      expect(legacy.level.index, greaterThan(MoodLevel.neutral.index));
 
       final sad = MoodEntry.fromJson({
         'id': '2',
         'mood': 'sad',
         'recorded_at': '2026-01-02T10:00:00Z',
       });
-      expect(sad.level, MoodLevel.awful);
+      expect(sad.level.index, lessThan(MoodLevel.neutral.index));
     });
 
     test('a score wins over a legacy mood key when both are present', () {
@@ -154,7 +197,7 @@ void main() {
         'score': 0.9,
         'recorded_at': '2026-01-02T10:00:00Z',
       });
-      expect(e.level, MoodLevel.awesome);
+      expect(e.level.index, greaterThan(MoodLevel.neutral.index));
     });
   });
 
@@ -187,7 +230,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.artPath, isNot(worst));
-      expect(controller.level, MoodLevel.awesome);
+      expect(controller.level, MoodLevel.values.last);
     });
 
     testWidgets('nothing is written until the button is pressed',
@@ -208,8 +251,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect((await repo.todaysEntry())!.score, closeTo(0.9, 1e-9));
-      // A completed check-in leads straight to the records screen.
-      expect(Get.currentRoute, AppRoutes.moodRecord);
+      // A completed check-in opens what the app offers back for that mood;
+      // the day's record follows from there.
+      expect(Get.currentRoute, AppRoutes.moodRecommendation);
     });
 
     testWidgets('a failed write does not navigate on', (tester) async {
@@ -221,7 +265,7 @@ void main() {
       await tester.tap(find.text('Add Detail'));
       await tester.pumpAndSettle();
 
-      expect(Get.currentRoute, isNot(AppRoutes.moodRecord));
+      expect(Get.currentRoute, isNot(AppRoutes.moodRecommendation));
 
       // Let the failure snackbar run its 3s dismiss timer out, otherwise the
       // binding reports a pending timer when the test ends.
@@ -239,7 +283,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(controller.score.value, closeTo(0.15, 1e-9));
-      expect(controller.level, MoodLevel.awful);
+      // Position on the scale, not a name: the bands moved when four levels
+      // became ten and will move again if more are added.
+      expect(controller.level.index, lessThan(MoodLevel.neutral.index));
     });
   });
 }

@@ -16,6 +16,17 @@ what the comparison notes below are measured against.
 | `aihub_unexpanded.png` | AI Hub \| Unexpanded | 176:56425 |
 | `aihub_chat.png` | AI Hub \| Expanded \| Chat | 176:56395 |
 | `onboarding_slide1.png` | Welcome screen (old file, same content) | — |
+| `journal_list.png` | Personal Journal | 259:36965 |
+| `journal_expert.png` | Journal \| Expert Recommendation | 259:60842 |
+| `article_core.png` | Pilates & Core Articles | 259:58647 |
+| `videos.png` | Video Contents | 259:60948 |
+| `payment_therapist.png` | Therapist booking payment | 259:58862 |
+| `payment_track.png` | Pilates booking paymet | 259:58919 |
+| `payment_success.png` | Success paymet | 259:36140 |
+
+Node JSON for the expert flow is cached rather than rendered — `/images` was
+spent — under `tool/.figma_cache/node_259_59*.json` and `node_259_60761.json`.
+See the three-budget note in `../README.md`.
 
 ## Getting more of these
 

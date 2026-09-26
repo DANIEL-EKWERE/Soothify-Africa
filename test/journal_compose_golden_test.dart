@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/data/repositories/local_journal_repository.dart';
 import 'package:soothifyafrica/app/modules/user/journal/controller/journal_compose_controller.dart';
 import 'package:soothifyafrica/app/modules/user/journal/journal_compose_screen.dart';
 
@@ -29,7 +30,7 @@ void main() {
     testWidgets('journal composer, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(JournalComposeController(now: now));
+      Get.put(JournalComposeController(LocalJournalRepository(), now: now));
 
       await pumpScreen(tester, const JournalComposeScreen(),
           brightness: brightness);

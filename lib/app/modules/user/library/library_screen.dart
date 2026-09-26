@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../widgets/filter_glyph.dart';
+import '../../../widgets/content_search_row.dart';
 import '../../../data/models/library_section.dart';
 import '../../../data/models/media_item.dart';
 import '../../../widgets/skeleton.dart';
@@ -28,7 +28,15 @@ class LibraryScreen extends GetView<LibraryController> {
             children: [
               _Header(title: controller.section.title),
               SizedBox(height: 27.v),
-              const _SearchRow(),
+              Obx(
+                () => ContentSearchRow(
+                  hint: controller.section.searchHint,
+                  filterCount: controller.filters.value.count,
+                  onSearch: controller.openSearch,
+                  // The real filter — it had no action at all.
+                  onFilters: controller.openFilters,
+                ),
+              ),
               SizedBox(height: 27.v),
               // Rendered in the frame's own order: the blocks are not all
               // shelves, and Meditation interleaves a card between two of them.
@@ -97,60 +105,6 @@ class _Header extends StatelessWidget {
               width: 28.h,
               fit: BoxFit.cover,
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _SearchRow extends StatelessWidget {
-  const _SearchRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<LibraryController>();
-    return Row(
-      children: [
-        Expanded(
-          child: InkWell(
-            onTap: controller.openSearch,
-            borderRadius: BorderRadius.circular(24.h),
-            child: Container(
-              height: 48.v,
-              padding: EdgeInsets.symmetric(horizontal: 15.h),
-              decoration: BoxDecoration(
-                color: appTheme.surface,
-                borderRadius: BorderRadius.circular(24.h),
-              ),
-              child: Row(
-                children: [
-                  CustomImageView(
-                    imagePath: ImageConstant.icSearch,
-                    height: 18.h,
-                    width: 18.h,
-                    color: appTheme.textPrimary,
-                  ),
-                  SizedBox(width: 14.h),
-                  Flexible(
-                    child: Text(
-                      controller.section.searchHint,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: CustomTextStyles.searchHint,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 28.h),
-        // The real filter — it had no action at all.
-        Obx(
-          () => FilterGlyph(
-            count: controller.filters.value.count,
-            onTap: controller.openFilters,
           ),
         ),
       ],

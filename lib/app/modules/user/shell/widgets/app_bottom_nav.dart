@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
-import '../../../../data/models/app_tab.dart';
+import '../../../../data/models/nav_destination.dart';
 
 /// The signed-in bottom navigation — 74 tall, five evenly spaced tabs with a
 /// label beneath each icon.
@@ -13,7 +13,12 @@ import '../../../../data/models/app_tab.dart';
 /// labels are Nunito Sans 400 at 10.88 with a 14.8 line height, the active one
 /// gradient-filled `#4B84F6 -> #0A399A`, the rest flat `#999999`.
 ///
-/// Icons are the design's own, exported from the nav component as SVG.
+/// Icons are the design's own, exported from the nav component as SVG. The
+/// expert bar's three middle glyphs were not exportable, so a destination may
+/// carry a Material [IconData] instead — see [NavDestination].
+///
+/// Shared by both roles: the client bar (`AppTab`) and the expert one
+/// (`ExpertTab`) are the same 74-tall five-up bar.
 class AppBottomNav extends StatelessWidget {
   const AppBottomNav({
     super.key,
@@ -22,7 +27,7 @@ class AppBottomNav extends StatelessWidget {
     required this.onSelected,
   });
 
-  final List<AppTab> tabs;
+  final List<NavDestination> tabs;
   final int currentIndex;
   final ValueChanged<int> onSelected;
 
@@ -57,7 +62,7 @@ class _NavItem extends StatelessWidget {
     required this.onTap,
   });
 
-  final AppTab tab;
+  final NavDestination tab;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -67,14 +72,21 @@ class _NavItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        CustomImageView(
-          imagePath: tab.asset,
-          height: 24.h,
-          width: 24.h,
-          // White under the shader when selected; srcIn takes the gradient
-          // from whatever is opaque, so the base colour must not be faded.
-          color: isSelected ? appTheme.onPrimary : appTheme.navInactive,
-        ),
+        // White under the shader when selected; srcIn takes the gradient
+        // from whatever is opaque, so the base colour must not be faded.
+        if (tab.asset case final path?)
+          CustomImageView(
+            imagePath: path,
+            height: 24.h,
+            width: 24.h,
+            color: isSelected ? appTheme.onPrimary : appTheme.navInactive,
+          )
+        else
+          Icon(
+            tab.icon,
+            size: 24.h,
+            color: isSelected ? appTheme.onPrimary : appTheme.navInactive,
+          ),
         SizedBox(height: 3.h),
         Text(
           tab.label,

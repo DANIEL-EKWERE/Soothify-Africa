@@ -29,6 +29,8 @@ class SettingsController extends GetxController {
     switch (entry) {
       case SettingsEntry.changeLanguage:
         await Get.toNamed(AppRoutes.language);
+      case SettingsEntry.becomeExpert:
+        await Get.toNamed(AppRoutes.expertApplication);
       case SettingsEntry.logout:
         await _session.signOut();
         await Get.offAllNamed(AppRoutes.shell);

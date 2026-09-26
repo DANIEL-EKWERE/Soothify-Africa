@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
 
 import '../../../../core/base_controller.dart';
-import '../../../../core/utils/feedback_utils.dart';
 import '../../../../data/models/plan_tier.dart';
+import '../../../../data/models/subscription_offer.dart';
 import '../../../../data/repositories/subscription_repository.dart';
+import '../../../../routes/app_routes.dart';
 
 /// Backs the Plans tab — Figma "Plans" (135:2444).
 class PlansTabController extends BaseController {
@@ -40,6 +41,9 @@ class PlansTabController extends BaseController {
 
   void proceed() {
     if (!canContinue) return;
-    AppFeedback.info('Checkout is not built yet.');
+    Get.toNamed(
+        AppRoutes.subscriptionOffer,
+        arguments: SubscriptionOffer.discountedYear,
+      );
   }
 }

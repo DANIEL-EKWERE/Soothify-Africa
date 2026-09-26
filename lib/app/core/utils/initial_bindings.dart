@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../../data/repositories/content_repository.dart';
+import '../../data/repositories/journal_repository.dart';
+import '../../data/repositories/local_journal_repository.dart';
 import '../../data/repositories/local_kyc_repository.dart';
 import '../../data/repositories/mock_content_repository.dart';
 import '../../data/repositories/mock_notification_repository.dart';
@@ -30,6 +32,10 @@ class InitialBindings extends Bindings {
     // the mock while there is no backend — swapping in the Django-backed
     // implementation is this one line.
     Get.lazyPut<ContentRepository>(() => MockContentRepository(), fenix: true);
+    Get.lazyPut<JournalRepository>(
+      () => LocalJournalRepository(),
+      fenix: true,
+    );
     Get.lazyPut<KycRepository>(
       () => LocalKycRepository(),
       fenix: true,

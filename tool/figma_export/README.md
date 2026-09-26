@@ -46,6 +46,31 @@ as the first non-TEXT child of their row or item frame.
 multi-day wait means the plan's quota is spent and no amount of waiting inside
 one session helps — reach for a plugin export then.
 
+## THREE endpoints, THREE budgets (found 2026-09-26)
+
+`/nodes` and `/images` were known to have separate quotas. There is a third,
+and it is the best of them:
+
+    GET /v1/files/{key}?ids=1:2,3:4        <-- its own budget
+
+It returns the same node JSON as `/nodes` — full geometry, full `characters`,
+styles and fills — for exactly the subtrees asked for. With both `/nodes` and
+`/images` reporting ~1.1 days on the same account, this answered 540 KB for
+seven whole frames on the first try.
+
+So the order to try, cheapest and most likely open first:
+
+    GET /v1/me                      -> is the token valid at all (403 = bad)
+    GET /v1/files/{key}?depth=1     -> ~1.5KB, proves file access
+    GET /v1/files/{key}?ids=...     -> node JSON, third budget, usually open
+    GET /v1/images/{key}?ids=...    -> renders, second budget
+    GET /v1/files/{key}/nodes?ids=  -> the one that blocks first
+
+`tool/figma.py nodes` uses the `/nodes` form. When that is blocked, fetch via
+`files?ids=` instead and split the result into `tool/.figma_cache/node_*.json`
+— `figma.py spec` then reads them as usual. Prefer this to a render: the JSON
+gives exact copy, so no string has to be read off a picture.
+
 A quota is per token *and* rolling — a block that reports days can clear on
 its own, so probe with one cheap call before assuming it is still in force. A
 fresh token also clears it immediately.

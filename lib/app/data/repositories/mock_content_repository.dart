@@ -338,6 +338,11 @@ class MockContentRepository implements ContentRepository {
     'sound-effects': ['10', '11'],
     'yoga-flow': ['7', '8', '9'],
     'sounds': ['10', '11'],
+    // The Videos screen's two rows (`259:60948`). The frame repeats the same
+    // artwork across both, so these reuse existing covers rather than
+    // pretending to a catalogue that does not exist.
+    'videos-pilates': ['1', '2', '3'],
+    'videos-yoga': ['7', '8', '9'],
   };
 
   /// The Recommendation page's own five cards, in the frame's order. Home's

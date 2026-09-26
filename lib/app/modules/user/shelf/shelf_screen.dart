@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/media_item.dart';
+import '../../../widgets/content_search_row.dart';
 import '../../../widgets/skeleton.dart';
 import 'controller/shelf_controller.dart';
 
-/// A shelf's full page — Figma "Balance Content" (135:20135).
+/// A shelf's full page — Figma "Balance Content" (135:20135), and
+/// "Pilates video content" (`259:61062`).
 ///
 /// Two columns of 163x174 cells: cover, then title and practitioner beneath.
 /// One route serves every "See All" — the frames differ only in their title
-/// and contents.
+/// and contents, plus the search row the Videos page puts above the grid.
 class ShelfScreen extends GetView<ShelfController> {
   const ShelfScreen({super.key});
 
@@ -44,6 +46,20 @@ class ShelfScreen extends GetView<ShelfController> {
                 ],
               ),
             ),
+            if (controller.showSearch) ...[
+              SizedBox(height: 27.v),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.h),
+                child: Obx(
+                  () => ContentSearchRow(
+                    hint: "Let's find your calm",
+                    filterCount: controller.filters.value.count,
+                    onSearch: controller.openSearch,
+                    onFilters: controller.openFilters,
+                  ),
+                ),
+              ),
+            ],
             Expanded(
               child: RefreshIndicator(
                 onRefresh: controller.load,
@@ -51,7 +67,8 @@ class ShelfScreen extends GetView<ShelfController> {
                   final loading = controller.isLoading.value &&
                       controller.items.isEmpty;
                   final grid = GridView.builder(
-                    padding: EdgeInsets.fromLTRB(24.h, 36.v, 24.h, 32.v),
+                    padding: EdgeInsets.fromLTRB(
+                        24.h, controller.showSearch ? 24.v : 36.v, 24.h, 32.v),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16.h,

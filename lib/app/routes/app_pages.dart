@@ -1,5 +1,36 @@
 import 'package:get/get.dart';
 
+import '../data/models/journal_entry.dart';
+import '../modules/practitioner/availability/controller/slot_editor_controller.dart';
+import '../modules/practitioner/call/controller/joining_session_controller.dart';
+import '../modules/practitioner/call/joining_session_screen.dart';
+import '../modules/practitioner/availability/expert_availability_screen.dart';
+import '../modules/practitioner/availability/expert_slot_editor_screen.dart';
+import '../modules/practitioner/dashboard/controller/expert_dashboard_controller.dart';
+import '../modules/practitioner/notes/controller/session_notes_controller.dart';
+import '../modules/practitioner/notes/session_notes_screen.dart';
+import '../modules/practitioner/payouts/binding/payout_binding.dart';
+import '../modules/practitioner/payouts/expert_payout_method_screen.dart';
+import '../modules/practitioner/payouts/expert_payouts_screen.dart';
+import '../modules/practitioner/payouts/expert_withdraw_screen.dart';
+import '../modules/practitioner/shell/binding/expert_shell_binding.dart';
+import '../modules/practitioner/shell/expert_shell_screen.dart';
+import '../modules/user/article/article_screen.dart';
+import '../modules/user/subscription/binding/subscription_offer_binding.dart';
+import '../modules/user/subscription/subscription_offer_screen.dart';
+import '../modules/user/expert_application/binding/expert_application_binding.dart';
+import '../modules/user/expert_application/expert_application_screen.dart';
+import '../modules/user/expert_application/expert_intro_screen.dart';
+import '../modules/user/journal/controller/expert_recommendation_controller.dart';
+import '../modules/user/journal/expert_recommendation_screen.dart';
+import '../modules/user/article/binding/article_binding.dart';
+import '../modules/user/payment/binding/booking_payment_binding.dart';
+import '../modules/user/payment/booking_payment_screen.dart';
+import '../modules/user/payment/payment_success_screen.dart';
+import '../modules/user/videos/binding/videos_binding.dart';
+import '../modules/user/videos/videos_screen.dart';
+import '../data/repositories/journal_repository.dart';
+
 import '../modules/auth/intro/binding/intro_binding.dart';
 import '../modules/auth/language/binding/language_binding.dart';
 import '../modules/auth/language/language_screen.dart';
@@ -15,8 +46,6 @@ import '../modules/auth/kyc/kyc_screen.dart';
 import '../modules/auth/role_select/binding/role_select_binding.dart';
 import '../modules/auth/role_select/role_select_screen.dart';
 import '../modules/auth/splash/splash_screen.dart';
-import '../modules/practitioner/dashboard/binding/practitioner_dashboard_binding.dart';
-import '../modules/practitioner/dashboard/practitioner_dashboard_screen.dart';
 import '../modules/user/mood_checker/binding/mood_checker_binding.dart';
 import '../modules/user/journal/binding/journal_binding.dart';
 import '../modules/user/journal/controller/journal_compose_controller.dart';
@@ -58,6 +87,8 @@ import '../modules/user/settings/binding/settings_binding.dart';
 import '../modules/user/settings/settings_screen.dart';
 import '../modules/user/shell/binding/shell_binding.dart';
 import '../modules/user/shell/shell_screen.dart';
+import '../modules/user/mood_recommendation/binding/mood_recommendation_binding.dart';
+import '../modules/user/mood_recommendation/mood_recommendation_screen.dart';
 import '../modules/user/mood_record/binding/mood_record_binding.dart';
 import '../modules/user/mood_record/mood_record_screen.dart';
 import '../modules/user/mood_checker/mood_checker_screen.dart';
@@ -111,7 +142,17 @@ class AppPages {
     GetPage(
       name: AppRoutes.journalCompose,
       page: () => const JournalComposeScreen(),
-      binding: BindingsBuilder.put(JournalComposeController.new),
+      // Takes the entry to re-open, when the list's chevron supplied one.
+      binding: BindingsBuilder(() {
+        Get.put(
+          JournalComposeController(
+            Get.find<JournalRepository>(),
+            entry: Get.arguments is JournalEntry
+                ? Get.arguments as JournalEntry
+                : null,
+          ),
+        );
+      }),
     ),
     GetPage(
       name: AppRoutes.journal,
@@ -161,6 +202,97 @@ class AppPages {
     // Three routes, one screen: the sheets differ only in their body, and
     // FiltersBinding creates the shared controller on whichever is entered
     // first.
+    // Both push over the expert shell and read its controller. The binding
+    // is repeated so a deep link straight to either still resolves it.
+    // The payout trio shares one controller: the amount chosen on the first
+    // has to survive into the second.
+    GetPage(
+      name: AppRoutes.expertWithdraw,
+      page: () => const ExpertWithdrawScreen(),
+      bindings: [ExpertShellBinding(), PayoutBinding()],
+    ),
+    GetPage(
+      name: AppRoutes.expertPayoutMethod,
+      page: () => const ExpertPayoutMethodScreen(),
+      bindings: [ExpertShellBinding(), PayoutBinding()],
+    ),
+    GetPage(
+      name: AppRoutes.expertPayouts,
+      page: () => const ExpertPayoutsScreen(),
+      bindings: [ExpertShellBinding(), PayoutBinding()],
+    ),
+    GetPage(
+      name: AppRoutes.expertAvailability,
+      page: () => const ExpertAvailabilityScreen(),
+      binding: ExpertShellBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.expertJoinSession,
+      page: () => const JoiningSessionScreen(),
+      binding: BindingsBuilder.put(JoiningSessionController.new),
+    ),
+    GetPage(
+      name: AppRoutes.expertSlotEditor,
+      page: () => const ExpertSlotEditorScreen(),
+      bindings: [
+        ExpertShellBinding(),
+        BindingsBuilder(() {
+          Get.put(
+            SlotEditorController(Get.find<ExpertDashboardController>()),
+          );
+        }),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.expertSessionNotes,
+      page: () => const SessionNotesScreen(),
+      bindings: [
+        ExpertShellBinding(),
+        BindingsBuilder.put(SessionNotesController.new),
+      ],
+    ),
+    GetPage(
+      name: AppRoutes.expertApplication,
+      page: () => const ExpertIntroScreen(),
+      binding: ExpertApplicationBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.expertApplicationForm,
+      page: () => const ExpertApplicationScreen(),
+      binding: ExpertApplicationBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.journalRecommendation,
+      page: () => const ExpertRecommendationScreen(),
+      binding: BindingsBuilder.put(ExpertRecommendationController.new),
+    ),
+    GetPage(
+      name: AppRoutes.subscriptionOffer,
+      page: () => const SubscriptionOfferScreen(),
+      binding: SubscriptionOfferBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.article,
+      page: () => const ArticleScreen(),
+      binding: ArticleBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.videos,
+      page: () => const VideosScreen(),
+      binding: VideosBinding(),
+    ),
+    // Payment, then its receipt. Two routes rather than two stages of one,
+    // because the receipt must not be walked back into an unpaid form.
+    GetPage(
+      name: AppRoutes.bookingPayment,
+      page: () => const BookingPaymentScreen(),
+      binding: BookingPaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.paymentSuccess,
+      page: () => const PaymentSuccessScreen(),
+      binding: BookingPaymentBinding(),
+    ),
     GetPage(
       name: AppRoutes.notifications,
       page: () => const NotificationsScreen(),
@@ -227,6 +359,11 @@ class AppPages {
       page: () => const MoodCheckerScreen(),
       binding: MoodCheckerBinding(),
     ),
+    GetPage(
+      name: AppRoutes.moodRecommendation,
+      page: () => const MoodRecommendationScreen(),
+      binding: MoodRecommendationBinding(),
+    ),
     // A celebration, not a destination: it fades up rather than sliding.
     GetPage(
       name: AppRoutes.moodRecord,
@@ -236,8 +373,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.practitionerDashboard,
-      page: () => const PractitionerDashboardScreen(),
-      binding: PractitionerDashboardBinding(),
+      page: () => const ExpertShellScreen(),
+      binding: ExpertShellBinding(),
     ),
   ];
 }

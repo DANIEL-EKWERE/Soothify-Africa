@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +36,10 @@ void main() {
   });
   tearDown(Get.reset);
 
-  Future<CheckinController> mount(WidgetTester tester) async {
+  Future<CheckinController> mount(
+    WidgetTester tester, {
+    Brightness brightness = Brightness.light,
+  }) async {
     useDesignFrame(tester);
     await loadAppFonts();
     await PrefUtils().init();
@@ -52,13 +56,18 @@ void main() {
       CheckinKind.mood,
       now: _now,
     ));
-    await pumpScreen(tester, const CheckinScreen());
+    await pumpScreen(tester, const CheckinScreen(),
+        brightness: brightness);
     await tester.pumpAndSettle();
     return c;
   }
 
-  testWidgets('the calendar draws a circle per day', (tester) async {
-    final c = await mount(tester);
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+  testWidgets('the calendar draws a circle per day, $shade', (tester) async {
+    final c = await mount(tester, brightness: brightness);
     await precacheAll(tester, find.byType(CheckinScreen), _art);
 
     expect(find.text('Mood Check-Ins'), findsOneWidget);
@@ -70,11 +79,12 @@ void main() {
     expect(c.showingEntry.value, isFalse);
 
     await expectLater(find.byType(CheckinScreen),
-        matchesGoldenFile('goldens/checkin_calendar.png'));
+        matchesGoldenFile('goldens/checkin_calendar_$shade.png'));
   });
 
-  testWidgets('picking a recorded day shows that entry', (tester) async {
-    final c = await mount(tester);
+  testWidgets('picking a recorded day shows that entry, $shade',
+      (tester) async {
+    final c = await mount(tester, brightness: brightness);
     await precacheAll(tester, find.byType(CheckinScreen), _art);
 
     await c.selectDate(DateTime(2024, 8, 2));
@@ -87,8 +97,9 @@ void main() {
     expect(find.text('August 2024'), findsNothing);
 
     await expectLater(find.byType(CheckinScreen),
-        matchesGoldenFile('goldens/checkin_entry.png'));
+        matchesGoldenFile('goldens/checkin_entry_$shade.png'));
   });
+  }
 
   testWidgets('the calendar glyph returns from an entry', (tester) async {
     final c = await mount(tester);

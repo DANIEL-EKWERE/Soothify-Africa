@@ -223,7 +223,7 @@ class _ProceedButton extends StatelessWidget {
           ),
           child: Text(
             'Proceed',
-            style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
+            style: CustomTextStyles.subscribeLabel,
           ),
         ),
       );

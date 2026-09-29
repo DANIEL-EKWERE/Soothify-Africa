@@ -184,7 +184,7 @@ class _SetButton extends StatelessWidget {
         ),
         child: Text(
           'Set Reminder',
-          style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
+          style: CustomTextStyles.subscribeLabel,
         ),
       ),
     );

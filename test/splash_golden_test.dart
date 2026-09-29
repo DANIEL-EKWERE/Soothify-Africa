@@ -22,19 +22,21 @@ void main() {
         ..resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(
-      Sizer(
-        builder: (_, _, _) => GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: theme,
-          home: const SplashView(),
+    for (final (shade, data) in [('light', theme), ('dark', darkTheme)]) {
+      await tester.pumpWidget(
+        Sizer(
+          builder: (_, _, _) => GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: data,
+            home: const SplashView(),
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    await expectLater(
-        find.byType(SplashView), matchesGoldenFile('goldens/splash.png'));
+      await expectLater(find.byType(SplashView),
+          matchesGoldenFile('goldens/splash_$shade.png'));
+    }
   });
 
   for (var i = 0; i < SplashScreen.prompts.length; i++) {

@@ -30,7 +30,7 @@ class SessionCard extends StatelessWidget {
         padding: EdgeInsets.all(13.h),
         decoration: BoxDecoration(
           color: appTheme.surface,
-          border: Border.all(color: appTheme.rowBorder),
+          border: Border.all(color: appTheme.cardHairline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -123,14 +123,15 @@ class _NotePanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: appTheme.policyPanel,
         borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.rowBorder),
+        border: Border.all(color: appTheme.cardHairline),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            Icons.edit_square,
-            size: 13.5.h,
+          CustomImageView(
+            imagePath: ImageConstant.icNoteEdit,
+            height: 18.h,
+            width: 18.h,
             color: appTheme.soothifyBlue,
           ),
           SizedBox(width: 9.h),
@@ -155,10 +156,14 @@ class _ActionRow extends StatelessWidget {
   final ExpertContent content;
   final String sessionLabel;
 
-  IconData get _glyph => switch (content.kind) {
-        ExpertContentKind.video => Icons.play_arrow_rounded,
-        ExpertContentKind.article => Icons.article_outlined,
-        ExpertContentKind.audio => Icons.headphones_rounded,
+  /// The frame draws only two: `akar-icons:video` (259:60795) and
+  /// `basil:headphone-solid` (259:60837). Its "Read Article" row reuses the
+  /// video glyph, which is a slip — an article gets the note glyph here
+  /// rather than a play triangle.
+  String get _glyph => switch (content.kind) {
+        ExpertContentKind.video => ImageConstant.icVideo,
+        ExpertContentKind.article => ImageConstant.icNoteEdit,
+        ExpertContentKind.audio => ImageConstant.icHeadphone,
       };
 
   @override
@@ -169,7 +174,7 @@ class _ActionRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: appTheme.surface,
         borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.rowBorder),
+        border: Border.all(color: appTheme.cardHairline),
       ),
       child: Row(
         children: [
@@ -181,7 +186,12 @@ class _ActionRow extends StatelessWidget {
               color: appTheme.policyPanel,
               shape: BoxShape.circle,
             ),
-            child: Icon(_glyph, size: 18.h, color: appTheme.soothifyBlue),
+            child: CustomImageView(
+              imagePath: _glyph,
+              height: 20.h,
+              width: 20.h,
+              color: appTheme.soothifyBlue,
+            ),
           ),
           SizedBox(width: 8.h),
           Expanded(

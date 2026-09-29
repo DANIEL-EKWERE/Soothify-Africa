@@ -19,6 +19,7 @@ import 'helpers.dart';
 const _art = [
   'assets/images/journal/empty.png',
   'assets/images/notifications/avatar_female.png',
+  'assets/images/journal/expert_avatar.png',
   'assets/images/content/breath_work.png',
   'assets/images/content/mindfulness.png',
   'assets/images/content/daily_focus.png',

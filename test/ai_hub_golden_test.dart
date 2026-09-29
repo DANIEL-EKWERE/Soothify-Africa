@@ -46,11 +46,16 @@ void main() {
     });
   }
 
-  testWidgets('ai hub chat', (tester) async {
-    await mount(tester, expanded: true);
-    await expectLater(find.byType(AiHubScreen),
-        matchesGoldenFile('goldens/ai_hub_chat.png'));
-  });
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('ai hub chat, $shade', (tester) async {
+      await mount(tester, expanded: true, brightness: brightness);
+      await expectLater(find.byType(AiHubScreen),
+          matchesGoldenFile('goldens/ai_hub_chat_$shade.png'));
+    });
+  }
 
   testWidgets('the panel shows the frame\'s readouts and vibes',
       (tester) async {

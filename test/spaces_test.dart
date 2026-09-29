@@ -60,27 +60,33 @@ void main() {
     });
   }
 
-  testWidgets('spaces map with a pin open', (tester) async {
-    final c = await mount(tester);
-    c.showMap();
-    c.selectPin(WellnessSpace.sample.first);
-    await tester.pumpAndSettle();
-    await precacheAll(tester, find.byType(SpacesScreen), _art);
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('spaces map with a pin open, $shade', (tester) async {
+      final c = await mount(tester, brightness: brightness);
+      c.showMap();
+      c.selectPin(WellnessSpace.sample.first);
+      await tester.pumpAndSettle();
+      await precacheAll(tester, find.byType(SpacesScreen), _art);
 
-    await expectLater(find.byType(SpacesScreen),
-        matchesGoldenFile('goldens/spaces_map_pin.png'));
-  });
+      await expectLater(find.byType(SpacesScreen),
+          matchesGoldenFile('goldens/spaces_map_pin_$shade.png'));
+    });
 
-  testWidgets('studio profile', (tester) async {
-    useDesignFrame(tester);
-    await loadAppFonts();
-    Get.put(SpacesController());
-    await pumpScreen(tester, const StudioProfileScreen());
-    await precacheAll(tester, find.byType(StudioProfileScreen), _art);
+    testWidgets('studio profile, $shade', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      Get.put(SpacesController());
+      await pumpScreen(tester, const StudioProfileScreen(),
+          brightness: brightness);
+      await precacheAll(tester, find.byType(StudioProfileScreen), _art);
 
-    await expectLater(find.byType(StudioProfileScreen),
-        matchesGoldenFile('goldens/studio_profile.png'));
-  });
+      await expectLater(find.byType(StudioProfileScreen),
+          matchesGoldenFile('goldens/studio_profile_$shade.png'));
+    });
+  }
 
   testWidgets('the list carries the frame’s chrome', (tester) async {
     await mount(tester);

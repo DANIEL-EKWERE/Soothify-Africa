@@ -50,7 +50,7 @@ class ExpertRecommendation {
     required this.note,
     required this.content,
     this.isNew = false,
-    this.avatarAsset = ImageConstant.imgAvatarFemale,
+    this.avatarAsset = ImageConstant.imgExpertAvatar,
   });
 
   final String id;

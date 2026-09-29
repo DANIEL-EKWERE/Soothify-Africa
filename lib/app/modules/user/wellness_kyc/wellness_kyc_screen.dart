@@ -250,7 +250,7 @@ class _NextButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
+          style: CustomTextStyles.subscribeLabel,
         ),
       ),
     );

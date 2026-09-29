@@ -61,7 +61,7 @@ class ScheduleSheet extends StatelessWidget {
                 child: Text(
                   'Select date',
                   style: CustomTextStyles.subscribeLabel
-                      .copyWith(fontSize: 18.fSize),
+                      ,
                 ),
               ),
             ),

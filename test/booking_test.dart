@@ -330,9 +330,8 @@ void main() {
     expect(find.text('98% Match'), findsOneWidget);
 
     // The frame is 1677 tall, so the ListView has not built the lower half
-    // yet — the rest has to be scrolled to before it exists at all.
-    await expectLater(find.byType(BookingScreen),
-        matchesGoldenFile('goldens/booking_matched.png'));
+    // yet — the rest has to be scrolled to before it exists at all. The
+    // golden for this stage is captured in the light/dark loop below.
 
     // Each is checked where it becomes visible: the list disposes what
     // scrolls away, so asserting everything after one long scroll finds only
@@ -356,33 +355,52 @@ void main() {
     }
   });
 
-  testWidgets('booking method', (tester) async {
-    useDesignFrame(tester);
-    await loadAppFonts();
-    boot();
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('booking method, $shade', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      boot();
 
-    await pumpScreen(tester, const BookingScreen());
-    await tester.pump(const Duration(milliseconds: 400));
-    Get.find<BookingController>().getStarted();
-    await tester.pumpAndSettle();
+      await pumpScreen(tester, const BookingScreen(), brightness: brightness);
+      await tester.pump(const Duration(milliseconds: 400));
+      Get.find<BookingController>().getStarted();
+      await tester.pumpAndSettle();
 
-    await expectLater(find.byType(BookingScreen),
-        matchesGoldenFile('goldens/booking_method.png'));
-  });
+      await expectLater(find.byType(BookingScreen),
+          matchesGoldenFile('goldens/booking_method_$shade.png'));
+    });
 
-  testWidgets('booking rating', (tester) async {
-    useDesignFrame(tester);
-    await loadAppFonts();
-    final c = boot();
+    testWidgets('booking rating, $shade', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final c = boot();
 
-    await pumpScreen(tester, const BookingScreen());
-    await tester.pump(const Duration(milliseconds: 400));
-    c.getStarted();
-    c.chooseMode(CallMode.phone);
-    c.endCall();
-    await tester.pumpAndSettle();
+      await pumpScreen(tester, const BookingScreen(), brightness: brightness);
+      await tester.pump(const Duration(milliseconds: 400));
+      c.getStarted();
+      c.chooseMode(CallMode.phone);
+      c.endCall();
+      await tester.pumpAndSettle();
 
-    await expectLater(find.byType(BookingScreen),
-        matchesGoldenFile('goldens/booking_rating.png'));
-  });
+      await expectLater(find.byType(BookingScreen),
+          matchesGoldenFile('goldens/booking_rating_$shade.png'));
+    });
+
+    testWidgets('booking matched, $shade', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      boot();
+
+      await pumpScreen(tester, const BookingScreen(), brightness: brightness);
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      await precacheAll(tester, find.byType(BookingScreen), _art);
+
+      await expectLater(find.byType(BookingScreen),
+          matchesGoldenFile('goldens/booking_matched_$shade.png'));
+    });
+  }
 }

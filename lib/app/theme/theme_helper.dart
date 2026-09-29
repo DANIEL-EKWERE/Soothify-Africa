@@ -112,6 +112,7 @@ class PrimaryColors {
     required this.filterRule,
     required this.topicChipLabel,
     required this.rowBorder,
+    required this.cardHairline,
     required this.divider,
     required this.accent,
     required this.success,
@@ -335,6 +336,12 @@ class PrimaryColors {
 
   /// Hairline around an unselected language row.
   final Color rowBorder;
+
+  /// The Expert Recommendation cards' outline — **5% black**, not a solid
+  /// grey. The Figma API reports `stroke #000000 w=1.0` and puts the 0.05 in
+  /// a separate `opacity` field, which is easy to miss and which this app has
+  /// now got wrong twice.
+  final Color cardHairline;
   final Color divider;
 
   // Status
@@ -506,6 +513,7 @@ class PrimaryColors {
     filterRule: Color(0xFF999999),
     topicChipLabel: Color(0xB81B1F26),
     rowBorder: Color(0xFFCCCCCC),
+    cardHairline: Color(0x0D000000),
     divider: Color(0xFFEDE9E3),
     accent: Color(0xFFF5A623),
     success: Color(0xFF34C759),
@@ -608,6 +616,8 @@ class PrimaryColors {
     filterRule: Color(0xFF5A5757),
     topicChipLabel: Color(0xDEFFFFFF),
     rowBorder: Color(0xFF4A4747),
+    // 5% black vanishes on a dark ground; the same weight in white.
+    cardHairline: Color(0x14FFFFFF),
     divider: Color(0xFF2A2828),
     accent: Color(0xFFF5A623),
     success: Color(0xFF34C759),

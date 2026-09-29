@@ -102,16 +102,42 @@ void main() {
     ('history', ProfileSection.history),
     ('checkins', ProfileSection.checkIns),
   ]) {
-    testWidgets('profile $name', (tester) async {
+    for (final (shade, brightness) in [
+      ('light', Brightness.light),
+      ('dark', Brightness.dark),
+    ]) {
+      testWidgets('profile $name, $shade', (tester) async {
+        useDesignFrame(tester);
+        await loadAppFonts();
+        Get.put(ProfileTabController(
+            _FakeProfileRepository(), _FakeSession(guest: false))
+          ..section.value = section);
+
+        await pumpScreen(tester, const ProfileTab(), brightness: brightness);
+
+        await expectLater(find.byType(ProfileTab),
+            matchesGoldenFile('goldens/profile_${name}_$shade.png'));
+      });
+    }
+  }
+
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('profile unsigned, $shade', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false))
-        ..section.value = section);
+      Get.put(ProfileTabController(
+        _FakeProfileRepository(),
+        _FakeSession(guest: true),
+      ));
 
-      await pumpScreen(tester, const ProfileTab());
+      await pumpScreen(tester, const ProfileTab(), brightness: brightness);
+      await precacheAll(tester, find.byType(ProfileTab), _art);
 
       await expectLater(find.byType(ProfileTab),
-          matchesGoldenFile('goldens/profile_$name.png'));
+          matchesGoldenFile('goldens/profile_unsigned_$shade.png'));
     });
   }
 
@@ -133,9 +159,6 @@ void main() {
     // The gear is a guest's way into Settings — the only frame that shows one.
     expect(find.text('Unlock Soothify Pro'), findsOneWidget);
 
-    await precacheAll(tester, find.byType(ProfileTab), _art);
-    await expectLater(find.byType(ProfileTab),
-        matchesGoldenFile('goldens/profile_unsigned.png'));
   });
 
   testWidgets('History picks a day in orange, and has no confirm button',

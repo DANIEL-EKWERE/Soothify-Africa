@@ -87,6 +87,18 @@ class ImageConstant {
   /// The flat map behind "Spaces Around Me" — the fill on `282:25250`.
   static const String imgSpacesMap = '$_images/spaces/map.png';
 
+  /// Dr. Amara Okafor on the Journal's Expert Recommendation tab —
+  /// `259:60781`, cropped the way the frame's `imageTransform` does.
+  static const String imgExpertAvatar = '$_images/journal/expert_avatar.png';
+
+  /// That tab's glyphs — Figma `ci:note-edit` (259:60790),
+  /// `akar-icons:video` (259:60795), `basil:headphone-solid` (259:60837) and
+  /// the 16px row chevron (259:60799).
+  static const String icNoteEdit = '$_icons/ic_note_edit.svg';
+  static const String icVideo = '$_icons/ic_video.svg';
+  static const String icHeadphone = '$_icons/ic_headphone.svg';
+  static const String icArrowRightSm = '$_icons/ic_arrow_right_sm.svg';
+
   static const String icBack = '$_icons/ic_back.svg';
   static const String icSearch = '$_icons/ic_search.svg';
   static const String icFilter = '$_icons/ic_filter.svg';

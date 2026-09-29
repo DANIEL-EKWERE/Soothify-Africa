@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,28 +52,33 @@ void main() {
     expect(c.canSetReminder, isFalse);
   });
 
-  testWidgets('the daily screen offers its own start action', (tester) async {
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+  testWidgets('the daily screen offers its own start action, $shade',
+      (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
     Get.put(DailyController(CheckinKind.balance, now: now));
 
-    await pumpScreen(tester, const DailyScreen());
+    await pumpScreen(tester, const DailyScreen(), brightness: brightness);
 
     expect(find.text('Daily Stretch & Restore'), findsOneWidget);
     expect(find.text('Start Daily Stretch & Restore'), findsOneWidget);
     expect(find.text('August 2024'), findsOneWidget);
 
     await expectLater(find.byType(DailyScreen),
-        matchesGoldenFile('goldens/daily_balance.png'));
+        matchesGoldenFile('goldens/daily_balance_$shade.png'));
   });
 
-  testWidgets('reminder days toggle independently', (tester) async {
+  testWidgets('reminder days toggle independently, $shade', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
     final c = DailyController(CheckinKind.meditation, now: now);
     Get.put(c);
 
-    await pumpScreen(tester, const ReminderScreen());
+    await pumpScreen(tester, const ReminderScreen(), brightness: brightness);
     expect(find.text('Pilates & Core Check-In'), findsOneWidget);
     expect(find.text('9:00'), findsOneWidget);
 
@@ -82,8 +88,9 @@ void main() {
     expect(c.reminderDays, {DateTime.monday, DateTime.friday});
 
     await expectLater(find.byType(ReminderScreen),
-        matchesGoldenFile('goldens/daily_reminder.png'));
+        matchesGoldenFile('goldens/daily_reminder_$shade.png'));
   });
+  }
 
   testWidgets('a check-in calendar marks days that have an entry',
       (tester) async {

@@ -122,7 +122,7 @@ class _OfferingCard extends StatelessWidget {
               child: Text(
                 'Book session',
                 style: CustomTextStyles.statsActionLabel
-                    .copyWith(fontSize: 18.fSize),
+                    ,
               ),
             ),
           ),

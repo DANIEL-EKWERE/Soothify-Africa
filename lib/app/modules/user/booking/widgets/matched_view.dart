@@ -264,7 +264,7 @@ class _PrimaryButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
+          style: CustomTextStyles.subscribeLabel,
         ),
       ),
     );
@@ -292,10 +292,8 @@ class _GhostButton extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: CustomTextStyles.subscribeLabel.copyWith(
-            fontSize: 18.fSize,
-            color: appTheme.actionFill,
-          ),
+          style: CustomTextStyles.subscribeLabel
+              .copyWith(color: appTheme.actionFill),
         ),
       ),
     );

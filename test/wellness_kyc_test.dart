@@ -314,22 +314,29 @@ void main() {
     });
   }
 
-  testWidgets('meditation kyc question', (tester) async {
-    useDesignFrame(tester);
-    await loadAppFonts();
-    await PrefUtils().init();
-    Get.put(
-      WellnessKycController(WellnessTrack.meditation, introWait: Duration.zero)
-        ..begin(),
-    );
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('meditation kyc question, $shade', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      await PrefUtils().init();
+      Get.put(
+        WellnessKycController(WellnessTrack.meditation,
+            introWait: Duration.zero)
+          ..begin(),
+      );
 
-    await pumpScreen(tester, const WellnessKycScreen());
+      await pumpScreen(tester, const WellnessKycScreen(),
+          brightness: brightness);
 
-    await expectLater(
-      find.byType(WellnessKycScreen),
-      matchesGoldenFile('goldens/wellness_kyc_question.png'),
-    );
-  });
+      await expectLater(
+        find.byType(WellnessKycScreen),
+        matchesGoldenFile('goldens/wellness_kyc_question_$shade.png'),
+      );
+    });
+  }
 
   testWidgets('each Next shows the following question', (tester) async {
     useDesignFrame(tester);

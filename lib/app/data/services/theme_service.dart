@@ -33,6 +33,17 @@ class ThemeService extends GetxService {
     mode.value = value;
     await PrefUtils().setThemeMode(_encode(value));
     Get.changeThemeMode(value);
+    // Rebuild everything that is already on screen.
+    //
+    // Screens read their colours from `appTheme`, which is a plain static —
+    // reading it subscribes to nothing, so a widget that is not otherwise
+    // rebuilt keeps painting the palette it captured last time. Changing the
+    // mode repainted the MaterialApp and nothing beneath it, which is why a
+    // toggle only showed up after the app was killed and reopened.
+    //
+    // `forceAppUpdate` marks every element dirty without discarding state,
+    // so routes, scroll positions and controllers survive the switch.
+    await Get.forceAppUpdate();
   }
 
   /// Flips between light and dark, resolving "system" against what is

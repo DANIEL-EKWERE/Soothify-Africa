@@ -1685,9 +1685,13 @@ class CustomTextStyles {
   /// Full-width button label — Nunito Sans ExtraBold 18.
   static TextStyle get buttonLabel => buttonLabelFor(appTheme);
 
+  /// Nunito Sans ExtraBold **16**, which is what every current frame sets a
+  /// button label at — `259:59*` and `280:*` alike. It was 18, carried over
+  /// from the previous file ("Apply", "Book session"), which ran every newer
+  /// screen's action two points large.
   static TextStyle buttonLabelFor(PrimaryColors c) => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 18.fSize,
+    fontSize: 16.fSize,
     fontWeight: FontWeight.w800,
     fontVariations: const [FontVariation('wght', 800)],
     color: c.onPrimary,
@@ -2370,7 +2374,7 @@ class CustomTextStyles {
   /// The label on the pop-up's ghost action.
   static TextStyle get offerAction => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 18.fSize,
+    fontSize: 16.fSize,
     fontWeight: FontWeight.w800,
     fontVariations: const [FontVariation('wght', 800)],
     color: appTheme.soothifyBlue,

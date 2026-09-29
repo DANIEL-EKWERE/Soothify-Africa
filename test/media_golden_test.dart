@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,12 +42,17 @@ void main() {
   MediaController boot() =>
       Get.put(MediaController(item, source: 'Top Picks for you'));
 
-  testWidgets('it shows the player and the written material', (tester) async {
+  for (final (shade, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+  testWidgets('it shows the player and the written material, $shade',
+      (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
     final c = boot();
 
-    await pumpScreen(tester, const MediaScreen());
+    await pumpScreen(tester, const MediaScreen(), brightness: brightness);
     await precacheAll(tester, find.byType(MediaScreen), _art);
 
     // The shelf the card came from titles the screen.
@@ -61,8 +67,9 @@ void main() {
     expect(c.elapsedLabel, '2:34 / 15:00');
 
     await expectLater(find.byType(MediaScreen),
-        matchesGoldenFile('goldens/media_detail.png'));
+        matchesGoldenFile('goldens/media_detail_$shade.png'));
   });
+  }
 
   test('seeking is clamped to the item', () {
     final c = MediaController(item, source: 'x');

@@ -66,16 +66,20 @@ class SoothifyApp extends StatelessWidget {
             // top, so it can stay out of onboarding and auth.
             routingCallback: AiAssistOverlay.onRouting,
             builder: (context, child) {
-              // Point the global palette at whichever ThemeData resolved here.
-              // This runs on every theme change, manual or system, so
-              // `appTheme` never lags what is painted.
-              PrimaryColors.syncFrom(context);
-
-              // Transparent status bar with dark icons, so the app's own
-              // background runs to the top of the screen. The icon brightness
-              // follows the theme rather than being pinned dark: black glyphs
-              // on the dark palette's near-black background would vanish.
-              final dark = Theme.of(context).brightness == Brightness.dark;
+              // Resolve the palette from the *service*, not from
+              // `Theme.of(context)`.
+              //
+              // MaterialApp animates between themes, and `ThemeData.lerp`
+              // switches `brightness` only at the half-way point — so for the
+              // first half of a toggle `Theme.of` still reports the OLD
+              // brightness. `syncFrom` therefore re-pinned the old palette on
+              // the very rebuild the toggle triggered, and nothing rebuilt
+              // again once the animation crossed over. That is why a theme
+              // change only appeared after killing the app.
+              final dark = Get.find<ThemeService>().isDark(context);
+              PrimaryColors.active = PrimaryColors.of(
+                dark ? Brightness.dark : Brightness.light,
+              );
 
               // Pin text scaling so the Figma layouts stay predictable.
               // Revisit once accessibility sizing is designed for.

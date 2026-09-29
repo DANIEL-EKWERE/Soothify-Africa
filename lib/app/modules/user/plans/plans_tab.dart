@@ -225,7 +225,7 @@ class _ContinueButton extends StatelessWidget {
           ),
           child: Text(
             'Continue',
-            style: CustomTextStyles.subscribeLabel.copyWith(fontSize: 18.fSize),
+            style: CustomTextStyles.subscribeLabel,
           ),
         ),
       );

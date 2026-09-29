@@ -246,7 +246,15 @@ def spec(nid):
                     ex.append("IMAGE")
             for s in n.get("strokes") or []:
                 if s["type"] == "SOLID":
-                    ex.append(f"stroke {_hex(s['color'])} w={n.get('strokeWeight')}")
+                    # Opacity, always. The fills line has printed it for ages;
+                    # this one did not, so a 5%-black hairline read as solid
+                    # black and shipped that way twice — the "Recommended for
+                    # you" cards and the Expert Recommendation cards.
+                    op = s.get("opacity", 1) * (s["color"].get("a", 1))
+                    ex.append(
+                        f"stroke {_hex(s['color'])}"
+                        + (f" o={op:.2f}" if abs(op - 1) > 1e-6 else "")
+                        + f" w={n.get('strokeWeight')}")
             if n.get("cornerRadius") is not None:
                 ex.append(f"r={n['cornerRadius']}")
             if n.get("characters"):

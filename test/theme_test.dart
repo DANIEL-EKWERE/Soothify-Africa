@@ -92,4 +92,55 @@ void main() {
       expect(appTheme.background, expected.background);
     }
   });
+
+  testWidgets('toggling repaints what is already on screen', (tester) async {
+    // The regression this covers: `appTheme` is a plain static, so reading it
+    // subscribes to nothing. Toggling rebuilt the MaterialApp and nothing
+    // beneath it, and the change only appeared after the app was killed and
+    // reopened. The old test above mounted a *fresh* tree per mode, so it
+    // passed throughout.
+    final service = Get.put(await ThemeService().init());
+
+    await tester.pumpWidget(
+      Obx(
+        () => GetMaterialApp(
+          theme: theme,
+          darkTheme: darkTheme,
+          themeMode: service.mode.value,
+          builder: (context, child) {
+            // Mirrors main.dart: resolved from the service, not from
+            // `Theme.of`, which reports the pre-toggle brightness for the
+            // first half of the theme animation.
+            PrimaryColors.active = PrimaryColors.of(
+              service.isDark(context) ? Brightness.dark : Brightness.light,
+            );
+            return child!;
+          },
+          home: Builder(
+            builder: (_) => ColoredBox(
+              color: appTheme.background,
+              child: const SizedBox.expand(),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    ColoredBox painted() => tester.widget<ColoredBox>(
+          find.byType(ColoredBox).last,
+        );
+    expect(painted().color, PrimaryColors.light.background);
+
+    await service.setMode(ThemeMode.dark);
+    await tester.pumpAndSettle();
+
+    expect(painted().color, PrimaryColors.dark.background,
+        reason: 'a mounted screen must repaint without being rebuilt by hand');
+    expect(appTheme.background, PrimaryColors.dark.background);
+
+    await service.setMode(ThemeMode.light);
+    await tester.pumpAndSettle();
+    expect(painted().color, PrimaryColors.light.background);
+  });
 }

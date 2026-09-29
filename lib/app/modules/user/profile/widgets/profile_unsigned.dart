@@ -124,10 +124,8 @@ class _SignupButton extends StatelessWidget {
             SizedBox(width: 12.h),
             Text(
               'Sign up',
-              style: CustomTextStyles.subscribeLabel.copyWith(
-                fontSize: 18.fSize,
-                color: appTheme.textPrimary,
-              ),
+              style: CustomTextStyles.subscribeLabel
+                  .copyWith(color: appTheme.textPrimary),
             ),
           ],
         ),
@@ -163,7 +161,6 @@ class _Action extends StatelessWidget {
         child: Text(
           label,
           style: CustomTextStyles.subscribeLabel.copyWith(
-            fontSize: 18.fSize,
             color: filled ? appTheme.onPrimary : appTheme.actionFill,
           ),
         ),

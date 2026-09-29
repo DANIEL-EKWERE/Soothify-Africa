@@ -59,6 +59,7 @@ class AppNotification {
     this.text = '',
     this.title = '',
     this.body = '',
+    this.emphasis = '',
     this.avatarAsset = '',
     this.iconAsset = '',
     this.actionLabel = '',
@@ -81,6 +82,13 @@ class AppNotification {
   /// "Booking" or "Reminder" — which the frame prints beside the line.
   final String title;
   final String body;
+
+  /// A run inside [body] the design sets in bold — Figma `259:61271` bolds
+  /// the discipline in "You have a **Yoga** session on 28 Sep 2026 at
+  /// 5:00pm" and leaves the rest regular, in the same ink.
+  ///
+  /// Empty means the line is all one weight.
+  final String emphasis;
 
   final String avatarAsset;
   final String iconAsset;
@@ -111,4 +119,23 @@ class AppNotification {
     if (d.inDays == 1) return 'Yesterday';
     return '${d.inDays} days ago';
   }
+}
+
+/// Splits [AppNotification.body] into runs, so the emphasised part can be
+/// drawn bold without the model carrying spans.
+///
+/// Returns the text before the run, the run itself, and the text after. With
+/// no emphasis — or an emphasis the body does not contain — the whole line
+/// comes back as the first part.
+({String before, String bold, String after}) splitEmphasis(
+  AppNotification n,
+) {
+  if (n.emphasis.isEmpty) return (before: n.body, bold: '', after: '');
+  final at = n.body.indexOf(n.emphasis);
+  if (at < 0) return (before: n.body, bold: '', after: '');
+  return (
+    before: n.body.substring(0, at),
+    bold: n.emphasis,
+    after: n.body.substring(at + n.emphasis.length),
+  );
 }

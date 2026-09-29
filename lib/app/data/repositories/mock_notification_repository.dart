@@ -96,6 +96,7 @@ class MockNotificationRepository implements NotificationRepository {
         kind: NotificationKind.booking,
         title: 'Booking',
         body: 'You have a Yoga session on 28 Sep 2026 at 5:00pm',
+        emphasis: 'Yoga',
         unread: true,
         at: now.subtract(const Duration(minutes: 20)),
         filters: const {
@@ -108,6 +109,7 @@ class MockNotificationRepository implements NotificationRepository {
         kind: NotificationKind.booking,
         title: 'Reminder',
         body: 'You have Yoga session today at 5:00pm',
+        emphasis: 'Yoga',
         unread: true,
         at: now.subtract(const Duration(hours: 2)),
         filters: const {
@@ -120,6 +122,7 @@ class MockNotificationRepository implements NotificationRepository {
         kind: NotificationKind.booking,
         title: 'Reminder',
         body: 'You have Pilates & Core session tomorrow at 7:00am',
+        emphasis: 'Pilates & Core',
         at: now.subtract(const Duration(hours: 5)),
         filters: const {
           NotificationFilter.all,

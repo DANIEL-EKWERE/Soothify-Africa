@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/wellness_space.dart';
 import '../../../widgets/custom_elevated_button.dart';
+import 'widgets/passport_sheet.dart';
 import 'widgets/space_card.dart';
 
 /// "Studio Profile & Direct Connect Screen" — Figma `282:25339`.
@@ -206,18 +207,16 @@ class _Sheet extends StatelessWidget {
 ///
 /// The frame styles this as one text node with two runs — the question in
 /// body ink and everything from "Get" in `#2F6FED`, which makes the second
-/// half a link. It carries no prototype interaction and **the file has no
-/// Passport screen**, so the destination does not exist yet; tapping says so
-/// rather than doing nothing, which is what a blue phrase promises.
+/// half a link. It carries no prototype interaction, so where it went was an
+/// open question until the designer gave the sheet's copy; it opens
+/// [PassportSheet].
 class _PassportTeaser extends StatelessWidget {
   const _PassportTeaser();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => AppFeedback.info(
-        'Passport passes are not open yet — we’ll let you know when they are.',
-      ),
+      onTap: () => PassportSheet.show(context),
       behavior: HitTestBehavior.opaque,
       child: Text.rich(
         TextSpan(

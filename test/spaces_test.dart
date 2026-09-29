@@ -8,6 +8,7 @@ import 'package:soothifyafrica/app/data/models/wellness_space.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/controller/spaces_controller.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/spaces_screen.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/studio_profile_screen.dart';
+import 'package:soothifyafrica/app/modules/user/spaces/widgets/passport_sheet.dart';
 
 import 'helpers.dart';
 
@@ -160,31 +161,50 @@ void main() {
     Get.testMode = true;
     await pumpScreen(tester, const StudioProfileScreen());
 
+    // It is the last thing in the sheet, so it starts below the fold.
+    final teaser = find.textContaining('Love this studio?');
+    await tester.scrollUntilVisible(
+      teaser,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     // `282:25364` is one text node in two runs — the question in body ink and
     // everything from "Get" in #2F6FED. Rendering it flat loses the only
     // thing that says it can be tapped.
-    final teaser = tester.widget<Text>(
-      find.byWidgetPredicate(
-        (w) => w is Text && w.textSpan != null &&
-            (w.textSpan! as TextSpan).children?.length == 1,
-      ),
-    );
-    final span = teaser.textSpan! as TextSpan;
-    expect(span.text, 'Love this studio? ');
-    expect((span.children!.first as TextSpan).text,
-        'Get early access to Passport passes');
-    expect((span.children!.first as TextSpan).style!.color,
-        isNot(span.style!.color),
+    final span = tester.widget<Text>(teaser).textSpan! as TextSpan;
+    final parts = span.children!.cast<TextSpan>();
+    expect(parts, hasLength(2));
+    expect(parts.first.text, 'Love this studio? ');
+    expect(parts.last.text, 'Get early access to Passport passes');
+    expect(parts.last.style!.color, isNot(parts.first.style!.color),
         reason: 'the link half is the only part the frame colours blue');
 
-    // The file has no Passport screen and the node carries no prototype
-    // link, so tapping has to say so rather than do nothing.
-    await tester.tap(find.textContaining('Love this studio?'));
-    await tester.pump();
-    expect(find.textContaining('Passport passes are not open yet'),
-        findsOneWidget);
-    await tester.pump(const Duration(seconds: 4));
+    // It opens the waitlist sheet.
+    await tester.tap(teaser);
     await tester.pumpAndSettle();
+    expect(find.byType(PassportSheet), findsOneWidget);
+    expect(find.text(PassportSheet.heading), findsOneWidget);
+    for (final paragraph in PassportSheet.body) {
+      expect(find.text(paragraph), findsOneWidget);
+    }
+  });
+
+  testWidgets('the sheet carries the designer’s words unchanged',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await pumpScreen(tester, const PassportSheet());
+
+    // Supplied by the designer rather than read from the file — the sheet is
+    // not a frame on page 124:2. If it ever is, these are what to check the
+    // frame against.
+    expect(PassportSheet.heading, 'Step into the broader sanctuary');
+    expect(PassportSheet.body.first, startsWith('We are putting together'));
+    expect(PassportSheet.body.first, contains('Abuja and Lagos'));
+    expect(PassportSheet.body.last, contains('the moment our doors open'));
+    expect(find.text('Notify me'), findsOneWidget);
   });
 
   test('every sample space is reachable through some chip', () {

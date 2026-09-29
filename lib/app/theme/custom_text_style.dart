@@ -2559,6 +2559,14 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
+  /// The discipline inside a booking line — the same ink at Bold, per
+  /// `259:61271`.
+  static TextStyle get notificationBookingEmphasis =>
+      notificationBookingBody.copyWith(
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+      );
+
   static TextStyle get notificationBookingBody => TextStyle(
     fontFamily: fontNunito,
     fontSize: 10.fSize,

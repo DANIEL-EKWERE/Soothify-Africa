@@ -1,5 +1,14 @@
 # Page 124:2 — full frame index (refreshed 2026-09-26)
 #
+# THIS IS ONE PAGE OF THREE. `tool/figma.py pages` lists them:
+#   0:1      Page 1
+#   124:2    Page 2   <- this file
+#   133:201  Page 3
+# Every index and note in this folder covers 124:2 alone. A frame that seems
+# absent from the file is very often on a page nobody indexed — the "Soothify
+# passport waitlist" sheet is not on 124:2, and was reported as missing from
+# the file before the page list was ever fetched.
+#
 # File NJjQwgwMr44oDKuaaHHKbn. 860 frames, lastModified 2026-09-26T07:08Z.
 # Ids were reassigned AGAIN (third time). Diff this file by NAME, never by
 # id — an id diff reports the whole page as new.

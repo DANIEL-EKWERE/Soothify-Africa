@@ -7,11 +7,19 @@ a personal access token instead, which has no such limit.
   tool/figma.py nodes  <id> ...   save node JSON to tool/.figma_cache/
   tool/figma.py filenodes <id> .. same, via /files?ids= (a separate quota)
   tool/figma.py render <id> ...   render PNGs at 2x
+  tool/figma.py pages             list the file's pages
   tool/figma.py fills  <ref> ...  download image fills by imageRef
   tool/figma.py spec   <id>       print positions, styles and fills
 
-Note the real design lives on page 55:23 ("App UI Design"); the API's page
-listing only reports the style-guide page.
+THE FILE HAS THREE PAGES and this tool has only ever been pointed at one:
+
+    0:1      Page 1
+    124:2    Page 2   <- everything in tool/figma_export/ indexes this
+    133:201  Page 3   <- the old page the node index calls superseded
+
+`tool/figma.py pages` lists them. A frame that "is not in the file" is very
+often on a page nobody looked at — the Soothify passport waitlist sheet was.
+Index a page with `nodes <page-id> depth=1`.
 """
 import json, os, sys, time, urllib.error, urllib.request, urllib.parse, pathlib
 
@@ -138,6 +146,18 @@ def render(ids, scale=2):
         print(f"  {i:>13} {dest.stat().st_size/1024:7.1f} KB -> {dest}")
 
 
+def pages(_args):
+    """List the file's pages.
+
+    One cheap call, and the first thing to run when a frame cannot be found:
+    every index in tool/figma_export/ covers page 124:2 alone.
+    """
+    data = api(f"files/{KEY}?depth=1")
+    print(f"{data.get('name')}  lastModified {data.get('lastModified')}")
+    for p in data["document"].get("children", []):
+        print(f"  {p['id']:12s} {p.get('name')}")
+
+
 def fills(refs):
     """Resolve image fills to their S3 URLs and download them.
 
@@ -250,6 +270,6 @@ def spec(nid):
 
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
-    {"nodes": nodes, "filenodes": file_nodes, "fills": fills,
+    {"nodes": nodes, "filenodes": file_nodes, "fills": fills, "pages": pages,
      "render": render, "icons": icons}.get(
         cmd, lambda a: spec(a[0]))(args)

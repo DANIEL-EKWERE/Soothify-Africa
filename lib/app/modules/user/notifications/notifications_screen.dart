@@ -242,15 +242,43 @@ class _Booking extends StatelessWidget {
               style: CustomTextStyles.notificationBookingKind),
           SizedBox(width: 6.h),
           Expanded(
-            child: Text(
-              notification.body,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: CustomTextStyles.notificationBookingBody,
-            ),
+            child: _BookingLine(notification: notification),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A booking line with its discipline in bold.
+///
+/// `259:61271` sets the discipline — "Yoga", "Pilates & Core" — in Nunito
+/// Bold inside an otherwise regular sentence, in the same ink. It was shipping
+/// flat.
+class _BookingLine extends StatelessWidget {
+  const _BookingLine({required this.notification});
+
+  final AppNotification notification;
+
+  @override
+  Widget build(BuildContext context) {
+    final parts = splitEmphasis(notification);
+    final base = CustomTextStyles.notificationBookingBody;
+    return Text.rich(
+      TextSpan(
+        style: base,
+        children: [
+          TextSpan(text: parts.before),
+          if (parts.bold.isNotEmpty)
+            TextSpan(
+              text: parts.bold,
+              style: CustomTextStyles.notificationBookingEmphasis,
+            ),
+          if (parts.after.isNotEmpty) TextSpan(text: parts.after),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }

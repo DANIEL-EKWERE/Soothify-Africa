@@ -61,6 +61,22 @@ class AppRoutes {
   static const String library = '/library';
   static const String schedule = '/schedule';
 
+  /// The client waiting for a booked session to open (`280:26643`) — the
+  /// practitioner has its own screen.
+  static const String clientJoining = '/session/joining';
+
+  /// "Spaces Around Me" (`282:25161`) — studios near the client, list or
+  /// map, reached from Discover. Under the "Client Safety & Trust Screens"
+  /// banner: somewhere real and vouched-for to practise.
+  static const String spaces = '/spaces';
+
+  /// One studio's profile and the two ways to reach it (`282:25339`).
+  static const String studioProfile = '/spaces/studio';
+
+  /// The cancellation policy in full (`280:26738`), reached from the payment
+  /// screen's policy panel.
+  static const String cancellationPolicy = '/cancellation-policy';
+
   /// "Book a licensed expert screen" (`259:31488`) — the three 1-on-1
   /// disciplines, reached from Home's Explore tile. The questionnaire comes
   /// after a card is picked, not before the list.

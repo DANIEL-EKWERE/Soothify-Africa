@@ -60,6 +60,12 @@ import '../modules/user/community/forum/forum_screen.dart';
 import '../modules/user/community/thread/binding/thread_binding.dart';
 import '../modules/user/community/thread/thread_screen.dart';
 import '../modules/user/booking/binding/booking_binding.dart';
+import '../modules/user/payment/cancellation_policy_screen.dart';
+import '../modules/user/session/binding/client_joining_binding.dart';
+import '../modules/user/session/client_joining_screen.dart';
+import '../modules/user/spaces/binding/spaces_binding.dart';
+import '../modules/user/spaces/spaces_screen.dart';
+import '../modules/user/spaces/studio_profile_screen.dart';
 import '../modules/user/book_expert/binding/book_expert_binding.dart';
 import '../modules/user/book_expert/book_expert_screen.dart';
 import '../modules/user/booking/booking_screen.dart';
@@ -185,6 +191,24 @@ class AppPages {
       name: AppRoutes.library,
       page: () => const LibraryScreen(),
       binding: LibraryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.clientJoining,
+      page: () => const ClientJoiningScreen(),
+      binding: ClientJoiningBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.spaces,
+      page: () => const SpacesScreen(),
+      binding: SpacesBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.studioProfile,
+      page: () => const StudioProfileScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.cancellationPolicy,
+      page: () => const CancellationPolicyScreen(),
     ),
     GetPage(
       name: AppRoutes.bookExpert,

@@ -1,11 +1,16 @@
 /// One bookable session type on the Schedule screen.
 enum SessionOffering {
-  therapy('therapy', 'Therapy sessions', single: 25000, monthly: 75000),
+  therapy('therapy', 'Therapy sessions',
+      single: 25000,
+      monthly: 75000,
+      matchingTitle: 'Finding your therapist'),
   meditation('meditation', 'Pilates & Core session', single: 10000,
       monthly: 36000,
       matchingTitle: 'Finding your Pilates instructor'),
-  balance('balance', 'Stretch & Restore sessions', single: 10000,
-      monthly: 36000);
+  balance('balance', 'Stretch & Restore sessions',
+      single: 10000,
+      monthly: 36000,
+      matchingTitle: 'Finding your instructor');
 
   const SessionOffering(
     this.id,
@@ -27,16 +32,17 @@ enum SessionOffering {
   /// The design prints the same blurb on all three cards.
   String get blurb => 'One on one session with a\nprofessional';
 
-  /// The heading on the matching interstitial — Figma
-  /// `Matching pilates instructor` (259:58806), "Finding your Pilates
-  /// instructor".
+  /// The heading on the matching interstitial.
   ///
-  /// Only that one frame could be read; the row ends with a sibling per
-  /// discipline (`Matching instructor` 259:58748, `Matching Therapist`
-  /// 259:58834) and those are still unfetched. An empty value falls back to
-  /// the old file's generic line rather than guessing at their wording —
-  /// "Matching Therapist" being a separate frame is reason enough to think
-  /// the therapist's does not say "instructor".
+  /// Read once, from `Matching pilates instructor` (259:58806): **"Finding
+  /// your Pilates instructor"**. The other two frames close their own KYC
+  /// rows — `Matching Therapist` (259:58834) and `Matching instructor`
+  /// (259:58748) — and neither could be fetched.
+  ///
+  /// Their lines here are **derived from that pattern and those frame
+  /// names**, not read: "Finding your " plus what the frame calls the person.
+  /// That is a guess, but a much closer one than the previous fallback, which
+  /// was the old file's generic sentence and matched no frame at all.
   final String matchingTitle;
 
   /// What the matching interstitial shows, per discipline where it is known.

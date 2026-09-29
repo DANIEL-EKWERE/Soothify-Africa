@@ -76,6 +76,17 @@ class ImageConstant {
 
   static const String icOthers = '$_icons/ic_others.svg';
 
+  /// The redrawn "Book a licensed Expert" section's glyphs — Figma
+  /// `mingcute:flower-2-line` (280:26760), `reicon:security` (280:26656),
+  /// `akar-icons:calendar` (280:26687) and `carbon:warning` (280:26710).
+  static const String icFlower = '$_icons/ic_flower.svg';
+  static const String icSecurity = '$_icons/ic_security.svg';
+  static const String icCalendarOutline = '$_icons/ic_calendar_outline.svg';
+  static const String icWarning = '$_icons/ic_warning.svg';
+
+  /// The flat map behind "Spaces Around Me" — the fill on `282:25250`.
+  static const String imgSpacesMap = '$_images/spaces/map.png';
+
   static const String icBack = '$_icons/ic_back.svg';
   static const String icSearch = '$_icons/ic_search.svg';
   static const String icFilter = '$_icons/ic_filter.svg';

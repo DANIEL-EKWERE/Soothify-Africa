@@ -15,9 +15,9 @@ import 'helpers.dart';
 /// Regenerate with:
 ///   flutter test --update-goldens test/book_expert_test.dart
 const _art = [
-  'assets/images/explore/book_expert.png',
-  'assets/images/explore/stretch_restore.png',
-  'assets/images/explore/pilates_core.png',
+  'assets/images/expert/therapy.png',
+  'assets/images/expert/yoga.png',
+  'assets/images/expert/pilates.png',
 ];
 
 void main() {
@@ -109,13 +109,18 @@ void main() {
     expect(tracks, hasLength(3));
   });
 
-  test('the photographs are stand-ins until the fills are exported', () {
-    // Three distinct image fills in the frame, none of them fetched. If these
-    // ever point at real exports this expectation is what says so.
+  test('each card carries its own photograph from the frame', () {
+    // The frame's three image fills, exported through `files/{key}/images`.
+    // These were Explore tiles standing in, which showed a stretching pose
+    // where the design has a therapy session.
     expect(
       ExpertSessionType.values.map((o) => o.assetPath).toSet(),
       hasLength(3),
       reason: 'one photograph per card, as the frame draws it',
     );
+    for (final o in ExpertSessionType.values) {
+      expect(o.assetPath, startsWith('assets/images/expert/'),
+          reason: '${o.name} is still pointing at a stand-in');
+    }
   });
 }

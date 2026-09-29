@@ -52,6 +52,6 @@ class BookingPaymentController extends GetxController {
   /// knows which one was booked.
   void done() => Get.offNamed(AppRoutes.booking, arguments: offering);
 
-  void openPolicy() =>
-      AppFeedback.info('The payment and cancellation policy is not written yet.');
+  /// The policy panel summarises; `280:26738` spells it out.
+  void openPolicy() => Get.toNamed(AppRoutes.cancellationPolicy);
 }

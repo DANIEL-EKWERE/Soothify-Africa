@@ -18,13 +18,17 @@ import '../core/app_export.dart';
 class ConfettiOverlay extends StatefulWidget {
   const ConfettiOverlay({
     super.key,
-    this.pieces = 40,
-    this.duration = const Duration(milliseconds: 2600),
+    this.pieces = 120,
+    this.duration = const Duration(milliseconds: 3600),
     this.onFinished,
   });
 
-  /// How many pieces fall. Forty reads as a celebration at 390 wide without
-  /// obscuring the coach's photograph behind it.
+  /// How many pieces fall.
+  ///
+  /// Forty was too thin to read as a celebration — staggered over two and a
+  /// half seconds, only a dozen or so were ever on screen at once. A hundred
+  /// and twenty over three and a half keeps the fall continuous without
+  /// hiding the coach's photograph behind it.
   final int pieces;
 
   final Duration duration;
@@ -122,6 +126,7 @@ class _Piece {
     required this.drift,
     required this.size,
     required this.spin,
+    required this.swayPhase,
     required this.colorIndex,
     required this.round,
   });
@@ -129,8 +134,8 @@ class _Piece {
   /// Horizontal start, 0..1 of the width.
   final double x;
 
-  /// How far into the burst this piece starts falling, 0..0.4. Staggering the
-  /// start is what makes it read as thrown rather than dropped.
+  /// How far into the burst this piece starts falling, 0..0.55. Staggering
+  /// the start is what makes it read as thrown rather than dropped.
   final double delay;
 
   /// Sideways travel over the fall, in fractions of the width.
@@ -146,14 +151,22 @@ class _Piece {
   /// Rounds a quarter of them, so the burst is not uniformly rectangular.
   final bool round;
 
+  /// How far through its own fall the piece sways, so it tumbles rather than
+  /// dropping on a rail.
+  final double swayPhase;
+
   static List<_Piece> scatter(int count, Random random) => [
         for (var i = 0; i < count; i++)
           _Piece(
-            x: random.nextDouble(),
-            delay: random.nextDouble() * 0.4,
-            drift: (random.nextDouble() - 0.5) * 0.3,
-            size: 6 + random.nextDouble() * 6,
-            spin: 1 + random.nextDouble() * 3,
+            // Spread across the width by index rather than at random, then
+            // jittered: pure randomness clumps, and a bald patch down one
+            // side is exactly what made forty pieces look sparse.
+            x: (i + random.nextDouble()) / count,
+            delay: random.nextDouble() * 0.55,
+            drift: (random.nextDouble() - 0.5) * 0.35,
+            size: 8 + random.nextDouble() * 12,
+            spin: 1 + random.nextDouble() * 4,
+            swayPhase: random.nextDouble() * 2 * pi,
             colorIndex: random.nextInt(4),
             round: random.nextInt(4) == 0,
           ),
@@ -184,7 +197,10 @@ class _ConfettiPainter extends CustomPainter {
       // Falls from just above the top to just past the bottom, fading out
       // over the last third rather than vanishing mid-air.
       final dy = (-0.1 + t * 1.2) * size.height;
-      final dx = (piece.x + piece.drift * t) * size.width;
+      // Drift carries it sideways over the whole fall; the sway is the
+      // side-to-side of a tumbling piece of paper on top of that.
+      final sway = sin(piece.swayPhase + t * 4 * pi) * 0.025;
+      final dx = (piece.x + piece.drift * t + sway) * size.width;
       final opacity = t < 0.66 ? 1.0 : (1 - t) / 0.34;
 
       paint.color = colors[piece.colorIndex].withValues(alpha: opacity);

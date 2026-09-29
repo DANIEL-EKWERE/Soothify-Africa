@@ -36,6 +36,8 @@ class DiscoveryTab extends GetView<DiscoveryTabController> {
               ),
               SizedBox(height: 24.v),
               const _SearchRow(),
+              SizedBox(height: 16.v),
+              const _SpacesButton(),
               SizedBox(height: 21.v),
               Obx(
                 () => _Shelf(
@@ -65,6 +67,45 @@ class DiscoveryTab extends GetView<DiscoveryTabController> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The way into "Spaces Around Me" (`282:25161`).
+///
+/// The design gives that screen no entry point of its own, so this placement
+/// is a decision, not the file's: directly under Discover's search field,
+/// because both answer "what is out there for me", and one is the physical
+/// version of the other.
+class _SpacesButton extends StatelessWidget {
+  const _SpacesButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => Get.toNamed(AppRoutes.spaces),
+      borderRadius: BorderRadius.circular(24.h),
+      child: Container(
+        height: 48.v,
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        decoration: BoxDecoration(
+          color: appTheme.policyPanel,
+          borderRadius: BorderRadius.circular(24.h),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.near_me_outlined,
+                size: 20.h, color: appTheme.soothifyBlue),
+            SizedBox(width: 11.h),
+            Expanded(
+              child: Text('Spaces Around Me',
+                  style: CustomTextStyles.spaceDirections),
+            ),
+            Icon(Icons.chevron_right,
+                size: 20.h, color: appTheme.soothifyBlue),
+          ],
         ),
       ),
     );

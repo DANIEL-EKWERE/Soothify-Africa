@@ -944,6 +944,255 @@ class CustomTextStyles {
 
   /// A "Book a licensed expert" card's title — Nunito Bold 16 on `#263238`,
   /// per `259:31488`.
+  /// The Cancellation Policy screen's body — Nunito Sans Light 14 on
+  /// `#263238`, per `280:26738`. Light, not the panel's regular weight.
+  static TextStyle get policyScreenBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w300,
+    fontVariations: const [FontVariation('wght', 300)],
+    height: 18.2 / 14,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  /// The Care Guarantee panel — Figma `280:26699`. Nunito Sans Bold 12 in
+  /// the success ink.
+  static TextStyle get careGuaranteeTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.successInk,
+  );
+
+  static TextStyle get careGuaranteeItem => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary.withValues(alpha: 0.88),
+  );
+
+  /// The checkout summary's two rows — the label is grey, everything the
+  /// money touches is bold ink.
+  static TextStyle get summaryLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
+    // #999999 in the frame — the same grey the hints use.
+    color: appTheme.hintText,
+  );
+
+  static TextStyle get summaryValue => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Spaces Around Me" — Figma `282:25161`.
+  static TextStyle get spaceSearchHint => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.hintText,
+  );
+
+  static TextStyle get spaceSearch =>
+      spaceSearchHint.copyWith(color: appTheme.textPrimary);
+
+  static TextStyle get spaceChip => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get spaceChipSelected =>
+      spaceChip.copyWith(color: appTheme.onPrimary);
+
+  /// The List/Map pair — Nunito SemiBold 12, the unselected one grey.
+  static TextStyle get spaceView => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: const [FontVariation('wght', 600)],
+    height: 16.4 / 12,
+    color: appTheme.spaceTagInk,
+  );
+
+  static TextStyle get spaceViewSelected =>
+      spaceView.copyWith(color: appTheme.textPrimary);
+
+  static TextStyle get spaceName => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get spaceArea => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get spaceTag => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 13.6 / 10,
+    color: appTheme.spaceTagInk,
+  );
+
+  static TextStyle get spaceDistance =>
+      spaceTag.copyWith(color: appTheme.soothifyBlue);
+
+  static TextStyle get spaceDirections => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get spaceMapHint => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  /// The studio profile — `282:25339`.
+  static TextStyle get studioCounter => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 19.1 / 14,
+    color: appTheme.onPrimary,
+  );
+
+  static TextStyle get studioLocation => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get studioAbout => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get studioSecondaryAction => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    color: appTheme.actionFill,
+  );
+
+  /// The second half of the teaser, which the frame colours `#2F6FED` — the
+  /// run that makes it a link.
+  static TextStyle get studioTeaserLink =>
+      studioTeaser.copyWith(color: appTheme.soothifyBlue);
+
+  static TextStyle get studioTeaser => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  /// Care Support — Figma `280:26747`.
+  static TextStyle get careSupportHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get careSupportNote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get careConcern => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.8 / 14,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  /// "(Please specify)" — `#999999`, lighter than the choice it follows.
+  static TextStyle get careConcernHint =>
+      careConcern.copyWith(color: appTheme.hintText);
+
+  /// Nunito Medium 12 at 64% — quieter than the note above the options.
+  static TextStyle get careSupportFootnote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 16.4 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.64),
+  );
+
+  /// The sent state — `280:26775`.
+  static TextStyle get careSentTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get careSentBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
   static TextStyle get expertOfferTitle => TextStyle(
     fontFamily: fontNunito,
     fontSize: 16.fSize,
@@ -2203,6 +2452,46 @@ class CustomTextStyles {
   );
 
   // --- Joining a session (259:59996) ---
+
+  /// The client joining screen — Figma `280:26643`.
+  static TextStyle get clientJoiningLead => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Expert" / "Session Time" and the date beneath — Nunito Sans 10 at 80%.
+  static TextStyle get sessionFieldLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 13 / 10,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary.withValues(alpha: 0.8),
+  );
+
+  static TextStyle get sessionFieldValue => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: const [FontVariation('wght', 600)],
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get callControlLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
 
   static TextStyle get joiningHeading => TextStyle(
     fontFamily: fontNunito,

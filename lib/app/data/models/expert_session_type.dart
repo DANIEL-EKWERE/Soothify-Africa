@@ -8,17 +8,17 @@
 enum ExpertSessionType {
   therapy(
     '1-on-1 virtual therapy session',
-    'assets/images/explore/book_expert.png',
+    'assets/images/expert/therapy.png',
   ),
   yoga(
     '1-on-1 virtual yoga session',
-    'assets/images/explore/stretch_restore.png',
+    'assets/images/expert/yoga.png',
   ),
   // The frame writes "Pilates" capitalised mid-sentence on this card and
   // lowercase nowhere, so it is the product name rather than a slip.
   pilates(
     '1-on-1 virtual Pilates session',
-    'assets/images/explore/pilates_core.png',
+    'assets/images/expert/pilates.png',
   );
 
   const ExpertSessionType(this.title, this.assetPath);
@@ -27,11 +27,13 @@ enum ExpertSessionType {
 
   /// A 294x150 photograph at the top of the card.
   ///
-  /// **Stand-ins.** The frame carries three distinct image fills
-  /// (`378815b9…`, `3d2bba51…`, `6bfb23f6…`) and the render endpoint's quota
-  /// was spent before they could be exported. These are the Explore tiles of
-  /// the nearest subject, which ship at 200x180 — fine for a 100x90 tile,
-  /// soft at 294x150. Replace all three when the exports land.
+  /// The frame's own fills, pulled through `files/{key}/images` — the fourth
+  /// Figma budget, which was still open when the other three were spent.
+  /// Refs `378815b9…` (therapy), `3d2bba51…` (yoga), `6bfb23f6…` (Pilates).
+  ///
+  /// Exported at 2x with a centre-cover crop, matching the frame's `FILL`
+  /// scale mode. Therapy's source is only 360 square, so 588x300 is already a
+  /// mild upscale; the other two had far more to give.
   final String assetPath;
 
   /// The design prints the same second line on all three cards.

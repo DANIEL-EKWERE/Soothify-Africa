@@ -295,14 +295,23 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  test('only the discipline whose frame was read names itself', () {
-    // `Matching Therapist` (259:58834) is its own frame, so assuming the
-    // therapist's heading says "instructor" would be a guess.
+  test('every discipline names the person it is finding', () {
+    // Read from `Matching pilates instructor` (259:58806).
     expect(SessionOffering.meditation.matchingHeading,
         'Finding your Pilates instructor');
-    for (final o in [SessionOffering.therapy, SessionOffering.balance]) {
-      expect(o.matchingHeading, startsWith('Pairing you with'),
-          reason: '${o.id} keeps the old generic line until its frame is read');
+
+    // Derived from that pattern and the frames' own names —
+    // `Matching Therapist` (259:58834) and `Matching instructor`
+    // (259:58748), neither fetched. A guess, but the previous fallback was
+    // the old file's generic sentence, which matched no frame at all.
+    expect(SessionOffering.therapy.matchingHeading, 'Finding your therapist');
+    expect(SessionOffering.balance.matchingHeading, 'Finding your instructor');
+
+    // Whatever the wording, none of them may fall back to the old line.
+    for (final o in SessionOffering.values) {
+      expect(o.matchingHeading, startsWith('Finding your'),
+          reason: '${o.id} still shows copy from the previous file');
+      expect(o.matchingHeading, isNot(contains('Pairing you with')));
     }
   });
 

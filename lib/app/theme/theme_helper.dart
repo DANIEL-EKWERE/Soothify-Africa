@@ -88,6 +88,12 @@ class PrimaryColors {
     required this.aiStatValue,
     required this.aiDivider,
     required this.policyPanel,
+    required this.careCrest,
+    required this.spaceTag,
+    required this.spaceTagInk,
+    required this.pinMarker,
+    required this.sheetHandle,
+    required this.careGuarantee,
     required this.expertIntroInk,
     required this.successInk,
     required this.segmentTrack,
@@ -261,6 +267,19 @@ class PrimaryColors {
 
   /// The pale panel behind the booking screen's cancellation policy.
   final Color policyPanel;
+
+  /// "Spaces Around Me" — the grey tag pill `#EEF1F5` and its `#717C87`
+  /// type, the `#F44336` map pin, and the `#D5DDE6` sheet handle.
+  final Color spaceTag;
+  final Color spaceTagInk;
+  final Color pinMarker;
+  final Color sheetHandle;
+
+  /// The disc behind the Care Support flower — `#E2EDFE` on `280:26747`.
+  final Color careCrest;
+
+  /// The Care Guarantee panel's wash — `#E6F7F2` on `280:26699`.
+  final Color careGuarantee;
 
   /// The dark end of the expert intro's title run, which is steeper than the
   /// app's [titleGradient].
@@ -463,6 +482,12 @@ class PrimaryColors {
     aiStatValue: Color(0xFF1B1F26),
     aiDivider: Color(0xFFEBF1F5),
     policyPanel: Color(0xFFEDF6FE),
+    careCrest: Color(0xFFE2EDFE),
+    spaceTag: Color(0xFFEEF1F5),
+    spaceTagInk: Color(0xFF717C87),
+    pinMarker: Color(0xFFF44336),
+    sheetHandle: Color(0xFFD5DDE6),
+    careGuarantee: Color(0xFFE6F7F2),
     expertIntroInk: Color(0xFF274889),
     successInk: Color(0xFF07661F),
     segmentTrack: Color(0xFFFEFEFE),
@@ -557,6 +582,12 @@ class PrimaryColors {
     // The dark frame draws no policy panel; this follows the same 12%-blue
     // treatment the trial banner uses on charcoal.
     policyPanel: Color(0x1F2F6FED),
+    careCrest: Color(0x332F6FED),
+    spaceTag: Color(0xFF2A3038),
+    spaceTagInk: Color(0xFFA8B3BF),
+    pinMarker: Color(0xFFF44336),
+    sheetHandle: Color(0xFF3A4048),
+    careGuarantee: Color(0x2634C759),
     // Lifted off the light value so the run stays legible on charcoal.
     expertIntroInk: Color(0xFF7FA8FF),
     // Lifted so it reads on the same 8% wash over charcoal.

@@ -159,7 +159,9 @@ class _MoodCheckerCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => Get.toNamed(AppRoutes.moodChecker),
       child: Container(
-        height: 88.h,
+        // 122 in the current design, up from 88 — the body runs to three
+        // lines and was being squeezed against the card's edges.
+        height: 122.h,
         padding: EdgeInsets.symmetric(horizontal: 23.h),
         decoration: BoxDecoration(
           gradient: appTheme.moodCardGradient,

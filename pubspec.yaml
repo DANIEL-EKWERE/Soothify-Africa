@@ -79,6 +79,8 @@ flutter:
     - assets/images/concerns/
     - assets/images/goals/
     - assets/images/explore/
+    - assets/images/expert/
+    - assets/images/spaces/
     - assets/images/home/
     - assets/images/content/
     - assets/images/profile/

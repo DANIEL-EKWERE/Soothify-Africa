@@ -91,7 +91,10 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Book a Licensed Expert',
+            // The frames title this flow "Schedule", not the tile's words —
+            // `Matching pilates instructor` (259:58806) and "Book a licensed
+            // expert screen" (259:31488) both do.
+            'Schedule',
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),

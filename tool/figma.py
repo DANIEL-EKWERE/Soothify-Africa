@@ -7,6 +7,7 @@ a personal access token instead, which has no such limit.
   tool/figma.py nodes  <id> ...   save node JSON to tool/.figma_cache/
   tool/figma.py filenodes <id> .. same, via /files?ids= (a separate quota)
   tool/figma.py render <id> ...   render PNGs at 2x
+  tool/figma.py fills  <ref> ...  download image fills by imageRef
   tool/figma.py spec   <id>       print positions, styles and fills
 
 Note the real design lives on page 55:23 ("App UI Design"); the API's page
@@ -137,6 +138,33 @@ def render(ids, scale=2):
         print(f"  {i:>13} {dest.stat().st_size/1024:7.1f} KB -> {dest}")
 
 
+def fills(refs):
+    """Resolve image fills to their S3 URLs and download them.
+
+    `GET /files/{key}/images` hands back EVERY image fill in the file as
+    `imageRef -> URL` in one response. A fourth budget, separate from /nodes,
+    /files and /images, and in practice the last of the four to block — so
+    when everything else is spent this is often still open.
+
+    Pass the imageRefs read off a frame's fills; with none, it lists how many
+    the file holds and writes the whole map for later.
+    """
+    CACHE.mkdir(parents=True, exist_ok=True)
+    data = api(f"files/{KEY}/images")
+    meta = data.get("meta") or {}
+    urls = meta.get("images") or {}
+    (CACHE / "image_fills.json").write_text(json.dumps(urls, indent=1))
+    print(f"  {len(urls)} image fills in the file "
+          f"-> {CACHE / 'image_fills.json'}")
+    for ref in refs:
+        url = urls.get(ref)
+        if not url:
+            print(f"  !! {ref[:12]}… not in the file"); continue
+        dest = CACHE / f"fill_{ref[:12]}.png"
+        urllib.request.urlretrieve(url, dest)
+        print(f"  {ref[:12]}… {dest.stat().st_size / 1024:8.1f} KB -> {dest}")
+
+
 def icons(args):
     """Export named nodes as SVG into assets/icons/.
 
@@ -202,7 +230,11 @@ def spec(nid):
             if n.get("cornerRadius") is not None:
                 ex.append(f"r={n['cornerRadius']}")
             if n.get("characters"):
-                ex.append(f'"{n["characters"][:48]}"')
+                # NOT truncated. It used to clip at 48, which read as the
+                # design leaving strings unfinished — a defect was reported
+                # against the Cancellation Policy frame on that basis and the
+                # frame was fine. If it is long, it is long.
+                ex.append(f'"{n["characters"]}"')
             if ex:
                 print(f"  {n['type'][:9]:<9} {n.get('name','')[:24]:<24} "
                       f"x={b['x']-o['x']:6.1f} y={b['y']-o['y']:6.1f} "
@@ -218,6 +250,6 @@ def spec(nid):
 
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
-    {"nodes": nodes, "filenodes": file_nodes,
+    {"nodes": nodes, "filenodes": file_nodes, "fills": fills,
      "render": render, "icons": icons}.get(
         cmd, lambda a: spec(a[0]))(args)

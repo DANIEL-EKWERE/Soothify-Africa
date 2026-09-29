@@ -137,7 +137,11 @@ class _Filters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<NotificationsController>();
-    return Padding(
+    // Five chips no longer fit 342 across. Each frame draws the three it
+    // cares about; the row scrolls so all four filters plus All are
+    // reachable without shrinking any of them.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 24.h),
       child: Row(
         children: [
@@ -195,7 +199,60 @@ class _Entry extends StatelessWidget {
         NotificationKind.digest => _Digest(notification: notification),
         NotificationKind.plain => _Plain(notification: notification, now: now),
         NotificationKind.action => _Action(notification: notification, now: now),
+        NotificationKind.booking => _Booking(notification: notification),
       };
+}
+
+/// A compact outlined pill — Figma `259:61271`.
+///
+/// Measured: 342x39, radius 8, a `#999999` hairline, an 8 unread dot 7 in,
+/// the kind at 37 and the line at 90, both centred in the row's height.
+class _Booking extends StatelessWidget {
+  const _Booking({required this.notification});
+
+  final AppNotification notification;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 39.v,
+      // The frame's own body box is 233 for a 47-character line — right at
+      // its limit. The gaps are trimmed from its 30 and 8 so the sentence
+      // lands whole rather than at "…at 5:00p…".
+      padding: EdgeInsets.only(left: 7.h, right: 4.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.filterRule),
+      ),
+      child: Row(
+        children: [
+          if (notification.unread)
+            Container(
+              width: 8.h,
+              height: 8.h,
+              decoration: BoxDecoration(
+                color: appTheme.unreadDot,
+                shape: BoxShape.circle,
+              ),
+            )
+          else
+            SizedBox(width: 8.h),
+          SizedBox(width: 14.h),
+          Text(notification.title,
+              style: CustomTextStyles.notificationBookingKind),
+          SizedBox(width: 6.h),
+          Expanded(
+            child: Text(
+              notification.body,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CustomTextStyles.notificationBookingBody,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// The bold actor and the rest of the line, sharing one baseline.

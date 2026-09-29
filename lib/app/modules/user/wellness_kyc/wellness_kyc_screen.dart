@@ -2,14 +2,26 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/gradient_text.dart';
+import '../../../widgets/match_progress_bar.dart';
 import 'controller/wellness_kyc_controller.dart';
 
-/// A section's pre-booking questionnaire — Figma "meditation" (135:23481,
-/// 135:23097 onward) and "Scheduling Kyc" (135:23889, 135:23694 onward).
+/// A section's pre-booking questionnaire — Figma `Pilates kyc` (259:38525
+/// for the intro, 259:38083 onward for the questions) and
+/// `Scheduling Kyc/Yoga` (259:38802).
 ///
-/// The intro and the questions are one route: they share a header and differ
-/// only in body, and the design gives the intro no control of its own — so it
-/// is a tap-anywhere interstitial rather than a screen with a hidden button.
+/// The intro and the questions are one route: the design gives the intro no
+/// control of its own, so it is a tap-anywhere interstitial rather than a
+/// screen with a hidden button.
+///
+/// Measured: on a question, the heading at 97 (Nunito Sans 700 20 on the
+/// `#2F6FED -> #274889` run), its hint 8 beneath, then 48 to a two-column
+/// grid of 160x90 tiles 20 apart at a 110 pitch, and 135 from the last row to
+/// the action. The intro puts its heading at 197 and its paragraph at 246.
+///
+/// **The question frames carry no header and no progress bar** — the intro's
+/// chevron is the only one drawn. A bare back chevron is kept on the
+/// questions all the same: six steps with no way back is a trap on a platform
+/// without a hardware back button.
 class WellnessKycScreen extends GetView<WellnessKycController> {
   const WellnessKycScreen({super.key});
 
@@ -24,7 +36,8 @@ class WellnessKycScreen extends GetView<WellnessKycController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Header(title: controller.track.title),
+                // The frames title only the intro.
+                _Header(title: controller.onIntro ? 'Schedule' : ''),
                 Expanded(
                   child: controller.onIntro
                       ? const _Intro()
@@ -87,78 +100,26 @@ class _Intro extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 165.v),
-          GradientText(
-            controller.track.intro,
-            gradient: appTheme.authHeaderGradient,
-            style: CustomTextStyles.kycQuestion,
-          ),
-          // The whole screen is the button, and nothing in the frame says so.
-          // Without this the intro is a dead end for anyone who does not
-          // think to tap it.
-          SizedBox(height: 28.v),
-          const Align(
-            alignment: Alignment.center,
-            child: _TapHint(),
-          ),
+          SizedBox(height: 116.v),
+          if (controller.track.heading.isNotEmpty) ...[
+            GradientText(
+              controller.track.heading,
+              gradient: appTheme.authHeaderGradient,
+              style: CustomTextStyles.kycQuestion,
+            ),
+            SizedBox(height: 23.v),
+          ],
+          Text(controller.track.intro, style: CustomTextStyles.kycIntroBody),
+          // 24 below the paragraph on both intro frames — the same bar the
+          // matching screen draws. It is what tells the user the screen is
+          // working, and why the frame needs no button.
+          SizedBox(height: 24.v),
+          Obx(() => MatchProgressBar(value: controller.introProgress.value)),
+          // No "Tap anywhere to continue" beneath it: the frames never drew
+          // one, and the bar already says the screen is moving on by itself.
+          // The tap still works, it is just no longer advertised.
         ],
       ),
-    );
-  }
-}
-
-/// "Tap anywhere to continue", breathing gently so the eye finds it.
-///
-/// Reduce-motion holds it at full strength rather than pulsing — the hint
-/// still has to be readable, so it settles bright rather than dim.
-class _TapHint extends StatefulWidget {
-  const _TapHint();
-
-  @override
-  State<_TapHint> createState() => _TapHintState();
-}
-
-class _TapHintState extends State<_TapHint>
-    with SingleTickerProviderStateMixin {
-  // Built here rather than lazily: a field the build skips under
-  // reduce-motion would be constructed by dispose() and throw looking up its
-  // ticker.
-  late final AnimationController _pulse;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pulse.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Text(
-      'Tap anywhere to continue',
-      textAlign: TextAlign.center,
-      style: CustomTextStyles.tapHint,
-    );
-
-    if (MediaQuery.disableAnimationsOf(context)) {
-      if (_pulse.isAnimating) _pulse.stop();
-      return text;
-    }
-    if (!_pulse.isAnimating) _pulse.repeat(reverse: true);
-
-    return FadeTransition(
-      opacity: Tween<double>(begin: 0.45, end: 1).animate(
-        CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
-      ),
-      child: text,
     );
   }
 }
@@ -188,13 +149,12 @@ class _Question extends StatelessWidget {
             gradient: appTheme.authHeaderGradient,
             style: CustomTextStyles.kycQuestion,
           ),
+          // Solid, not on the run: the frame gradient-fills the question and
+          // leaves this line in plain #323233.
           if (question.multiSelect) ...[
-            SizedBox(height: 16.v),
-            GradientText(
-              'You can select more than one option',
-              gradient: appTheme.authHeaderGradient,
-              style: CustomTextStyles.communityBody,
-            ),
+            SizedBox(height: 8.v),
+            Text(controller.track.multiHint,
+                style: CustomTextStyles.kycIntroBody),
           ],
           SizedBox(height: 48.v),
           Expanded(

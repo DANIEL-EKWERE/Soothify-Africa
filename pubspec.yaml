@@ -41,6 +41,10 @@ dependencies:
   shimmer: ^3.0.0
 
   # Platform / storage
+  # Picks the certification and ID documents the expert application asks for
+  # (`259:59198`, "PDF, JPG, or PNG"). The document picker needs no runtime
+  # permission on either platform, unlike an image-library picker.
+  file_picker: ^8.1.7
   shared_preferences: ^2.3.4
   connectivity_plus: ^6.1.1
   path_provider: ^2.1.5

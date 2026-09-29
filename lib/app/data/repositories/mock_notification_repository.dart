@@ -88,6 +88,44 @@ class MockNotificationRepository implements NotificationRepository {
         actionLabel: 'Read',
         at: now.subtract(const Duration(minutes: 7)),
       ),
+      // The booking rows — Figma `259:61271`, which draws one "Booking" and
+      // four identical "Reminder" lines. Three is enough to show the shape
+      // without repeating the same sentence down the screen.
+      AppNotification(
+        id: '8',
+        kind: NotificationKind.booking,
+        title: 'Booking',
+        body: 'You have a Yoga session on 28 Sep 2026 at 5:00pm',
+        unread: true,
+        at: now.subtract(const Duration(minutes: 20)),
+        filters: const {
+          NotificationFilter.all,
+          NotificationFilter.newBooking,
+        },
+      ),
+      AppNotification(
+        id: '9',
+        kind: NotificationKind.booking,
+        title: 'Reminder',
+        body: 'You have Yoga session today at 5:00pm',
+        unread: true,
+        at: now.subtract(const Duration(hours: 2)),
+        filters: const {
+          NotificationFilter.all,
+          NotificationFilter.schedules,
+        },
+      ),
+      AppNotification(
+        id: '10',
+        kind: NotificationKind.booking,
+        title: 'Reminder',
+        body: 'You have Pilates & Core session tomorrow at 7:00am',
+        at: now.subtract(const Duration(hours: 5)),
+        filters: const {
+          NotificationFilter.all,
+          NotificationFilter.schedules,
+        },
+      ),
     ];
   }
 }

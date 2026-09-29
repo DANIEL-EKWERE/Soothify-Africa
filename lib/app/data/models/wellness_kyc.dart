@@ -1,9 +1,21 @@
 /// The questionnaire a section shows before its booking flow.
 ///
-/// Meditation, Balance and Schedule each gate their sessions behind one, and
-/// the questions differ per section — the Meditation set (Figma 135:23097
-/// onward) asks about meditation experience, the Schedule set (135:23694
-/// onward) about coaching and effort. Only the shape is shared.
+/// Each section gates its sessions behind one and asks its own questions;
+/// only the shape is shared.
+///
+/// Rewritten for Pilates & Core from `Pilates kyc` (259:38525 for the intro,
+/// then 259:38083 / 38121 / 38155 / 38196 / 38236 / 38252). The design drew
+/// each question twice — once with "Next" and once with "Continue" — which is
+/// the same step, not two.
+///
+/// Each card of "Book a licensed expert screen" (259:31488) opens its own
+/// track: the Pilates card [meditation], the yoga card [balance] and the
+/// therapy card [therapy] (the row closing on `Matching Therapist`
+/// 259:58834, still unread).
+///
+/// [balance] is both Stretch & Restore's section questionnaire and the yoga
+/// card's — `Scheduling Kyc/Yoga` plus the `Yoga Kyc` row is one thing, and
+/// the card reaches it without the interstitial the section shows.
 class WellnessKycStep {
   const WellnessKycStep({
     required this.question,
@@ -24,102 +36,116 @@ enum WellnessTrack {
     'Pilates & Core',
     [
       WellnessKycStep(
-        question:
-            'What is your primary reason for seeking meditation guidance?',
-        // The design writes "Better  sleep" with a double space; normalised.
+        question: 'How experienced are you with Pilates?',
+        options: ['Total beginner', 'I know the basics', 'Very experienced'],
+      ),
+      WellnessKycStep(
+        question: 'How often do you want to practice?',
         options: [
-          'Stress relief',
-          'Better sleep',
-          'Focus and concentration',
-          'Emotional well-being',
-          'Others',
+          'Just starting out',
+          'A couple times a week',
+          'Almost every day',
         ],
       ),
       WellnessKycStep(
-        question: 'How familiar are you with meditation practices?',
+        question: 'What do you want to focus on most?',
         options: [
-          'New to meditation',
-          'Some experience',
-          'Regular practice',
-          'Advanced practitioner',
+          'Building core strength',
+          'Fixing my posture',
+          'Postpartum recovery',
+          'Overall toning',
         ],
+        multiSelect: true,
       ),
       WellnessKycStep(
-        question: 'What types of meditation are you interested in?',
+        question: 'Any specific spots you want to work on?',
         options: [
-          'Mindfulness',
-          'Guided meditation',
-          'Mantra meditation',
-          'Breathing exercises',
-          'Others',
+          'Lower back',
+          'Pelvic floor and core',
+          'Shoulders and upper body',
+          'Full body',
         ],
+        multiSelect: true,
       ),
       WellnessKycStep(
-        question:
-            'Do you prefer your meditation sessions in English or Pidgin '
-            'English?',
-        // The frame lists the *previous* question's options here — a
-        // copy-paste slip in the file, since the question asks about
-        // language. These are what the question actually calls for; confirm
-        // with the designer before launch.
-        options: ['English', 'Pidgin English'],
+        question: 'How active are you right now?',
+        options: ['Not very active', 'Moderately active', 'Very active'],
       ),
+      // No "pick as many" line on this frame, unlike the two above it — so
+      // one answer, which is also why "None" is among the options.
       WellnessKycStep(
-        question:
-            'What time of the day do you prefer to schedule your meditation '
-            'sessions?',
-        options: ['Morning', 'Afternoon', 'Evening', 'No preference'],
+        question: 'Anything we should keep in mind to keep you safe?',
+        options: [
+          'Recovering postpartum',
+          'Diastasis recti',
+          'Sensitive joints',
+          'None',
+        ],
       ),
     ],
+    introTitle: 'Let’s set up your Pilates session',
+    introBody: 'Answer a few quick questions so we can find the right '
+        'instructor for you',
+    multiHint: 'Pick as many as you like',
   ),
   balance(
     'Stretch & Restore',
     [
       WellnessKycStep(
-        question: 'What’s your level of experience with yoga?',
-        options: ['Beginner', 'Intermediate', 'Advanced'],
+        question: 'Where are you currently at with your yoga practice?',
+        // The frame writes "Finding my rhythm " with a trailing space.
+        options: ['Beginner', 'Finding my rhythm', 'Deeply familiar'],
       ),
       WellnessKycStep(
-        question: 'What are your goals for practicing yoga?',
-        options: ['Stress Relief', 'Flexibility', 'Strength Building'],
-        multiSelect: true,
-      ),
-      WellnessKycStep(
-        // The frame writes "yoga  are" with a double space; normalised.
-        question: 'What type of yoga are you interested in?',
-        options: ['Hatha', 'Vinyasa', 'Ashtanga', 'Others'],
-        multiSelect: true,
-      ),
-      WellnessKycStep(
-        question: 'Do you have any specific areas of you’d like to focus on?',
+        question: 'How often do you step onto the mat?',
+        // "Most days." carries a full stop its siblings do not; dropped as a
+        // slip, the way the app drops the frames' other typos.
         options: [
-          'Knees',
-          'Shoulders',
-          'Back Pain',
-          'Stress Relief',
+          'Just beginning',
+          'A few intentional times a week',
+          'Most days',
+        ],
+        // The frame marks this one "You can select more than one option",
+        // which is odd for a frequency question — Pilates asks the same
+        // thing single-select. Honoured as drawn. Confirm.
+        multiSelect: true,
+      ),
+      WellnessKycStep(
+        question: 'What are you hoping to cultivate through your practice?',
+        // "Cultivating inner strength." likewise loses its full stop.
+        options: [
+          'Releasing stress & tension',
+          'Building flexibility & ease',
+          'Cultivating inner strength',
           'Others',
         ],
         multiSelect: true,
       ),
-      WellnessKycStep(
-        question: 'How would you rate overall fitness level?',
-        options: ['Low', 'Moderate', 'High'],
-      ),
-      WellnessKycStep(
-        question: 'Are you currently pregnant or do you have any preexisting '
-            'health conditions?',
-        options: ['High Blood Pressure', 'Asthma', 'Others'],
-        // The frame omits the "select more than one" hint here, which would
-        // make it single-select — but the question is plural and someone can
-        // have both. Forcing one answer would under-report a health
-        // condition before a physical class, so it is multi. Confirm.
-        multiSelect: true,
-      ),
     ],
-    hasIntro: false,
+    // `Scheduling Kyc/Yoga` (259:38802) is this section's intro, and the
+    // `Yoga Kyc` row behind it is this section's questions. That frame has
+    // been assigned twice before and moved twice; it belongs here.
+    //
+    // Only 259:25803, 25816 and 25831 have been read. Four remain —
+    // 259:25848, 25868, 25886, 25899 — so this is three questions where the
+    // design draws seven. The six it replaces came from the archived
+    // `Balance Kyc` row (y>62000) and are no longer what the design asks.
+    introTitle: 'Tailoring your practice',
+    introBody: 'Tell us a little about your body and your rhythm so we can '
+        'pair you with the right guide.',
   ),
-  schedule(
-    'Book a Licensed Expert',
+
+  /// The therapy card — the row that closes on `Matching Therapist`
+  /// (259:58834).
+  ///
+  /// **The questions are placeholders.** The six therapy frames (259:38665,
+  /// 38719, 38686, 38740, 38702, 38756, behind intro 259:38773) have never
+  /// been fetched. These five are the old file's, which is what this card's
+  /// users were already being shown, so nothing regresses while they are
+  /// pending — but not one of them has been checked against the current
+  /// design.
+  therapy(
+    '1-on-1 virtual therapy session',
     [
       WellnessKycStep(
         question: 'What type of wellness sessions are you interested in?',
@@ -156,9 +182,17 @@ enum WellnessTrack {
         options: ['Heartfelt', 'Playful', 'Supportive', 'Technical'],
       ),
     ],
+    hasIntro: false,
   );
 
-  const WellnessTrack(this.title, this.steps, {this.hasIntro = true});
+  const WellnessTrack(
+    this.title,
+    this.steps, {
+    this.hasIntro = true,
+    this.introTitle = '',
+    this.introBody = '',
+    this.multiHint = 'You can select more than one option',
+  });
 
   /// The header title — the frames differ only here, which is why the
   /// Meditation and Schedule intros read identically otherwise.
@@ -166,15 +200,33 @@ enum WellnessTrack {
 
   final List<WellnessKycStep> steps;
 
-  /// Meditation and Schedule open on the "Tell us a little about yourself"
-  /// interstitial; Balance has no such frame and starts on its first
-  /// question.
+  /// Whether the track has an interstitial at all.
+  ///
+  /// Pilates & Core and Stretch & Restore do; [therapy] has no intro frame
+  /// identified. Having one is not the same as showing one — a card on
+  /// "Book a licensed expert screen" skips it, since the card has already
+  /// asked what the intro would be introducing. See
+  /// `WellnessKycController.skipIntro`.
   final bool hasIntro;
 
-  /// The shared intro line, identical across the three sections.
-  String get intro =>
-      'Tell us a little about yourself, and we’ll match you with the perfect '
-      'wellness coach';
+  /// The intro's heading and its paragraph. The sections used to share one
+  /// line; they now each have their own — see [intro] for the fallback.
+  final String introTitle;
+  final String introBody;
+
+  /// The line under a multi-select question. Pilates & Core says "Pick as
+  /// many as you like"; the others keep the older wording.
+  final String multiHint;
+
+  /// Older tracks whose intro has not been re-read still show the shared
+  /// line the previous file gave all three.
+  String get intro => introBody.isNotEmpty
+      ? introBody
+      : 'Tell us a little about yourself, and we’ll match you with the '
+          'perfect wellness coach';
+
+  /// The heading above [intro], when the track has one of its own.
+  String get heading => introTitle;
 
   String get prefKey => 'wellnessKyc_$name';
 }

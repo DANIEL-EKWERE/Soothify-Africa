@@ -15,6 +15,10 @@
 #   Recent payouts   259:59463  -> the PAYOUT METHOD chooser, not a history
 #   Notification     259:61271  -> carries the CLIENT nav bar; a client frame
 #                                  filed in the expert row
+#   Scheduling Kyc/Yoga 259:38802 -> BOOK A LICENSED EXPERT's intro, not
+#                                  Stretch & Restore's. Its row banner reads
+#                                  "Book/scheduling Yoga KYC"; "Yoga" is the
+#                                  discipline booked, not the section.
 # Typos in frame names and copy: "paymet", "PIlates", "Neutra", "Avaliability",
 # "Update Availabilty", "Session in Progess", "Seesion Time", "a quite space",
 # "(Naria)", "(select network" (unclosed), "Choose how you'd like to your

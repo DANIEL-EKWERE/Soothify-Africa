@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_export.dart';
+import '../data/models/expert_application.dart';
 
 /// A choosable row on the application form — Figma `259:59145`, `259:59179`.
 ///
@@ -117,37 +118,97 @@ class ExpertFormField extends StatelessWidget {
 ///
 /// An 82x34 chip, radius 8, `#F9F9F9` inside a 1px black hairline, with a
 /// small upload glyph at its left and the label in blue.
+///
+/// The frame draws only the empty state. Once a document is picked the chip
+/// gives way to a row naming it, with its size and a way to drop it — a slot
+/// that still reads "Add file" after a successful pick would be telling the
+/// applicant their certificate did not take.
 class ExpertUploadChip extends StatelessWidget {
-  const ExpertUploadChip({super.key, required this.onTap});
+  const ExpertUploadChip({
+    super.key,
+    required this.onTap,
+    this.attached,
+    this.onRemove,
+  });
 
   final VoidCallback onTap;
 
+  /// What is in this slot, if anything.
+  final AttachedDocument? attached;
+
+  final VoidCallback? onRemove;
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 82.h,
-        height: 34.v,
-        padding: EdgeInsets.symmetric(horizontal: 11.h),
-        decoration: BoxDecoration(
-          color: appTheme.fieldFill,
-          borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.textPrimary),
+    final file = attached;
+    if (file == null) {
+      return GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          width: 82.h,
+          height: 34.v,
+          padding: EdgeInsets.symmetric(horizontal: 11.h),
+          decoration: BoxDecoration(
+            color: appTheme.fieldFill,
+            borderRadius: BorderRadius.circular(8.h),
+            border: Border.all(color: appTheme.textPrimary),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.file_upload_outlined,
+                size: 13.h,
+                color: appTheme.soothifyBlue,
+              ),
+              SizedBox(width: 3.h),
+              Text('Add file', style: CustomTextStyles.expertAddFile),
+            ],
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.file_upload_outlined,
-              size: 13.h,
-              color: appTheme.soothifyBlue,
+      );
+    }
+
+    return Container(
+      height: 48.v,
+      padding: EdgeInsets.symmetric(horizontal: 11.h),
+      decoration: BoxDecoration(
+        color: appTheme.fieldFill,
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.soothifyBlue),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.description_outlined,
+            size: 18.h,
+            color: appTheme.soothifyBlue,
+          ),
+          SizedBox(width: 8.h),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  file.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: CustomTextStyles.expertAddFile
+                      .copyWith(color: appTheme.textPrimary),
+                ),
+                Text(file.size, style: CustomTextStyles.expertAddFile),
+              ],
             ),
-            SizedBox(width: 3.h),
-            Text('Add file', style: CustomTextStyles.expertAddFile),
-          ],
-        ),
+          ),
+          SizedBox(width: 8.h),
+          GestureDetector(
+            onTap: onRemove,
+            behavior: HitTestBehavior.opaque,
+            child: Icon(Icons.close, size: 18.h, color: appTheme.textSecondary),
+          ),
+        ],
       ),
     );
   }

@@ -6,8 +6,13 @@ enum KycInput {
   /// Exactly one option.
   single,
 
-  /// A scrolling wheel of values, always with something selected.
-  wheel,
+  /// A wheel of birth *years* beside a live readout of the age they imply —
+  /// Figma `259:27860`.
+  ///
+  /// This replaced a plain wheel of ages 18-50. That `wheel` case is gone
+  /// rather than kept unused: with no branch for it left in the screen, a
+  /// question declaring it would silently render as a list of tiles.
+  birthYear,
 
   /// A full-bleed swipeable carousel of illustrations, one per option, on the
   /// focused option's own background colour. Multi-select, like [multi].
@@ -84,7 +89,7 @@ class KycQuestion {
 
   static const String _multiHint = 'You can select more than one option';
 
-  static final List<KycQuestion> all = [
+  static List<KycQuestion> allFor(int currentYear) => [
     // First, before the concerns carousel: its answer decides whether the
     // carousel draws the male or the female set of illustrations, so it has
     // to be known by the time that step is reached.
@@ -170,14 +175,38 @@ class KycQuestion {
       ],
     ),
     KycQuestion(
-      id: 'age',
-      prompt: 'How old are you?',
-      input: KycInput.wheel,
-      // The design lists 18 through 50.
+      id: 'birth_year',
+      prompt: 'What is your age?',
+      input: KycInput.birthYear,
+      // Newest year first, the order the frame lists them in: 1995 above
+      // 1994 above the boxed 1993.
       options: [
-        for (var age = 18; age <= 50; age++)
-          KycOption('$age', '$age'),
+        for (var year = currentYear - minAge;
+            year >= currentYear - maxAge;
+            year--)
+          KycOption('$year', '$year'),
       ],
     ),
   ];
+
+  /// The questionnaire against the current year.
+  ///
+  /// A getter, not a `static final`: the birth-year wheel's range is relative
+  /// to today, and a list frozen at first access would drift as the year
+  /// turned over in a long-lived process. Callers that rebuild per frame hold
+  /// the result once — see [KycController.questions].
+  static List<KycQuestion> get all => allFor(DateTime.now().year);
+
+  /// The ages the questionnaire accepts. The frame shows years rather than
+  /// ages now, so these are what bound the wheel rather than what it prints.
+  static const int minAge = 18;
+  static const int maxAge = 50;
+
+  /// The age a birth year implies, as the left half of `259:27860` prints it.
+  ///
+  /// Birthday-agnostic — the question only ever collects a year, so this is
+  /// the age reached during [currentYear], which is the most the year alone
+  /// can support.
+  static int ageFor(String birthYear, int currentYear) =>
+      currentYear - (int.tryParse(birthYear) ?? currentYear);
 }

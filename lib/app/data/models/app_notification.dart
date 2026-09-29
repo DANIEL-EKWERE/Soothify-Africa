@@ -1,4 +1,5 @@
-/// The notification feed — Figma "Notification" (page 124:2, `176:24737`).
+/// The notification feed — Figma "Notification" (page 124:2, `176:24737`
+/// for the social rows and `259:61271` for the booking ones).
 ///
 /// The frame is deliberately heterogeneous: some entries are a bare line with
 /// an avatar, one is an outlined card, one is a headed block with body copy,
@@ -24,13 +25,25 @@ enum NotificationKind {
 
   /// A line with an inline action beside it — "New article posted / Read".
   action,
+
+  /// A compact outlined pill — an unread dot, the kind, then one line about a
+  /// session. Figma `259:61271`, which fills the feed with these under its
+  /// own two chips.
+  booking,
 }
 
 /// Which filter chip an entry belongs to.
+///
+/// Two frames draw this row and both lead with "All": `176:24737` adds the
+/// social pair, `259:61271` the scheduling pair. They are one feed with four
+/// filters rather than two screens — the second frame's rows are simply all
+/// of the one kind its chips select.
 enum NotificationFilter {
   all('All'),
   myPost('My post'),
-  mentions('Mentions');
+  mentions('Mentions'),
+  schedules('Schedules'),
+  newBooking('New booking');
 
   const NotificationFilter(this.label);
 
@@ -63,7 +76,9 @@ class AppNotification {
   /// What follows the actor, in regular weight.
   final String text;
 
-  /// [NotificationKind.reminder] and [NotificationKind.digest] only.
+  /// [NotificationKind.reminder], [NotificationKind.digest] and
+  /// [NotificationKind.booking]. On a booking row it is the kind itself —
+  /// "Booking" or "Reminder" — which the frame prints beside the line.
   final String title;
   final String body;
 

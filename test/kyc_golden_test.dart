@@ -19,7 +19,11 @@ import 'helpers.dart';
 int _stepOf(String id) => KycQuestion.all.indexWhere((q) => q.id == id);
 final int _concerns = _stepOf('concerns');
 final int _goals = _stepOf('goals');
-final int _age = _stepOf('age');
+final int _age = _stepOf('birth_year');
+
+/// The birth-year wheel is measured against this, so the golden holds still
+/// as the calendar turns over.
+DateTime _fixedYear() => DateTime(2026, 9, 29);
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -41,7 +45,9 @@ void main() {
     await loadAppFonts();
 
     Get.put<KycRepository>(LocalKycRepository());
-    final c = Get.put(KycController(Get.find<KycRepository>()));
+    final c = Get.put(
+      KycController(Get.find<KycRepository>(), now: _fixedYear),
+    );
     c.step.value = step;
 
     await pumpScreen(tester, const KycScreen(), brightness: brightness);

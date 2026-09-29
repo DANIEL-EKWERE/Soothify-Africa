@@ -9,12 +9,12 @@ enum ExploreDestination {
   // (page 124:2, `191:5489`). The illustrated badges the tiles used to carry
   // are still used elsewhere (the Check-Ins cards, the library header), so
   // they stay under their old names and these are new files.
-  meditation('Pilates & Core', 'assets/images/explore/pilates_core.jpg'),
+  meditation('Pilates & Core', 'assets/images/explore/pilates_core.png'),
   scheduleSession(
     'Book a Licensed Expert',
-    'assets/images/explore/book_expert.jpg',
+    'assets/images/explore/book_expert.png',
   ),
-  balance('Stretch & Restore', 'assets/images/explore/stretch_restore.jpg');
+  balance('Stretch & Restore', 'assets/images/explore/stretch_restore.png');
 
   const ExploreDestination(this.label, this.assetPath);
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/confetti_overlay.dart';
 import '../../../widgets/gradient_text.dart';
+import '../../../widgets/match_progress_bar.dart';
 import 'controller/booking_controller.dart';
 import 'widgets/matched_view.dart';
 
@@ -18,31 +20,53 @@ class BookingScreen extends GetView<BookingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appTheme.background,
-      body: SafeArea(
-        child: Obx(() {
-          final stage = controller.stage.value;
-          // The call screen has no header — it is a full-bleed call UI.
-          if (stage == BookingStage.call) return const _CallStage();
-          return Padding(
-            padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _Header(),
-                Expanded(
-                  child: switch (stage) {
-                    BookingStage.matching => const _MatchingStage(),
-                    BookingStage.matched => const MatchedView(),
-                    BookingStage.method => const _MethodStage(),
-                    BookingStage.rating => const _RatingStage(),
-                    BookingStage.feedback => const _FeedbackStage(),
-                    BookingStage.call => const SizedBox.shrink(),
-                  },
+      // The confetti sits outside the SafeArea so it falls past the status
+      // bar and the home indicator rather than beginning and ending inside
+      // the inset.
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Obx(() {
+              final stage = controller.stage.value;
+              // The call screen has no header — a full-bleed call UI.
+              if (stage == BookingStage.call) return const _CallStage();
+              return Padding(
+                padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const _Header(),
+                    Expanded(
+                      child: switch (stage) {
+                        BookingStage.matching => const _MatchingStage(),
+                        BookingStage.matched => const MatchedView(),
+                        BookingStage.method => const _MethodStage(),
+                        BookingStage.rating => const _RatingStage(),
+                        BookingStage.feedback => const _FeedbackStage(),
+                        BookingStage.call => const SizedBox.shrink(),
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              );
+            }),
+          ),
+          // Positioned.fill wraps the Obx rather than the other way round: a
+          // Positioned has to be an immediate child of the Stack, and an Obx
+          // returning one is not.
+          //
+          // Gated on the stage as well as the flag: tapping "Get started"
+          // inside the 2.6s burst should not leave paper falling over the
+          // communication picker.
+          Positioned.fill(
+            child: Obx(
+              () => controller.celebrating.value &&
+                      controller.stage.value == BookingStage.matched
+                  ? ConfettiOverlay(onFinished: controller.celebrationShown)
+                  : const SizedBox.shrink(),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }
@@ -78,6 +102,18 @@ class _Header extends StatelessWidget {
   }
 }
 
+/// The matching interstitial — Figma `Matching pilates instructor`
+/// (259:58806), the frame that closes each KYC row.
+///
+/// Redrawn from that frame, which moved it well down the screen and centred
+/// it: the heading at 361 (Nunito Sans 700 20, centred, on the
+/// `#2F6FED -> #274889` run), a 280.7x7 track at 411 with an 18.3 radius, and
+/// a 10pt line at 434 across 242. The old file had it left-aligned near the
+/// top at a much larger blurb size.
+///
+/// The heading names the discipline. Only the Pilates frame could be read —
+/// see [SessionOffering.matchingTitle] — so the other two keep the old
+/// generic line rather than a guess.
 class _MatchingStage extends StatelessWidget {
   const _MatchingStage();
 
@@ -85,37 +121,34 @@ class _MatchingStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<BookingController>();
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 51.v),
+        SizedBox(height: 273.v),
         GradientText(
-          'Pairing you with a wellness coach who suits your needs.',
+          controller.matchingHeading,
           gradient: appTheme.authHeaderGradient,
+          textAlign: TextAlign.center,
           style: CustomTextStyles.kycQuestion,
         ),
         SizedBox(height: 24.v),
-        // 281x7 track, 18.3 radius, filled part-way in the frame.
-        Center(
-          child: SizedBox(
-            width: 281.h,
-            child: Obx(() => ClipRRect(
-                  borderRadius: BorderRadius.circular(18.h),
-                  child: LinearProgressIndicator(
-                    value: controller.matchProgress.value,
-                    minHeight: 7.v,
-                    backgroundColor: appTheme.progressTrack,
-                    valueColor:
-                        AlwaysStoppedAnimation(appTheme.soothifyBlue),
-                  ),
-                )),
-          ),
-        ),
+        Obx(() => MatchProgressBar(
+              value: controller.matchProgress.value,
+              // The frame draws this one's fill at 70%.
+              fillOpacity: 0.7,
+            )),
         SizedBox(height: 16.v),
-        GradientText(
-          'We’ll ensure a calm and supportive connection, helping\n'
-          'you find the right guide for your journey to wellness.',
-          gradient: appTheme.authHeaderGradient,
-          style: CustomTextStyles.matchingBlurb,
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 54.h),
+          child: GradientText(
+            // The frame's own string is 65 characters and stops mid-word:
+            // `"We are matching you with someone who fits what you're
+            // looking fo` — with the opening quote never closed. Finished
+            // here, as the receipt's scrambled line was.
+            'We are matching you with someone who fits what you’re looking '
+            'for.',
+            gradient: appTheme.authHeaderGradient,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.matchingCaption,
+          ),
         ),
       ],
     );

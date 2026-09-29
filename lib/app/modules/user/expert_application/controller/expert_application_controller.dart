@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../core/utils/document_picker.dart';
 import '../../../../data/models/expert_application.dart';
 
 /// Runs the "Become an Expert" application — Figma `259:59132` (the intro),
@@ -12,6 +13,13 @@ import '../../../../data/models/expert_application.dart';
 /// through the form rather than unwind a route stack the applicant never
 /// chose to build. Same reasoning as [BookingController].
 class ExpertApplicationController extends GetxController {
+  /// [pickDocument] is injectable so a test can supply a file without a
+  /// platform channel; the app uses the system picker.
+  ExpertApplicationController({DocumentPicker? pickDocument})
+      : _pickDocument = pickDocument ?? pickDocumentFromDevice;
+
+  final DocumentPicker _pickDocument;
+
   final Rx<ExpertApplicationStep> step = ExpertApplicationStep.profile.obs;
 
   /// Set once the application has been sent; the form gives way to the
@@ -33,9 +41,9 @@ class ExpertApplicationController extends GetxController {
   final licenceNumber = TextEditingController();
   final insurance = TextEditingController();
 
-  /// Which documents have been attached. No file picker is wired, so this
-  /// stays empty and [attach] says so rather than pretending.
-  final RxSet<ExpertDocument> attached = <ExpertDocument>{}.obs;
+  /// What has been attached, per slot.
+  final RxMap<ExpertDocument, AttachedDocument> attached =
+      <ExpertDocument, AttachedDocument>{}.obs;
 
   /// Redraws the step when a field is typed into, so the button can enable
   /// itself. Text controllers are not observables.
@@ -84,8 +92,10 @@ class ExpertApplicationController extends GetxController {
           name.text.trim().isNotEmpty &&
           experience.text.trim().isNotEmpty,
       ExpertApplicationStep.languages => languages.isNotEmpty,
-      ExpertApplicationStep.credentials =>
-        licenceNumber.text.trim().isNotEmpty,
+      // Both uploads carry an asterisk in the frame, so both are required —
+      // the only thing on any step that says what is mandatory.
+      ExpertApplicationStep.credentials => licenceNumber.text.trim().isNotEmpty &&
+          ExpertDocument.values.every(attached.containsKey),
     };
   }
 
@@ -97,10 +107,24 @@ class ExpertApplicationController extends GetxController {
 
   bool isSelected(ExpertLanguage value) => languages.contains(value);
 
-  /// No file picker is wired. Saying so beats a chip that appears to have
-  /// taken a document the application will never carry.
-  void attach(ExpertDocument document) =>
-      AppFeedback.info('Attaching a file is not built yet.');
+  /// Opens the system picker for one slot.
+  ///
+  /// A cancelled pick leaves whatever was there: backing out of the sheet is
+  /// not the same as removing a document already chosen.
+  Future<void> attach(ExpertDocument document) async {
+    final picked = await _pickDocument();
+    if (picked == null) return;
+    if (picked.tooLarge) {
+      AppFeedback.info(
+        '${picked.name} is ${picked.size}. Files must be under '
+        '${AttachedDocument.maxBytes ~/ (1024 * 1024)} MB.',
+      );
+      return;
+    }
+    attached[document] = picked;
+  }
+
+  void removeAttachment(ExpertDocument document) => attached.remove(document);
 
   /// "Start Application" on the intro.
   void start() => Get.toNamed(AppRoutes.expertApplicationForm);

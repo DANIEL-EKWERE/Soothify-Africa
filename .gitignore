@@ -48,3 +48,7 @@ app.*.map.json
 .figma_token*
 tool/.figma_cache/
 .env
+
+# Downloaded Figma image fills, if ever pulled again — the whole file's
+# artwork, most of it other projects'.
+tool/.figma_cache/fills/

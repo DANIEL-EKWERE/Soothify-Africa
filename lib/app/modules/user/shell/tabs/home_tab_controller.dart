@@ -4,8 +4,6 @@ import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/explore_destination.dart';
 import '../../../../data/models/library_section.dart';
-import '../../../../core/utils/wellness_entry.dart';
-import '../../../../data/models/wellness_kyc.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
@@ -65,8 +63,10 @@ class HomeTabController extends BaseController {
       case ExploreDestination.balance:
         Get.toNamed(AppRoutes.library, arguments: LibrarySection.balance);
       case ExploreDestination.scheduleSession:
-        // First time through, the questionnaire comes before booking.
-        openBooking(WellnessTrack.schedule);
+        // Straight to "Book a licensed expert screen" (`259:31488`), which
+        // is where the design puts the choice of discipline. The
+        // questionnaire is behind a card on that screen, not in front of it.
+        Get.toNamed(AppRoutes.bookExpert);
     }
   }
 

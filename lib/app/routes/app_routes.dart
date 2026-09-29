@@ -61,6 +61,11 @@ class AppRoutes {
   static const String library = '/library';
   static const String schedule = '/schedule';
 
+  /// "Book a licensed expert screen" (`259:31488`) — the three 1-on-1
+  /// disciplines, reached from Home's Explore tile. The questionnaire comes
+  /// after a card is picked, not before the list.
+  static const String bookExpert = '/book-expert';
+
   /// The three filter sheets behind a library's filter glyph. One route each
   /// so no screen has to read its own kind out of the arguments; the
   /// arguments carry only the library's current [FilterSelection], and the

@@ -41,6 +41,41 @@ enum ExpertDocument {
   final String prompt;
 }
 
+/// A document the applicant has attached.
+///
+/// Only what the form needs to show and send: the name it was picked under,
+/// where it is on disk, and how big it is. Deliberately not the bytes — a
+/// scan of a passport is not something to hold in memory across three form
+/// steps.
+class AttachedDocument {
+  const AttachedDocument({
+    required this.name,
+    required this.path,
+    required this.bytes,
+  });
+
+  final String name;
+  final String path;
+
+  /// Size on disk, for the "2.4 MB" the row shows.
+  final int bytes;
+
+  /// The frame gives no size limit. 10 MB is this app's: a phone photo of a
+  /// certificate is ~3-5 MB, and anything far past that is a scan that will
+  /// fail to upload on the connections these users have.
+  static const int maxBytes = 10 * 1024 * 1024;
+
+  bool get tooLarge => bytes > maxBytes;
+
+  String get size {
+    if (bytes >= 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    if (bytes >= 1024) return '${(bytes / 1024).round()} KB';
+    return '$bytes B';
+  }
+}
+
 /// The three form steps, in the order the frames run.
 ///
 /// The progress bar carries three segments and fills one more per step —

@@ -46,7 +46,11 @@ class BookingPaymentController extends GetxController {
 
   /// "Continue" on the receipt — back into the booking flow the payment
   /// unlocks, replacing the receipt so it cannot be returned to.
-  void done() => Get.offNamed(AppRoutes.booking);
+  ///
+  /// Carries the offering: the matching interstitial names the discipline
+  /// ("Finding your Pilates instructor"), and it is the only thing that
+  /// knows which one was booked.
+  void done() => Get.offNamed(AppRoutes.booking, arguments: offering);
 
   void openPolicy() =>
       AppFeedback.info('The payment and cancellation policy is not written yet.');

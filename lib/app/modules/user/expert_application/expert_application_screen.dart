@@ -203,12 +203,18 @@ class _CredentialsStep extends StatelessWidget {
         for (final document in ExpertDocument.values) ...[
           Text(document.prompt, style: CustomTextStyles.expertFormLabel),
           SizedBox(height: 16.v),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: ExpertUploadChip(
+          Obx(() {
+            final file = controller.attached[document];
+            final chip = ExpertUploadChip(
               onTap: () => controller.attach(document),
-            ),
-          ),
+              attached: file,
+              onRemove: () => controller.removeAttachment(document),
+            );
+            // The empty chip hugs its label; a filled row takes the width.
+            return file == null
+                ? Align(alignment: Alignment.centerLeft, child: chip)
+                : chip;
+          }),
           SizedBox(height: 16.v),
         ],
         ExpertFormField(

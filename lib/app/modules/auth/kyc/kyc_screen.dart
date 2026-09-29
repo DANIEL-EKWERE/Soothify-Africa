@@ -6,7 +6,7 @@ import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/step_progress_bar.dart';
 import 'controller/kyc_controller.dart';
-import 'widgets/age_wheel.dart';
+import 'widgets/birth_year_picker.dart';
 import 'widgets/kyc_concern_carousel.dart';
 import 'widgets/kyc_option_tile.dart';
 
@@ -99,15 +99,16 @@ class _Answers extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<KycController>();
 
-    if (question.input == KycInput.wheel) {
+    if (question.input == KycInput.birthYear) {
       return Obx(
-        () => AgeWheel(
+        () => BirthYearPicker(
           // Keyed by question so switching steps rebuilds the wheel rather
           // than reusing the previous question's scroll position.
           key: ValueKey(question.id),
           options: question.options,
           selectedValue:
               controller.current.isEmpty ? null : controller.current.first,
+          currentYear: controller.currentYear,
           onSelected: controller.choose,
         ),
       );

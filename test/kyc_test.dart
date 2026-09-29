@@ -21,7 +21,8 @@ void main() {
         KycQuestion.all.map((q) => q.id),
         // Gender leads: the concerns carousel draws a gendered figure, so
         // the answer has to exist by the time that step is reached.
-        ['gender', 'concerns', 'frequency', 'in_treatment', 'goals', 'age'],
+        ['gender', 'concerns', 'frequency', 'in_treatment', 'goals',
+          'birth_year'],
       );
     });
 
@@ -32,12 +33,30 @@ void main() {
       );
     });
 
-    test('the age question spans 18 to 50', () {
-      final age = KycQuestion.all.last;
-      expect(age.input, KycInput.wheel);
-      expect(age.options.first.label, '18');
-      expect(age.options.last.label, '50');
-      expect(age.options, hasLength(33));
+    test('the age step now collects a birth year — Figma 259:27860', () {
+      // Was a wheel of ages 18-50 under "How old are you?".
+      final q = KycQuestion.allFor(2026).last;
+      expect(q.id, 'birth_year');
+      expect(q.prompt, 'What is your age?');
+      expect(q.input, KycInput.birthYear);
+
+      // Newest year first, as the frame lists them, and still bounded by the
+      // same two ages.
+      expect(q.options.first.label, '2008'); // 2026 - 18
+      expect(q.options.last.label, '1976'); // 2026 - 50
+      expect(q.options, hasLength(33));
+    });
+
+    test('the wheel moves with the calendar', () {
+      expect(KycQuestion.allFor(2027).last.options.first.label, '2009');
+    });
+
+    test('the readout is the age the year implies', () {
+      expect(KycQuestion.ageFor('1993', 2026), 33);
+      expect(KycQuestion.ageFor('2008', 2026), 18);
+      // The frame prints "20" beside a boxed 1993; that is a placeholder, and
+      // this is what the app shows instead.
+      expect(KycQuestion.ageFor('1993', 2026), isNot(20));
     });
   });
 

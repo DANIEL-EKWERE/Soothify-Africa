@@ -60,6 +60,8 @@ import '../modules/user/community/forum/forum_screen.dart';
 import '../modules/user/community/thread/binding/thread_binding.dart';
 import '../modules/user/community/thread/thread_screen.dart';
 import '../modules/user/booking/binding/booking_binding.dart';
+import '../modules/user/book_expert/binding/book_expert_binding.dart';
+import '../modules/user/book_expert/book_expert_screen.dart';
 import '../modules/user/booking/booking_screen.dart';
 import '../modules/user/checkin/binding/checkin_binding.dart';
 import '../modules/user/daily/binding/daily_binding.dart';
@@ -183,6 +185,11 @@ class AppPages {
       name: AppRoutes.library,
       page: () => const LibraryScreen(),
       binding: LibraryBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.bookExpert,
+      page: () => const BookExpertScreen(),
+      binding: BookExpertBinding(),
     ),
     GetPage(
       name: AppRoutes.wellnessKyc,

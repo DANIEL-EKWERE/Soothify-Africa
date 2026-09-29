@@ -7,9 +7,11 @@ import 'schedule_sheet.dart';
 
 /// The matched coach's profile — Figma "Matched with instructor" (135:20932).
 ///
-/// The celebration frame (135:21320) carries identical copy, and the calendar
-/// frame (135:21450) is this screen with a date sheet over its lower half —
-/// so all three are this one view, with the sheet raised on demand.
+/// The celebration frame (135:21320, `259:31992` in the current file) carries
+/// identical copy, and the calendar frame (135:21450) is this screen with a
+/// date sheet over its lower half — so all three are this one view, with the
+/// sheet raised on demand and the celebration drawn over it by
+/// [ConfettiOverlay] the first time matching completes.
 class MatchedView extends StatelessWidget {
   const MatchedView({super.key});
 

@@ -42,7 +42,7 @@ class ImageConstant {
   /// image was not exported; the "Book a Licensed Expert" Explore tile is the
   /// same subject and already ships.
   static const String imgExpertNetwork =
-      '$_images/explore/book_expert.jpg';
+      '$_images/explore/book_expert.png';
 
   static const String imgSessionCover = '$_images/schedule/session.png';
   static const String imgHomeAvatar = '$_images/home/avatar.png';

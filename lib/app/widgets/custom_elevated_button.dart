@@ -22,6 +22,7 @@ class CustomElevatedButton extends StatelessWidget {
     this.margin,
     this.width,
     this.labelStyle,
+    this.height,
   });
 
   final String text;
@@ -37,13 +38,17 @@ class CustomElevatedButton extends StatelessWidget {
   /// text, which [CustomTextStyles.buttonLabel] cannot give it.
   final TextStyle? labelStyle;
 
+  /// Overrides the design's standard 52. The "Book session" buttons on
+  /// `259:31488` are 48 — a card action rather than a page action.
+  final double? height;
+
   bool get _interactive => isEnabled && !isLoading && onPressed != null;
 
   @override
   Widget build(BuildContext context) {
     final button = SizedBox(
       width: width ?? double.maxFinite,
-      height: 52.h,
+      height: (height ?? 52).h,
       child: ElevatedButton(
         style: style ??
             ElevatedButton.styleFrom(

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import '../../../../core/app_export.dart';
+import '../../../../data/models/session_offering.dart';
 import '../../../../data/models/wellness_kyc.dart';
 
 /// Runs a section's pre-booking questionnaire — Figma "meditation"
@@ -9,18 +12,75 @@ import '../../../../data/models/wellness_kyc.dart';
 /// the completion flag is persisted for now, since nothing consumes the
 /// answers yet and storing them would imply they are being used.
 class WellnessKycController extends GetxController {
-  WellnessKycController(this.track);
+  WellnessKycController(
+    this.track, {
+    Duration? introWait,
+    this.skipIntro = false,
+  }) : _introWait = introWait ?? const Duration(milliseconds: 2400);
+
+  /// Opens straight on the first question, whatever the track draws.
+  ///
+  /// Set when the questionnaire is reached from a card on "Book a licensed
+  /// expert screen": the card already named the discipline, so the
+  /// interstitial that would introduce it has nothing left to say.
+  final bool skipIntro;
+
+  /// How long the intro's bar takes to fill before it advances.
+  ///
+  /// [Duration.zero] holds the intro open indefinitely — what a golden of
+  /// that screen needs, and what stops a periodic timer outliving a test.
+  final Duration _introWait;
 
   final WellnessTrack track;
 
-  /// -1 is the intro; 0..steps.length-1 are the questions. Tracks without an
-  /// intro frame start on the first question.
-  late final RxInt index = (track.hasIntro ? -1 : 0).obs;
+  /// -1 is the intro; 0..steps.length-1 are the questions.
+  ///
+  /// Pilates & Core opens on `Pilates kyc` (259:38525) and Stretch & Restore
+  /// on `Scheduling Kyc/Yoga` (259:38802). Therapy has no intro frame, and
+  /// [skipIntro] suppresses the others.
+  late final RxInt index = (track.hasIntro && !skipIntro ? -1 : 0).obs;
 
   /// Step index to the options chosen for it.
   final RxMap<int, Set<String>> answers = <int, Set<String>>{}.obs;
 
   bool get onIntro => index.value < 0;
+
+  /// How full the intro's bar is, 0..1.
+  final RxDouble introProgress = 0.0.obs;
+
+  Timer? _intro;
+
+  /// The intro carries a progress bar — `Pilates kyc` (259:38525) and
+  /// `Scheduling Kyc/Yoga` (259:38802) both draw one 24 below the paragraph.
+  /// That is why the frame gives the screen no button: it is loading, and it
+  /// moves on by itself. Tapping still skips ahead, though nothing says so
+  /// on screen any more.
+  ///
+  /// The frames park the fill at 128 of 280.7, which is a still frame drawing
+  /// motion rather than a measurement — so this runs it as a real wait.
+  @override
+  void onInit() {
+    super.onInit();
+    if (!onIntro || _introWait == Duration.zero) return;
+    const tick = Duration(milliseconds: 60);
+    final total = _introWait;
+    var elapsed = Duration.zero;
+    _intro = Timer.periodic(tick, (t) {
+      elapsed += tick;
+      introProgress.value =
+          (elapsed.inMilliseconds / total.inMilliseconds).clamp(0.0, 1.0);
+      if (introProgress.value >= 1) {
+        t.cancel();
+        if (onIntro) begin();
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    _intro?.cancel();
+    super.onClose();
+  }
 
   WellnessKycStep get step => track.steps[index.value];
 
@@ -36,7 +96,10 @@ class WellnessKycController extends GetxController {
   /// The button is drawn at 45% until something is chosen.
   bool get canAdvance => selected.isNotEmpty;
 
-  void begin() => index.value = 0;
+  void begin() {
+    _intro?.cancel();
+    index.value = 0;
+  }
 
   void choose(String option) {
     final current = {...selected};
@@ -58,6 +121,13 @@ class WellnessKycController extends GetxController {
       return;
     }
     await PrefUtils().setWellnessKycDone(track.name);
+    if (track == WellnessTrack.therapy) {
+      // The expert row runs the match *before* the money — Figma 259:31488
+      // -> `Matched with instructor celebration` 259:31992 -> `Therapist
+      // booking payment` 259:58862. The section tracks still price first.
+      await Get.offNamed(AppRoutes.booking, arguments: SessionOffering.therapy);
+      return;
+    }
     // Straight into booking — the questionnaire exists to match a coach.
     await Get.offNamed(AppRoutes.schedule);
   }

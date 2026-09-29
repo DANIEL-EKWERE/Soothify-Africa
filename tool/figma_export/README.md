@@ -46,7 +46,7 @@ as the first non-TEXT child of their row or item frame.
 multi-day wait means the plan's quota is spent and no amount of waiting inside
 one session helps — reach for a plugin export then.
 
-## THREE endpoints, THREE budgets (found 2026-09-26)
+## FOUR endpoints, FOUR budgets (2026-09-26)
 
 `/nodes` and `/images` were known to have separate quotas. There is a third,
 and it is the best of them:
@@ -58,13 +58,44 @@ styles and fills — for exactly the subtrees asked for. With both `/nodes` and
 `/images` reporting ~1.1 days on the same account, this answered 540 KB for
 seven whole frames on the first try.
 
+A fourth was found when the other three were all spent on a fresh account:
+
+    GET /v1/files/{key}/images      -> EVERY image fill in the file, as
+                                       imageRef -> S3 URL. Its own budget,
+                                       and the last to block.
+
+The URLs it returns are S3, not Figma, so downloading them costs no quota at
+all. What it cannot tell you is *which node* uses which ref — that needs node
+JSON. On a shared file (this one holds art from several unrelated projects,
+514 fills) the refs alone are not enough to identify a screen's artwork.
+
 So the order to try, cheapest and most likely open first:
 
-    GET /v1/me                      -> is the token valid at all (403 = bad)
+    GET /v1/me                      -> is the token valid at all
+                                       (401 "Invalid token" = wrong/truncated,
+                                        403 = no access, 429 = quota)
     GET /v1/files/{key}?depth=1     -> ~1.5KB, proves file access
-    GET /v1/files/{key}?ids=...     -> node JSON, third budget, usually open
+    GET /v1/files/{key}/images      -> image fills, fourth budget
+    GET /v1/files/{key}?ids=...     -> node JSON, third budget
     GET /v1/images/{key}?ids=...    -> renders, second budget
     GET /v1/files/{key}/nodes?ids=  -> the one that blocks first
+
+**`files?ids=` is charged by request size, not per call.** A single-frame
+request succeeded on an account where a five-frame one was refused, and the
+budget was spent by that one call. Ask for one frame at a time when it is
+nearly out.
+
+**`files/{key}/images` needs node JSON to be useful.** It maps
+`imageRef -> S3 URL` and says nothing about which node uses which ref. Pair it
+with a frame's node JSON — read `fills[].imageRef` off the node you want, then
+look the ref up. Also read `scaleMode`: `FILL` is centre-cover, while
+`STRETCH` carries an `imageTransform` that is a crop, and ignoring it reframes
+the picture.
+
+**Save what a probe returns.** A `files?ids=259:27952` probe answered with
+271 KB — the whole Home frame — and it was thrown away because the probe only
+printed the size. The next call for the same frame was refused. Probe with
+the real call and keep the body.
 
 `tool/figma.py nodes` uses the `/nodes` form. When that is blocked, fetch via
 `files?ids=` instead and split the result into `tool/.figma_cache/node_*.json`

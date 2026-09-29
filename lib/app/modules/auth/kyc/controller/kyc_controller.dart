@@ -4,16 +4,26 @@ import '../../../../data/models/kyc_question.dart';
 import '../../../../data/repositories/kyc_repository.dart';
 
 class KycController extends BaseController {
-  KycController(this._repository);
+  KycController(this._repository, {DateTime Function()? now})
+      : _now = now ?? DateTime.now;
 
   final KycRepository _repository;
+
+  /// Injectable so the birth-year wheel and the age it prints are fixed in a
+  /// test rather than drifting with the calendar.
+  final DateTime Function() _now;
 
   final RxInt step = 0.obs;
 
   /// Question id -> chosen option values.
   final RxMap<String, Set<String>> answers = <String, Set<String>>{}.obs;
 
-  List<KycQuestion> get questions => KycQuestion.all;
+  /// The year the birth-year wheel is measured against.
+  late final int currentYear = _now().year;
+
+  /// Held once: [KycQuestion.allFor] builds a fresh list each call, and the
+  /// screen reads `question` several times per frame.
+  late final List<KycQuestion> questions = KycQuestion.allFor(currentYear);
 
   int get totalSteps => questions.length;
 

@@ -72,13 +72,17 @@ void main() {
     // the row with an inline action.
     expect(find.textContaining('Kendrick'), findsOneWidget);
     expect(find.textContaining('John'), findsOneWidget);
-    expect(find.text('Reminder'), findsOneWidget);
-    expect(find.textContaining('session today at 5:00pm'), findsOneWidget);
+    // The outlined Reminder card, plus the two booking rows the second
+    // frame labels the same way.
+    expect(find.text('Reminder'), findsNWidgets(3));
+    expect(find.textContaining('session today at 5:00pm'), findsNWidgets(2));
     expect(find.text('Your Weekly Mindful Quotes'), findsOneWidget);
     expect(find.textContaining('weekly mental health tip'), findsOneWidget);
     expect(find.text('New article posted'), findsOneWidget);
     expect(find.text('Read'), findsOneWidget);
 
+    // Five chips no longer fit across 342, so the row scrolls. They are all
+    // laid out — clipped is not offstage — so all five are still found.
     for (final f in NotificationFilter.values) {
       expect(find.text(f.label), findsOneWidget);
     }
@@ -86,7 +90,7 @@ void main() {
 
   testWidgets('the chips narrow the list', (tester) async {
     final controller = await mount(tester);
-    expect(controller.visible, hasLength(7));
+    expect(controller.visible, hasLength(10));
 
     await tester.tap(find.text('Mentions'));
     await tester.pumpAndSettle();
@@ -99,6 +103,19 @@ void main() {
     await tester.tap(find.text('My post'));
     await tester.pumpAndSettle();
     expect(controller.visible, hasLength(2));
+
+    // The second frame's pair — `259:61271`. Selected directly rather than
+    // tapped: the chips scroll, and these two sit past the right edge.
+    controller.select(NotificationFilter.schedules);
+    await tester.pumpAndSettle();
+    expect(controller.visible, hasLength(2));
+    expect(find.textContaining('Pilates & Core session tomorrow'),
+        findsOneWidget);
+
+    controller.select(NotificationFilter.newBooking);
+    await tester.pumpAndSettle();
+    expect(controller.visible, hasLength(1));
+    expect(find.textContaining('Yoga session on 28 Sep 2026'), findsOneWidget);
   });
 
   test('timestamps are computed, not the frame\'s typos', () {
@@ -117,10 +134,16 @@ void main() {
     expect(at(const Duration(days: 2)).ago(now), '2 days ago');
   });
 
-  test('the unread marks match the frame', () async {
+  test('the unread marks match the frames', () async {
     final feed = await MockNotificationRepository(now: _fixedNow).feed();
     final unread = feed.where((n) => n.unread).map((n) => n.kind).toList();
-    // Only the Reminder card and the weekly digest carry a red dot.
-    expect(unread, [NotificationKind.reminder, NotificationKind.digest]);
+    // `176:24737` dots only the Reminder card and the weekly digest;
+    // `259:61271` dots its first two booking rows and not the third.
+    expect(unread, [
+      NotificationKind.reminder,
+      NotificationKind.digest,
+      NotificationKind.booking,
+      NotificationKind.booking,
+    ]);
   });
 }

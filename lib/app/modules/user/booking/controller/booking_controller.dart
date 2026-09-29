@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/coach.dart';
+import '../../../../data/models/session_offering.dart';
 
 /// How the session is taken. The design offers exactly these two.
 enum CallMode {
@@ -24,8 +25,18 @@ enum BookingStage { matching, matched, method, call, rating, feedback }
 /// strictly in order, and a back press should step back through the flow
 /// rather than unwind a route stack the user never chose to build.
 class BookingController extends GetxController {
-  BookingController({Duration? matchDuration})
+  BookingController({Duration? matchDuration, this.offering})
       : _matchDuration = matchDuration ?? const Duration(seconds: 3);
+
+  /// What was booked. Null only when the route is opened without one, which
+  /// the app does not do — the receipt always passes it.
+  final SessionOffering? offering;
+
+  /// The matching interstitial's heading. Names the discipline where the
+  /// design says so, and falls back to the old file's generic line.
+  String get matchingHeading =>
+      offering?.matchingHeading ??
+      'Pairing you with a wellness coach who suits your needs.';
 
   /// How long the matching interstitial runs. Injectable so a test does not
   /// wait on a real timer.
@@ -35,6 +46,14 @@ class BookingController extends GetxController {
   final Rxn<CallMode> mode = Rxn<CallMode>();
   final RxInt rating = 0.obs;
   final RxDouble matchProgress = 0.0.obs;
+
+  /// Whether the match celebration is still owed — Figma `259:31992`, which
+  /// is the plain matched frame (`259:31617`) plus a burst of confetti.
+  ///
+  /// Latches false once it has played, so stepping back to the matched screen
+  /// from "Get started" lands on the plain frame. A celebration that fires
+  /// every time you press back stops reading as an occasion.
+  final RxBool celebrating = false.obs;
   final TextEditingController feedback = TextEditingController();
 
   /// The matched coach. The backend will supply this once matching is real.
@@ -75,10 +94,14 @@ class BookingController extends GetxController {
               .clamp(0.0, 1.0);
       if (matchProgress.value >= 1.0) {
         t.cancel();
+        celebrating.value = true;
         stage.value = BookingStage.matched;
       }
     });
   }
+
+  /// The burst has finished; the screen is now the plain matched frame.
+  void celebrationShown() => celebrating.value = false;
 
   /// "Get started" — straight into choosing how to connect.
   void getStarted() => stage.value = BookingStage.method;

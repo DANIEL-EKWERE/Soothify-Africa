@@ -137,6 +137,46 @@ class CustomTextStyles {
   );
 
   /// Centred value in the age wheel — Nunito ExtraBold 24 at 90%.
+  /// "Age" and "yrs" flanking the number on `259:27860` — Nunito Regular 16,
+  /// muted, both the same.
+  static TextStyle get ageReadoutLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.textSubtitle,
+  );
+
+  /// The derived age itself, the largest type in the app.
+  static TextStyle get ageReadoutValue => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 72.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 1,
+    color: appTheme.textPrimary,
+  );
+
+  /// An unselected year on the birth-year wheel. Larger and darker than the
+  /// old age wheel's neighbours ([wheelItem]) — the render shows them plainly
+  /// readable rather than faded to half.
+  static TextStyle get yearWheelItem => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    color: appTheme.textSubtitle,
+  );
+
+  /// The boxed year under the marker.
+  static TextStyle get yearWheelSelected => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
   static TextStyle get wheelSelected => TextStyle(
     fontFamily: fontNunito,
     fontSize: 24.fSize,
@@ -427,16 +467,6 @@ class CustomTextStyles {
         fontWeight: FontWeight.w700,
         fontVariations: _bold,
         height: 27 / 20,
-      );
-
-  /// "Tap anywhere to continue" under a wellness questionnaire's intro.
-  static TextStyle get tapHint => TextStyle(
-        fontFamily: fontNunitoSans,
-        fontSize: 14.fSize,
-        fontWeight: FontWeight.w500,
-        fontVariations: const [FontVariation('wght', 500)],
-        height: 19 / 14,
-        color: appTheme.textSecondary,
       );
 
   /// The opening line on a mood recommendation — Nunito Sans Bold 18 over
@@ -909,6 +939,28 @@ class CustomTextStyles {
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
     height: 18 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// A "Book a licensed expert" card's title — Nunito Bold 16 on `#263238`,
+  /// per `259:31488`.
+  static TextStyle get expertOfferTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The same card's "One on one session with a professional" — Nunito
+  /// Regular 14. Same colour as the title in the frame, not a muted subtitle.
+  static TextStyle get expertOfferBlurb => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
     color: appTheme.textPrimary,
   );
 
@@ -2205,6 +2257,48 @@ class CustomTextStyles {
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
     height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  /// A booking notification row — Figma `259:61271`.
+  static TextStyle get notificationBookingKind => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 14.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get notificationBookingBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 12 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  /// The KYC intro's paragraph, and the "pick as many" line under a
+  /// multi-select question — Nunito 400 16 in plain #323233 at 90%.
+  static TextStyle get kycIntroBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 24 / 16,
+    letterSpacing: 0.3,
+    color: appTheme.textSubtitle,
+  );
+
+  /// The line under the matching bar — Nunito Sans SemiBold 10, centred.
+  static TextStyle get matchingCaption => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 13 / 10,
+    letterSpacing: -0.2,
     color: appTheme.textPrimary,
   );
 

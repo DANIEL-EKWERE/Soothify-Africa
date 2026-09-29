@@ -17,8 +17,9 @@ class JoiningPulse extends StatefulWidget {
 
 class _JoiningPulseState extends State<JoiningPulse>
     with SingleTickerProviderStateMixin {
-  // Built in initState, not lazily: a `late final` controller constructed
-  // during dispose under reduce-motion throws.
+  // `late final`, but initState touches it below — which is what forces the
+  // construction to happen there. Left to build alone, a reduce-motion path
+  // that never reads it would have dispose construct it, and that throws.
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1600),

@@ -35,10 +35,10 @@ class WellnessKycController extends GetxController {
 
   /// -1 is the intro; 0..steps.length-1 are the questions.
   ///
-  /// Pilates & Core opens on `Pilates kyc` (259:38525) and Stretch & Restore
-  /// on `Scheduling Kyc/Yoga` (259:38802). Therapy has no intro frame, and
-  /// [skipIntro] suppresses the others.
-  late final RxInt index = (track.hasIntro && !skipIntro ? -1 : 0).obs;
+  /// Every track opens on an interstitial of its own — Pilates & Core
+  /// `259:38525`, Stretch & Restore `259:38802`, therapy `259:38773` — so
+  /// only [skipIntro] sends a track straight to its first question.
+  late final RxInt index = (skipIntro ? 0 : -1).obs;
 
   /// Step index to the options chosen for it.
   final RxMap<int, Set<String>> answers = <int, Set<String>>{}.obs;

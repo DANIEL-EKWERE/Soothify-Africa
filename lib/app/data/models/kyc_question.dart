@@ -17,7 +17,8 @@ enum KycInput {
   /// A full-bleed swipeable carousel of illustrations, one per option, on the
   /// focused option's own background colour. Multi-select, like [multi].
   ///
-  /// Only "What brings you to Soothify?" uses it — Figma "Kyc screen | Stress"
+  /// Only "What brings you to your space today?" uses it — Figma
+  /// "Kyc screen | Stress"
   /// (`176:23723`) and "| Anxiety" (`176:56150`).
   carousel,
 }
@@ -87,7 +88,11 @@ class KycQuestion {
   bool get isMulti =>
       input == KycInput.multi || input == KycInput.carousel;
 
-  static const String _multiHint = 'You can select more than one option';
+  /// The carousel's own hint, in the title case the frames set it in.
+  static const String _carouselHint = 'You Can Select More Than One Option';
+
+  /// The list questions' hint, rewritten with the rest of the copy.
+  static const String _multiHint = '(Select what applies)';
 
   static List<KycQuestion> allFor(int currentYear) => [
     // First, before the concerns carousel: its answer decides whether the
@@ -95,42 +100,45 @@ class KycQuestion {
     // to be known by the time that step is reached.
     const KycQuestion(
       id: 'gender',
-      prompt: 'What is your gender?',
+      // `259:27844`. Was "What is your gender?" with "Non binary" and
+      // "Rather not say".
+      prompt: 'How do you identify?',
       options: [
         KycOption('male', 'Male'),
         KycOption('female', 'Female'),
-        KycOption('non_binary', 'Non binary'),
-        KycOption('undisclosed', 'Rather not say'),
+        KycOption('non_binary', 'Non-binary'),
+        KycOption('undisclosed', 'Prefer not to say'),
       ],
     ),
     const KycQuestion(
       id: 'concerns',
-      prompt: 'What brings you to Soothify?',
-      subtitle: _multiHint,
+      // `259:58499` onward. Was "What brings you to Soothify?".
+      prompt: 'What brings you to your space today?',
+      subtitle: _carouselHint,
       // Illustrations on a flooded background, not the emoji tiles the older
       // file drew. Colours sampled from the four frames: the progress accent
       // contrasts the flood rather than matching it — amber on every ground
       // except the amber one, which takes blue.
       input: KycInput.carousel,
       options: [
-        KycOption('stress', 'Stress',
+        KycOption('stress', 'Carrying heavy stress',
             illustration: 'assets/images/concerns/stress_figure.png',
             illustrationMale: 'assets/images/concerns/stress_figure_male.png',
             backgroundArgb: 0xFFF9980F,
             accentArgb: 0xFF4679ED),
-        KycOption('anxiety', 'Anxiety',
+        KycOption('anxiety', 'Navigating anxiety',
             illustration: 'assets/images/concerns/anxiety_figure.png',
             illustrationMale: 'assets/images/concerns/anxiety_figure_male.png',
             backgroundArgb: 0xFF7B7FE8,
             accentArgb: 0xFFFFAE24),
         // `176:56173` and `176:56161`, both misnamed "Kyc screen | Anxiety"
         // in the file — the names are duplicates, the artwork is not.
-        KycOption('sleep_disorder', 'Sleep disorder',
+        KycOption('sleep_disorder', 'Restless sleep',
             illustration: 'assets/images/concerns/sleep_disorder_figure.png',
             illustrationMale: 'assets/images/concerns/sleep_disorder_figure_male.png',
             backgroundArgb: 0xFF465A8C,
             accentArgb: 0xFFFFAE24),
-        KycOption('depression', 'Depression',
+        KycOption('depression', 'Low energy or burnout',
             illustration: 'assets/images/concerns/depression_figure.png',
             illustrationMale: 'assets/images/concerns/depression_figure_male.png',
             backgroundArgb: 0xFF626A8A,
@@ -139,18 +147,23 @@ class KycQuestion {
     ),
     const KycQuestion(
       id: 'frequency',
-      prompt: 'How often do you experience symptoms related to stress, '
-          'anxiety, or depression?',
+      // `259:27752`. Was "How often do you experience symptoms related to
+      // stress, anxiety, or depression?" — Regularly / Not regularly / Not at
+      // all. "this" now refers back to whatever the carousel just collected.
+      prompt: 'How often does this show up in your daily life?',
       options: [
-        KycOption('regularly', 'Regularly'),
-        KycOption('not_regularly', 'Not regularly'),
-        KycOption('not_at_all', 'Not at all'),
+        KycOption('often', 'Often'),
+        KycOption('sometimes', 'Sometimes'),
+        KycOption('passing', 'Just passing through'),
       ],
     ),
     const KycQuestion(
       id: 'in_treatment',
-      prompt: 'Are you currently undergoing treatment for any mental health '
-          'condition?',
+      // `259:27780`. Was "Are you currently undergoing treatment for any
+      // mental health condition?" — the new wording asks the same thing
+      // without naming it a condition.
+      prompt: 'Are you currently working with a care provider or therapist '
+          'elsewhere?',
       options: [
         KycOption('yes', 'Yes'),
         KycOption('no', 'No'),
@@ -158,20 +171,18 @@ class KycQuestion {
     ),
     const KycQuestion(
       id: 'goals',
-      prompt: 'What are the goals or outcomes you hope to achieve?',
+      // `259:27804` / `27824`. Was "What are the goals or outcomes you hope
+      // to achieve?" over five options with a 30px icon each; the new rows
+      // carry no artwork, so the goal images are no longer referenced.
+      prompt: 'What are you hoping to cultivate here?',
       subtitle: _multiHint,
       input: KycInput.multi,
       options: [
-        KycOption('career', 'My career/performance',
-            assetPath: 'assets/images/goals/career.png'),
-        KycOption('romance', 'My romantic relationship',
-            assetPath: 'assets/images/goals/romance.png'),
-        KycOption('friendship', 'My friendship/family relations',
-            assetPath: 'assets/images/goals/friendship.png'),
-        KycOption('peace', 'My peace of mind',
-            assetPath: 'assets/images/goals/peace.png'),
-        KycOption('something_else', 'Something else',
-            assetPath: 'assets/images/goals/something_else.png'),
+        KycOption('clarity', 'Mental clarity & performance'),
+        KycOption('relationships', 'Grounding in relationships'),
+        KycOption('boundaries', 'Boundaries with family & friends'),
+        KycOption('peace', 'Inner calm & peace of mind'),
+        KycOption('something_else', 'Something else'),
       ],
     ),
     KycQuestion(

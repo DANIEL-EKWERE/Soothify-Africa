@@ -30,10 +30,10 @@ void main() {
     );
     expect(
       WellnessTrack.therapy.steps.first.question,
-      'What type of wellness sessions are you interested in?',
+      'What\u2019s on your mind right now?',
     );
     expect(WellnessTrack.meditation.steps.length, 6);
-    expect(WellnessTrack.therapy.steps.length, 5);
+    expect(WellnessTrack.therapy.steps.length, 3);
     // Two of the six carry "Pick as many as you like"; the rest take one.
     expect(
       WellnessTrack.meditation.steps.where((s) => s.multiSelect).length,
@@ -51,7 +51,8 @@ void main() {
       'Let’s set up your Pilates session',
     );
     expect(WellnessTrack.balance.heading, 'Tailoring your practice');
-    expect(WellnessTrack.therapy.heading, isEmpty);
+    expect(WellnessTrack.therapy.heading,
+        'Let\u2019s find the right therapist for you');
     expect(WellnessTrack.meditation.intro, isNot(WellnessTrack.balance.intro));
   });
 
@@ -66,9 +67,13 @@ void main() {
   });
 
   test('the multi-select hint is the track’s own wording', () {
+    // Pilates & Core and therapy both say "Pick as many as you like"
+    // (`259:38083`, `259:38665`); Stretch & Restore keeps the older line its
+    // own frames set (`259:25816`).
     expect(WellnessTrack.meditation.multiHint, 'Pick as many as you like');
+    expect(WellnessTrack.therapy.multiHint, 'Pick as many as you like');
     expect(
-      WellnessTrack.therapy.multiHint,
+      WellnessTrack.balance.multiHint,
       'You can select more than one option',
     );
   });
@@ -80,11 +85,11 @@ void main() {
     )..begin();
 
     // Step 1 is multi-select in the design.
-    c.choose('Mindfulness');
-    c.choose('Anusara');
-    expect(c.selected, {'Mindfulness', 'Anusara'});
-    c.choose('Anusara');
-    expect(c.selected, {'Mindfulness'});
+    c.choose('Feeling anxious');
+    c.choose('Restless sleep');
+    expect(c.selected, {'Feeling anxious', 'Restless sleep'});
+    c.choose('Restless sleep');
+    expect(c.selected, {'Feeling anxious'});
 
     final single = WellnessKycController(
       WellnessTrack.meditation,
@@ -174,31 +179,16 @@ void main() {
   });
 
   test('only the tracks with an intro frame open on one', () {
-    // Pilates & Core has `Pilates kyc` 259:38525 and Stretch & Restore has
-    // `Scheduling Kyc/Yoga` 259:38802. Therapy's (259:38773) has never been
-    // fetched, so it starts on its first question rather than on an
-    // interstitial nothing in the file draws.
-    expect(
-      WellnessKycController(
-        WellnessTrack.meditation,
-        introWait: Duration.zero,
-      ).onIntro,
-      isTrue,
-    );
-    expect(
-      WellnessKycController(
-        WellnessTrack.balance,
-        introWait: Duration.zero,
-      ).onIntro,
-      isTrue,
-    );
-    expect(
-      WellnessKycController(
-        WellnessTrack.therapy,
-        introWait: Duration.zero,
-      ).onIntro,
-      isFalse,
-    );
+    // Every track has one of its own: Pilates & Core `259:38525`, Stretch &
+    // Restore `259:38802`, therapy `259:38773`.
+    for (final track in WellnessTrack.values) {
+      expect(
+        WellnessKycController(track, introWait: Duration.zero).onIntro,
+        isTrue,
+        reason: '${track.title} should open on its interstitial',
+      );
+      expect(track.heading, isNotEmpty);
+    }
   });
 
   test('a card on Book a licensed expert skips the interstitial', () {
@@ -213,8 +203,12 @@ void main() {
       ).onIntro,
       isFalse,
     );
-    expect(WellnessTrack.balance.hasIntro, isTrue,
-        reason: 'skipping is the caller’s choice, not the track losing it');
+    expect(
+      WellnessKycController(WellnessTrack.balance, introWait: Duration.zero)
+          .onIntro,
+      isTrue,
+      reason: 'skipping is the caller’s choice, not the track losing it',
+    );
   });
 
   test('the last step is labelled Continue, the rest Next', () {
@@ -374,7 +368,7 @@ void main() {
   testWidgets('every intro shows the bar, and none of them says to tap', (
     tester,
   ) async {
-    for (final track in WellnessTrack.values.where((t) => t.hasIntro)) {
+    for (final track in WellnessTrack.values) {
       useDesignFrame(tester);
       await loadAppFonts();
       await PrefUtils().init();

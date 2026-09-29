@@ -11,21 +11,26 @@ import '../../../../data/models/wellness_kyc.dart';
 class BookExpertController extends GetxController {
   List<ExpertSessionType> get offers => ExpertSessionType.values;
 
-  /// Each card opens its own questionnaire, without the interstitial.
+  /// Each card opens its own questionnaire.
   ///
-  /// The yoga card and Stretch & Restore share one: `Scheduling Kyc/Yoga`
-  /// (259:38802) plus the `Yoga Kyc` row is that section's questionnaire, and
-  /// yoga is what it asks about. The Pilates card shares Pilates & Core's for
-  /// the same reason — the design draws no separate expert-Pilates row.
-  ///
-  /// `skipIntro` because a card has already named the discipline; being told
-  /// "Tailoring your practice" after choosing a yoga session is a screen that
-  /// introduces something the user just picked.
-  Future<void> book(ExpertSessionType offer) =>
-      openBooking(trackFor(offer), skipIntro: true);
+  /// The therapy card shows its interstitial — `259:38773`, "Let’s find the
+  /// right therapist for you", which is the first screen of that flow. The
+  /// other two skip theirs by request: the card has already named the
+  /// discipline, and being told "Tailoring your practice" after choosing a
+  /// yoga session introduces what was just picked.
+  Future<void> book(ExpertSessionType offer) => openBooking(
+        trackFor(offer),
+        skipIntro: offer != ExpertSessionType.therapy,
+      );
 
   /// Which questionnaire a card opens. Separate from [book] so the mapping
   /// can be asserted without driving navigation.
+  ///
+  /// The yoga card and Stretch & Restore share one: `Scheduling Kyc/Yoga`
+  /// (259:38802) plus the `Yoga Kyc` row is that section’s questionnaire,
+  /// and yoga is what it asks about. The Pilates card shares Pilates &
+  /// Core’s for the same reason — the design draws no separate
+  /// expert-Pilates row.
   WellnessTrack trackFor(ExpertSessionType offer) => switch (offer) {
         ExpertSessionType.therapy => WellnessTrack.therapy,
         ExpertSessionType.yoga => WellnessTrack.balance,

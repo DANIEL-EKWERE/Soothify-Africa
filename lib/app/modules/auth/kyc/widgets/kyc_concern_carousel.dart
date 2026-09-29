@@ -6,7 +6,7 @@ import '../../../../widgets/custom_elevated_button.dart';
 import '../../../../widgets/step_progress_bar.dart';
 import '../controller/kyc_controller.dart';
 
-/// "What brings you to Soothify?" — Figma "Kyc screen | Stress"
+/// "What brings you to your space today?" — Figma "Kyc screen | Stress"
 /// (`176:23723`) and "| Anxiety" (`176:56150`).
 ///
 /// A full-bleed screen in the focused option's own colour, with the

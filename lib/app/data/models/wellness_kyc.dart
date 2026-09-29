@@ -135,60 +135,61 @@ enum WellnessTrack {
         'pair you with the right guide.',
   ),
 
-  /// The therapy card — the row that closes on `Matching Therapist`
-  /// (259:58834).
+  /// The therapy card — Figma's `Scheduling Kyc/balance/meditation` row,
+  /// which despite the name is the **therapy** questionnaire: it opens on
+  /// `259:38773` ("Let's find the right therapist for you") and closes on
+  /// `Matching Therapist` (259:58834).
   ///
-  /// **The questions are placeholders.** The six therapy frames (259:38665,
-  /// 38719, 38686, 38740, 38702, 38756, behind intro 259:38773) have never
-  /// been fetched. These five are the old file's, which is what this card's
-  /// users were already being shown, so nothing regresses while they are
-  /// pending — but not one of them has been checked against the current
-  /// design.
+  /// Six question frames, which are three questions drawn twice — once
+  /// unanswered and once with a tile chosen: 259:38665/38719,
+  /// 259:38686/38740, 259:38702/38756.
+  ///
+  /// It previously held the old file's five generic questions as
+  /// placeholders, the first of which offered Hatha Yoga, Ashtanga Vinyasa
+  /// and Prenatal Yoga — so the therapy card opened a yoga questionnaire.
   therapy(
     '1-on-1 virtual therapy session',
     [
       WellnessKycStep(
-        question: 'What type of wellness sessions are you interested in?',
+        // The answered twin (259:38719) still carries the old heading,
+        // "What type of wellness sessions are you interested in?", over these
+        // same six options. Left behind when the copy was rewritten.
+        question: 'What’s on your mind right now?',
         options: [
-          'Mindfulness',
-          'Hatha Yoga',
-          'Restorative Yoga',
-          'Ashtanga Vinyasa',
-          'Anusara',
-          'Prenatal Yoga',
+          'Dealing with a lot of stress or burnout',
+          'Feeling anxious',
+          'Feeling low or overwhelmed',
+          'Relationship or family issues',
+          'Going through a big life change',
+          'Something else',
         ],
         multiSelect: true,
       ),
       WellnessKycStep(
-        question: 'How much effort would you like to put in?',
-        options: ['Low', 'Moderate', 'High'],
-      ),
-      WellnessKycStep(
-        question: 'What types of sounds would you enjoy on SoothifyAfrica?',
+        question: 'What kind of therapist do you prefer?',
         options: [
-          'sound effects',
-          'slow instrumentals',
-          'sleep stories',
-          'Voice overs',
+          'Someone warm and just listens',
+          'Someone practical with clear steps',
+          'Someone who shares my background',
+          'No preference',
         ],
-        multiSelect: true,
       ),
       WellnessKycStep(
-        question: 'In which language would you prefer to take your classes?',
-        options: ['English', 'Pidgin'],
-      ),
-      WellnessKycStep(
-        question: 'What type of coaching are you looking for?',
-        options: ['Heartfelt', 'Playful', 'Supportive', 'Technical'],
+        // The frame draws a phone and a camera glyph above these two; the
+        // tiles here are text-only for now.
+        question: 'How do you want to have your sessions?',
+        options: ['Audio only (camera off)', 'Video call'],
       ),
     ],
-    hasIntro: false,
+    introTitle: 'Let’s find the right therapist for you',
+    introBody: 'Tell us a bit about what’s going on so we can pair you with '
+        'someone good',
+    multiHint: 'Pick as many as you like',
   );
 
   const WellnessTrack(
     this.title,
     this.steps, {
-    this.hasIntro = true,
     this.introTitle = '',
     this.introBody = '',
     this.multiHint = 'You can select more than one option',
@@ -199,15 +200,6 @@ enum WellnessTrack {
   final String title;
 
   final List<WellnessKycStep> steps;
-
-  /// Whether the track has an interstitial at all.
-  ///
-  /// Pilates & Core and Stretch & Restore do; [therapy] has no intro frame
-  /// identified. Having one is not the same as showing one — a card on
-  /// "Book a licensed expert screen" skips it, since the card has already
-  /// asked what the intro would be introducing. See
-  /// `WellnessKycController.skipIntro`.
-  final bool hasIntro;
 
   /// The intro's heading and its paragraph. The sections used to share one
   /// line; they now each have their own — see [intro] for the fallback.

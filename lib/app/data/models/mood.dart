@@ -80,7 +80,7 @@ enum MoodLevel {
   }
 }
 
-/// Which character is drawn. Taken from the KYC "What is your gender?"
+/// Which character is drawn. Taken from the KYC "How do you identify?"
 /// answer, so the figure on screen is the user's own.
 enum MoodFigure {
   female('female'),

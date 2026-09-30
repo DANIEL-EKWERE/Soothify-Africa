@@ -91,38 +91,18 @@ enum MoodFigure {
   final String key;
 
   /// Anything that is not an explicit "male" — non-binary, undisclosed, or a
-  /// guest who never answered — gets the female set. It is the only one the
-  /// design draws all four steps for; the male frames reuse one illustration
-  /// for the top two.
+  /// guest who never answered — gets the female set.
   static MoodFigure fromKycAnswer(String? answer) =>
       answer == 'male' ? MoodFigure.male : MoodFigure.female;
 
-  String artFor(MoodLevel level) =>
-      'assets/images/mood/${key}_${_drawn(level).key}.png';
-
-  /// Which of the shipped figures actually stands in for [level].
+  /// Each mood has its own drawing, for both figures — twenty files in
+  /// `assets/images/mood/`, named `<figure>_<mood>.png`.
   ///
-  /// The design has ten moods per figure; four female and three male are
-  /// exported so far, so the rest borrow their nearest neighbour. Delete this
-  /// and the map below the moment the twenty real files land — `artFor` then
-  /// resolves each mood to its own art with no other change.
-  MoodLevel _drawn(MoodLevel level) {
-    final have = this == MoodFigure.male
-        ? const {MoodLevel.awful, MoodLevel.low, MoodLevel.awesome}
-        : const {
-            MoodLevel.awful,
-            MoodLevel.low,
-            MoodLevel.content,
-            MoodLevel.awesome,
-          };
-    if (have.contains(level)) return level;
-    return switch (level) {
-      MoodLevel.drained || MoodLevel.anxious => MoodLevel.awful,
-      MoodLevel.neutral || MoodLevel.reflective => MoodLevel.low,
-      MoodLevel.energized || MoodLevel.joyful => MoodLevel.awesome,
-      _ => MoodLevel.low,
-    };
-  }
+  /// This used to route thirteen of the twenty through a nearest-neighbour
+  /// map, because only four female and three male illustrations had been
+  /// drawn. The full set landed; the map is gone.
+  String artFor(MoodLevel level) =>
+      'assets/images/mood/${key}_${level.key}.png';
 
   /// Every asset this figure can show, for precaching so dragging the slider
   /// never flashes an empty box.

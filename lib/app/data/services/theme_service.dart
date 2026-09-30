@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -41,9 +43,15 @@ class ThemeService extends GetxService {
     // mode repainted the MaterialApp and nothing beneath it, which is why a
     // toggle only showed up after the app was killed and reopened.
     //
-    // `forceAppUpdate` marks every element dirty without discarding state,
-    // so routes, scroll positions and controllers survive the switch.
-    await Get.forceAppUpdate();
+    // `forceAppUpdate` marks every element dirty without discarding state, so
+    // routes, scroll positions and controllers survive the switch.
+    //
+    // Deliberately **not awaited**: it completes at the end of a frame, and
+    // awaiting it from a caller that has not pumped one yet simply never
+    // returns — which is precisely how the first version of this hung a test
+    // for ten minutes. Skipped entirely when no app is mounted, since there
+    // is then nothing to repaint and the test binding asserts on the call.
+    if (Get.context != null) unawaited(Get.forceAppUpdate());
   }
 
   /// Flips between light and dark, resolving "system" against what is

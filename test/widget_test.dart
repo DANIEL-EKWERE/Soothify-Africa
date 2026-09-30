@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -125,22 +126,22 @@ void main() {
       expect(MoodFigure.fromKycAnswer(null), MoodFigure.female);
     });
 
-    test('every mood resolves to art that exists', () {
-      // Ten moods per figure are designed; four female and three male are
-      // exported, so the rest borrow a neighbour until the real files land.
+    test('every mood has its own drawing, for both figures', () {
+      // Was four female and three male, with the other thirteen borrowing a
+      // neighbour. All twenty are drawn now, so nothing repeats.
       for (final f in MoodFigure.values) {
         for (final l in MoodLevel.values) {
-          expect(f.artFor(l), startsWith('assets/images/mood/${f.key}_'));
+          expect(f.artFor(l), 'assets/images/mood/${f.key}_${l.key}.png');
         }
+        expect(f.allArt, hasLength(MoodLevel.values.length));
       }
-      expect(MoodFigure.female.allArt, hasLength(4));
-      expect(MoodFigure.male.allArt, hasLength(3));
     });
 
-    test('the extremes keep their own faces rather than borrowing', () {
+    test('the twenty files the model names are all on disk', () {
       for (final f in MoodFigure.values) {
-        expect(f.artFor(MoodLevel.awful), endsWith('_awful.png'));
-        expect(f.artFor(MoodLevel.awesome), endsWith('_awesome.png'));
+        for (final path in f.allArt) {
+          expect(File(path).existsSync(), isTrue, reason: '$path is missing');
+        }
       }
     });
   });

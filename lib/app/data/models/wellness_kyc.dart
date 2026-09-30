@@ -1,3 +1,5 @@
+import '../../core/utils/image_constant.dart';
+
 /// The questionnaire a section shows before its booking flow.
 ///
 /// Each section gates its sessions behind one and asks its own questions;
@@ -21,10 +23,25 @@ class WellnessKycStep {
     required this.question,
     required this.options,
     this.multiSelect = false,
+    this.optionIcons = const [],
   });
 
   final String question;
   final List<String> options;
+
+  /// A glyph per option, aligned to [options] by index. Empty — which is
+  /// every question but one — means text-only tiles.
+  ///
+  /// Only the therapy track's "How do you want to have your sessions?"
+  /// (`259:38702`) draws icons: a handset over "Audio only" and a camcorder
+  /// over "Video call".
+  final List<String> optionIcons;
+
+  /// The glyph for [option], or null where the question has none.
+  String? iconFor(String option) {
+    final i = options.indexOf(option);
+    return i >= 0 && i < optionIcons.length ? optionIcons[i] : null;
+  }
 
   /// The design marks these with "You can select more than one option".
   final bool multiSelect;
@@ -175,10 +192,9 @@ enum WellnessTrack {
         ],
       ),
       WellnessKycStep(
-        // The frame draws a phone and a camera glyph above these two; the
-        // tiles here are text-only for now.
         question: 'How do you want to have your sessions?',
         options: ['Audio only (camera off)', 'Video call'],
+        optionIcons: [ImageConstant.icPhoneCall, ImageConstant.icVideoCall],
       ),
     ],
     introTitle: 'Let’s find the right therapist for you',

@@ -99,6 +99,13 @@ class ImageConstant {
   static const String icHeadphone = '$_icons/ic_headphone.svg';
   static const String icArrowRightSm = '$_icons/ic_arrow_right_sm.svg';
 
+  /// The two session-format tiles on the therapy questionnaire's last
+  /// question — `259:38702`. The frame draws a handset and a camcorder;
+  /// [icVideo] is a different glyph (a play button in a box) and is not
+  /// interchangeable with these.
+  static const String icPhoneCall = '$_icons/ic_phone_call.svg';
+  static const String icVideoCall = '$_icons/ic_video_call.svg';
+
   static const String icBack = '$_icons/ic_back.svg';
   static const String icSearch = '$_icons/ic_search.svg';
   static const String icFilter = '$_icons/ic_filter.svg';

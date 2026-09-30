@@ -166,6 +166,7 @@ class _Question extends StatelessWidget {
                   for (final option in question.options)
                     _OptionTile(
                       label: option,
+                      icon: question.iconFor(option),
                       selected: controller.isSelected(option),
                       onTap: () => controller.choose(option),
                     ),
@@ -190,11 +191,17 @@ class _OptionTile extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.icon,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+
+  /// Set only on the therapy track's session-format question, which is the
+  /// one place the design draws a glyph above the words (`259:38702`). Those
+  /// tiles are taller to make room for it.
+  final String? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +210,7 @@ class _OptionTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(4.h),
       child: Container(
         width: 160.h,
-        height: 90.v,
+        height: icon == null ? 90.v : 143.v,
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 10.h),
         decoration: BoxDecoration(
@@ -215,11 +222,29 @@ class _OptionTile extends StatelessWidget {
               ? Border.all(color: appTheme.soothifyBlue)
               : Border.all(color: appTheme.transparent),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: CustomTextStyles.topicChip,
-        ),
+        child: icon == null
+            ? Text(
+                label,
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.topicChip,
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomImageView(
+                    imagePath: icon!,
+                    height: 28.h,
+                    width: 28.h,
+                    color: appTheme.soothifyBlue,
+                  ),
+                  SizedBox(height: 16.v),
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.topicChip,
+                  ),
+                ],
+              ),
       ),
     );
   }

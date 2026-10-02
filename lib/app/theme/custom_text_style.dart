@@ -85,6 +85,25 @@ class CustomTextStyles {
   );
 
   /// Slide heading ("Personalized Therapy") — Nunito Sans Bold 20, gradient.
+  /// The second sentence of the language screen's heading — Figma
+  /// `259:25756` sets "Choose your preferred language." at weight **300**
+  /// inside the same text node as the bold question above it.
+  static TextStyle get onboardingSlideSubtitle =>
+      onboardingSlideTitle.copyWith(
+        fontWeight: FontWeight.w300,
+        fontVariations: const [FontVariation('wght', 300)],
+      );
+
+  /// The intro carousel's "Skip" — quiet, so it does not compete with the
+  /// primary action at the foot of the screen.
+  static TextStyle get skipAction => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: const [FontVariation('wght', 600)],
+    color: appTheme.textSubtitle,
+  );
+
   static TextStyle get onboardingSlideTitle => TextStyle(
     fontFamily: fontNunitoSans,
     fontSize: 20.fSize,
@@ -304,6 +323,29 @@ class CustomTextStyles {
     color: appTheme.navInactive,
   );
 
+  /// What the user has typed into Discovery's field, and the line under it
+  /// while the search is in flight.
+  static TextStyle get searchInput =>
+      searchHint.copyWith(color: appTheme.textPrimary);
+
+  static TextStyle get searchStatus => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get searchEmptyBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: appTheme.navInactive,
+  );
+
   /// The tiny white-on-charcoal duration and rating pills over a Discovery
   /// cover — Nunito Sans SemiBold 6. Genuinely 6px in the design.
   static TextStyle get cardMeta => TextStyle(
@@ -458,6 +500,16 @@ class CustomTextStyles {
 
   static TextStyle get notificationChipSelected =>
       notificationChip.copyWith(color: appTheme.onPrimary);
+
+  /// The "New" tag the What's new chip carries.
+  static TextStyle get notificationChipBadge => TextStyle(
+        fontFamily: fontNunitoSans,
+        fontSize: 9.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 1,
+        color: Colors.white,
+      );
 
   /// The screen title, painted with the app's title gradient like the other
   /// gradient headings.
@@ -1072,6 +1124,26 @@ class CustomTextStyles {
     fontVariations: _bold,
     height: 16.4 / 12,
     color: appTheme.soothifyBlue,
+  );
+
+  /// The Discover entry into "Spaces Around Me" — white on the blue card, so
+  /// these two carry their own colours rather than taking a theme token.
+  static TextStyle get spacesEntryTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: Colors.white,
+  );
+
+  static TextStyle get spacesEntrySubtitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.4 / 12,
+    color: Colors.white.withValues(alpha: 0.88),
   );
 
   static TextStyle get spaceMapHint => TextStyle(

@@ -45,10 +45,17 @@ class _BirthYearPickerState extends State<BirthYearPicker> {
 
   int get _initialIndex {
     final i = widget.options.indexWhere((o) => o.value == widget.selectedValue);
-    // Nothing chosen yet: the frame opens part-way down the list rather than
-    // at the youngest year, so the wheel reads as scrollable in both
-    // directions. Index 2 is the third year offered.
-    return i == -1 ? 2 : i;
+    if (i != -1) return i;
+    // Nothing chosen yet: open on the age the frame's readout shows, which is
+    // also safely inside the accepted range. Opening on a fixed offset into
+    // the list meant the wheel landed under 18 once younger years were added,
+    // and the screen refused the user before they had touched it.
+    final target = '${widget.currentYear - KycQuestion.defaultAge}';
+    final at = widget.options.indexWhere((o) => o.value == target);
+    if (at != -1) return at;
+    return widget.options.indexWhere(
+      (o) => !KycQuestion.isUnderage(o.value, widget.currentYear),
+    );
   }
 
   @override

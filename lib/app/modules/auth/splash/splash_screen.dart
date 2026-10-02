@@ -102,6 +102,25 @@ class SplashView extends StatelessWidget {
           // the first prompt fades in, and each prompt replaces the last.
           child: AnimatedSwitcher(
             duration: SplashScreen.fade,
+            // Sequential, not overlapping.
+            //
+            // AnimatedSwitcher's default runs both children linearly across
+            // the whole duration, so half way through "Inhale Deeply" and
+            // "Exhale Slowly" are each at 50% in the same spot — they ghost
+            // through one another and the line visibly dims. Clearing the old
+            // word in the first half and bringing the new one in over the
+            // second reads as one continuous breath instead of a dissolve.
+            switchOutCurve: const Interval(0, 0.5, curve: Curves.easeOut),
+            switchInCurve: const Interval(0.5, 1, curve: Curves.easeIn),
+            transitionBuilder: (child, animation) => FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                // Barely perceptible, and deliberately so: it is the words
+                // that should feel like breathing, not the layout moving.
+                scale: Tween<double>(begin: 0.97, end: 1).animate(animation),
+                child: child,
+              ),
+            ),
             child: showingBrand
                 ? SvgPicture.asset(
                     ImageConstant.svgWordmark,

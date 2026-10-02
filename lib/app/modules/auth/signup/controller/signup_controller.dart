@@ -88,6 +88,13 @@ class SignupController extends BaseController {
     });
     if (ok != true) return;
 
+    // Taking an account supersedes a skipped onboarding. Clearing the flag
+    // matters beyond this navigation: without it, quitting part-way through
+    // the questionnaire would leave `resolveStartRoute` still treating it as
+    // skipped, and the next launch would walk straight past the KYC that
+    // registering had just asked for.
+    await PrefUtils().setOnboardingSkipped(false);
+
     // Guests reach sign-up from Profile having already answered the
     // questionnaire during onboarding, so sending everyone to KYC would make
     // them repeat it. Signing in has always checked; signing up now does too.

@@ -89,7 +89,7 @@ class KycQuestion {
       input == KycInput.multi || input == KycInput.carousel;
 
   /// The carousel's own hint, in the title case the frames set it in.
-  static const String _carouselHint = 'You Can Select More Than One Option';
+  static const String _carouselHint = 'You can select more than one option';
 
   /// The list questions' hint, rewritten with the rest of the copy.
   static const String _multiHint = '(Select what applies)';
@@ -116,16 +116,22 @@ class KycQuestion {
       prompt: 'What brings you to your space today?',
       subtitle: _carouselHint,
       // Illustrations on a flooded background, not the emoji tiles the older
-      // file drew. Colours sampled from the four frames: the progress accent
-      // contrasts the flood rather than matching it — amber on every ground
-      // except the amber one, which takes blue.
+      // file drew. Colours sampled from the four frames.
+      //
+      // The accent contrasts the flood rather than matching it: amber on
+      // every ground. The stress panel used to be amber and took a blue
+      // accent for that reason; its ground is `#2F6FED` now, and `259:58499`
+      // still carries the old `#4679ED` accent — blue on blue, all but
+      // invisible. Read as a leftover from the colour change, so it takes
+      // amber like the other three. Confirm with the designer.
       input: KycInput.carousel,
       options: [
         KycOption('stress', 'Carrying heavy stress',
             illustration: 'assets/images/concerns/stress_figure.png',
             illustrationMale: 'assets/images/concerns/stress_figure_male.png',
-            backgroundArgb: 0xFFF9980F,
-            accentArgb: 0xFF4679ED),
+            // Was amber (`#F9980F`); `259:58499` floods brand blue now.
+            backgroundArgb: 0xFF2F6FED,
+            accentArgb: 0xFFFFAE24),
         KycOption('anxiety', 'Navigating anxiety',
             illustration: 'assets/images/concerns/anxiety_figure.png',
             illustrationMale: 'assets/images/concerns/anxiety_figure_male.png',
@@ -191,8 +197,13 @@ class KycQuestion {
       input: KycInput.birthYear,
       // Newest year first, the order the frame lists them in: 1995 above
       // 1994 above the boxed 1993.
+      //
+      // The wheel runs *past* the minimum age rather than stopping at it. A
+      // list that simply ends at 18 gives someone younger nothing to scroll
+      // to and no reason why; offering the years and refusing them says what
+      // the rule is. See [isUnderage].
       options: [
-        for (var year = currentYear - minAge;
+        for (var year = currentYear - youngestOffered;
             year >= currentYear - maxAge;
             year--)
           KycOption('$year', '$year'),
@@ -212,6 +223,27 @@ class KycQuestion {
   /// ages now, so these are what bound the wheel rather than what it prints.
   static const int minAge = 18;
   static const int maxAge = 50;
+
+  /// The youngest birth year the wheel offers. Below [minAge] on purpose, so
+  /// the restriction can be shown rather than merely enforced by absence.
+  static const int youngestOffered = 13;
+
+  /// Where the wheel opens — the age `259:27860` prints in its readout.
+  ///
+  /// It must sit on an accepted age. The picker used to open on the third
+  /// option, which was 20 while the list started at 18; once the list was
+  /// extended down to [youngestOffered] that same position became 15, so the
+  /// screen greeted everyone with the under-18 refusal.
+  static const int defaultAge = 20;
+
+  /// Whether this birth year puts the user under [minAge].
+  static bool isUnderage(String birthYear, int currentYear) =>
+      ageFor(birthYear, currentYear) < minAge;
+
+  /// What the app says when someone picks a year that makes them too young.
+  static const String underageMessage =
+      'You need to be 18 or older to use Soothify. Please check the year '
+      'you selected.';
 
   /// The age a birth year implies, as the left half of `259:27860` prints it.
   ///

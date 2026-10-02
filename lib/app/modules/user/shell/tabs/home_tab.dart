@@ -161,7 +161,7 @@ class _MoodCheckerCard extends StatelessWidget {
       child: Container(
         // 122 in the current design, up from 88 — the body runs to three
         // lines and was being squeezed against the card's edges.
-        height: 122.h,
+        height: 109.h,
         padding: EdgeInsets.symmetric(horizontal: 23.h),
         decoration: BoxDecoration(
           gradient: appTheme.moodCardGradient,

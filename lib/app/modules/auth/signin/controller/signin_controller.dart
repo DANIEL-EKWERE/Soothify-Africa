@@ -60,6 +60,13 @@ class SigninController extends BaseController {
     });
     if (ok != true) return;
 
+    // Taking an account supersedes a skipped onboarding. Clearing the flag
+    // matters beyond this navigation: without it, quitting part-way through
+    // the questionnaire would leave `resolveStartRoute` still treating it as
+    // skipped, and the next launch would walk straight past the KYC that
+    // registering had just asked for.
+    await PrefUtils().setOnboardingSkipped(false);
+
     final complete = await _kyc.isComplete();
     Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }

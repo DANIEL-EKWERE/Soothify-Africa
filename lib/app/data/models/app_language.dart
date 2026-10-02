@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-/// Languages offered on the "Choose Your Preferred Language" screen
+/// Languages offered on the "How would you like to converse?" screen
 /// (Figma 655:5390 / 655:5402).
 ///
 /// Only these two are designed. Adding one is a matter of adding a value here

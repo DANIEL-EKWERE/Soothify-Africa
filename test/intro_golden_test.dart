@@ -33,7 +33,7 @@ void main() {
     testWidgets('intro carousel, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(IntroController());
+      Get.put(IntroController(autoAdvance: Duration.zero));
 
       await pumpScreen(tester, const IntroScreen(), brightness: brightness);
       await precacheAll(tester, find.byType(IntroScreen),
@@ -75,4 +75,28 @@ void main() {
           matchesGoldenFile('goldens/language_selected_$name.png'));
     });
   }
+
+  testWidgets('the carousel offers Skip', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    Get.put(IntroController(autoAdvance: Duration.zero));
+
+    await pumpScreen(tester, const IntroScreen());
+    expect(find.text('Skip'), findsOneWidget);
+  });
+
+  test('Skip records that onboarding was declined', () async {
+    await PrefUtils().init();
+    // Navigation is a no-op here; this is about what Skip persists, and the
+    // route table is not mounted in a unit test.
+    Get.testMode = true;
+    await Get.put(IntroController(autoAdvance: Duration.zero)).skip();
+
+    expect(PrefUtils().introSeen(), isTrue);
+    // Kept apart from KYC completion on purpose: skipped means declined, not
+    // answered. Without it, resolveStartRoute sends a guest with unfinished
+    // KYC straight back into the questionnaire they just skipped.
+    expect(PrefUtils().onboardingSkipped(), isTrue);
+  });
 }

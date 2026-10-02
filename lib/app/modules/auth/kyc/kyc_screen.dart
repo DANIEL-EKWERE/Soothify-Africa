@@ -101,15 +101,33 @@ class _Answers extends StatelessWidget {
 
     if (question.input == KycInput.birthYear) {
       return Obx(
-        () => BirthYearPicker(
-          // Keyed by question so switching steps rebuilds the wheel rather
-          // than reusing the previous question's scroll position.
-          key: ValueKey(question.id),
-          options: question.options,
-          selectedValue:
-              controller.current.isEmpty ? null : controller.current.first,
-          currentYear: controller.currentYear,
-          onSelected: controller.choose,
+        () => Column(
+          children: [
+            Expanded(
+              child: BirthYearPicker(
+                // Keyed by question so switching steps rebuilds the wheel
+                // rather than reusing the previous question's position.
+                key: ValueKey(question.id),
+                options: question.options,
+                selectedValue: controller.current.isEmpty
+                    ? null
+                    : controller.current.first,
+                currentYear: controller.currentYear,
+                onSelected: controller.choose,
+              ),
+            ),
+            // Stays on screen while the year is out of range, so a disabled
+            // Next is never unexplained.
+            if (controller.isUnderage)
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Text(
+                  KycQuestion.underageMessage,
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyles.inlineError,
+                ),
+              ),
+          ],
         ),
       );
     }

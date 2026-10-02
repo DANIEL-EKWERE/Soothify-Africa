@@ -82,7 +82,7 @@ void main() {
     expect(find.text('Read'), findsOneWidget);
 
     // Five chips no longer fit across 342, so the row scrolls. They are all
-    // laid out — clipped is not offstage — so all five are still found.
+    // laid out — clipped is not offstage — so all three are still found.
     for (final f in NotificationFilter.values) {
       expect(find.text(f.label), findsOneWidget);
     }
@@ -92,30 +92,35 @@ void main() {
     final controller = await mount(tester);
     expect(controller.visible, hasLength(10));
 
-    await tester.tap(find.text('Mentions'));
+    await tester.tap(find.text('Sessions'));
     await tester.pumpAndSettle();
 
-    expect(controller.filter.value, NotificationFilter.mentions);
-    expect(controller.visible, hasLength(1));
-    expect(find.textContaining('John'), findsOneWidget);
-    expect(find.textContaining('Kendrick'), findsNothing);
-
-    await tester.tap(find.text('My post'));
-    await tester.pumpAndSettle();
-    expect(controller.visible, hasLength(2));
-
-    // The second frame's pair — `259:61271`. Selected directly rather than
-    // tapped: the chips scroll, and these two sit past the right edge.
-    controller.select(NotificationFilter.schedules);
-    await tester.pumpAndSettle();
-    expect(controller.visible, hasLength(2));
+    expect(controller.filter.value, NotificationFilter.sessions);
+    // The three booking rows plus the Reminder card.
+    expect(controller.visible, hasLength(4));
     expect(find.textContaining('Pilates & Core session tomorrow'),
         findsOneWidget);
+    expect(find.textContaining('Kendrick'), findsNothing);
 
-    controller.select(NotificationFilter.newBooking);
+    await tester.tap(find.text("What's new"));
     await tester.pumpAndSettle();
-    expect(controller.visible, hasLength(1));
-    expect(find.textContaining('Yoga session on 28 Sep 2026'), findsOneWidget);
+    expect(controller.filter.value, NotificationFilter.whatsNew);
+    expect(controller.visible, hasLength(6));
+    expect(find.textContaining('Kendrick'), findsOneWidget);
+    expect(find.textContaining('Yoga session on 28 Sep 2026'), findsNothing);
+
+    await tester.tap(find.text('All'));
+    await tester.pumpAndSettle();
+    expect(controller.visible, hasLength(10));
+  });
+
+  testWidgets("only What's new carries the New tag", (tester) async {
+    await mount(tester);
+    expect(find.text('New'), findsOneWidget);
+    expect(
+      NotificationFilter.values.where((f) => f.badge).toList(),
+      [NotificationFilter.whatsNew],
+    );
   });
 
   test('timestamps are computed, not the frame\'s typos', () {

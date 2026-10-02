@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../data/models/app_language.dart';
 
-/// One language option: 342x48, 4px radius, centred label. Selection swaps the
-/// hairline for the brand blue, exactly as the design does.
+/// One language option: 342x48, 8px radius, centred label. Selection swaps
+/// the hairline for the brand blue, exactly as the design does.
 class LanguageRow extends StatelessWidget {
   const LanguageRow({
     super.key,
@@ -32,7 +32,7 @@ class LanguageRow extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: appTheme.surface,
-            borderRadius: BorderRadius.circular(4.h),
+            borderRadius: BorderRadius.circular(8.h),
             border: Border.all(
               color: isSelected ? appTheme.soothifyBlue : appTheme.rowBorder,
               // The design draws the unselected hairline at 0.2; that rounds

@@ -3,12 +3,16 @@ import '../app_export.dart';
 
 /// Opens a section's booking flow, asking its questionnaire the first time.
 ///
-/// Shared by Home's "Schedule Session" tile and the Meditation and Balance
-/// sessions cards, so the gate cannot be wired one way in one place and
-/// another way somewhere else.
+/// Shared by Home's Explore tiles, the "Book a licensed expert" cards and the
+/// section sessions cards, so the gate cannot be wired one way in one place
+/// and another way somewhere else.
+///
+/// Either path ends at the match. Someone who has already answered skips
+/// straight to it; `ScheduleScreen`'s three gradient cards used to sit here
+/// and are no longer part of the design.
 Future<void> openBooking(WellnessTrack track, {bool skipIntro = false}) async {
   if (PrefUtils().wellnessKycDone(track.name)) {
-    await Get.toNamed(AppRoutes.schedule);
+    await Get.toNamed(AppRoutes.booking, arguments: track.offering);
     return;
   }
   await Get.toNamed(

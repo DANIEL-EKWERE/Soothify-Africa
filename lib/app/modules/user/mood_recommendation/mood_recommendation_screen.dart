@@ -33,7 +33,7 @@ class MoodRecommendationScreen
                 style: CustomTextStyles.moodRecommendationIntro,
               ),
             ),
-            SizedBox(height: 28.v),
+            SizedBox(height: 40.v),
             Expanded(
               child: Obx(() {
                 if (controller.items.isEmpty && controller.isLoading.value) {

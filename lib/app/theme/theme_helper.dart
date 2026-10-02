@@ -409,6 +409,16 @@ class PrimaryColors {
     colors: [Color(0xFFF09D39), Color(0xFF0A399A)],
   );
 
+  /// The Discover card that opens "Spaces Around Me". A deeper indigo than
+  /// [brandGradient] and the same in both themes: it is a saturated brand
+  /// panel, and white text has to stay legible on it either way. Measured
+  /// left-to-right off the designer's screenshot, #2C3FE3 to #131F87.
+  LinearGradient get spacesEntryGradient => const LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [Color(0xFF2C3FE3), Color(0xFF131F87)],
+  );
+
   /// Splash / brand gradient, top-left to bottom-right.
   LinearGradient get brandGradient => LinearGradient(
     begin: Alignment.topLeft,

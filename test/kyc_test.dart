@@ -40,15 +40,16 @@ void main() {
       expect(q.prompt, 'What is your age?');
       expect(q.input, KycInput.birthYear);
 
-      // Newest year first, as the frame lists them, and still bounded by the
-      // same two ages.
-      expect(q.options.first.label, '2008'); // 2026 - 18
+      // Newest year first, as the frame lists them. The top of the wheel is
+      // the youngest year *offered*, not the youngest accepted — see the age
+      // gate group below.
+      expect(q.options.first.label, '2013'); // 2026 - 13
       expect(q.options.last.label, '1976'); // 2026 - 50
-      expect(q.options, hasLength(33));
+      expect(q.options, hasLength(38));
     });
 
     test('the wheel moves with the calendar', () {
-      expect(KycQuestion.allFor(2027).last.options.first.label, '2009');
+      expect(KycQuestion.allFor(2027).last.options.first.label, '2014');
     });
 
     test('the readout is the age the year implies', () {
@@ -57,6 +58,24 @@ void main() {
       // The frame prints "20" beside a boxed 1993; that is a placeholder, and
       // this is what the app shows instead.
       expect(KycQuestion.ageFor('1993', 2026), isNot(20));
+    });
+  });
+
+  group('the age gate', () {
+    test('the wheel scrolls past 18 so the rule can be shown', () {
+      final q = KycQuestion.allFor(2026).last;
+      // Youngest offered is 13, not 18: a list that simply stops at the limit
+      // gives someone younger nothing to scroll to and no reason why.
+      expect(q.options.first.label, '2013');
+      expect(KycQuestion.ageFor('2013', 2026), 13);
+      expect(q.options.last.label, '1976');
+    });
+
+    test('years under 18 are refused, 18 and over are not', () {
+      expect(KycQuestion.isUnderage('2009', 2026), isTrue); // 17
+      expect(KycQuestion.isUnderage('2008', 2026), isFalse); // 18
+      expect(KycQuestion.isUnderage('1990', 2026), isFalse);
+      expect(KycQuestion.underageMessage, contains('18 or older'));
     });
   });
 

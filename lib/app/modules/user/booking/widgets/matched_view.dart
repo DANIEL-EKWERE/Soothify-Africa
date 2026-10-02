@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../widgets/gradient_text.dart';
 import '../controller/booking_controller.dart';
-import 'schedule_sheet.dart';
 
 /// The matched coach's profile — Figma "Matched with instructor" (135:20932).
 ///
@@ -119,11 +118,10 @@ class MatchedView extends StatelessWidget {
           ),
         ),
         SizedBox(height: 34.v),
-        _PrimaryButton(label: 'Get started', onTap: controller.getStarted),
-        SizedBox(height: 8.v),
-        _GhostButton(
-          label: 'Schedule for later',
-          onTap: () => ScheduleSheet.show(context),
+        // One action, not the old "Get started" / "Schedule for later" pair.
+        _PrimaryButton(
+          label: 'Book a session',
+          onTap: controller.bookSession,
         ),
       ],
     );
@@ -265,35 +263,6 @@ class _PrimaryButton extends StatelessWidget {
         child: Text(
           label,
           style: CustomTextStyles.subscribeLabel,
-        ),
-      ),
-    );
-  }
-}
-
-class _GhostButton extends StatelessWidget {
-  const _GhostButton({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8.h),
-      child: Container(
-        height: 52.v,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: appTheme.surface,
-          borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.actionFill),
-        ),
-        child: Text(
-          label,
-          style: CustomTextStyles.subscribeLabel
-              .copyWith(color: appTheme.actionFill),
         ),
       ),
     );

@@ -14,6 +14,7 @@ class PrefUtils {
   static const _kUserRole = 'userRole';
   static const _kLanguage = 'language';
   static const _kIntroSeen = 'introSeen';
+  static const _kOnboardingSkipped = 'onboardingSkipped';
   static const _kOnboarded = 'hasOnboarded';
   static const _kWifiOnlyDownloads = 'wifiOnlyDownloads';
   static const _kCommunityWelcomeSeen = 'communityWelcomeSeen';
@@ -65,6 +66,16 @@ class PrefUtils {
   bool introSeen() => _store.getBool(_kIntroSeen) ?? false;
   Future<void> setIntroSeen(bool value) async =>
       _store.setBool(_kIntroSeen, value);
+
+  /// Set when the intro carousel's Skip is used.
+  ///
+  /// Separate from [introSeen] and from KYC completion: skipping means the
+  /// questionnaire was *declined*, not answered, and marking it complete
+  /// would be a lie about data nobody collected. Without this flag the next
+  /// launch would send the user straight back to the KYC they skipped.
+  bool onboardingSkipped() => _store.getBool(_kOnboardingSkipped) ?? false;
+  Future<void> setOnboardingSkipped(bool value) async =>
+      _store.setBool(_kOnboardingSkipped, value);
 
   String? getUserRole() => _store.getString(_kUserRole);
   Future<void> setUserRole(String value) async =>

@@ -137,9 +137,8 @@ class _Filters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<NotificationsController>();
-    // Five chips no longer fit 342 across. Each frame draws the three it
-    // cares about; the row scrolls so all four filters plus All are
-    // reachable without shrinking any of them.
+    // Three chips now, and they fit 342 across — the row still scrolls so a
+    // large system text scale cannot clip the last one.
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.symmetric(horizontal: 24.h),
@@ -165,14 +164,33 @@ class _Filters extends StatelessWidget {
                         ? null
                         : Border.all(color: appTheme.chipOutline),
                   ),
-                  child: Center(
-                    widthFactor: 1,
-                    child: Text(
-                      f.label,
-                      style: selected
-                          ? CustomTextStyles.notificationChipSelected
-                          : CustomTextStyles.notificationChip,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        f.label,
+                        style: selected
+                            ? CustomTextStyles.notificationChipSelected
+                            : CustomTextStyles.notificationChip,
+                      ),
+                      if (f.badge) ...[
+                        SizedBox(width: 6.h),
+                        // Accent rather than the brand blue: the chip itself
+                        // turns blue when selected, and a blue tag on blue
+                        // would vanish.
+                        Container(
+                          height: 14.v,
+                          padding: EdgeInsets.symmetric(horizontal: 5.h),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: appTheme.accent,
+                            borderRadius: BorderRadius.circular(7.h),
+                          ),
+                          child: Text('New',
+                              style: CustomTextStyles.notificationChipBadge),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               );

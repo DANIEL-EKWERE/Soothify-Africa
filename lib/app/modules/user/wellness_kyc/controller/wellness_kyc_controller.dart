@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import '../../../../core/app_export.dart';
-import '../../../../data/models/session_offering.dart';
 import '../../../../data/models/wellness_kyc.dart';
 
 /// Runs a section's pre-booking questionnaire — Figma "meditation"
@@ -121,15 +120,12 @@ class WellnessKycController extends GetxController {
       return;
     }
     await PrefUtils().setWellnessKycDone(track.name);
-    if (track == WellnessTrack.therapy) {
-      // The expert row runs the match *before* the money — Figma 259:31488
-      // -> `Matched with instructor celebration` 259:31992 -> `Therapist
-      // booking payment` 259:58862. The section tracks still price first.
-      await Get.offNamed(AppRoutes.booking, arguments: SessionOffering.therapy);
-      return;
-    }
-    // Straight into booking — the questionnaire exists to match a coach.
-    await Get.offNamed(AppRoutes.schedule);
+    // Every track goes straight to matching now. The three gradient
+    // offering cards (`ScheduleScreen`) used to sit between the
+    // questionnaire and the match for Pilates & Core and Stretch & Restore;
+    // that card design is retired, and all three disciplines run
+    // questionnaire -> matching -> matched, as the therapy row always did.
+    await Get.offNamed(AppRoutes.booking, arguments: track.offering);
   }
 
   void back() {

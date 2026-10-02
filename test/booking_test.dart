@@ -110,7 +110,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(ConfettiOverlay), findsNothing);
 
-      c.getStarted();
+      c.startSession();
       await tester.pumpAndSettle();
       c.back();
       await tester.pumpAndSettle();
@@ -126,7 +126,7 @@ void main() {
       expect(find.byType(ConfettiOverlay), findsOneWidget);
 
       // Straight on through, while the burst is still running.
-      c.getStarted();
+      c.startSession();
       await tester.pump();
       expect(find.byType(ConfettiOverlay), findsNothing);
 
@@ -170,7 +170,7 @@ void main() {
     expect(find.text('Awesome! You matched with'), findsOneWidget);
     expect(find.text('98% Match'), findsOneWidget);
 
-    c.getStarted();
+    c.startSession();
     await tester.pumpAndSettle();
     expect(find.text('Phone call'), findsOneWidget);
     expect(find.text('Video call'), findsOneWidget);
@@ -186,7 +186,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 
-    c.getStarted();
+    c.startSession();
     await tester.pumpAndSettle();
     await tester.tap(find.text('Phone call'));
     await tester.pumpAndSettle();
@@ -214,7 +214,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 
-    c.getStarted();
+    c.startSession();
     c.chooseMode(CallMode.video);
     expect(c.stage.value, BookingStage.call);
 
@@ -233,7 +233,7 @@ void main() {
     await pumpScreen(tester, const BookingScreen());
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
-    c.getStarted();
+    c.startSession();
     c.chooseMode(CallMode.phone);
     c.endCall();
     c.rate(5);
@@ -244,6 +244,28 @@ void main() {
     expect(c.canPost, isFalse);
     await tester.enterText(find.byType(TextField), 'It went well');
     expect(c.canPost, isTrue);
+  });
+
+  testWidgets('the instructor screen offers one action, not two',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    boot();
+    await pumpScreen(tester, const BookingScreen());
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    // The matched frame is 1677 tall, so the action starts below the fold.
+    await tester.dragUntilVisible(
+      find.text('Book a session'),
+      find.byType(ListView).first,
+      const Offset(0, -120),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Book a session'), findsOneWidget);
+    expect(find.text('Get started'), findsNothing);
+    expect(find.text('Schedule for later'), findsNothing);
   });
 
   test('every track is gated by its own questionnaire', () {
@@ -342,8 +364,8 @@ void main() {
     final page = find.byType(ListView).first;
     for (final label in const [
       'Other Instructors Matches',
-      'Get started',
-      'Schedule for later',
+      // One action now; "Get started" and "Schedule for later" are gone.
+      'Book a session',
     ]) {
       await tester.dragUntilVisible(
         find.text(label),
@@ -366,7 +388,7 @@ void main() {
 
       await pumpScreen(tester, const BookingScreen(), brightness: brightness);
       await tester.pump(const Duration(milliseconds: 400));
-      Get.find<BookingController>().getStarted();
+      Get.find<BookingController>().startSession();
       await tester.pumpAndSettle();
 
       await expectLater(find.byType(BookingScreen),
@@ -380,7 +402,7 @@ void main() {
 
       await pumpScreen(tester, const BookingScreen(), brightness: brightness);
       await tester.pump(const Duration(milliseconds: 400));
-      c.getStarted();
+      c.startSession();
       c.chooseMode(CallMode.phone);
       c.endCall();
       await tester.pumpAndSettle();

@@ -1,4 +1,5 @@
 import '../../core/utils/image_constant.dart';
+import 'session_offering.dart';
 
 /// The questionnaire a section shows before its booking flow.
 ///
@@ -235,6 +236,14 @@ enum WellnessTrack {
 
   /// The heading above [intro], when the track has one of its own.
   String get heading => introTitle;
+
+  /// What this questionnaire is booking, so the matching screen can name the
+  /// discipline it is searching for.
+  SessionOffering get offering => switch (this) {
+        WellnessTrack.meditation => SessionOffering.meditation,
+        WellnessTrack.balance => SessionOffering.balance,
+        WellnessTrack.therapy => SessionOffering.therapy,
+      };
 
   String get prefKey => 'wellnessKyc_$name';
 }

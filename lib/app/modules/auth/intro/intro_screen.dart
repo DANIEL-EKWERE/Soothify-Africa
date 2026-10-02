@@ -16,6 +16,11 @@ import 'widgets/page_dots.dart';
 ///
 /// Only the artwork and the middle block change between panels, so the title,
 /// dots and button sit outside the PageView and stay put as it scrolls.
+///
+/// The carousel advances on its own every few seconds and can still be
+/// swiped; a manual swipe resets the timer so the page is never pulled out
+/// from under a finger. It settles on the last slide rather than wrapping —
+/// see [IntroController].
 class IntroScreen extends GetView<IntroController> {
   const IntroScreen({super.key});
 
@@ -26,7 +31,23 @@ class IntroScreen extends GetView<IntroController> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 20.h),
+            // Skip sits above the title, right-aligned. The frame for this
+            // carousel could not be read when it was added, so the placement
+            // is the conventional one rather than a measured one.
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: EdgeInsets.only(right: 24.h, top: 8.h),
+                child: GestureDetector(
+                  onTap: controller.skip,
+                  behavior: HitTestBehavior.opaque,
+                  child: Semantics(
+                    button: true,
+                    child: Text('Skip', style: CustomTextStyles.skipAction),
+                  ),
+                ),
+              ),
+            ),
             GradientText(
               'Welcome to Soothify',
               gradient: appTheme.titleGradient,
@@ -34,11 +55,20 @@ class IntroScreen extends GetView<IntroController> {
               style: CustomTextStyles.onboardingScreenTitle,
             ),
             Expanded(
-              child: PageView.builder(
-                controller: controller.pageController,
-                onPageChanged: controller.onPageChanged,
-                itemCount: controller.slides.length,
-                itemBuilder: (context, i) => _Slide(slide: controller.slides[i]),
+              child: Builder(
+                builder: (context) {
+                  // The carousel still advances under reduce motion; it cuts
+                  // between slides instead of sliding.
+                  controller.animateAutoAdvance =
+                      !MediaQuery.disableAnimationsOf(context);
+                  return PageView.builder(
+                    controller: controller.pageController,
+                    onPageChanged: controller.onPageChanged,
+                    itemCount: controller.slides.length,
+                    itemBuilder: (context, i) =>
+                        _Slide(slide: controller.slides[i]),
+                  );
+                },
               ),
             ),
             Obx(

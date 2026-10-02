@@ -13,7 +13,7 @@ import '../../../data/services/session_service.dart';
 ///   practitioner     -> practitioner dashboard (no designs yet)
 ///   guest            -> same as a signed-in user; the app is usable without
 ///                       an account, and Profile offers sign-up when wanted
-///   KYC unfinished   -> KYC
+///   KYC unfinished   -> KYC, unless the intro carousel's Skip was used
 ///   otherwise        -> the shell
 ///
 /// If reading KYC state fails we send the user to the questionnaire rather
@@ -34,7 +34,10 @@ Future<String> resolveStartRoute({
   // an account, so sending guests to sign-up on the *next* launch would lock
   // them out of an app they had already been using.
   try {
-    return await kyc.isComplete() ? AppRoutes.shell : AppRoutes.kyc;
+    if (await kyc.isComplete()) return AppRoutes.shell;
+    // Skip has to survive a relaunch. Sending someone back to the
+    // questionnaire they declined is the app overruling them.
+    return PrefUtils().onboardingSkipped() ? AppRoutes.shell : AppRoutes.kyc;
   } catch (e, s) {
     Log.e('could not read KYC state', error: e, stackTrace: s);
     return AppRoutes.kyc;

@@ -33,8 +33,19 @@ class KycController extends BaseController {
 
   bool isChosen(KycOption option) => current.contains(option.value);
 
-  /// The design disables Next until the question has an answer.
-  bool get canProceed => current.isNotEmpty;
+  /// The design disables Next until the question has an answer. The birth
+  /// year also has to clear the age limit.
+  bool get canProceed => current.isNotEmpty && !isUnderage;
+
+  /// True when the birth-year wheel is parked on a year that makes the user
+  /// younger than [KycQuestion.minAge].
+  ///
+  /// The wheel deliberately scrolls past the limit, so this is reachable by
+  /// design — see the comment on the question's options.
+  bool get isUnderage {
+    if (question.input != KycInput.birthYear || current.isEmpty) return false;
+    return KycQuestion.isUnderage(current.first, currentYear);
+  }
 
   bool get isLastStep => step.value == totalSteps - 1;
 
@@ -73,8 +84,17 @@ class KycController extends BaseController {
         ..add(option.value);
     }
 
+    final wasUnderage = isUnderage;
     answers[q.id] = chosen;
     answers.refresh();
+
+    // Only on the way in. The wheel reports every year it scrolls past, so
+    // announcing on each one would strobe the message while the finger is
+    // still moving; the inline note under the picker is what keeps the
+    // reason on screen afterwards.
+    if (isUnderage && !wasUnderage) {
+      AppFeedback.error(KycQuestion.underageMessage);
+    }
   }
 
   void back() {

@@ -103,8 +103,24 @@ class BookingController extends GetxController {
   /// The burst has finished; the screen is now the plain matched frame.
   void celebrationShown() => celebrating.value = false;
 
-  /// "Get started" — straight into choosing how to connect.
-  void getStarted() => stage.value = BookingStage.method;
+  /// "Book a session" — the instructor screen's only action now.
+  ///
+  /// It used to be a pair: "Get started", which jumped straight to the
+  /// communication picker, and "Schedule for later", which raised the date
+  /// sheet. The design replaced both with one button that runs the booking
+  /// properly — payment, then the calendar, then a confirmation.
+  Future<void> bookSession() async {
+    await Get.toNamed(AppRoutes.bookingPayment, arguments: offering);
+  }
+
+  /// Opens the communication picker, and from there the call.
+  ///
+  /// No longer reached from the matched screen — booking now goes through
+  /// payment and a calendar instead. The picker, the call and the rating are
+  /// still drawn (`Communiction method/selected` 280:26514 onward); this is
+  /// where the flow resumes when a booked session actually starts, and it is
+  /// kept so those stages stay reachable.
+  void startSession() => stage.value = BookingStage.method;
 
   /// "Schedule for later" — the calendar sheet picks a date instead.
   void schedule(DateTime date) {

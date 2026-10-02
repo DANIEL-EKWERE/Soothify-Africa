@@ -40,14 +40,16 @@ enum NotificationKind {
 /// of the one kind its chips select.
 enum NotificationFilter {
   all('All'),
-  myPost('My post'),
-  mentions('Mentions'),
-  schedules('Schedules'),
-  newBooking('New booking');
+  sessions('Sessions'),
+  whatsNew("What's new", badge: true);
 
-  const NotificationFilter(this.label);
+  const NotificationFilter(this.label, {this.badge = false});
 
   final String label;
+
+  /// Whether the chip carries the small "New" tag beside its label. Only
+  /// "What's new" does.
+  final bool badge;
 }
 
 class AppNotification {

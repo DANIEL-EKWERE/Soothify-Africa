@@ -6,11 +6,17 @@ import '../../../widgets/gradient_text.dart';
 import 'controller/language_controller.dart';
 import 'widgets/language_row.dart';
 
-/// "Choose Your Preferred Language to Continue" — Figma 655:5390 (untouched)
-/// and 655:5402 (English selected).
+/// "How would you like to converse?" — Figma `259:25752`, which replaced
+/// "Choose Your Preferred Language to Continue".
+///
+/// The frame holds both sentences in **one** text node: the question at the
+/// base weight (Nunito Sans Bold 20) and "Choose your preferred language."
+/// at weight 300, both on the `#2F6FED -> #274889` run. They fall on separate
+/// lines at 310 wide, so they are drawn here as two stacked blocks rather
+/// than one rich span.
 ///
 /// Positions inside the 390x844 frame: title at 219, rows at 320 and 382
-/// (342x48, 14 apart), Next at 573.
+/// (342x48 at an 8 radius, 14 apart), Next at 573.
 class LanguageScreen extends GetView<LanguageController> {
   const LanguageScreen({super.key});
 
@@ -31,10 +37,16 @@ class LanguageScreen extends GetView<LanguageController> {
               // spacing at reference size and compress below it.
               const Spacer(flex: 172),
               GradientText(
-                'Choose Your Preferred Language to Continue',
+                'How would you like to converse?',
                 gradient: appTheme.titleGradient,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.onboardingSlideTitle,
+              ),
+              GradientText(
+                'Choose your preferred language.',
+                gradient: appTheme.titleGradient,
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.onboardingSlideSubtitle,
               ),
               SizedBox(height: 49.h),
               for (final language in controller.languages) ...[

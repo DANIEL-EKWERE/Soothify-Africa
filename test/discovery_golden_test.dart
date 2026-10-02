@@ -62,6 +62,72 @@ void main() {
     });
   }
 
+  testWidgets('searching swaps the tab for the search surface', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final controller = DiscoveryTabController(
+      MockContentRepository(),
+      MockSubscriptionRepository(),
+    );
+    Get.put(controller);
+
+    await pumpScreen(tester, const DiscoveryTab());
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('What can we help you find?'));
+    await tester.pumpAndSettle();
+
+    // The shelves give way to the field.
+    expect(find.text('Recent'), findsNothing);
+    expect(find.text('Spaces Around Me'), findsNothing);
+    expect(find.byType(TextField), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Voice over');
+    // One frame: the spinner is up before the request has been made.
+    await tester.pump();
+    expect(find.textContaining('Searching for'), findsOneWidget);
+    expect(find.text('Searching for \u201Cvoice over\u201D...'), findsOneWidget);
+
+    // Past the debounce and the mock's latency.
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Searching for'), findsNothing);
+    expect(controller.searched.value, isTrue);
+
+    // Back leaves the search and restores the tab.
+    await tester.tap(find.byType(InkWell).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Recent'), findsOneWidget);
+    expect(controller.query.value, isEmpty);
+    // Clearing the field rearms the debounce; let it fire, or the binding
+    // fails the test for a timer outliving the tree.
+    await tester.pump(const Duration(milliseconds: 400));
+  });
+
+  testWidgets('a query that matches nothing says so', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    Get.put(DiscoveryTabController(
+      MockContentRepository(),
+      MockSubscriptionRepository(),
+    ));
+
+    await pumpScreen(tester, const DiscoveryTab());
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('What can we help you find?'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'zzzzzz');
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No results found'), findsOneWidget);
+  });
+
   testWidgets('the design ships One time selected', (tester) async {
     useDesignFrame(tester);
     // Without the real font the fallback renders far wider and every row

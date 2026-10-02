@@ -30,7 +30,7 @@ class MockNotificationRepository implements NotificationRepository {
         text: ' commented on your post...',
         avatarAsset: ImageConstant.imgAvatarMale,
         at: now.subtract(const Duration(minutes: 45)),
-        filters: const {NotificationFilter.all, NotificationFilter.myPost},
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       AppNotification(
         id: '2',
@@ -40,6 +40,7 @@ class MockNotificationRepository implements NotificationRepository {
         // The frame gives Kendrick and Paul the same portrait.
         avatarAsset: ImageConstant.imgAvatarMale,
         at: now.subtract(const Duration(days: 1)),
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       AppNotification(
         id: '3',
@@ -53,6 +54,7 @@ class MockNotificationRepository implements NotificationRepository {
         iconAsset: ImageConstant.icReminder,
         unread: true,
         at: now.subtract(const Duration(minutes: 5)),
+        filters: const {NotificationFilter.all, NotificationFilter.sessions},
       ),
       AppNotification(
         id: '4',
@@ -61,7 +63,7 @@ class MockNotificationRepository implements NotificationRepository {
         text: ' replied to your post',
         avatarAsset: ImageConstant.imgAvatarFemale,
         at: now.subtract(const Duration(hours: 1)),
-        filters: const {NotificationFilter.all, NotificationFilter.myPost},
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       AppNotification(
         id: '5',
@@ -72,6 +74,7 @@ class MockNotificationRepository implements NotificationRepository {
         iconAsset: ImageConstant.icHeartFilled,
         unread: true,
         at: now.subtract(const Duration(hours: 5)),
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       AppNotification(
         id: '6',
@@ -79,7 +82,7 @@ class MockNotificationRepository implements NotificationRepository {
         actor: 'John',
         text: ' commented on your post...',
         at: now.subtract(const Duration(days: 1)),
-        filters: const {NotificationFilter.all, NotificationFilter.mentions},
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       AppNotification(
         id: '7',
@@ -87,6 +90,7 @@ class MockNotificationRepository implements NotificationRepository {
         text: 'New article posted',
         actionLabel: 'Read',
         at: now.subtract(const Duration(minutes: 7)),
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
       // The booking rows — Figma `259:61271`, which draws one "Booking" and
       // four identical "Reminder" lines. Three is enough to show the shape
@@ -101,7 +105,7 @@ class MockNotificationRepository implements NotificationRepository {
         at: now.subtract(const Duration(minutes: 20)),
         filters: const {
           NotificationFilter.all,
-          NotificationFilter.newBooking,
+          NotificationFilter.sessions,
         },
       ),
       AppNotification(
@@ -114,7 +118,7 @@ class MockNotificationRepository implements NotificationRepository {
         at: now.subtract(const Duration(hours: 2)),
         filters: const {
           NotificationFilter.all,
-          NotificationFilter.schedules,
+          NotificationFilter.sessions,
         },
       ),
       AppNotification(
@@ -126,7 +130,7 @@ class MockNotificationRepository implements NotificationRepository {
         at: now.subtract(const Duration(hours: 5)),
         filters: const {
           NotificationFilter.all,
-          NotificationFilter.schedules,
+          NotificationFilter.sessions,
         },
       ),
     ];

@@ -29,6 +29,8 @@ class SettingsScreen extends GetView<SettingsController> {
               SizedBox(height: 8.v),
             ],
             SizedBox(height: 16.v),
+            const _ExpertModeDoor(),
+            SizedBox(height: 16.v),
             Center(
               child: GradientText(
                 controller.version,
@@ -68,6 +70,45 @@ class _Header extends StatelessWidget {
         ),
         SizedBox(width: 16.h),
       ],
+    );
+  }
+}
+
+/// TEMPORARY — a way into the practitioner side of the app.
+///
+/// The expert dashboard, availability, payouts and session notes all sit
+/// behind `/practitioner`, which `resolveStartRoute` opens only when the
+/// saved role is already `practitioner`. The one screen that sets that role
+/// is `/role`, and nothing navigates to it — so the whole expert app was
+/// unreachable from a running build.
+///
+/// This row stands in until something real grants the role, most likely an
+/// approved "Become an Expert" application. **Delete it then.** It is drawn
+/// deliberately unlike the designed rows so it is not mistaken for one.
+///
+/// The way back is the expert's own Profile tab, which offers the role
+/// chooser again.
+class _ExpertModeDoor extends StatelessWidget {
+  const _ExpertModeDoor();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<SettingsController>();
+    return InkWell(
+      onTap: controller.enterExpertMode,
+      borderRadius: BorderRadius.circular(8.h),
+      child: Container(
+        height: 44.v,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.h),
+          border: Border.all(color: appTheme.accent),
+        ),
+        child: Text(
+          'Open expert mode (temporary)',
+          style: CustomTextStyles.settingsRow.copyWith(color: appTheme.accent),
+        ),
+      ),
     );
   }
 }

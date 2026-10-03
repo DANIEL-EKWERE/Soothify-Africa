@@ -13,6 +13,7 @@ import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/modules/user/settings/settings_screen.dart';
 import 'package:soothifyafrica/app/data/models/notification_preference.dart';
 import 'package:soothifyafrica/app/data/models/settings_entry.dart';
+import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/settings/account_settings_screen.dart';
@@ -168,6 +169,49 @@ void main() {
     await tester.tap(find.text('Log out'));
     await tester.pumpAndSettle();
     expect(Get.currentRoute, AppRoutes.shell);
+  });
+
+  testWidgets('the temporary door saves the role and opens the expert app',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    await putSettings();
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          home: const SettingsScreen(),
+          getPages: [
+            GetPage(
+              name: AppRoutes.practitionerDashboard,
+              page: () => const SizedBox.shrink(),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final door = find.text('Open expert mode (temporary)');
+    await tester.dragUntilVisible(
+      door,
+      find.byType(Scrollable).first,
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(door);
+    await tester.pumpAndSettle();
+
+    // Both halves matter: without the saved role the next launch sends the
+    // user straight back to the client shell.
+    expect(Get.find<SessionService>().role.value, UserRole.practitioner);
+    expect(Get.currentRoute, AppRoutes.practitionerDashboard);
   });
 
   test('the rows are in the order the screen draws them', () {

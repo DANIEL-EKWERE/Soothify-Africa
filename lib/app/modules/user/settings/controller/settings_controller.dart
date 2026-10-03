@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/settings_entry.dart';
+import '../../../../data/models/user_role.dart';
 import '../../../auth/language/controller/language_controller.dart';
 import '../../../../data/models/subscription_offer.dart';
 import '../policy_screen.dart';
@@ -100,6 +101,16 @@ class SettingsController extends GetxController {
     }
     await _session.signOut();
     await Get.offAllNamed(AppRoutes.shell);
+  }
+
+  /// TEMPORARY — see [_ExpertModeDoor] in the screen.
+  ///
+  /// Saves the practitioner role and opens that side of the app, which is
+  /// exactly what `/role` does; the difference is that this one is reachable.
+  /// Remove both once an approved application grants the role.
+  Future<void> enterExpertMode() async {
+    await _session.setRole(UserRole.practitioner);
+    await Get.offAllNamed(AppRoutes.practitionerDashboard);
   }
 
   /// Nothing deletes an account yet, and this is the one action in Settings

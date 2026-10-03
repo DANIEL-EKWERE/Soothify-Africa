@@ -128,7 +128,7 @@ void main() {
     expect(find.text('No results found'), findsOneWidget);
   });
 
-  testWidgets('the design ships One time selected', (tester) async {
+  testWidgets('the card ships its first tier selected', (tester) async {
     useDesignFrame(tester);
     // Without the real font the fallback renders far wider and every row
     // reports a spurious overflow, which reads as a layout bug that is not one.
@@ -143,14 +143,16 @@ void main() {
     await tester.pump(const Duration(milliseconds: 900));
     await tester.pumpAndSettle();
 
-    expect(controller.selectedPlanId.value, 'one-time');
+    expect(controller.selectedPlanId.value, 'core');
 
     // The subscription card sits below the fold on an 844-tall frame, so the
     // row has to be brought into view before it can be tapped.
-    await tester.ensureVisible(find.text('Pro'));
+    // The card sells the same three tiers Plans does, by the same names.
+    await tester.ensureVisible(find.text('Soothify Passport'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Pro'));
+    await tester.tap(find.text('Soothify Passport'));
     await tester.pumpAndSettle();
-    expect(controller.selectedPlanId.value, 'pro');
+    expect(controller.selectedPlanId.value, 'passport');
+    expect(find.text('One time'), findsNothing);
   });
 }

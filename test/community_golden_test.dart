@@ -94,7 +94,16 @@ void main() {
 
     expect(controller.stage.value, CommunityStage.welcome);
 
-    await tester.tap(find.text('Continue'));
+    // The welcome's button is held at "Coming soon" while the community is
+    // not being built, so the walk starts from the controller instead.
+    expect(find.text('Coming soon'), findsOneWidget);
+    expect(find.text('Continue'), findsNothing);
+    await tester.tap(find.text('Coming soon'));
+    await tester.pumpAndSettle();
+    expect(controller.stage.value, CommunityStage.welcome,
+        reason: 'the disabled button must not advance');
+
+    controller.dismissWelcome();
     await tester.pumpAndSettle();
     expect(controller.stage.value, CommunityStage.username);
 

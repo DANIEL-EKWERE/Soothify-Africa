@@ -502,6 +502,16 @@ class CustomTextStyles {
     color: appTheme.textSecondary,
   );
 
+  /// The "NEW" tag on Discovery's Spaces card.
+  static TextStyle get newTag => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 11.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 1,
+    color: Colors.white,
+  );
+
   /// The Corporate form's field captions, and the line on its success card —
   /// Nunito Bold 14 over a 19.1 pitch. Figma `259:36101` / `259:36093`.
   static TextStyle get corporateLabel => TextStyle(
@@ -1942,9 +1952,15 @@ class CustomTextStyles {
 
   /// The two-way tab over the list. Bold 16; the chosen half is painted on
   /// the navy gradient, so it takes [onPrimary] rather than a second style.
+  /// The Journal's two-way tab.
+  ///
+  /// 14, not the frame's 16. At 16 the bundled NunitoSans set "Expert
+  /// Recommendation" wider than its half of the control and clipped it to
+  /// "Expert Recommendatio" — the same face measured wider than the design's
+  /// instance on the community welcome.
   static TextStyle get journalTab => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 16.fSize,
+    fontSize: 14.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
     color: appTheme.textPrimary,

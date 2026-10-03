@@ -6,8 +6,8 @@ import '../../../../data/repositories/journal_repository.dart';
 
 /// Which half of the Journal's two-way tab is showing.
 enum JournalTab {
-  own('Journal', 131),
-  expert('Expert Recommendation', 190);
+  own('Journal', 110),
+  expert('Expert Recommendation', 232);
 
   const JournalTab(this.label, this.restingWidth);
 
@@ -17,9 +17,14 @@ enum JournalTab {
   ///
   /// The two are not equal — each is sized to its own label, and splitting
   /// the control down the middle ellipsises "Expert Recommendation". The
-  /// chosen half then takes [selectionBonus] from the other: `259:36965`
-  /// draws Journal chosen at 152 against 190, and `259:60761` draws Expert
-  /// chosen at 211 against 131. Both pairs sum to 342.
+  /// chosen half then takes [selectionBonus] from the other; both pairs sum
+  /// to 342.
+  ///
+  /// The frame draws 131/190, with the unread badge hanging off the control's
+  /// right end. The badge now sits inside the pill beside the label it
+  /// counts, so the Expert half has to hold both: 110/232, which leaves
+  /// "Journal" far more than it needs and "Expert Recommendation" enough to
+  /// print whole in either state.
   final int restingWidth;
 
   /// What the chosen half gains, and the other loses.

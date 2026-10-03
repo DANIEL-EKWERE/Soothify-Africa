@@ -103,19 +103,34 @@ class _TabBar extends StatelessWidget {
                         duration: const Duration(milliseconds: 180),
                         curve: Curves.easeOut,
                         alignment: Alignment.center,
+                        // So a label never sits flush against the pill's
+                        // rounded end.
+                        padding: EdgeInsets.symmetric(horizontal: 10.h),
                         decoration: BoxDecoration(
                           gradient: controller.tab.value == tab
                               ? appTheme.titleGradient
                               : null,
                           borderRadius: BorderRadius.circular(20.h),
                         ),
-                        child: Text(
-                          tab.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: controller.tab.value == tab
-                              ? CustomTextStyles.journalTabSelected
-                              : CustomTextStyles.journalTab,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                tab.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: controller.tab.value == tab
+                                    ? CustomTextStyles.journalTabSelected
+                                    : CustomTextStyles.journalTab,
+                              ),
+                            ),
+                            if (tab == JournalTab.expert &&
+                                controller.unread > 0) ...[
+                              SizedBox(width: 6.h),
+                              _UnreadCount(count: controller.unread),
+                            ],
+                          ],
                         ),
                       ),
                     ),
@@ -123,28 +138,33 @@ class _TabBar extends StatelessWidget {
               ],
             ),
           ),
-          // The frame hangs the unread count off the control's right end,
-          // overlapping it — hence the Stack rather than a trailing child.
-          if (controller.unread > 0)
-            Positioned(
-              right: -5.h,
-              top: 11.v,
-              child: Container(
-                width: 18.h,
-                height: 18.h,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: appTheme.unreadDot,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  '${controller.unread}',
-                  style: CustomTextStyles.expertTabCount,
-                ),
-              ),
-            ),
         ],
       ),
+    );
+  }
+}
+
+/// The unread count beside "Expert Recommendation".
+///
+/// The frame hangs this off the control's right end, overlapping it. Inside
+/// the pill it belongs to the label it counts, and nothing has to be kept
+/// clear of it.
+class _UnreadCount extends StatelessWidget {
+  const _UnreadCount({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 18.h,
+      height: 18.h,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: appTheme.unreadDot,
+        shape: BoxShape.circle,
+      ),
+      child: Text('$count', style: CustomTextStyles.expertTabCount),
     );
   }
 }

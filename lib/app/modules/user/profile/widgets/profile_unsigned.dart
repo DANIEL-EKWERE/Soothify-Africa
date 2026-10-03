@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../controller/profile_tab_controller.dart';
 
 /// Profile while browsing as a guest — Figma "Profile/unsigned/not logged in"
 /// (page 124:2, `176:34542`).
@@ -33,7 +34,7 @@ class ProfileUnsigned extends StatelessWidget {
             // "Unclock" in the frame — a typo for Unlock.
             label: 'Unlock Soothify Pro',
             filled: false,
-            onTap: () => Get.toNamed(AppRoutes.shell),
+            onTap: Get.find<ProfileTabController>().openPlans,
           ),
         ],
       ),

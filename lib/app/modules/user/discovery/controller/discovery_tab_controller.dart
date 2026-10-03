@@ -23,9 +23,9 @@ class DiscoveryTabController extends BaseController {
   final RxList<MediaItem> popular = <MediaItem>[].obs;
   final RxList<SubscriptionPlan> plans = <SubscriptionPlan>[].obs;
 
-  /// The tier whose row is outlined in blue. The design ships "One time"
+  /// The tier whose row is outlined in blue. The design ships the first one
   /// selected, so that is the initial value rather than nothing.
-  final RxString selectedPlanId = 'one-time'.obs;
+  final RxString selectedPlanId = 'core'.obs;
 
   final RxBool freeTrial = false.obs;
 

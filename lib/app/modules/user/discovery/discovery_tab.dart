@@ -165,8 +165,7 @@ class _SearchView extends GetView<DiscoveryTabController> {
         padding: EdgeInsets.fromLTRB(24.h, 48.v, 24.h, 0),
         child: Column(
           children: [
-            Icon(Icons.search_off,
-                size: 40.h, color: appTheme.navInactive),
+            Icon(Icons.search_off, size: 40.h, color: appTheme.navInactive),
             SizedBox(height: 16.v),
             Text('No results found', style: CustomTextStyles.searchStatus),
             SizedBox(height: 8.v),
@@ -217,45 +216,80 @@ class _SpacesButton extends StatelessWidget {
     return InkWell(
       onTap: () => Get.toNamed(AppRoutes.spaces),
       borderRadius: BorderRadius.circular(16.h),
-      child: Container(
-        height: 96.v,
-        padding: EdgeInsets.symmetric(horizontal: 16.h),
-        decoration: BoxDecoration(
-          gradient: appTheme.spacesEntryGradient,
-          borderRadius: BorderRadius.circular(16.h),
-        ),
-        child: Row(
-          children: [
-            Container(
-              height: 56.v,
-              width: 56.h,
-              decoration: BoxDecoration(
-                // White at 10% rather than the flat #4051E7 it composites to,
-                // so the tile keeps its lift wherever it sits on the gradient.
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(14.h),
-              ),
-              child: Icon(Icons.location_on, size: 30.h, color: Colors.white),
+      // Clip.none so the tag can sit over the card's top edge, which is
+      // where the screenshot puts it — 4.5 above it and 3 in from the right.
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 96.v,
+            padding: EdgeInsets.symmetric(horizontal: 16.h),
+            decoration: BoxDecoration(
+              gradient: appTheme.spacesEntryGradient,
+              borderRadius: BorderRadius.circular(16.h),
             ),
-            SizedBox(width: 16.h),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Spaces Around Me',
-                      style: CustomTextStyles.spacesEntryTitle),
-                  SizedBox(height: 4.v),
-                  Text('Find studios & wellness spaces near you',
-                      style: CustomTextStyles.spacesEntrySubtitle),
-                ],
-              ),
+            child: Row(
+              children: [
+                Container(
+                  height: 56.v,
+                  width: 56.h,
+                  decoration: BoxDecoration(
+                    // White at 10% rather than the flat #4051E7 it composites to,
+                    // so the tile keeps its lift wherever it sits on the gradient.
+                    color: Colors.white.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(14.h),
+                  ),
+                  child: Icon(
+                    Icons.location_on,
+                    size: 30.h,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 16.h),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Spaces Around Me',
+                        style: CustomTextStyles.spacesEntryTitle,
+                      ),
+                      SizedBox(height: 4.v),
+                      Text(
+                        'Find studios & wellness spaces near you',
+                        style: CustomTextStyles.spacesEntrySubtitle,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.h),
+                Icon(Icons.chevron_right, size: 28.h, color: Colors.white),
+              ],
             ),
-            SizedBox(width: 8.h),
-            Icon(Icons.chevron_right, size: 28.h, color: Colors.white),
-          ],
-        ),
+          ),
+          Positioned(top: -4.5.v, right: 3.h, child: const _NewTag()),
+        ],
       ),
+    );
+  }
+}
+
+/// The "NEW" tag over the Spaces card's top-right corner.
+class _NewTag extends StatelessWidget {
+  const _NewTag();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 21.5.v,
+      width: 35.5.h,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: appTheme.authAccent,
+        borderRadius: BorderRadius.circular(6.h),
+      ),
+      child: Text('NEW', style: CustomTextStyles.newTag),
     );
   }
 }
@@ -276,8 +310,9 @@ class _SearchRow extends StatefulWidget {
 
 class _SearchRowState extends State<_SearchRow> {
   final DiscoveryTabController controller = Get.find<DiscoveryTabController>();
-  late final TextEditingController _text =
-      TextEditingController(text: controller.query.value);
+  late final TextEditingController _text = TextEditingController(
+    text: controller.query.value,
+  );
 
   @override
   void dispose() {

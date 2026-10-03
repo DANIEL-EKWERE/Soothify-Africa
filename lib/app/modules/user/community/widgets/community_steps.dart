@@ -48,9 +48,15 @@ class CommunityWelcomeStep extends StatelessWidget {
             ),
           ),
           SizedBox(height: 80.v),
+          // The community is not being built yet, so the welcome does not
+          // lead anywhere: the button says so and stays disabled rather than
+          // opening a username step and a forum that are not ready.
+          //
+          // Everything behind it still exists; restoring the flow is a matter
+          // of putting `dismissWelcome` back here.
           _PrimaryButton(
-            label: 'Continue',
-            enabled: true,
+            label: 'Coming soon',
+            enabled: false,
             onTap: controller.dismissWelcome,
           ),
         ],

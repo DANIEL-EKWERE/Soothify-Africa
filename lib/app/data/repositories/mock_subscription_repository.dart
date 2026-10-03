@@ -7,9 +7,23 @@ class MockSubscriptionRepository implements SubscriptionRepository {
   static const _latency = Duration(milliseconds: 400);
 
   static const List<SubscriptionPlan> _plans = [
-    SubscriptionPlan(id: 'one-time', label: 'One time', price: 'NGN 5,000 / day'),
-    SubscriptionPlan(id: 'basic', label: 'Basic', price: 'NGN 5,000 / day'),
-    SubscriptionPlan(id: 'pro', label: 'Pro', price: 'NGN 5,000 / day'),
+    // The same three tiers Plans sells, named the same way. They used to be
+    // "One time / Basic / Pro", which named nothing the rest of the app knew.
+    SubscriptionPlan(
+      id: 'core',
+      label: 'Soothify Core',
+      price: 'NGN 5,000 / day',
+    ),
+    SubscriptionPlan(
+      id: 'passport',
+      label: 'Soothify Passport',
+      price: 'NGN 5,000 / day',
+    ),
+    SubscriptionPlan(
+      id: 'corporate',
+      label: 'Soothify Corporate Wellness',
+      price: 'NGN 5,000 / day',
+    ),
   ];
 
   /// The three the designer redrew on 2026-10-02: one priced tier, one

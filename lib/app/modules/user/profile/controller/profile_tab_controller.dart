@@ -1,10 +1,12 @@
 
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
+import '../../../../data/models/app_tab.dart';
 import '../../../../data/models/checkin_kind.dart';
 import '../../../../data/models/profile_stats.dart';
 import '../../../../data/services/session_service.dart';
 import '../../../../data/repositories/profile_repository.dart';
+import '../../shell/controller/shell_controller.dart';
 
 /// Backs the Profile tab — Figma "Profile/dashboard" (135:8098).
 class ProfileTabController extends BaseController {
@@ -14,6 +16,19 @@ class ProfileTabController extends BaseController {
 
   /// Browsing without an account — Profile offers sign-up instead of stats.
   bool get isGuest => _session.isGuest;
+
+  /// "Unlock Soothify Pro" on the guest card.
+  ///
+  /// It used to call `toNamed(shell)` — pushing a second copy of the shell
+  /// the user was already inside, which looked like nothing happening. Plans
+  /// is a tab, so the way to it is the shell's own selection.
+  void openPlans() {
+    if (Get.isRegistered<ShellController>()) {
+      Get.find<ShellController>().current.value = AppTab.plans;
+      return;
+    }
+    Get.toNamed(AppRoutes.shell);
+  }
 
   final ProfileRepository _repository;
 

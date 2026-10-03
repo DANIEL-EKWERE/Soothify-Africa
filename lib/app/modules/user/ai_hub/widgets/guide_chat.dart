@@ -37,7 +37,12 @@ class _GuideChatState extends State<GuideChat> {
       children: [
         Positioned.fill(
           child: Obx(
-            () => BreathingSceneLoop(playing: controller.playing.value),
+            () => BreathingSceneLoop(
+              playing: controller.playing.value,
+              palette: ScenePalette.of(controller.vibe.value),
+              period: AiHubController.breathPeriod,
+              onCycle: controller.countBreath,
+            ),
           ),
         ),
         SafeArea(
@@ -175,12 +180,25 @@ class _Composer extends StatelessWidget {
               onSubmitted: (_) => onSend(),
               textInputAction: TextInputAction.send,
               style: CustomTextStyles.guideBubble,
+              // `border: InputBorder.none` does not cover the focused
+              // state — the decorator falls back to the app's
+              // `inputDecorationTheme` for that one, which drew a blue
+              // rounded rectangle inside this capsule: a different radius,
+              // inset by the row, and short at both ends. The capsule is the
+              // control, so the field carries no border in any state.
               decoration: InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                contentPadding: EdgeInsets.zero,
                 hintText: 'Ask anything...',
                 hintStyle: CustomTextStyles.guideComposerHint,
               ),
+              cursorColor: appTheme.soothifyBlue,
             ),
           ),
           InkWell(

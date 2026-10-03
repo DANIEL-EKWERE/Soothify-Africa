@@ -16,6 +16,16 @@ import '../modules/practitioner/payouts/expert_withdraw_screen.dart';
 import '../modules/practitioner/shell/binding/expert_shell_binding.dart';
 import '../modules/practitioner/shell/expert_shell_screen.dart';
 import '../modules/user/article/article_screen.dart';
+import '../modules/user/corporate/binding/corporate_binding.dart';
+import '../modules/user/settings/account_settings_screen.dart';
+import '../modules/user/settings/controller/notification_settings_controller.dart';
+import '../modules/user/settings/delete_account_screen.dart';
+import '../modules/user/settings/manage_subscription_screen.dart';
+import '../modules/user/settings/notification_settings_screen.dart';
+import '../modules/user/settings/policy_screen.dart';
+import '../modules/user/settings/user_profile_screen.dart';
+import '../modules/user/corporate/corporate_form_screen.dart';
+import '../modules/user/corporate/corporate_success_screen.dart';
 import '../modules/user/subscription/binding/subscription_offer_binding.dart';
 import '../modules/user/subscription/subscription_offer_screen.dart';
 import '../modules/user/expert_application/binding/expert_application_binding.dart';
@@ -296,6 +306,45 @@ class AppPages {
       name: AppRoutes.journalRecommendation,
       page: () => const ExpertRecommendationScreen(),
       binding: BindingsBuilder.put(ExpertRecommendationController.new),
+    ),
+    GetPage(
+      name: AppRoutes.manageSubscription,
+      page: () => const ManageSubscriptionScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.accountSettings,
+      page: () => const AccountSettingsScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.userProfile,
+      page: () => const UserProfileScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.deleteAccount,
+      page: () => const DeleteAccountScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.notificationSettings,
+      page: () => const NotificationSettingsScreen(),
+      binding: BindingsBuilder.put(NotificationSettingsController.new),
+    ),
+    GetPage(
+      name: AppRoutes.policy,
+      page: () => const PolicyScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.corporateForm,
+      page: () => const CorporateFormScreen(),
+      binding: CorporateBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.corporateSuccess,
+      page: () => const CorporateSuccessScreen(),
+      binding: CorporateBinding(),
     ),
     GetPage(
       name: AppRoutes.subscriptionOffer,

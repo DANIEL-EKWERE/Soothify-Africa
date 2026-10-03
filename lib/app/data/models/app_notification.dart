@@ -12,12 +12,17 @@ enum NotificationKind {
   /// Avatar, a bold actor, the rest of the line, and a timestamp.
   social,
 
-  /// The outlined "Reminder" card — an unread mark, an icon, a heading and a
-  /// line of body.
+  /// The card the frame opens with: a 342x77 outline holding an avatar, a
+  /// bold heading over two lines, and a two-line body. Re-measured on
+  /// 2026-10-02; it was missing from the feed entirely.
+  recommendation,
+
+  /// "Reminder". The frame draws it as the same 342x39 pill as [booking], not
+  /// as its own taller card — the card shape came from an older revision.
   reminder,
 
-  /// The weekly digest: an unread mark, an icon, a heading and centred body.
-  /// No border in the frame.
+  /// The weekly digest: an unread mark, an icon, a bold heading and a
+  /// left-aligned body, inside a 342x62 outline.
   digest,
 
   /// A line with no avatar, and a timestamp.

@@ -5,7 +5,7 @@ class Coach {
     required this.name,
     required this.matchPercent,
     required this.blurb,
-    required this.interests,
+    required this.feelings,
     required this.quote,
     required this.outside,
     required this.expertise,
@@ -20,7 +20,8 @@ class Coach {
   final String blurb;
 
   /// The "Because you like" chips.
-  final List<String> interests;
+  /// The chips under "Because you feel...".
+  final List<String> feelings;
 
   final String quote;
 
@@ -36,22 +37,29 @@ class Coach {
   static const Coach sample = Coach(
     name: 'Baraqhat Ibrahim',
     matchPercent: 98,
+    // The frame writes "Practicing yoga with Melody Briggs" on Baraqhat's
+    // own profile — a name left over from another card. The coach's name is
+    // substituted rather than printed as drawn.
     blurb: 'We believe that fitness is part of your journey\n'
-        'to authenticity.',
-    // "Mediatation classes" is misspelt in the file; corrected here.
-    interests: [
-      'Heartfelt Coaching',
-      'Pop Music',
-      'Pop Music',
-      'Mediatation classes',
-      'Yoga',
+        'to authenticity. Practicing yoga with Baraqhat Ibrahim will help '
+        'you tap into your emotions, physically challenge yourself, and find '
+        'joy in movement,',
+    // The chips answer "Because you feel...", so they are moods, not
+    // interests. They were "Heartfelt Coaching / Pop Music / Yoga" under an
+    // older heading that read "Because you like".
+    feelings: [
+      'Anxious',
+      'Stressed',
+      'Low',
+      'Drained',
+      'Overwhelmed',
     ],
     quote: '“Live your life in your truth.”',
     outside: [
       'Pop music lover',
       'Enjoys being active and spending time with friends',
     ],
-    expertise: ['Yoga', 'Pilates & Core'],
+    expertise: ['Yoga', 'Meditation'],
     videoTitles: ['Unshakeable', 'Unshakeable', 'Unshakeable'],
   );
 }

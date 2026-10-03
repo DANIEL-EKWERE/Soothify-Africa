@@ -163,6 +163,7 @@ void main() {
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
+    await PrefUtils().init();
     Get.put(SpacesController());
     Get.testMode = true;
     await pumpScreen(tester, const StudioProfileScreen());
@@ -201,6 +202,9 @@ void main() {
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
+    // The sheet reads a previously-left address on mount, so preferences
+    // have to be up — `main.dart` awaits this before the first frame.
+    await PrefUtils().init();
     await pumpScreen(tester, const PassportSheet());
 
     // Supplied by the designer rather than read from the file — the sheet is
@@ -210,7 +214,62 @@ void main() {
     expect(PassportSheet.body.first, startsWith('We are putting together'));
     expect(PassportSheet.body.first, contains('Abuja and Lagos'));
     expect(PassportSheet.body.last, contains('the moment our doors open'));
-    expect(find.text('Notify me'), findsOneWidget);
+    expect(find.text(PassportSheet.action), findsOneWidget);
+    expect(PassportSheet.action, 'Reserve my place on the waitlist');
+    expect(find.text('Notify me'), findsNothing);
+  });
+
+  testWidgets('the waitlist takes an address, and refuses a bad one',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    await pumpScreen(tester, const PassportSheet());
+
+    expect(find.text('Email address'), findsOneWidget);
+    expect(find.text('you@example.com'), findsOneWidget);
+
+    // An address that cannot be one is refused, and nothing is stored.
+    await tester.enterText(find.byType(TextField), 'dera');
+    await tester.tap(find.text(PassportSheet.action));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Enter an email address'), findsOneWidget);
+    expect(PrefUtils().passportWaitlistEmail(), isNull);
+
+    // Typing again clears the complaint.
+    await tester.enterText(find.byType(TextField), 'dera@soothify.africa');
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Enter an email address'), findsNothing);
+
+    await tester.tap(find.text(PassportSheet.action));
+    await tester.pumpAndSettle();
+    expect(PrefUtils().passportWaitlistEmail(), 'dera@soothify.africa');
+    // The confirmation raises a snackbar; let its timer run out rather than
+    // leaving it pending past the end of the test.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('a returning user sees the address they left', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    await PrefUtils().setPassportWaitlistEmail('dera@soothify.africa');
+
+    await pumpScreen(tester, const PassportSheet());
+    expect(find.text('dera@soothify.africa'), findsOneWidget);
+  });
+
+  test('the address check turns away only what cannot be an address', () {
+    for (final good in const [
+      'dera@soothify.africa',
+      'a.b+tag@sub.example.co.uk',
+    ]) {
+      expect(PassportSheet.isValidEmail(good), isTrue, reason: good);
+    }
+    for (final bad in const ['dera', 'dera@', '@soothify.africa', 'a@b', '']) {
+      expect(PassportSheet.isValidEmail(bad), isFalse, reason: bad);
+    }
   });
 
   test('every sample space is reachable through some chip', () {

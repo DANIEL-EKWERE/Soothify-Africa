@@ -17,6 +17,7 @@ class PrefUtils {
   static const _kOnboardingSkipped = 'onboardingSkipped';
   static const _kOnboarded = 'hasOnboarded';
   static const _kWifiOnlyDownloads = 'wifiOnlyDownloads';
+  static const _kPassportWaitlist = 'passportWaitlistEmail';
   static const _kCommunityWelcomeSeen = 'communityWelcomeSeen';
   static const _kCommunityUsername = 'communityUsername';
   static const _kWellnessKycPrefix = 'wellnessKyc_';
@@ -86,6 +87,15 @@ class PrefUtils {
       _store.setBool(_kOnboarded, value);
 
   /// Defaults to true — data cost matters in our target markets.
+  /// The address left on the Passport waitlist.
+  ///
+  /// Nothing sends it anywhere yet — there is no waitlist endpoint. It is
+  /// kept so a returning user sees their own address back instead of being
+  /// asked again, and so the confirmation can say what actually happened.
+  String? passportWaitlistEmail() => _store.getString(_kPassportWaitlist);
+  Future<void> setPassportWaitlistEmail(String value) async =>
+      _store.setString(_kPassportWaitlist, value);
+
   bool wifiOnlyDownloads() => _store.getBool(_kWifiOnlyDownloads) ?? true;
   Future<void> setWifiOnlyDownloads(bool value) async =>
       _store.setBool(_kWifiOnlyDownloads, value);
@@ -106,6 +116,12 @@ class PrefUtils {
   /// Whether a section's pre-booking questionnaire has been completed. Keyed
   /// per track, because Meditation, Balance and Schedule each ask their own
   /// questions and completing one must not skip another.
+  /// The Notifications screen's switches — Figma `259:37526`. The frame
+  /// draws every one of them off, which is the default here too.
+  bool notificationPreference(String key) => _store.getBool(key) ?? false;
+  Future<void> setNotificationPreference(String key, bool value) async =>
+      _store.setBool(key, value);
+
   bool wellnessKycDone(String track) =>
       _store.getBool('$_kWellnessKycPrefix$track') ?? false;
   Future<void> setWellnessKycDone(String track) async =>

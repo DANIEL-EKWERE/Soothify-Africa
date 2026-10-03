@@ -12,31 +12,35 @@ class MockSubscriptionRepository implements SubscriptionRepository {
     SubscriptionPlan(id: 'pro', label: 'Pro', price: 'NGN 5,000 / day'),
   ];
 
-  /// The design prints the same price on all three cards and the same copy on
-  /// two of them. That is placeholder content in the file, reproduced as-is
-  /// rather than invented around.
+  /// The three the designer redrew on 2026-10-02: one priced tier, one
+  /// waitlisted, one that routes to a conversation rather than a checkout.
   static const List<PlanTier> _tiers = [
     PlanTier(
-      id: 'one-off',
-      name: 'One-Off Plan',
-      description: 'One-time access, Experience selected features and '
-          'resources, Perfect for testing Soothify',
-      price: '₦15,000/One time access',
+      id: 'core',
+      name: 'Soothify Core',
+      description: 'Your sanctuary for daily balance. Includes unlimited '
+          'streaming of our video library, sleep stories, soothing '
+          'soundscapes, and the wellness journal.',
+      price: '₦15,000',
+      priceSuffix: '/One time access',
     ),
     PlanTier(
-      id: 'pro',
-      name: 'Pro Plan',
-      description: 'Custom wellness programs for organizations, Group therapy '
-          'sessions, Team mindfulness and relaxation',
-      price: '₦15,000/One time access',
+      id: 'passport',
+      name: 'Soothify Passport',
+      description: 'Your city-wide pass to physical movement. Enjoy 6 curated '
+          'class bookings monthly across boutique studios, gyms, and '
+          'sanctuaries in Abuja and Lagos (fully inclusive of your Core '
+          'digital access).',
+      action: PlanAction.waitlist,
       emphasised: true,
     ),
     PlanTier(
       id: 'corporate',
-      name: 'Corporate Plan',
-      description: 'Custom wellness programs for organizations, Group therapy '
-          'sessions, Team mindfulness and relaxation exercises',
-      price: '₦15,000/One time access',
+      name: 'Soothify Corporate Wellness',
+      description: 'Tailored holistic care designed to nurture your entire '
+          'team. Bring mindful movement, stress relief, and restorative '
+          'wellness directly into your workplace culture.',
+      action: PlanAction.corporate,
     ),
   ];
 

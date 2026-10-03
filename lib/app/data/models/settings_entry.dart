@@ -8,15 +8,17 @@ enum SettingsEntry {
   themeToggle('Light Mode', 'ic_settings_moon'),
   changeLanguage('Change Language', 'ic_settings_language'),
   notifications('Notifications', 'ic_settings_notifications'),
+  // The designer's screenshot of this screen puts "Become an Expert" here,
+  // between Notifications and Privacy Policy. It had been appended near the
+  // bottom on the belief that the frame did not draw the row at all.
+  //
+  // Its glyph used to be the rating star, which is a *filled* 5x5 shape — it
+  // read as a solid blob beside nine outlined ones. `ic_settings_expert` is
+  // drawn to match the set: a person with a check, 24 square at a 2 stroke.
+  becomeExpert('Become an Expert', 'ic_settings_expert'),
   privacyPolicy('Privacy Policy', 'ic_settings_privacy'),
   terms('Terms & Conditions', 'ic_settings_terms'),
   about('About Us', 'ic_settings_about'),
-  // Not a row the Settings frame draws. The "Become an Expert" flow
-  // (`259:59132` onward) has no entry point anywhere in the file, and this is
-  // the app's list of account-level actions, so it goes here. The glyph is
-  // borrowed from the rating star; there is no exported one for it, and the
-  // live-session camcorder read as "video" rather than "expert".
-  becomeExpert('Become an Expert', 'ic_star'),
   logout('Logout', 'ic_settings_logout');
 
   const SettingsEntry(this.label, this._icon);

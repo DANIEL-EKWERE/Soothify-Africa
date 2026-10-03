@@ -199,8 +199,12 @@ void main() {
     expect(c.stage.value, BookingStage.rating);
 
     c.rate(4);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    // The stars fill first and the screen holds before moving on.
     expect(c.rating.value, 4);
+    expect(c.stage.value, BookingStage.rating);
+    await tester.pump(BookingController.ratingHold);
+    await tester.pumpAndSettle();
     expect(c.stage.value, BookingStage.feedback);
     expect(find.text('Post'), findsOneWidget);
   });
@@ -237,6 +241,7 @@ void main() {
     c.chooseMode(CallMode.phone);
     c.endCall();
     c.rate(5);
+    await tester.pump(BookingController.ratingHold);
     await tester.pumpAndSettle();
 
     expect(c.canPost, isFalse);
@@ -244,6 +249,45 @@ void main() {
     expect(c.canPost, isFalse);
     await tester.enterText(find.byType(TextField), 'It went well');
     expect(c.canPost, isTrue);
+  });
+
+  testWidgets('the review box owns its focus ring', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = boot();
+
+    await pumpScreen(tester, const BookingScreen());
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    c.startSession();
+    c.chooseMode(CallMode.phone);
+    c.endCall();
+    c.rate(5);
+    await tester.pump(BookingController.ratingHold);
+    await tester.pumpAndSettle();
+
+    // The decorator must not fall back to the app's focused outline, which
+    // is what drew a second rounded rectangle inside the box.
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.decoration!.focusedBorder, InputBorder.none);
+    expect(field.decoration!.border, InputBorder.none);
+
+    Color borderColour() {
+      final box = tester.widget<Container>(
+        find
+            .ancestor(
+              of: find.byType(TextField),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      return ((box.decoration! as BoxDecoration).border! as Border).top.color;
+    }
+
+    final unfocused = borderColour();
+    await tester.tap(find.byType(TextField));
+    await tester.pumpAndSettle();
+    expect(borderColour(), isNot(unfocused));
   });
 
   testWidgets('the instructor screen offers one action, not two',
@@ -257,13 +301,13 @@ void main() {
 
     // The matched frame is 1677 tall, so the action starts below the fold.
     await tester.dragUntilVisible(
-      find.text('Book a session'),
+      find.text('Book a Session'),
       find.byType(ListView).first,
       const Offset(0, -120),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Book a session'), findsOneWidget);
+    expect(find.text('Book a Session'), findsOneWidget);
     expect(find.text('Get started'), findsNothing);
     expect(find.text('Schedule for later'), findsNothing);
   });
@@ -363,9 +407,12 @@ void main() {
     // holds a horizontal video row, so the scrollable must be named.
     final page = find.byType(ListView).first;
     for (final label in const [
-      'Other Instructors Matches',
+      // Centred in the redrawn screen, with the chips and the peer avatars.
+      'Because you feel...',
+      'Other Instructor Matches',
+      'Expertise in',
       // One action now; "Get started" and "Schedule for later" are gone.
-      'Book a session',
+      'Book a Session',
     ]) {
       await tester.dragUntilVisible(
         find.text(label),

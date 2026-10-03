@@ -91,8 +91,18 @@ class _Sheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 533.v,
-      decoration: BoxDecoration(color: appTheme.onPrimary),
+      // 538 puts the sheet's top at 306, which is 12 above the photograph's
+      // lower edge — the overlap is what makes the rounded corners read as a
+      // sheet lifted over the picture rather than a seam.
+      height: 538.v,
+      // It had no radius at all: square corners cutting straight across the
+      // photograph. 16 measured off the designer's screenshot, top corners
+      // only.
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: appTheme.onPrimary,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.h)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

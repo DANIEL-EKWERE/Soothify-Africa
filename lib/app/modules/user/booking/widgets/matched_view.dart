@@ -31,32 +31,52 @@ class MatchedView extends StatelessWidget {
           style: CustomTextStyles.coachName,
         ),
         SizedBox(height: 8.v),
-        CustomImageView(
-          imagePath: ImageConstant.imgCoachPhoto,
-          height: 246.v,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          radius: BorderRadius.circular(8.h),
+        // The badge sits on the photo's lower edge, centred — not in a row of
+        // its own beneath it.
+        Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            CustomImageView(
+              imagePath: ImageConstant.imgCoachPhoto,
+              height: 258.v,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              radius: BorderRadius.circular(8.h),
+            ),
+            Positioned(
+              bottom: -2.v,
+              child: _MatchBadge(percent: coach.matchPercent),
+            ),
+          ],
         ),
-        SizedBox(height: 12.v),
-        _MatchBadge(percent: coach.matchPercent),
-        SizedBox(height: 16.v),
+        SizedBox(height: 22.v),
         Text(coach.blurb, style: CustomTextStyles.coachBlurb),
         SizedBox(height: 32.v),
-        Text('Because you like', style: CustomTextStyles.coachSection),
+        // This block is centred in the frame — the heading, both chip rows
+        // and the peer avatars. Everything above and below it is flush left.
+        Text(
+          'Because you feel...',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.coachSection,
+        ),
         SizedBox(height: 8.v),
         Wrap(
+          alignment: WrapAlignment.center,
           spacing: 8.h,
           runSpacing: 9.v,
           children: [
-            for (final interest in coach.interests) _InterestChip(interest),
+            for (final feeling in coach.feelings) _InterestChip(feeling),
           ],
         ),
         SizedBox(height: 27.v),
-        Text('Other Instructors Matches',
-            style: CustomTextStyles.coachSection),
+        Text(
+          'Other Instructor Matches',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.coachSection,
+        ),
         SizedBox(height: 8.v),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             for (final peer in ImageConstant.imgCoachPeers) ...[
               ClipOval(
@@ -67,7 +87,8 @@ class MatchedView extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(width: 12.h),
+              if (peer != ImageConstant.imgCoachPeers.last)
+                SizedBox(width: 12.h),
             ],
           ],
         ),
@@ -78,27 +99,9 @@ class MatchedView extends StatelessWidget {
         SizedBox(height: 16.v),
         _Detail(heading: 'Outside of Soothify', lines: coach.outside),
         SizedBox(height: 16.v),
-        Text('Find ${coach.name}', style: CustomTextStyles.coachHeading),
-        SizedBox(height: 8.v),
-        Row(
-          children: [
-            for (final icon in const [Icons.public, Icons.alternate_email]) ...[
-              Container(
-                width: 23.h,
-                height: 23.h,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  gradient: appTheme.authHeaderGradient,
-                  shape: BoxShape.circle,
-                ),
-                // The social glyphs were not exported; Material stands in.
-                child: Icon(icon, size: 12.h, color: appTheme.onPrimary),
-              ),
-              SizedBox(width: 8.h),
-            ],
-          ],
-        ),
-        SizedBox(height: 24.v),
+        // The redrawn screen runs Signature quote -> Outside of Soothify ->
+        // Expertise in. The "Find <name>" row of social glyphs it used to
+        // carry between the last two is gone from the frame.
         _Detail(heading: 'Expertise in', lines: coach.expertise),
         SizedBox(height: 26.v),
         Text(
@@ -120,7 +123,7 @@ class MatchedView extends StatelessWidget {
         SizedBox(height: 34.v),
         // One action, not the old "Get started" / "Schedule for later" pair.
         _PrimaryButton(
-          label: 'Book a session',
+          label: 'Book a Session',
           onTap: controller.bookSession,
         ),
       ],
@@ -135,22 +138,19 @@ class _MatchBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      // No `alignment` on the Container: setting one makes it expand to the
-      // largest allowed size, which stretched the badge across the screen
-      // instead of hugging "98% Match".
-      child: Container(
+    // No `alignment` on the Container: setting one makes it expand to the
+    // largest allowed size, which stretched the badge across the screen
+    // instead of hugging "98% Match".
+    return Container(
         height: 24.v,
         padding: EdgeInsets.symmetric(horizontal: 10.h),
         decoration: BoxDecoration(
           color: appTheme.textPrimary,
           borderRadius: BorderRadius.circular(4.h),
         ),
-        child: Center(
-          widthFactor: 1,
-          child: Text('$percent% Match', style: CustomTextStyles.matchBadge),
-        ),
+      child: Center(
+        widthFactor: 1,
+        child: Text('$percent% Match', style: CustomTextStyles.matchBadge),
       ),
     );
   }

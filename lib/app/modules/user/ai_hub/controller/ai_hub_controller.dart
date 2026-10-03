@@ -1,5 +1,6 @@
 import '../../../../core/app_export.dart';
 import '../../../../data/models/environment_vibe.dart';
+import '../widgets/breathing_scene.dart';
 
 /// Backs the AI Hub — Figma "AI Hub | Unexpanded" (`176:56425`) and
 /// "AI Hub | Expanded | Chat" (`176:56395`).
@@ -16,11 +17,28 @@ class AiHubController extends GetxController {
 
   final Rx<EnvironmentVibe> vibe = EnvironmentVibe.morningMist.obs;
 
-  /// The two readouts beside the vibe. The frame prints "4.7mm" and "94.2%";
-  /// they are a live session's telemetry, and there is no breathing engine
-  /// behind them yet, so they are held here rather than invented per vibe.
-  String get breathingPace => '4.7mm';
-  String get easeLevel => '94.2%';
+  /// One breath, and the pace that follows from it.
+  ///
+  /// The frame prints "4.7mm" and "94.2%" as fixed strings. Both now read
+  /// what is actually happening: the pace is the droplet's own cycle, so the
+  /// number and the thing it describes cannot disagree, and the ease level
+  /// settles upward as breaths are taken.
+  static const Duration breathPeriod = BreathingSceneLoop.defaultPeriod;
+
+  String get breathingPace =>
+      '${(60000 / breathPeriod.inMilliseconds).toStringAsFixed(1)}/min';
+
+  /// Where the ease level starts, and what it approaches without reaching.
+  static const double easeFloor = 82.0;
+  static const double easeCeiling = 97.5;
+
+  final RxDouble ease = easeFloor.obs;
+
+  String get easeLevel => '${ease.value.toStringAsFixed(1)}%';
+
+  /// Called once per completed breath by the scene. A settling curve, not a
+  /// progress bar: each breath closes a twelfth of what is left.
+  void countBreath() => ease.value += (easeCeiling - ease.value) / 12;
 
   /// The guide's opening lines, as the frame writes them. The frame then
   /// repeats one line as filler for the remaining bubbles; that is mock copy,
@@ -37,7 +55,13 @@ class AiHubController extends GetxController {
     ),
   ].obs;
 
-  void selectVibe(EnvironmentVibe value) => vibe.value = value;
+  /// Changing the scene restarts the reading — the previous vibe's settling
+  /// is not this one's.
+  void selectVibe(EnvironmentVibe value) {
+    if (vibe.value == value) return;
+    vibe.value = value;
+    ease.value = easeFloor;
+  }
 
   void togglePlaying() => playing.value = !playing.value;
 

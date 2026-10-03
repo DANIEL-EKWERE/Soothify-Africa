@@ -107,4 +107,8 @@ class SignupController extends BaseController {
   void continueWithGoogle() => AppFeedback.info(
         'Google sign-in arrives with the backend.',
       );
+
+  void continueWithApple() => AppFeedback.info(
+        'Apple sign-in arrives with the backend.',
+      );
 }

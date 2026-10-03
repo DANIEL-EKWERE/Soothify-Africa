@@ -91,6 +91,9 @@ class _ScenePanel extends StatelessWidget {
               Positioned.fill(
                 child: Obx(() => BreathingSceneLoop(
                       playing: controller.playing.value,
+                      palette: ScenePalette.of(controller.vibe.value),
+                      period: AiHubController.breathPeriod,
+                      onCycle: controller.countBreath,
                     )),
               ),
               Positioned(
@@ -178,7 +181,7 @@ class _Readouts extends StatelessWidget {
               value: controller.vibe.value.label,
             )),
         _Readout(label: 'Breathing Pace', value: controller.breathingPace),
-        _Readout(label: 'Ease Level', value: controller.easeLevel),
+        Obx(() => _Readout(label: 'Ease Level', value: controller.easeLevel)),
       ],
     );
   }
@@ -196,7 +199,15 @@ class _Readout extends StatelessWidget {
       children: [
         Text(label, style: CustomTextStyles.aiStatLabel),
         SizedBox(height: 8.v),
-        Text(value, style: CustomTextStyles.aiStatValue),
+        // "Evening Breeze" is the longest value and the column is only as
+        // wide as its label, so it is clipped rather than allowed to push
+        // the row apart.
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: CustomTextStyles.aiStatValue,
+        ),
       ],
     );
   }

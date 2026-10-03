@@ -17,6 +17,12 @@ import 'widgets/language_row.dart';
 ///
 /// Positions inside the 390x844 frame: title at 219, rows at 320 and 382
 /// (342x48 at an 8 radius, 14 apart), Next at 573.
+///
+/// The file draws this twice — `259:25752` in the onboarding run and
+/// `259:37703` among the Settings frames. Opened from Settings it gains a
+/// back arrow and its button reads "Save Language"; the rest is this layout,
+/// because the Settings frame could not be read (both Figma budgets were
+/// spent when it was built) and is worth re-measuring when they return.
 class LanguageScreen extends GetView<LanguageController> {
   const LanguageScreen({super.key});
 
@@ -30,6 +36,25 @@ class LanguageScreen extends GetView<LanguageController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Settings pushed this route on top of itself, so there is a
+              // stack to go back to; onboarding arrives by `offAllNamed` and
+              // has none.
+              if (controller.fromSettings)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 20.v),
+                    child: InkWell(
+                      onTap: Get.back,
+                      child: CustomImageView(
+                        imagePath: ImageConstant.icBack,
+                        height: 18.h,
+                        width: 18.h,
+                        color: appTheme.textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
               // Proportional spacers, not fixed heights. The design places
               // the title at 219, rows at 320 and Next at 573 within an
               // 844-tall frame; pinning those gaps overflowed by 376px on a
@@ -71,7 +96,7 @@ class LanguageScreen extends GetView<LanguageController> {
                   // isEnabled stays true so the fill remains the design's
                   // #2233B5; the Opacity above supplies the disabled look.
                   child: CustomElevatedButton(
-                    text: 'Next',
+                    text: controller.entry.action,
                     isLoading: controller.isLoading.value,
                     onPressed: controller.canProceed ? controller.next : null,
                   ),

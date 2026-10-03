@@ -201,7 +201,7 @@ class _Chip extends StatelessWidget {
           color: selected ? appTheme.soothifyBlue : appTheme.surface,
           borderRadius: BorderRadius.circular(16.h),
           border: Border.all(
-            color: selected ? appTheme.soothifyBlue : appTheme.textBlack,
+            color: selected ? appTheme.soothifyBlue : appTheme.spaceChipBorder,
           ),
         ),
         child: Text(

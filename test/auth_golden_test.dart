@@ -11,6 +11,7 @@ import 'package:soothifyafrica/app/modules/auth/signin/controller/signin_control
 import 'package:soothifyafrica/app/modules/auth/signin/signin_screen.dart';
 import 'package:soothifyafrica/app/modules/auth/signup/controller/signup_controller.dart';
 import 'package:soothifyafrica/app/modules/auth/signup/signup_screen.dart';
+import 'package:soothifyafrica/app/widgets/social_auth_button.dart';
 
 import 'helpers.dart';
 
@@ -80,4 +81,50 @@ void main() {
           matchesGoldenFile('goldens/signin_error_$name.png'));
     });
   }
+
+  for (final (label, screen) in <(String, Widget)>[
+    ('create account', SignupScreen()),
+    ('log in', SigninScreen()),
+  ]) {
+    testWidgets('$label offers both Google and Apple', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      Get.put(await SessionService().init());
+      Get.put(SignupController(
+        Get.find<SessionService>(),
+        LocalKycRepository(),
+      ));
+      Get.put(SigninController(
+        Get.find<SessionService>(),
+        LocalKycRepository(),
+      ));
+
+      await pumpScreen(tester, screen);
+
+      for (final provider in SocialProvider.values) {
+        expect(find.text(provider.label), findsOneWidget,
+            reason: '$label is missing ${provider.label}');
+      }
+    });
+  }
+
+  testWidgets('the header mark sits beside the words, not across the screen',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    Get.put(await SessionService().init());
+    Get.put(SignupController(
+      Get.find<SessionService>(),
+      LocalKycRepository(),
+    ));
+
+    await pumpScreen(tester, const SignupScreen());
+    await precacheAll(tester, find.byType(SignupScreen), icons);
+
+    final heading = tester.getRect(find.text('Create your account'));
+    final mark = tester.getRect(find.byType(Image).first);
+    // It used to be pushed to the far right by an Expanded; 8 apart now.
+    expect(mark.left - heading.right, lessThan(24),
+        reason: 'the mark drifted away from the heading');
+  });
 }

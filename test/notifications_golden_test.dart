@@ -68,21 +68,23 @@ void main() {
   testWidgets('every shape the frame draws is on screen', (tester) async {
     await mount(tester);
 
-    // A line with an avatar, one without, the outlined card, the digest and
-    // the row with an inline action.
+    // The card the frame opens with, a line with an avatar, one without,
+    // the digest and the row with an inline action.
+    expect(find.text('Dr. Amaka recommended something for you'),
+        findsOneWidget);
     expect(find.textContaining('Kendrick'), findsOneWidget);
     expect(find.textContaining('John'), findsOneWidget);
-    // The outlined Reminder card, plus the two booking rows the second
-    // frame labels the same way.
+    // The Reminder pill, plus the two booking rows labelled the same way.
     expect(find.text('Reminder'), findsNWidgets(3));
     expect(find.textContaining('session today at 5:00pm'), findsNWidgets(2));
     expect(find.text('Your Weekly Mindful Quotes'), findsOneWidget);
-    expect(find.textContaining('weekly mental health tip'), findsOneWidget);
+    // The recommendation card and the digest print the same tip line.
+    expect(find.textContaining('weekly mental health tip'), findsNWidgets(2));
     expect(find.text('New article posted'), findsOneWidget);
     expect(find.text('Read'), findsOneWidget);
 
-    // Five chips no longer fit across 342, so the row scrolls. They are all
-    // laid out — clipped is not offstage — so all three are still found.
+    // The chips sit in a scroller. They are all laid out — clipped is not
+    // offstage — so all three are still found.
     for (final f in NotificationFilter.values) {
       expect(find.text(f.label), findsOneWidget);
     }
@@ -90,7 +92,7 @@ void main() {
 
   testWidgets('the chips narrow the list', (tester) async {
     final controller = await mount(tester);
-    expect(controller.visible, hasLength(10));
+    expect(controller.visible, hasLength(11));
 
     await tester.tap(find.text('Sessions'));
     await tester.pumpAndSettle();
@@ -105,13 +107,13 @@ void main() {
     await tester.tap(find.text("What's new"));
     await tester.pumpAndSettle();
     expect(controller.filter.value, NotificationFilter.whatsNew);
-    expect(controller.visible, hasLength(6));
+    expect(controller.visible, hasLength(7));
     expect(find.textContaining('Kendrick'), findsOneWidget);
     expect(find.textContaining('Yoga session on 28 Sep 2026'), findsNothing);
 
     await tester.tap(find.text('All'));
     await tester.pumpAndSettle();
-    expect(controller.visible, hasLength(10));
+    expect(controller.visible, hasLength(11));
   });
 
   testWidgets("only What's new carries the New tag", (tester) async {
@@ -142,9 +144,10 @@ void main() {
   test('the unread marks match the frames', () async {
     final feed = await MockNotificationRepository(now: _fixedNow).feed();
     final unread = feed.where((n) => n.unread).map((n) => n.kind).toList();
-    // `176:24737` dots only the Reminder card and the weekly digest;
-    // `259:61271` dots its first two booking rows and not the third.
+    // `259:26851` dots its opening card, the Reminder pill and the weekly
+    // digest; `259:61271` dots its first two booking rows and not the third.
     expect(unread, [
+      NotificationKind.recommendation,
       NotificationKind.reminder,
       NotificationKind.digest,
       NotificationKind.booking,

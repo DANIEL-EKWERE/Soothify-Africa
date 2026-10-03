@@ -8,6 +8,7 @@ import 'package:soothifyafrica/app/data/models/plan_tier.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_subscription_repository.dart';
 import 'package:soothifyafrica/app/modules/user/plans/controller/plans_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/plans/plans_tab.dart';
+import 'package:soothifyafrica/app/modules/user/spaces/widgets/passport_sheet.dart';
 
 import 'helpers.dart';
 
@@ -38,27 +39,58 @@ void main() {
     });
   }
 
-  testWidgets('Continue stays blocked until a tier is picked', (tester) async {
+  testWidgets('the three cards the designer redrew', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final controller = PlansTabController(MockSubscriptionRepository());
-    Get.put(controller);
+    Get.put(PlansTabController(MockSubscriptionRepository()));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
-    // The frame draws the button at 45% with nothing selected, so an empty
-    // selection is the design's own starting state rather than an oversight.
-    expect(controller.canContinue, isFalse);
+    expect(find.text('Soothify Core'), findsOneWidget);
+    expect(find.text('Soothify Passport'), findsOneWidget);
+    expect(find.text('Soothify Corporate Wellness'), findsOneWidget);
 
-    await tester.ensureVisible(find.text('One-Off Plan'));
+    // Only Core carries a price; the other two carry a link instead.
+    expect(find.text('₦15,000'), findsOneWidget);
+    expect(find.text('/One time access'), findsOneWidget);
+
+    await tester.dragUntilVisible(
+      find.text('Start 7-Day Free Trial'),
+      find.byType(Scrollable).first,
+      const Offset(0, -200),
+    );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('One-Off Plan'));
+    expect(find.text(PlanAction.waitlist.label), findsOneWidget);
+    expect(find.text(PlanAction.corporate.label), findsOneWidget);
+    expect(find.text('Start 7-Day Free Trial'), findsOneWidget);
+    // The screen no longer gates on a selection, so there is no Continue.
+    expect(find.text('Continue'), findsNothing);
+  });
+
+  testWidgets('the Passport card opens the waitlist sheet', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    // The sheet reads a previously-left address on mount.
+    await PrefUtils().init();
+    Get.put(PlansTabController(MockSubscriptionRepository()));
+
+    await pumpScreen(tester, const PlansTab());
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
-    expect(controller.selectedTierId.value, 'one-off');
-    expect(controller.canContinue, isTrue);
+    await tester.dragUntilVisible(
+      find.text(PlanAction.waitlist.label),
+      find.byType(Scrollable).first,
+      const Offset(0, -200),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(PlanAction.waitlist.label));
+    await tester.pumpAndSettle();
+
+    // The same waitlist the Spaces flow opens, not a second one.
+    expect(find.text(PassportSheet.heading), findsOneWidget);
   });
 
   testWidgets('switching period reloads the tiers', (tester) async {

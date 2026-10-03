@@ -1,10 +1,12 @@
 import 'package:get/get.dart';
 
 import '../../../../core/base_controller.dart';
+import '../../../../data/models/app_tab.dart';
 import '../../../../data/models/plan_tier.dart';
 import '../../../../data/models/subscription_offer.dart';
 import '../../../../data/repositories/subscription_repository.dart';
 import '../../../../routes/app_routes.dart';
+import '../../shell/controller/shell_controller.dart';
 
 /// Backs the Plans tab — Figma "Plans" (135:2444).
 class PlansTabController extends BaseController {
@@ -15,11 +17,6 @@ class PlansTabController extends BaseController {
   final Rx<BillingPeriod> period = BillingPeriod.monthly.obs;
   final RxList<PlanTier> tiers = <PlanTier>[].obs;
 
-  /// Nothing is selected on the frame and the continue button is drawn at 45%,
-  /// so an empty selection is the design's own initial state.
-  final RxnString selectedTierId = RxnString();
-
-  bool get canContinue => selectedTierId.value != null;
 
   @override
   void onInit() {
@@ -37,13 +34,23 @@ class PlansTabController extends BaseController {
     load();
   }
 
-  void selectTier(String id) => selectedTierId.value = id;
-
-  void proceed() {
-    if (!canContinue) return;
-    Get.toNamed(
+  /// The redrawn screen sells the trial rather than a chosen tier, so the
+  /// button no longer waits on a selection — the cards are not selectable.
+  void startTrial() => Get.toNamed(
         AppRoutes.subscriptionOffer,
-        arguments: SubscriptionOffer.discountedYear,
+        arguments: SubscriptionOffer.trial,
       );
+
+  /// "Speak with Corporate Team" — Figma "Corporate form" (`259:36101`).
+  void openCorporateForm() => Get.toNamed(AppRoutes.corporateForm);
+
+  /// The arrow in the header: Plans is a tab, so "back" is the tab before it
+  /// rather than a route to pop.
+  void back() {
+    if (Get.isRegistered<ShellController>()) {
+      Get.find<ShellController>().current.value = AppTab.home;
+      return;
+    }
+    if (Get.key.currentState?.canPop() ?? false) Get.back();
   }
 }

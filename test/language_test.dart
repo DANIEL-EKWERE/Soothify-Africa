@@ -63,6 +63,18 @@ void main() {
       final c = LanguageController(await LanguageService().init());
       expect(c.languages.map((l) => l.label), ['English', 'Pidgin']);
     });
+
+    test('onboarding is the default entry, and Settings must ask for its own',
+        () async {
+      final c = LanguageController(await LanguageService().init());
+      // Nothing passed: the onboarding run arrives by `offAllNamed`, so it
+      // cannot carry an argument.
+      expect(c.entry, LanguageEntry.onboarding);
+      expect(c.fromSettings, isFalse);
+      expect(c.entry.action, 'Next');
+      expect(LanguageEntry.settings.action, 'Save Language');
+    });
+
   });
 
   group('IntroSlide', () {

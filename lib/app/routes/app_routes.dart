@@ -135,6 +135,21 @@ class AppRoutes {
   /// both frames.
   static const String subscriptionOffer = '/subscribe';
 
+  /// The Corporate enquiry — Figma `259:36101`, and its success card
+  /// `259:36093`. Reached from "Speak with Corporate Team" on Plans.
+  /// The Settings sub-screens — Figma `259:37602` (subscription), `259:37589`
+  /// (account), `259:37551` (user profile), `259:37617` (delete), `259:37526`
+  /// (notifications) and the three content pages.
+  static const String manageSubscription = '/settings/subscription';
+  static const String accountSettings = '/settings/account';
+  static const String userProfile = '/settings/account/profile';
+  static const String deleteAccount = '/settings/account/delete';
+  static const String notificationSettings = '/settings/notifications';
+  static const String policy = '/settings/policy';
+
+  static const String corporateForm = '/corporate-form';
+  static const String corporateSuccess = '/corporate-success';
+
   /// The notification feed, reached from the bell on Home.
   static const String notifications = '/notifications';
 

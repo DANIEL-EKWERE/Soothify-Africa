@@ -112,10 +112,14 @@ class _AccountRow extends StatelessWidget {
                       border: Border.all(color: appTheme.onPrimary, width: 0.8),
                     ),
                     alignment: Alignment.center,
+                    // The glyph only — the blue disc and its white ring are
+                    // drawn above. The file used to carry its own circle too,
+                    // which this tint turned into a white blob filling the
+                    // badge, so the pencil was never visible.
                     child: CustomImageView(
                       imagePath: ImageConstant.icEditBadge,
-                      height: 9.h,
-                      width: 9.h,
+                      height: 11.h,
+                      width: 11.h,
                       color: appTheme.onPrimary,
                     ),
                   ),

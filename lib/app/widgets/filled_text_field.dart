@@ -16,6 +16,7 @@ class FilledTextField extends StatelessWidget {
     this.suffix,
     this.hasError = false,
     this.onChanged,
+    this.labelStyle,
   });
 
   final String label;
@@ -32,12 +33,16 @@ class FilledTextField extends StatelessWidget {
 
   final ValueChanged<String>? onChanged;
 
+  /// Overrides the caption's style. The auth screens use the default muted
+  /// one; the Corporate form sets its labels bold in the body ink.
+  final TextStyle? labelStyle;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: CustomTextStyles.inputLabel),
+        Text(label, style: labelStyle ?? CustomTextStyles.inputLabel),
         SizedBox(height: 8.h),
         Container(
           height: 48.h,

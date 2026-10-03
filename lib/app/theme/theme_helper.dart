@@ -80,6 +80,8 @@ class PrimaryColors {
     required this.toggleTrack,
     required this.periodToggleBorder,
     required this.planEmphasisFill,
+    required this.planOutlineMuted,
+    required this.spaceChipBorder,
     required this.topicChipBorder,
     required this.unreadDot,
     required this.notificationCardBorder,
@@ -252,7 +254,18 @@ class PrimaryColors {
   /// barely legible.
   final Color planEmphasisFill;
 
-  /// The red mark on an unread notification.
+  /// The unselected category chip on "Spaces Around Me". A soft grey — it
+  /// was drawing in [textBlack], which put a near-black ring round every
+  /// chip beside the one filled blue.
+  final Color spaceChipBorder;
+
+  /// The Corporate card's outline. The priced card takes [actionFill]; this
+  /// one is a plain grey, because it sells a conversation rather than a plan.
+  final Color planOutlineMuted;
+
+  /// The red mark on an unread notification. `#F44336`, measured off
+  /// `259:26851`; the Journal reuses it for its unread count badge and, at
+  /// 20%, for the "New" pill, so there is one unread red in the app.
   final Color unreadDot;
 
   /// The hairline around the Reminder card, and around an unchosen filter
@@ -361,6 +374,18 @@ class PrimaryColors {
     begin: Alignment(-0.86, -0.51),
     end: Alignment(0.86, 0.51),
     colors: [Color(0xFF2F6FED), Color(0xFF274889)],
+    stops: [0.028, 0.531],
+  );
+
+  /// The selected Monthly/Annual segment. [authHeaderGradient] with the
+  /// design's 20% black overlay actually folded in — the Plans code claimed
+  /// to do that in a comment and then passed the gradient raw, which drew the
+  /// segment two shades too light. #2F6FED and #274889 at 80% are exactly the
+  /// colours measured off the screenshot.
+  LinearGradient get periodSelectedGradient => const LinearGradient(
+    begin: Alignment(-0.86, -0.51),
+    end: Alignment(0.86, 0.51),
+    colors: [Color(0xFF2659BE), Color(0xFF1F3A6E)],
     stops: [0.028, 0.531],
   );
 
@@ -491,9 +516,11 @@ class PrimaryColors {
     toggleTrack: Color(0xFFE9E9EA),
     periodToggleBorder: Color(0xFFD7D7D7),
     planEmphasisFill: Color(0xFF0A399A),
+    planOutlineMuted: Color(0xFFCBCBCB),
+    spaceChipBorder: Color(0xFFD7D7D7),
     topicChipBorder: Color(0x4D999999),
-    unreadDot: Color(0xFFF45A4F),
-    notificationCardBorder: Color(0xFFE6EBEE),
+    unreadDot: Color(0xFFF44336),
+    notificationCardBorder: Color(0x29999999),
     chipOutline: Color(0xFFECEDED),
     aiStatLabel: Color(0xFF72737A),
     aiStatValue: Color(0xFF1B1F26),
@@ -590,8 +617,10 @@ class PrimaryColors {
     toggleTrack: Color(0xFF4A4A4C),
     periodToggleBorder: Color(0x33FFFFFF),
     planEmphasisFill: Color(0xFF0A399A),
+    planOutlineMuted: Color(0xFF3F4347),
+    spaceChipBorder: Color(0x33FFFFFF),
     topicChipBorder: Color(0x4DFFFFFF),
-    unreadDot: Color(0xFFF45A4F),
+    unreadDot: Color(0xFFF44336),
     notificationCardBorder: Color(0xFF33383B),
     chipOutline: Color(0xFF3A3838),
     aiStatLabel: Color(0xFF9AA0A6),

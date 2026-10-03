@@ -23,6 +23,18 @@ class MockNotificationRepository implements NotificationRepository {
     await Future<void>.delayed(_latency);
     final now = _now();
     return [
+      // The card `259:26851` opens with.
+      AppNotification(
+        id: '0',
+        kind: NotificationKind.recommendation,
+        title: 'Dr. Amaka recommended something for you',
+        body: 'We\u2019ve prepared your weekly mental health tip to help you '
+            'improve your mood.',
+        avatarAsset: ImageConstant.imgAvatarFemale,
+        unread: true,
+        at: now.subtract(const Duration(minutes: 30)),
+        filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
+      ),
       AppNotification(
         id: '1',
         kind: NotificationKind.social,
@@ -46,12 +58,11 @@ class MockNotificationRepository implements NotificationRepository {
         id: '3',
         kind: NotificationKind.reminder,
         title: 'Reminder',
-        actor: 'You have ',
-        // Bold in the frame, and still "Yoga" there — the rename covered the
-        // three section names, not the practice.
-        text: 'Yoga',
-        body: ' session today at 5:00pm',
-        iconAsset: ImageConstant.icReminder,
+        // The pill reads title + body, with the discipline bolded inside it.
+        // Still "Yoga" — the rename covered the three section names, not the
+        // practice.
+        body: 'You have Yoga session today at 5:00pm',
+        emphasis: 'Yoga',
         unread: true,
         at: now.subtract(const Duration(minutes: 5)),
         filters: const {NotificationFilter.all, NotificationFilter.sessions},

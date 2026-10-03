@@ -74,7 +74,9 @@ class NotificationsScreen extends GetView<NotificationsController> {
                   return ListView.separated(
                     padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
                     itemCount: items.length,
-                    separatorBuilder: (_, _) => SizedBox(height: 30.v),
+                    // 16 between every row, whatever shape either one is —
+                    // the frame's eight entries sit on a uniform pitch.
+                    separatorBuilder: (_, _) => SizedBox(height: 16.v),
                     itemBuilder: (context, i) => ContentReveal(
                       delay: Duration(milliseconds: 45 * i),
                       child: _Entry(
@@ -213,7 +215,10 @@ class _Entry extends StatelessWidget {
   @override
   Widget build(BuildContext context) => switch (notification.kind) {
         NotificationKind.social => _Social(notification: notification, now: now),
-        NotificationKind.reminder => _ReminderCard(notification: notification),
+        NotificationKind.recommendation =>
+          _Recommendation(notification: notification),
+        // The frame gives "Reminder" the same pill as a booking row.
+        NotificationKind.reminder => _Booking(notification: notification),
         NotificationKind.digest => _Digest(notification: notification),
         NotificationKind.plain => _Plain(notification: notification, now: now),
         NotificationKind.action => _Action(notification: notification, now: now),
@@ -240,7 +245,7 @@ class _Booking extends StatelessWidget {
       padding: EdgeInsets.only(left: 7.h, right: 4.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.filterRule),
+        border: Border.all(color: appTheme.notificationCardBorder),
       ),
       child: Row(
         children: [
@@ -325,8 +330,8 @@ class _Social extends StatelessWidget {
         ClipOval(
           child: CustomImageView(
             imagePath: notification.avatarAsset,
-            height: 28.h,
-            width: 28.h,
+            height: 39.h,
+            width: 39.h,
             fit: BoxFit.cover,
           ),
         ),
@@ -348,16 +353,78 @@ class _Social extends StatelessWidget {
   }
 }
 
-/// The one outlined entry in the frame.
-class _ReminderCard extends StatelessWidget {
-  const _ReminderCard({required this.notification});
+/// The card the feed opens with — Figma `259:26851`, 342x77.
+///
+/// Measured from the card's own box: avatar 39 at (10, 7), the bold heading
+/// at x=59 over two lines, the body at x=60 and y=46. The unread dot sits
+/// *on* the avatar's top-left corner, where the frame leaves it — every other
+/// row puts it at x=8, and here the avatar was dropped over that spot.
+class _Recommendation extends StatelessWidget {
+  const _Recommendation({required this.notification});
 
   final AppNotification notification;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10.h, 9.v, 10.h, 11.v),
+      padding: EdgeInsets.fromLTRB(10.h, 7.v, 10.h, 7.v),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.notificationCardBorder),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipOval(
+                child: CustomImageView(
+                  imagePath: notification.avatarAsset,
+                  height: 39.h,
+                  width: 39.h,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              if (notification.unread)
+                Positioned(left: 2.h, top: 2.h, child: const _UnreadDot()),
+            ],
+          ),
+          SizedBox(width: 10.h),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  notification.title,
+                  style: CustomTextStyles.notificationDigestTitle,
+                ),
+                SizedBox(height: 11.v),
+                Text(
+                  notification.body,
+                  style: CustomTextStyles.notificationCardBody,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The weekly digest — Figma `259:26851`, a 342x62 outline.
+///
+/// It shipped borderless with centred body copy; the frame gives it the same
+/// hairline as the other cards and sets the body flush left.
+class _Digest extends StatelessWidget {
+  const _Digest({required this.notification});
+
+  final AppNotification notification;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(8.h, 7.v, 8.h, 7.v),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.h),
         border: Border.all(color: appTheme.notificationCardBorder),
@@ -369,82 +436,33 @@ class _ReminderCard extends StatelessWidget {
             children: [
               if (notification.unread) ...[
                 const _UnreadDot(),
-                SizedBox(width: 9.h),
+                SizedBox(width: 3.h),
               ],
-              // Navy line art, cropped from a light-mode frame — tinted so
-              // it does not disappear against the dark palette.
               CustomImageView(
                 imagePath: notification.iconAsset,
-                height: 21.h,
-                width: 21.h,
+                height: 22.h,
+                width: 22.h,
                 color: appTheme.brandInk,
               ),
-              SizedBox(width: 10.h),
-              Text(
-                notification.title,
-                style: CustomTextStyles.notificationCardTitle,
+              SizedBox(width: 3.h),
+              Expanded(
+                child: Text(
+                  notification.title,
+                  style: CustomTextStyles.notificationDigestTitle,
+                ),
               ),
             ],
           ),
-          SizedBox(height: 18.v),
-          Text.rich(
-            TextSpan(
-              style: CustomTextStyles.notificationText,
-              children: [
-                TextSpan(text: notification.actor),
-                TextSpan(
-                  text: notification.text,
-                  style: CustomTextStyles.notificationActor,
-                ),
-                TextSpan(text: notification.body),
-              ],
+          SizedBox(height: 10.v),
+          Padding(
+            padding: EdgeInsets.only(left: 36.h),
+            child: Text(
+              notification.body,
+              style: CustomTextStyles.notificationCardBody,
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-/// The weekly digest — headed, with its body centred and no border.
-class _Digest extends StatelessWidget {
-  const _Digest({required this.notification});
-
-  final AppNotification notification;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            if (notification.unread) ...[
-              const _UnreadDot(),
-              SizedBox(width: 12.h),
-            ],
-            CustomImageView(
-              imagePath: notification.iconAsset,
-              height: 22.h,
-              width: 22.h,
-              color: appTheme.brandInk,
-            ),
-            SizedBox(width: 13.h),
-            Expanded(
-              child: Text(
-                notification.title,
-                style: CustomTextStyles.notificationDigestTitle,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 20.v),
-        Text(
-          notification.body,
-          textAlign: TextAlign.center,
-          style: CustomTextStyles.notificationText,
-        ),
-      ],
     );
   }
 }

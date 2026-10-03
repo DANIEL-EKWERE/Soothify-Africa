@@ -99,7 +99,8 @@ class _OfferingCard extends StatelessWidget {
           SizedBox(height: 16.v),
           Text(
             offering.title,
-            style: CustomTextStyles.tierName.copyWith(color: appTheme.onPrimary),
+            style: CustomTextStyles.scheduleCardTitle
+                .copyWith(color: appTheme.onPrimary),
           ),
           SizedBox(height: 4.v),
           Text(

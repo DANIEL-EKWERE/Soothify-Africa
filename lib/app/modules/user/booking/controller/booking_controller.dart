@@ -69,6 +69,15 @@ class BookingController extends GetxController {
 
   Timer? _timer;
 
+  /// How long the filled stars stay on screen before the review opens.
+  ///
+  /// Tapping used to swap the screen in the same frame, so the star never
+  /// appeared to fill — the tap read as "nothing happened, then a different
+  /// screen". Exposed so a test can pump exactly this long.
+  static const Duration ratingHold = Duration(milliseconds: 650);
+
+  Timer? _ratingHold;
+
   @override
   void onInit() {
     super.onInit();
@@ -78,6 +87,7 @@ class BookingController extends GetxController {
   @override
   void onClose() {
     _timer?.cancel();
+    _ratingHold?.cancel();
     feedback.dispose();
     super.onClose();
   }
@@ -140,7 +150,15 @@ class BookingController extends GetxController {
 
   void rate(int stars) {
     rating.value = stars;
-    stage.value = BookingStage.feedback;
+    // Restarted on every tap: changing the answer before the hold is up
+    // should not shorten it, and must not queue a second move.
+    _ratingHold?.cancel();
+    _ratingHold = Timer(ratingHold, () {
+      // Guarded: back() can leave the rating stage while this is pending.
+      if (stage.value == BookingStage.rating) {
+        stage.value = BookingStage.feedback;
+      }
+    });
   }
 
   bool get canPost => feedback.text.trim().isNotEmpty;
@@ -163,6 +181,7 @@ class BookingController extends GetxController {
       case BookingStage.call:
         stage.value = BookingStage.method;
       case BookingStage.rating:
+        _ratingHold?.cancel();
         stage.value = BookingStage.call;
       case BookingStage.feedback:
         stage.value = BookingStage.rating;

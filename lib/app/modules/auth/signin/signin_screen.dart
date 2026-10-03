@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/filled_text_field.dart';
-import '../../../widgets/google_button.dart';
+import '../../../widgets/social_auth_button.dart';
 import '../../../widgets/gradient_text.dart';
 import 'controller/signin_controller.dart';
 
@@ -28,12 +28,16 @@ class SigninScreen extends GetView<SigninController> {
             children: [
               Row(
                 children: [
-                  Expanded(
+                  // Flexible, not Expanded: expanding the text pushed the
+                  // mark to the far right of the screen, a line's width away
+                  // from the words it belongs to.
+                  Flexible(
                     child: Text(
                       'Log in to your account',
                       style: CustomTextStyles.authHeading,
                     ),
                   ),
+                  SizedBox(width: 8.h),
                   Image.asset(
                     ImageConstant.imgAuthHeaderIcon,
                     height: 24.h,
@@ -105,7 +109,15 @@ class SigninScreen extends GetView<SigninController> {
                 ),
               ),
               SizedBox(height: 24.h),
-              GoogleButton(onPressed: controller.continueWithGoogle),
+              SocialAuthButton(
+                provider: SocialProvider.google,
+                onPressed: controller.continueWithGoogle,
+              ),
+              SizedBox(height: 16.h),
+              SocialAuthButton(
+                provider: SocialProvider.apple,
+                onPressed: controller.continueWithApple,
+              ),
               SizedBox(height: 24.h),
               GestureDetector(
                 onTap: controller.goToSignUp,

@@ -43,19 +43,23 @@ void main() {
     await mount(tester);
     // The whole expert section titles itself "Schedule".
     expect(find.text('Schedule'), findsOneWidget);
-    expect(find.text('Cancellation Policy'), findsOneWidget);
+    expect(find.text('Cancellation & Refund Policy'), findsOneWidget);
     // The frame's label reads "Go Bavk".
     expect(find.text('Go Back'), findsOneWidget);
     expect(find.text('Go Bavk'), findsNothing);
   });
 
-  testWidgets('the policy is the frame’s own wording', (tester) async {
+  testWidgets('it prints the policy the designer supplied', (tester) async {
     await mount(tester);
-    // `280:26738` carries all 193 characters of this. An earlier reading had
-    // it stopping at "...for a full refund if you" — that was the spec
-    // printer clipping at 48 characters, not the design.
-    expect(CancellationPolicyScreen.body, isNot(endsWith('if you')));
-    expect(find.textContaining('at least 24 hours before'), findsOneWidget);
-    expect(find.textContaining('not eligible for a refund'), findsOneWidget);
+
+    expect(find.text(CancellationPolicyScreen.effectiveDate), findsOneWidget);
+    for (final section in CancellationPolicyScreen.sections) {
+      expect(find.text(section.heading), findsOneWidget,
+          reason: section.heading);
+    }
+    // The frame's two summary sentences are section 2 stated in full; the
+    // 24-hour rule has to survive the swap in both directions.
+    expect(find.textContaining('more than 24 hours prior'), findsOneWidget);
+    expect(find.textContaining('strictly non-refundable'), findsOneWidget);
   });
 }

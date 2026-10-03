@@ -399,7 +399,125 @@ class CustomTextStyles {
   );
 
   /// A plan card's name — Nunito Bold 16.
-  static TextStyle get tierName => TextStyle(
+  /// The Settings sub-screens — Figma `259:37589` and siblings. The heading
+  /// is Nunito ExtraBold 20 centred; the body and the rows are Nunito 16, the
+  /// body Medium and a row SemiBold.
+  static TextStyle get settingsPageHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 27.3 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  /// The cancellation policy's numbered headings and its effective date.
+  static TextStyle get policyScreenHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 20.5 / 15,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get policyEffectiveDate => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 17.7 / 13,
+    color: appTheme.hintText,
+  );
+
+  /// A headed block on About Us — Nunito Bold 16, flush left above its
+  /// paragraph.
+  static TextStyle get settingsSectionHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get settingsPageBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get settingsRowLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The name under the avatar on "User Profile" — Nunito Sans Bold 20.
+  static TextStyle get profileName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 24 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  /// The photo-source sheet's rows — Nunito Sans SemiBold 14, the chosen one
+  /// in the brand blue.
+  static TextStyle get photoSource => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 1,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get photoSourceSelected =>
+      photoSource.copyWith(color: appTheme.soothifyBlue);
+
+  /// A confirmation dialog's question and the line under it.
+  static TextStyle get confirmDialogTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 24.5 / 18,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get confirmDialogBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.1 / 14,
+    color: appTheme.textSecondary,
+  );
+
+  /// The Corporate form's field captions, and the line on its success card —
+  /// Nunito Bold 14 over a 19.1 pitch. Figma `259:36101` / `259:36093`.
+  static TextStyle get corporateLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// A Schedule card's title — Nunito Bold 16, measured on its own frame.
+  ///
+  /// It borrowed the Plans card's style until Plans was redrawn at 20 and
+  /// took this with it. The two screens are not the same screen.
+  static TextStyle get scheduleCardTitle => TextStyle(
     fontFamily: fontNunito,
     fontSize: 16.fSize,
     fontWeight: FontWeight.w700,
@@ -408,26 +526,72 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
-  /// A plan card's selling points — Nunito SemiBold 20. Genuinely larger than
-  /// the card's own title, which is the design's choice, not a transcription
-  /// slip.
-  static TextStyle get tierBody => TextStyle(
+  /// A plan card's name — Nunito Bold 20.
+  static TextStyle get tierName => TextStyle(
     fontFamily: fontNunito,
     fontSize: 20.fSize,
-    fontWeight: FontWeight.w600,
-    fontVariations: _semiBold,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
     height: 27.28 / 20,
     color: appTheme.textPrimary,
   );
 
-  /// A plan card's price line — Nunito Bold 14.
+  /// A plan card's paragraph — Nunito 18 over a 25 pitch. Larger than most
+  /// body copy in the app; the redrawn cards are built around it.
+  static TextStyle get tierBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 25 / 18,
+    color: appTheme.textPrimary,
+  );
+
+  /// The amount alone, painted with the brand gradient.
   static TextStyle get tierPrice => TextStyle(
     fontFamily: fontNunito,
-    fontSize: 14.fSize,
+    fontSize: 20.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
-    height: 19.096 / 14,
+    height: 27.28 / 20,
     color: appTheme.textPrimary,
+  );
+
+  /// "/One time access" — grey, and two thirds the amount's size.
+  static TextStyle get tierPriceTerms => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19.096 / 14,
+    color: appTheme.hintText,
+  );
+
+  /// "Join the Waitlist" on the filled card.
+  static TextStyle get tierLink => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 27.28 / 20,
+    color: appTheme.onPrimary,
+  );
+
+  /// "Speak with Corporate Team" — the same size, set bold.
+  static TextStyle get tierLinkStrong => tierLink.copyWith(
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        color: appTheme.actionFill,
+      );
+
+  /// "Start 7-Day Free Trial" — Nunito Bold 16 in the brand blue.
+  static TextStyle get trialButtonLabel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.824 / 16,
+    color: appTheme.soothifyBlue,
   );
 
   /// A Settings row label, and the version line — Nunito SemiBold 16.
@@ -442,12 +606,15 @@ class CustomTextStyles {
 
   /// A notification line — the actor is bold, the rest regular. Both come
   /// from the same size so they sit on one baseline.
+  ///
+  /// Nunito 12/14.4, measured off `259:26851`. It shipped at NunitoSans 15,
+  /// which came from an older revision of the frame.
   static TextStyle get notificationText => TextStyle(
-        fontFamily: fontNunitoSans,
-        fontSize: 15.fSize,
+        fontFamily: fontNunito,
+        fontSize: 12.fSize,
         fontWeight: FontWeight.w400,
         fontVariations: _regular,
-        height: 20 / 15,
+        height: 14.4 / 12,
         color: appTheme.textPrimary,
       );
 
@@ -457,35 +624,35 @@ class CustomTextStyles {
         fontVariations: _bold,
       );
 
-  /// "45 minutes ago". Dark in this frame, not the grey the carded variant
-  /// uses.
+  /// "45 minutes ago" — the frame prints it in the body ink at 64%.
   static TextStyle get notificationTime => TextStyle(
-        fontFamily: fontNunitoSans,
-        // 11.5 measured: "1 day ago" fills 42.5 in the frame.
-        fontSize: 11.5.fSize,
+        fontFamily: fontNunito,
+        fontSize: 10.fSize,
         fontWeight: FontWeight.w400,
         fontVariations: _regular,
-        height: 16 / 11.5,
-        color: appTheme.textPrimary,
+        height: 12 / 10,
+        color: appTheme.textPrimary.withValues(alpha: 0.64),
       );
 
-  /// "Reminder" on its card.
-  static TextStyle get notificationCardTitle => TextStyle(
-        fontFamily: fontNunitoSans,
-        fontSize: 17.fSize,
-        fontWeight: FontWeight.w400,
-        fontVariations: _regular,
-        height: 23 / 17,
-        color: appTheme.textPrimary,
-      );
-
-  /// "Your Weekly Mindful Quotes".
+  /// "Your Weekly Mindful Quotes", and the recommendation card's heading —
+  /// the only two bold lines in the feed.
   static TextStyle get notificationDigestTitle => TextStyle(
-        fontFamily: fontNunitoSans,
-        fontSize: 18.fSize,
+        fontFamily: fontNunito,
+        fontSize: 12.fSize,
+        fontWeight: FontWeight.w700,
+        fontVariations: _bold,
+        height: 14.4 / 12,
+        color: appTheme.textPrimary,
+      );
+
+  /// The two-line body under either of those headings. Left-aligned in the
+  /// frame, not centred.
+  static TextStyle get notificationCardBody => TextStyle(
+        fontFamily: fontNunito,
+        fontSize: 10.fSize,
         fontWeight: FontWeight.w400,
         fontVariations: _regular,
-        height: 25 / 18,
+        height: 12 / 10,
         color: appTheme.textPrimary,
       );
 
@@ -514,11 +681,13 @@ class CustomTextStyles {
   /// The screen title, painted with the app's title gradient like the other
   /// gradient headings.
   static TextStyle get notificationTitle => TextStyle(
-        fontFamily: fontNunitoSans,
-        fontSize: 20.fSize,
+        fontFamily: fontNunito,
+        // Nunito Bold 16, the same as every other screen's [appBarTitle].
+        // It shipped at NunitoSans 20, which `259:26851` does not draw.
+        fontSize: 16.fSize,
         fontWeight: FontWeight.w700,
         fontVariations: _bold,
-        height: 27 / 20,
+        height: 19.2 / 16,
       );
 
   /// The opening line on a mood recommendation — Nunito Sans Bold 18 over

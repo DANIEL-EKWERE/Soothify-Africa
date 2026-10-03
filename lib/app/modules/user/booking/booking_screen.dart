@@ -350,8 +350,30 @@ class _RatingStage extends StatelessWidget {
   }
 }
 
-class _FeedbackStage extends StatelessWidget {
+class _FeedbackStage extends StatefulWidget {
   const _FeedbackStage();
+
+  @override
+  State<_FeedbackStage> createState() => _FeedbackStageState();
+}
+
+class _FeedbackStageState extends State<_FeedbackStage> {
+  final FocusNode _node = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _node.addListener(_onFocusChanged);
+  }
+
+  void _onFocusChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _node.removeListener(_onFocusChanged);
+    _node.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -367,26 +389,46 @@ class _FeedbackStage extends StatelessWidget {
           style: CustomTextStyles.kycQuestion,
         ),
         SizedBox(height: 29.v),
+        // The focus ring belongs to this box, not to the field inside it.
+        //
+        // The app's `inputDecorationTheme` carries a focused outline, and
+        // `border: InputBorder.none` does not switch that off — the decorator
+        // falls back to the theme for the focused state alone. So on focus a
+        // second blue rounded rectangle was drawn *inside* this one, inset by
+        // the padding and short of the corners. Every border is off now and
+        // the box itself answers to focus.
         Container(
           height: 161.v,
-          padding: EdgeInsets.symmetric(horizontal: 2.h, vertical: 8.v),
+          padding: EdgeInsets.fromLTRB(12.h, 8.v, 12.h, 8.v),
           decoration: BoxDecoration(
             color: appTheme.fieldFill,
             borderRadius: BorderRadius.circular(8.h),
-            border: Border.all(color: appTheme.navInactive),
+            border: Border.all(
+              color: _node.hasFocus
+                  ? appTheme.soothifyBlue
+                  : appTheme.navInactive,
+            ),
           ),
           child: TextField(
             controller: controller.feedback,
+            focusNode: _node,
             maxLines: null,
             expands: true,
             textAlignVertical: TextAlignVertical.top,
             style: CustomTextStyles.topicChip,
+            cursorColor: appTheme.soothifyBlue,
             decoration: InputDecoration(
               hintText: 'Write......',
               hintStyle: CustomTextStyles.pillLabel
                   .copyWith(color: appTheme.navInactive),
+              isDense: true,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 10.h),
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
             ),
           ),
         ),

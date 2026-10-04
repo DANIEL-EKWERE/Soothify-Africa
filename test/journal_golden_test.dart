@@ -144,10 +144,20 @@ void main() {
           .reduce((a, b) => a + b);
       expect(total, 342, reason: 'the control is 342 wide in both frames');
     }
-    // `259:36965` draws Journal chosen at 152; `259:60761` draws Expert
-    // chosen at 211.
-    expect(JournalTab.own.widthWhen(selected: true), 152);
-    expect(JournalTab.expert.widthWhen(selected: true), 211);
+    // `259:36965` draws Journal chosen at 152 and `259:60761` draws Expert
+    // chosen at 211, with the unread badge hanging off the control's right
+    // end. The badge now sits inside the pill beside the label it counts, so
+    // the Expert half carries both and the split moved with it.
+    expect(JournalTab.own.widthWhen(selected: true), 110);
+    expect(JournalTab.expert.widthWhen(selected: true), 253);
+    // Whichever is chosen, Expert keeps enough for "Expert Recommendation"
+    // at 14 plus the badge — about 184 of it.
+    for (final chosen in JournalTab.values) {
+      expect(
+        JournalTab.expert.widthWhen(selected: chosen == JournalTab.expert),
+        greaterThanOrEqualTo(200),
+      );
+    }
   });
 
   group('JournalEntry.titleFrom', () {

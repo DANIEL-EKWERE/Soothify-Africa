@@ -123,6 +123,12 @@ class AppRoutes {
   /// The receipt. Takes the same [SessionOffering].
   static const String paymentSuccess = '/schedule/payment/success';
 
+  /// Picking the day the paid-for session happens, and the confirmation that
+  /// follows it. The receipt used to return to [booking], which restarts at
+  /// the matching interstitial.
+  static const String bookingCalendar = '/schedule/calendar';
+  static const String bookingConfirmed = '/schedule/calendar/confirmed';
+
   /// Applying to practise on Soothify. The intro, then the form, which runs
   /// its three steps and the acknowledgement in one route.
   static const String expertApplication = '/expert/apply';

@@ -29,6 +29,9 @@ import '../modules/user/settings/policy_screen.dart';
 import '../modules/user/settings/user_profile_screen.dart';
 import '../modules/user/corporate/corporate_form_screen.dart';
 import '../modules/user/corporate/corporate_success_screen.dart';
+import '../modules/user/booking_calendar/binding/booking_calendar_binding.dart';
+import '../modules/user/booking_calendar/booking_calendar_screen.dart';
+import '../modules/user/booking_calendar/booking_confirmed_screen.dart';
 import '../modules/user/breathe/binding/breathe_binding.dart';
 import '../modules/user/breathe/breathe_screen.dart';
 import '../modules/user/trial_offer/binding/trial_offer_binding.dart';
@@ -393,6 +396,15 @@ class AppPages {
       name: AppRoutes.bookingPayment,
       page: () => const BookingPaymentScreen(),
       binding: BookingPaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.bookingCalendar,
+      page: () => const BookingCalendarScreen(),
+      binding: BookingCalendarBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.bookingConfirmed,
+      page: () => const BookingConfirmedScreen(),
     ),
     GetPage(
       name: AppRoutes.paymentSuccess,

@@ -23,7 +23,10 @@ class SplashScreen extends StatefulWidget {
   /// UI transition — this is the one moment the app asks you to slow down.
   static const breathHold = Duration(milliseconds: 2600);
 
-  static const fade = Duration(milliseconds: 700);
+  /// Slow on purpose, and with a gap in the middle of it: the old word
+  /// clears, nothing is shown for a beat, then the next one arrives. At 700
+  /// the two words chased each other.
+  static const fade = Duration(milliseconds: 1800);
 
   /// The prompts, in order.
   static const prompts = ['Inhale Deeply', 'Exhale Slowly'];
@@ -108,10 +111,12 @@ class SplashView extends StatelessWidget {
             // the whole duration, so half way through "Inhale Deeply" and
             // "Exhale Slowly" are each at 50% in the same spot — they ghost
             // through one another and the line visibly dims. Clearing the old
-            // word in the first half and bringing the new one in over the
-            // second reads as one continuous breath instead of a dissolve.
-            switchOutCurve: const Interval(0, 0.5, curve: Curves.easeOut),
-            switchInCurve: const Interval(0.5, 1, curve: Curves.easeIn),
+            // word, holding the gap, then bringing the new one in reads as
+            // one slow breath instead of a dissolve.
+            // Out over the first third, in over the last third, and a beat
+            // of nothing between them.
+            switchOutCurve: const Interval(0, 0.35, curve: Curves.easeOut),
+            switchInCurve: const Interval(0.65, 1, curve: Curves.easeIn),
             transitionBuilder: (child, animation) => FadeTransition(
               opacity: animation,
               child: ScaleTransition(

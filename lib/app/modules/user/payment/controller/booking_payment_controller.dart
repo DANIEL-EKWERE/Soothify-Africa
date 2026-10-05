@@ -22,7 +22,9 @@ class BookingPaymentController extends GetxController {
 
   /// Whose session this is. The frames print the literal placeholder
   /// "[Expert Name]"; the matched coach is who actually goes there.
-  String get expertName => Coach.sample.name;
+  /// The heading greets the expert by first name — "Ready for your session
+  /// with Baraqhat" — which is what keeps it on one line.
+  String get expertName => Coach.sample.name.split(' ').first;
 
   void select(SessionPlan value) => plan.value = value;
 
@@ -44,13 +46,13 @@ class BookingPaymentController extends GetxController {
   void proceed() =>
       Get.toNamed(AppRoutes.paymentSuccess, arguments: offering);
 
-  /// "Continue" on the receipt — back into the booking flow the payment
-  /// unlocks, replacing the receipt so it cannot be returned to.
+  /// "Continue" on the receipt — on to the calendar, where the session the
+  /// payment just bought is actually placed.
   ///
-  /// Carries the offering: the matching interstitial names the discipline
-  /// ("Finding your Pilates instructor"), and it is the only thing that
-  /// knows which one was booked.
-  void done() => Get.offNamed(AppRoutes.booking, arguments: offering);
+  /// This used to go to [AppRoutes.booking], which starts at the matching
+  /// interstitial: paying dropped the user back on "Awesome! You matched
+  /// with" and no booking was ever made.
+  void done() => Get.offNamed(AppRoutes.bookingCalendar, arguments: offering);
 
   /// The policy panel summarises; `280:26738` spells it out.
   void openPolicy() => Get.toNamed(AppRoutes.cancellationPolicy);

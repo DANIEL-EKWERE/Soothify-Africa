@@ -29,7 +29,7 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
             const _Header(),
             Expanded(
               child: ListView(
-                padding: EdgeInsets.fromLTRB(24.h, 61.5.v, 24.h, 24.v),
+                padding: EdgeInsets.fromLTRB(24.h, 61.5.v, 24.h, 0),
                 children: [
                   GradientText(
                     'Ready for your session with ${controller.expertName}',
@@ -57,11 +57,14 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
                     SizedBox(height: 32.v),
                     const _CancellationPolicy(),
                   ],
+                  // 32 between the panel and the action, as the frame draws
+                  // it. Without this the button sat flush against the policy.
+                  SizedBox(height: 32.v),
                 ],
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 27.v),
+              padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 46.v),
               child: Column(
                 children: [
                   CustomElevatedButton(

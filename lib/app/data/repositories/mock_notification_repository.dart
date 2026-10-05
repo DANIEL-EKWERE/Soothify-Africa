@@ -95,6 +95,17 @@ class MockNotificationRepository implements NotificationRepository {
         at: now.subtract(const Duration(days: 1)),
         filters: const {NotificationFilter.all, NotificationFilter.whatsNew},
       ),
+      // The push the designer added on 2026-10-05, which lands in the feed
+      // as well as on the lock screen.
+      AppNotification(
+        id: '11',
+        kind: NotificationKind.breathe,
+        text: 'Your session is set — take 60 seconds to breathe',
+        actionLabel: 'Begin',
+        unread: true,
+        at: now.subtract(const Duration(minutes: 2)),
+        filters: const {NotificationFilter.all, NotificationFilter.sessions},
+      ),
       AppNotification(
         id: '7',
         kind: NotificationKind.action,

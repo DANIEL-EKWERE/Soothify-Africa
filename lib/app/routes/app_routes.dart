@@ -139,6 +139,10 @@ class AppRoutes {
   static const String subscriptionOffer = '/subscribe';
   static const String trialPayment = '/subscribe/payment';
 
+  /// The 60-second breathing minute a push notification opens — Figma's
+  /// "Push Notification" section, `313:25770` onward.
+  static const String breathe = '/breathe';
+
   /// The Corporate enquiry — Figma `259:36101`, and its success card
   /// `259:36093`. Reached from "Speak with Corporate Team" on Plans.
   /// The Settings sub-screens — Figma `259:37602` (subscription), `259:37589`

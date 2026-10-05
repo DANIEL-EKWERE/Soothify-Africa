@@ -44,6 +44,11 @@ class NotificationsController extends BaseController {
   /// The notification names no particular article — it reads "New article
   /// posted" — and the file holds two, so this opens the Pilates & Core one.
   /// When the feed carries an id, it goes in the arguments instead.
-  void openAction(AppNotification notification) =>
-      Get.toNamed(AppRoutes.article, arguments: Article.core);
+  void openAction(AppNotification notification) {
+    if (notification.kind == NotificationKind.breathe) {
+      Get.toNamed(AppRoutes.breathe);
+      return;
+    }
+    Get.toNamed(AppRoutes.article, arguments: Article.core);
+  }
 }

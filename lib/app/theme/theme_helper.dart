@@ -485,6 +485,15 @@ class PrimaryColors {
     colors: [Color(0xFF2C3FE3), Color(0xFF131F87)],
   );
 
+  /// The breathing circle — Figma `313:25770`. Lighter at the top left,
+  /// deepening toward the bottom right, which is what gives it its roundness
+  /// at a flat 210 across.
+  LinearGradient get breatheCircleGradient => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF6E9BF2), Color(0xFF2F62D6)],
+  );
+
   /// Splash / brand gradient, top-left to bottom-right.
   LinearGradient get brandGradient => LinearGradient(
     begin: Alignment.topLeft,

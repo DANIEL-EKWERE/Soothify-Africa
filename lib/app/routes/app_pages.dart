@@ -29,6 +29,8 @@ import '../modules/user/settings/policy_screen.dart';
 import '../modules/user/settings/user_profile_screen.dart';
 import '../modules/user/corporate/corporate_form_screen.dart';
 import '../modules/user/corporate/corporate_success_screen.dart';
+import '../modules/user/breathe/binding/breathe_binding.dart';
+import '../modules/user/breathe/breathe_screen.dart';
 import '../modules/user/trial_offer/binding/trial_offer_binding.dart';
 import '../modules/user/trial_offer/trial_offer_screen.dart';
 import '../modules/user/trial_offer/trial_payment_screen.dart';
@@ -364,6 +366,11 @@ class AppPages {
       name: AppRoutes.subscriptionOffer,
       page: () => const TrialOfferScreen(),
       binding: TrialOfferBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.breathe,
+      page: () => const BreatheScreen(),
+      binding: BreatheBinding(),
     ),
     GetPage(
       name: AppRoutes.trialPayment,

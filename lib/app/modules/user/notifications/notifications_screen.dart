@@ -221,7 +221,9 @@ class _Entry extends StatelessWidget {
         NotificationKind.reminder => _Booking(notification: notification),
         NotificationKind.digest => _Digest(notification: notification),
         NotificationKind.plain => _Plain(notification: notification, now: now),
-        NotificationKind.action => _Action(notification: notification, now: now),
+        NotificationKind.action ||
+        NotificationKind.breathe =>
+          _Action(notification: notification, now: now),
         NotificationKind.booking => _Booking(notification: notification),
       };
 }

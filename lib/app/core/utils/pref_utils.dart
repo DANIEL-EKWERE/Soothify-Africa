@@ -18,6 +18,8 @@ class PrefUtils {
   static const _kOnboarded = 'hasOnboarded';
   static const _kWifiOnlyDownloads = 'wifiOnlyDownloads';
   static const _kPassportWaitlist = 'passportWaitlistEmail';
+  static const _kBreatheStreak = 'breatheStreak';
+  static const _kBreatheLastDay = 'breatheLastDay';
   static const _kCommunityWelcomeSeen = 'communityWelcomeSeen';
   static const _kCommunityUsername = 'communityUsername';
   static const _kWellnessKycPrefix = 'wellnessKyc_';
@@ -87,6 +89,31 @@ class PrefUtils {
       _store.setBool(_kOnboarded, value);
 
   /// Defaults to true — data cost matters in our target markets.
+  /// How many days running the 60-second breathing minute has been finished
+  /// — Figma's "Push Notification" section counts it on the last screen.
+  int breatheStreak() => _store.getInt(_kBreatheStreak) ?? 0;
+
+  /// Records today and returns the streak it leaves behind.
+  ///
+  /// Finishing twice in one day does not count twice, and a gap of more than
+  /// a day starts again at one — a streak that survives a missed day is not
+  /// a streak.
+  Future<int> recordBreatheDay({DateTime? now}) async {
+    final today = now ?? DateTime.now();
+    final key = today.year * 10000 + today.month * 100 + today.day;
+    final last = _store.getInt(_kBreatheLastDay);
+    if (last == key) return breatheStreak();
+
+    final yesterday = today.subtract(const Duration(days: 1));
+    final yesterdayKey =
+        yesterday.year * 10000 + yesterday.month * 100 + yesterday.day;
+    final next = last == yesterdayKey ? breatheStreak() + 1 : 1;
+
+    await _store.setInt(_kBreatheLastDay, key);
+    await _store.setInt(_kBreatheStreak, next);
+    return next;
+  }
+
   /// The address left on the Passport waitlist.
   ///
   /// Nothing sends it anywhere yet — there is no waitlist endpoint. It is

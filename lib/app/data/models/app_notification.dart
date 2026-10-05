@@ -31,6 +31,11 @@ enum NotificationKind {
   /// A line with an inline action beside it — "New article posted / Read".
   action,
 
+  /// The 60-second breathing minute, which arrives as a push and also sits
+  /// in the feed — Figma's "Push Notification" section. Same shape as
+  /// [action]; the link opens the minute rather than an article.
+  breathe,
+
   /// A compact outlined pill — an unread dot, the kind, then one line about a
   /// session. Figma `259:61271`, which fills the feed with these under its
   /// own two chips.

@@ -512,6 +512,46 @@ class CustomTextStyles {
     color: Colors.white,
   );
 
+  // --- The 60-second breathing minute ---
+  // Figma's "Push Notification" section: `313:25770`, `313:25785`,
+  // `313:25825`.
+
+  static TextStyle get breatheHeader => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get breatheHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 17.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 23 / 17,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get breatheBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19 / 13,
+    color: appTheme.textSecondary,
+  );
+
+  static TextStyle get breatheStreak => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 17.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 23 / 17,
+    color: appTheme.textPrimary,
+  );
+
   /// The Community holding screen — the designer's screenshot of
   /// 2026-10-05.
   static TextStyle get comingSoonHeading => TextStyle(

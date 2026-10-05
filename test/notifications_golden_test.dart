@@ -92,14 +92,15 @@ void main() {
 
   testWidgets('the chips narrow the list', (tester) async {
     final controller = await mount(tester);
-    expect(controller.visible, hasLength(11));
+    expect(controller.visible, hasLength(12));
 
     await tester.tap(find.text('Sessions'));
     await tester.pumpAndSettle();
 
     expect(controller.filter.value, NotificationFilter.sessions);
-    // The three booking rows plus the Reminder card.
-    expect(controller.visible, hasLength(4));
+    // The three booking rows, the Reminder card, and the breathe push that
+    // follows a booking.
+    expect(controller.visible, hasLength(5));
     expect(find.textContaining('Pilates & Core session tomorrow'),
         findsOneWidget);
     expect(find.textContaining('Kendrick'), findsNothing);
@@ -113,7 +114,7 @@ void main() {
 
     await tester.tap(find.text('All'));
     await tester.pumpAndSettle();
-    expect(controller.visible, hasLength(11));
+    expect(controller.visible, hasLength(12));
   });
 
   testWidgets("only What's new carries the New tag", (tester) async {
@@ -146,10 +147,12 @@ void main() {
     final unread = feed.where((n) => n.unread).map((n) => n.kind).toList();
     // `259:26851` dots its opening card, the Reminder pill and the weekly
     // digest; `259:61271` dots its first two booking rows and not the third.
+    // The breathe push the designer added on 2026-10-05 lands unread too.
     expect(unread, [
       NotificationKind.recommendation,
       NotificationKind.reminder,
       NotificationKind.digest,
+      NotificationKind.breathe,
       NotificationKind.booking,
       NotificationKind.booking,
     ]);

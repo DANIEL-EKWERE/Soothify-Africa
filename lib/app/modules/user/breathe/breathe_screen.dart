@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
@@ -80,13 +78,21 @@ class BreatheScreen extends GetView<BreatheController> {
   }
 }
 
-/// The circle, which swells and settles with the cue it is on.
+/// The circle, which breathes the cycle rather than decorating it.
 ///
-/// The frames draw it still, because a frame cannot do otherwise. A minute
-/// spent watching a circle that does not move is a minute with nothing to
-/// breathe along with, so it breathes.
+/// The frames draw it still, because a frame cannot do otherwise. It is the
+/// thing the user breathes along with, so it has to move with the cue and not
+/// merely near it: it swells over the four seconds of the inhale, holds its
+/// size for the two of the hold, and settles back over the six of the exhale.
+///
+/// One repeating 12-second pass drives it — the whole cycle, not a sine wave
+/// that happens to be about the right length — so the size and the line under
+/// the clock always agree.
 class _BreathCircle extends StatefulWidget {
   const _BreathCircle();
+
+  /// The circle at its smallest, as a fraction of the frame's 210.
+  static const double _restScale = 0.66;
 
   @override
   State<_BreathCircle> createState() => _BreathCircleState();
@@ -96,18 +102,26 @@ class _BreathCircleState extends State<_BreathCircle>
     with SingleTickerProviderStateMixin {
   late final AnimationController _swell = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 6),
+    duration: Duration(seconds: BreatheCue.cycleSeconds),
   );
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
     _swell.dispose();
     super.dispose();
+  }
+
+  /// How full the lungs are, 0 at rest and 1 at the top of a breath.
+  ///
+  /// Eased at both ends of the inhale and the exhale, so the turn is a pause
+  /// rather than a bounce — the circle should never look like it snapped.
+  double _fullness() {
+    final (cue, through) = BreatheCue.at(_swell.value * BreatheCue.cycleSeconds);
+    return switch (cue) {
+      BreatheCue.inhale => Curves.easeInOutSine.transform(through),
+      BreatheCue.hold => 1,
+      BreatheCue.exhale => 1 - Curves.easeInOutSine.transform(through),
+    };
   }
 
   @override
@@ -118,36 +132,38 @@ class _BreathCircleState extends State<_BreathCircle>
     return Obx(() {
       final active = controller.phase.value == BreathePhase.active;
       if (!still && active && !_swell.isAnimating) {
-        _swell.repeat(reverse: true);
+        // From 0 — the start of an inhale — so the first thing the user sees
+        // is the circle opening under "Breathe in".
+        _swell.repeat();
       } else if ((!active || still) && _swell.isAnimating) {
         _swell.stop();
       }
       return AnimatedBuilder(
         animation: _swell,
-        builder: (context, _) {
-          // 1.0 at rest, up to 1.06 at the top of a breath.
-          final scale = active
-              ? 1 + 0.06 * math.sin(_swell.value * math.pi)
+        builder: (context, child) {
+          // Outside the minute — and wherever motion is turned off — the
+          // circle sits at the size the frames draw it.
+          final scale = active && !still
+              ? _BreathCircle._restScale +
+                  (1 - _BreathCircle._restScale) * _fullness()
               : 1.0;
-          return Transform.scale(
-            scale: scale,
-            child: Container(
-              height: 210.h,
-              width: 210.h,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: appTheme.breatheCircleGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: appTheme.soothifyBlue.withValues(alpha: 0.18),
-                    blurRadius: 36,
-                    spreadRadius: 4,
-                  ),
-                ],
-              ),
-            ),
-          );
+          return Transform.scale(scale: scale, child: child);
         },
+        child: Container(
+          height: 210.h,
+          width: 210.h,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: appTheme.breatheCircleGradient,
+            boxShadow: [
+              BoxShadow(
+                color: appTheme.soothifyBlue.withValues(alpha: 0.18),
+                blurRadius: 36,
+                spreadRadius: 4,
+              ),
+            ],
+          ),
+        ),
       );
     });
   }

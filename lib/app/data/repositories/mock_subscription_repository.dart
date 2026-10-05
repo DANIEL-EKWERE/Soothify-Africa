@@ -37,6 +37,7 @@ class MockSubscriptionRepository implements SubscriptionRepository {
           'soundscapes, and the wellness journal.',
       price: '₦15,000',
       priceSuffix: '/One time access',
+      action: PlanAction.trial,
     ),
     PlanTier(
       id: 'passport',

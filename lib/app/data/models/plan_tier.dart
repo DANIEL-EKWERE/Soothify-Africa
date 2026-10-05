@@ -4,8 +4,15 @@
 /// in the Discovery upsell. This carries the marketing copy the Plans screen
 /// prints, and knows whether the design gives it the filled emphasis
 /// treatment.
-/// What a card offers instead of, or as well as, a price.
+/// The button at the foot of a card.
+///
+/// Every tier carries one now: the designer moved the trial off the bottom of
+/// the screen and into the Core card, so each card asks for its own next step
+/// rather than one button standing for all three.
 enum PlanAction {
+  /// The Core card's "Start 7-Day Free Trial" — on to the subscription offer.
+  trial('Start 7-Day Free Trial'),
+
   /// The Passport card's "Join the Waitlist" — opens the waitlist sheet the
   /// Spaces flow already uses, since it is the same waitlist.
   waitlist('Join the Waitlist'),
@@ -42,7 +49,8 @@ class PlanTier {
   /// What follows the amount in grey at a smaller size: "/One time access".
   final String priceSuffix;
 
-  /// The link under the copy, where the card has one instead of a price.
+  /// The button under the copy. A priced card carries both — the price, then
+  /// the button beneath it.
   final PlanAction? action;
 
   /// The design fills one card with [PrimaryColors.brandInk] and reverses its
@@ -59,6 +67,7 @@ class PlanTier {
         price: json['price_display'] as String? ?? '',
         priceSuffix: json['price_suffix'] as String? ?? '',
         action: switch (json['action'] as String?) {
+          'trial' => PlanAction.trial,
           'waitlist' => PlanAction.waitlist,
           'corporate' => PlanAction.corporate,
           _ => null,

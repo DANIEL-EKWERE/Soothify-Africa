@@ -53,6 +53,62 @@ void main() {
     });
   }
 
+  test('the cue lookup splits the cycle 4-2-6', () {
+    expect(BreatheCue.cycleSeconds, 12);
+    // At the start of each cue, and just before it ends.
+    expect(BreatheCue.at(0), (BreatheCue.inhale, 0.0));
+    expect(BreatheCue.at(2).$1, BreatheCue.inhale);
+    expect(BreatheCue.at(2).$2, closeTo(0.5, 0.001));
+    expect(BreatheCue.at(4), (BreatheCue.hold, 0.0));
+    expect(BreatheCue.at(6), (BreatheCue.exhale, 0.0));
+    expect(BreatheCue.at(9).$2, closeTo(0.5, 0.001));
+    // And it wraps, so a second minute reads the same as the first.
+    expect(BreatheCue.at(12), (BreatheCue.inhale, 0.0));
+    expect(BreatheCue.at(13).$1, BreatheCue.inhale);
+  });
+
+  testWidgets('the circle grows through the inhale and settles on the exhale',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    final c = Get.put(BreatheController());
+    // Motion on: this is the one test that is about the movement itself.
+    await pumpScreen(tester, const BreatheScreen(), motion: true);
+
+    // The circle, found by its shape rather than by position in the tree.
+    // Measured on screen, so the scale the Transform applies is in the figure.
+    final circle = find.byWidgetPredicate((w) =>
+        w is Container &&
+        w.decoration is BoxDecoration &&
+        (w.decoration! as BoxDecoration).shape == BoxShape.circle);
+    double scale() => tester.getRect(circle).width;
+
+    final still = scale();
+
+    c.start();
+    await tester.pump();
+    // The inhale starts from the bottom of the breath, so the circle is at
+    // its smallest the moment the minute begins.
+    final atStart = scale();
+    expect(atStart, lessThan(still));
+
+    // Four seconds in is the top of the inhale.
+    await tester.pump(const Duration(seconds: 4));
+    final atTop = scale();
+    expect(atTop, greaterThan(atStart));
+
+    // Two more holds it there.
+    await tester.pump(const Duration(seconds: 2));
+    expect(scale(), closeTo(atTop, 1));
+
+    // Then six seconds of exhale put it back where it started.
+    await tester.pump(const Duration(seconds: 6));
+    expect(scale(), closeTo(atStart, 1));
+
+    c.close();
+  });
+
   testWidgets('the invitation is the frame’s own', (tester) async {
     await mount(tester);
     expect(find.text('Breathe in, breathe out'), findsOneWidget);

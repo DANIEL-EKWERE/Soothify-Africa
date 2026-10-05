@@ -20,6 +20,20 @@ enum BreatheCue {
 
   static int get cycleSeconds =>
       BreatheCue.values.fold(0, (sum, c) => sum + c.seconds);
+
+  /// The cue a given number of seconds into a cycle, and how far through it.
+  ///
+  /// The screen needs this at a finer grain than the one-second clock: the
+  /// circle has to grow and shrink smoothly across a cue, not step once a
+  /// second.
+  static (BreatheCue, double) at(double secondsIntoCycle) {
+    var into = secondsIntoCycle % cycleSeconds;
+    for (final c in BreatheCue.values) {
+      if (into < c.seconds) return (c, into / c.seconds);
+      into -= c.seconds;
+    }
+    return (BreatheCue.inhale, 0);
+  }
 }
 
 /// Backs the 60-second breathing minute — Figma's "Push Notification"

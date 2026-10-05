@@ -197,6 +197,8 @@ class _MessageBar extends StatelessWidget {
                   hintText: 'Type in your message',
                   hintStyle: CustomTextStyles.searchHint,
                   border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
                   isDense: true,
                 ),
               ),

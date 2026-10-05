@@ -1092,24 +1092,7 @@ class CustomTextStyles {
     color: appTheme.hintText,
   );
 
-  /// "Join the Waitlist" on the filled card.
-  static TextStyle get tierLink => TextStyle(
-    fontFamily: fontNunito,
-    fontSize: 20.fSize,
-    fontWeight: FontWeight.w400,
-    fontVariations: _regular,
-    height: 27.28 / 20,
-    color: appTheme.onPrimary,
-  );
-
-  /// "Speak with Corporate Team" — the same size, set bold.
-  static TextStyle get tierLinkStrong => tierLink.copyWith(
-        fontWeight: FontWeight.w700,
-        fontVariations: _bold,
-        color: appTheme.actionFill,
-      );
-
-  /// "Start 7-Day Free Trial" — Nunito Bold 16 in the brand blue.
+  /// A plan card's button label — Nunito Bold 16, tinted by the card.
   static TextStyle get trialButtonLabel => TextStyle(
     fontFamily: fontNunito,
     fontSize: 16.fSize,

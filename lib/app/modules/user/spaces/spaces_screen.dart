@@ -95,7 +95,15 @@ class _SearchField extends StatelessWidget {
                 style: CustomTextStyles.spaceSearch,
                 decoration: InputDecoration(
                   isDense: true,
+                  // Otherwise the decorator's own padding pushes the hint a
+                  // further 12 off the magnifier it is meant to sit beside.
+                  contentPadding: EdgeInsets.zero,
                   border: InputBorder.none,
+                  // `border` is only the fallback — the themed
+                  // `focusedBorder` still draws on focus, which put a blue
+                  // rectangle inside the search pill, inset from it.
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
                   hintText: 'Find a quiet space near you...',
                   hintStyle: CustomTextStyles.spaceSearchHint,
                 ),

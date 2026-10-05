@@ -59,6 +59,8 @@ class ComposeScreen extends GetView<ComposeController> {
                     hintStyle: CustomTextStyles.pillLabel
                         .copyWith(color: appTheme.navInactive),
                     border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 10.h),
                   ),
                 ),

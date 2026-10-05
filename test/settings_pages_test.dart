@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:io';
 
+import 'package:soothifyafrica/app/core/utils/image_constant.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/widgets/custom_image_view.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
@@ -66,6 +68,30 @@ void main() {
       }
     });
   }
+
+  testWidgets('the avatar badge offers two photo sources, not three',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    await putSettings();
+
+    await pumpScreen(tester, const UserProfileScreen());
+    await tester.pumpAndSettle();
+
+    // The badge on the avatar, not the back arrow that comes before it.
+    await tester.tap(find.ancestor(
+      of: find.byWidgetPredicate((w) =>
+          w is CustomImageView && w.imagePath == ImageConstant.icEditBadge),
+      matching: find.byType(InkWell),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Take a photo'), findsOneWidget);
+    expect(find.text('Upload from gallery'), findsOneWidget);
+    // The redrawn sheet dropped it; the app has no Facebook sign-in anyway.
+    expect(find.textContaining('facebook'), findsNothing);
+  });
 
   testWidgets('every Settings row opens its screen, none toast',
       (tester) async {

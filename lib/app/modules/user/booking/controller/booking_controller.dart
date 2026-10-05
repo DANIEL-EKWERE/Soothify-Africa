@@ -19,13 +19,25 @@ enum CallMode {
 /// Where the booking flow currently is — Figma 135:20803 onward.
 enum BookingStage { matching, matched, method, call, rating, feedback }
 
+/// What the booking route was opened with.
+///
+/// It used to take a bare [SessionOffering] and always begin at the matching
+/// interstitial. Joining a booked session from the notification feed has to
+/// enter at the call instead, so the stage travels with the offering.
+class BookingEntry {
+  const BookingEntry({required this.offering, required this.stage});
+
+  final SessionOffering offering;
+  final BookingStage stage;
+}
+
 /// Drives the booking flow after Schedule.
 ///
 /// One controller rather than five routes: the frames share a header and run
 /// strictly in order, and a back press should step back through the flow
 /// rather than unwind a route stack the user never chose to build.
 class BookingController extends GetxController {
-  BookingController({Duration? matchDuration, this.offering})
+  BookingController({Duration? matchDuration, this.offering, this.startAt})
       : _matchDuration = matchDuration ?? const Duration(seconds: 3);
 
   /// What was booked. Null only when the route is opened without one, which
@@ -42,7 +54,11 @@ class BookingController extends GetxController {
   /// wait on a real timer.
   final Duration _matchDuration;
 
-  final Rx<BookingStage> stage = BookingStage.matching.obs;
+  late final Rx<BookingStage> stage = (startAt ?? BookingStage.matching).obs;
+
+  /// Where to begin. Null means the matching interstitial, which is how every
+  /// route into this screen behaved before sessions could be joined.
+  final BookingStage? startAt;
   final Rxn<CallMode> mode = Rxn<CallMode>();
   final RxInt rating = 0.obs;
   final RxDouble matchProgress = 0.0.obs;
@@ -81,7 +97,9 @@ class BookingController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _runMatching();
+    // Entering at the call means the session was already matched and paid
+    // for; running the interstitial would walk it through matching again.
+    if (stage.value == BookingStage.matching) _runMatching();
   }
 
   @override

@@ -239,7 +239,13 @@ class _Booking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final controller = Get.find<NotificationsController>();
+    return InkWell(
+      // A booked session is a way into the session, not just a note about
+      // one: tapping it opens the waiting room and then the call.
+      onTap: () => controller.openSession(notification),
+      borderRadius: BorderRadius.circular(8.h),
+      child: Container(
       height: 39.v,
       // The frame's own body box is 233 for a 47-character line — right at
       // its limit. The gaps are trimmed from its 30 and 8 so the sentence
@@ -270,6 +276,7 @@ class _Booking extends StatelessWidget {
             child: _BookingLine(notification: notification),
           ),
         ],
+      ),
       ),
     );
   }
@@ -508,14 +515,17 @@ class _Action extends StatelessWidget {
     return Row(
       children: [
         Flexible(
+          // "New article posted" fits a line; the breathe reminder — "Your
+          // session is set — take 60 seconds to breathe" — does not, and
+          // ellipsising it cut the instruction off at "take 60 sec…".
           child: Text(
             notification.text,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: CustomTextStyles.notificationText,
           ),
         ),
-        SizedBox(width: 24.h),
+        SizedBox(width: 12.h),
         InkWell(
           onTap: () => controller.openAction(notification),
           child: GradientText(

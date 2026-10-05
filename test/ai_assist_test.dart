@@ -9,6 +9,7 @@ import 'package:soothifyafrica/app/routes/app_routes.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/widgets/ai_assist_overlay.dart';
 import 'package:soothifyafrica/app/widgets/ai_assist_button.dart';
+import 'package:soothifyafrica/app/widgets/ai_mini_player.dart';
 
 import 'helpers.dart';
 
@@ -139,6 +140,9 @@ void main() {
   group('the app-wide overlay', () {
     Future<void> mountApp(WidgetTester tester, {String? at}) async {
       AiAssistOverlay.route.value = at;
+      // Both are static: a test that left the panel open would otherwise hand
+      // the next one a screen with no button on it.
+      AiAssistOverlay.expanded.value = false;
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) => GetMaterialApp(
@@ -215,7 +219,7 @@ void main() {
       );
     });
 
-    testWidgets('tapping it opens the AI Hub, and it steps aside there',
+    testWidgets('tapping it floats the mini player in its place',
         (tester) async {
       useDesignFrame(tester);
       await mountApp(tester, at: AppRoutes.shell);
@@ -224,8 +228,25 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
+      // The panel stands where the button was, so the two never show at once.
+      expect(find.byType(AiMiniPlayer), findsOneWidget);
+      expect(find.byType(AiAssistButton), findsNothing);
+    });
+
+    testWidgets('expanding the mini player opens the AI Hub, and it steps '
+        'aside there', (tester) async {
+      useDesignFrame(tester);
+      await mountApp(tester, at: AppRoutes.shell);
+
+      await tester.tap(find.byType(AiAssistButton));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.open_in_full));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
       expect(find.text('ai hub'), findsOneWidget);
-      // The hub is the button's own destination, so it must not float over it.
+      // The hub is what the panel expands into, so neither floats over it.
+      expect(find.byType(AiMiniPlayer), findsNothing);
       expect(find.byType(AiAssistButton), findsNothing);
     });
 

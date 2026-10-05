@@ -42,8 +42,6 @@ class PlansTab extends GetView<PlansTabController> {
                       ],
                     ],
                   )),
-              SizedBox(height: 24.v),
-              const _TrialButton(),
             ],
           ),
         ),
@@ -173,10 +171,11 @@ class _PeriodSegment extends StatelessWidget {
 
 /// One plan card.
 ///
-/// Three shapes from one widget: a white card with a blue outline and a
-/// price, the filled card with a link in place of one, and a white card with
-/// a grey outline and a link. Nothing here is selectable — the redrawn screen
-/// sells the trial at the bottom, not a chosen tier.
+/// Two shapes from one widget: a white card ringed in the brand blue, and the
+/// filled card ringed in the brand orange — blue would disappear into its own
+/// fill. Each ends in its own button, which is what the card is asking for:
+/// the trial, the waitlist sheet, or the corporate form. Nothing here is
+/// selectable; the button is the choice.
 class _TierCard extends StatelessWidget {
   const _TierCard({required this.tier});
 
@@ -195,15 +194,10 @@ class _TierCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: onDark ? appTheme.planEmphasisFill : appTheme.surface,
         borderRadius: BorderRadius.circular(16.h),
-        border: onDark
-            ? null
-            : Border.all(
-                // The priced card is outlined in the deep brand blue; the
-                // one that only starts a conversation in plain grey.
-                color: tier.hasPrice
-                    ? appTheme.actionFill
-                    : appTheme.planOutlineMuted,
-              ),
+        border: Border.all(
+          color:
+              onDark ? appTheme.planEmphasisOutline : appTheme.actionFill,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,13 +212,16 @@ class _TierCard extends StatelessWidget {
             style: CustomTextStyles.tierBody.copyWith(color: foreground),
           ),
           SizedBox(height: 28.v),
-          if (tier.hasPrice)
-            _Price(tier: tier)
-          else if (tier.action != null)
-            _ActionLink(
+          if (tier.hasPrice) ...[
+            _Price(tier: tier),
+            SizedBox(height: 24.v),
+          ],
+          if (tier.action != null)
+            _TierButton(
               action: tier.action!,
               onDark: onDark,
               onTap: () => switch (tier.action!) {
+                PlanAction.trial => controller.startTrial(),
                 PlanAction.waitlist => PassportSheet.show(context),
                 PlanAction.corporate => controller.openCorporateForm(),
               },
@@ -266,8 +263,13 @@ class _Price extends StatelessWidget {
   }
 }
 
-class _ActionLink extends StatelessWidget {
-  const _ActionLink({
+/// The card's own button.
+///
+/// The outlined trial button that used to sit under the whole list, now one
+/// per card: white with a blue ring on the white cards, and transparent with
+/// a white ring on the filled one, where a blue ring would be unreadable.
+class _TierButton extends StatelessWidget {
+  const _TierButton({
     required this.action,
     required this.onDark,
     required this.onTap,
@@ -279,50 +281,25 @@ class _ActionLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colour = onDark ? appTheme.onPrimary : appTheme.actionFill;
+    final colour = onDark ? appTheme.onPrimary : appTheme.soothifyBlue;
     return InkWell(
       onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            action.label,
-            style: (onDark
-                    ? CustomTextStyles.tierLink
-                    : CustomTextStyles.tierLinkStrong)
-                .copyWith(color: colour),
-          ),
-          // Only the waitlist card draws the arrow.
-          if (action == PlanAction.waitlist) ...[
-            SizedBox(width: 12.h),
-            Icon(Icons.arrow_forward, size: 20.h, color: colour),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _TrialButton extends StatelessWidget {
-  const _TrialButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<PlansTabController>();
-    return InkWell(
-      onTap: controller.startTrial,
       borderRadius: BorderRadius.circular(8.h),
       child: Container(
         height: 52.v,
         alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(horizontal: 12.h),
         decoration: BoxDecoration(
-          color: appTheme.surface,
+          color: onDark ? Colors.transparent : appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.soothifyBlue),
+          border: Border.all(color: colour),
         ),
         child: Text(
-          'Start 7-Day Free Trial',
-          style: CustomTextStyles.trialButtonLabel,
+          action.label,
+          maxLines: 1,
+          textAlign: TextAlign.center,
+          overflow: TextOverflow.ellipsis,
+          style: CustomTextStyles.trialButtonLabel.copyWith(color: colour),
         ),
       ),
     );

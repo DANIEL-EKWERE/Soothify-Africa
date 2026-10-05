@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
@@ -21,7 +23,7 @@ import 'controller/client_joining_controller.dart';
 /// "Joining Call" and again inside the titled panel — the same paste slip the
 /// practitioner frame has. It appears once here, under the heading that makes
 /// sense of it.
-class ClientJoiningScreen extends GetView<ClientJoiningController> {
+class ClientJoiningScreen extends StatefulWidget {
   const ClientJoiningScreen({super.key});
 
   static const String guarantee =
@@ -29,6 +31,33 @@ class ClientJoiningScreen extends GetView<ClientJoiningController> {
       'Guarantee. Staying inside your Soothify space ensures your privacy '
       'remains encrypted, your payments are secure, and your support is '
       'guaranteed';
+
+  @override
+  State<ClientJoiningScreen> createState() => _ClientJoiningScreenState();
+}
+
+class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
+  ClientJoiningController get controller => Get.find<ClientJoiningController>();
+
+  /// The waiting room holds while the call opens, then goes through to it.
+  ///
+  /// The countdown belongs to the screen rather than the controller: the
+  /// screen is what the user is looking at while it runs, and leaving the
+  /// screen — by any route, including a test tearing the tree down — must
+  /// stop it.
+  Timer? _connect;
+
+  @override
+  void initState() {
+    super.initState();
+    _connect = Timer(controller.connecting, controller.join);
+  }
+
+  @override
+  void dispose() {
+    _connect?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -81,6 +81,8 @@ class PrimaryColors {
     required this.periodToggleBorder,
     required this.planEmphasisFill,
     required this.planOutlineMuted,
+    required this.planEmphasisOutline,
+    required this.expertCardBorder,
     required this.spaceChipBorder,
     required this.topicChipBorder,
     required this.unreadDot,
@@ -268,9 +270,23 @@ class PrimaryColors {
   /// chip beside the one filled blue.
   final Color spaceChipBorder;
 
-  /// The Corporate card's outline. The priced card takes [actionFill]; this
-  /// one is a plain grey, because it sells a conversation rather than a plan.
+  /// A muted plan outline. The Plans cards no longer use it — every white
+  /// card is outlined in [actionFill] now — but it stays as the app's plain
+  /// card hairline.
   final Color planOutlineMuted;
+
+  /// The outline on the emphasised plan card. The white cards are ringed in
+  /// the brand blue, which would vanish against [planEmphasisFill], so the
+  /// filled one takes the brand orange instead — the same `#F09D39` the auth
+  /// CTA uses, in both themes, because it sits on a surface that does not
+  /// invert.
+  final Color planEmphasisOutline;
+
+  /// The hairline around the expert dashboard's white cards. Black at 4% —
+  /// they were drawing in [textPrimary], which ringed every card in near
+  /// black. In dark mode it is white at 10%, since 4% of white over a dark
+  /// surface is no line at all.
+  final Color expertCardBorder;
 
   /// The red mark on an unread notification. `#F44336`, measured off
   /// `259:26851`; the Journal reuses it for its unread count badge and, at
@@ -567,6 +583,8 @@ class PrimaryColors {
     periodToggleBorder: Color(0xFFD7D7D7),
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFFCBCBCB),
+    planEmphasisOutline: Color(0xFFF09D39),
+    expertCardBorder: Color(0x0A000000),
     spaceChipBorder: Color(0xFFD7D7D7),
     topicChipBorder: Color(0x4D999999),
     unreadDot: Color(0xFFF44336),
@@ -677,6 +695,8 @@ class PrimaryColors {
     periodToggleBorder: Color(0x33FFFFFF),
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFF3F4347),
+    planEmphasisOutline: Color(0xFFF09D39),
+    expertCardBorder: Color(0x1AFFFFFF),
     spaceChipBorder: Color(0x33FFFFFF),
     topicChipBorder: Color(0x4DFFFFFF),
     unreadDot: Color(0xFFF44336),

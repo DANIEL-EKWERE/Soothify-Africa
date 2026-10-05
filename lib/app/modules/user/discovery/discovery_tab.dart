@@ -390,6 +390,8 @@ class _SearchRowState extends State<_SearchRow> {
                 decoration: InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
                   hintText: 'What can we help you find?',
                   hintStyle: CustomTextStyles.searchHint,

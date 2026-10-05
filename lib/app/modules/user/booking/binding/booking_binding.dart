@@ -7,11 +7,18 @@ import '../controller/booking_controller.dart';
 /// can name the discipline.
 class BookingBinding extends Bindings {
   @override
-  void dependencies() => Get.lazyPut(
-        () => BookingController(
-          offering: Get.arguments is SessionOffering
-              ? Get.arguments as SessionOffering
-              : null,
-        ),
-      );
+  void dependencies() => Get.lazyPut(() {
+        final args = Get.arguments;
+        // Two callers: the receipt passes a bare offering, and the joining
+        // screen passes an entry that also says where to begin.
+        if (args is BookingEntry) {
+          return BookingController(
+            offering: args.offering,
+            startAt: args.stage,
+          );
+        }
+        return BookingController(
+          offering: args is SessionOffering ? args : null,
+        );
+      });
 }

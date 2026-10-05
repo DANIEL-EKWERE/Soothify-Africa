@@ -90,8 +90,10 @@ class UserProfileScreen extends GetView<SettingsController> {
     );
   }
 
-  /// The sheet `259:37567` draws over the avatar — three sources, the middle
-  /// one highlighted.
+  /// The photo-source sheet, redrawn in the updated Mobile/Setting section:
+  /// two sources, not three. The Facebook upload is gone — the app has no
+  /// Facebook sign-in to borrow a photo from — and "Upload from gallery" is
+  /// the highlighted one.
   Future<void> _showPhotoSources(BuildContext context) =>
       showModalBottomSheet<void>(
         context: context,
@@ -108,7 +110,6 @@ class UserProfileScreen extends GetView<SettingsController> {
               for (final (label, highlighted) in const [
                 ('Take a photo', false),
                 ('Upload from gallery', true),
-                ('Upload from facebook', false),
               ])
                 InkWell(
                   onTap: () {

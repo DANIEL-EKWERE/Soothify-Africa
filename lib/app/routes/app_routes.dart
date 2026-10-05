@@ -133,14 +133,23 @@ class AppRoutes {
 
   /// The subscription pitch. Takes a [SubscriptionOffer]; one route serves
   /// both frames.
+  /// The trial pop-up — Figma `311:25655`, which replaced the pair at
+  /// `259:59011` and `259:58598` — and the payment screen behind it,
+  /// `311:25477` / `311:25582`.
   static const String subscriptionOffer = '/subscribe';
+  static const String trialPayment = '/subscribe/payment';
 
   /// The Corporate enquiry — Figma `259:36101`, and its success card
   /// `259:36093`. Reached from "Speak with Corporate Team" on Plans.
   /// The Settings sub-screens — Figma `259:37602` (subscription), `259:37589`
   /// (account), `259:37551` (user profile), `259:37617` (delete), `259:37526`
   /// (notifications) and the three content pages.
+  /// The Manage-subscription set the designer added on 2026-10-05 — Figma
+  /// `308:25746` (inactive), `308:25763` (active), `308:25888` (change plan)
+  /// and `308:25859` (billing history).
   static const String manageSubscription = '/settings/subscription';
+  static const String changePlan = '/settings/subscription/change-plan';
+  static const String billingHistory = '/settings/subscription/billing';
   static const String accountSettings = '/settings/account';
   static const String userProfile = '/settings/account/profile';
   static const String deleteAccount = '/settings/account/delete';

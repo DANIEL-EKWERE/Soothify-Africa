@@ -115,6 +115,15 @@ class PrimaryColors {
     required this.topicChipLabel,
     required this.rowBorder,
     required this.cardHairline,
+    required this.paymentWash,
+    required this.radioRim,
+    required this.fieldRim,
+    required this.paymentHintInk,
+    required this.statusIdleFill,
+    required this.statusIdleInk,
+    required this.statusLiveInk,
+    required this.destructiveInk,
+    required this.brandWash,
     required this.divider,
     required this.accent,
     required this.success,
@@ -350,6 +359,38 @@ class PrimaryColors {
   /// Hairline around an unselected language row.
   final Color rowBorder;
 
+  /// The trial pop-up and its payment screen — Figma `311:25655`,
+  /// `311:25477` and `311:25582`.
+  ///
+  /// `paymentWash` is the pale blue behind a chosen payment method and the
+  /// summary's chips; `radioRim` is an unselected radio's ring; `fieldRim`
+  /// the card inputs' border, which is heavier than the 5% hairline the cards
+  /// use.
+  final Color paymentWash;
+  final Color radioRim;
+  final Color fieldRim;
+
+  /// A card field's placeholder.
+  final Color paymentHintInk;
+
+  /// "Your Subscription" and the screens behind it — Figma `308:25746` and
+  /// siblings, the Manage-subscription set the designer added on 2026-10-05.
+  ///
+  /// The status pills: Inactive is grey on a grey wash, Active is the
+  /// design's own #4CAF50 at 26% — a different green from [success], which is
+  /// #34C759, so it gets a token rather than borrowing one.
+  final Color statusIdleFill;
+  final Color statusIdleInk;
+  final Color statusLiveInk;
+
+  /// "Cancel Subscription" and "Confirm Cancellation" — destructive, and a
+  /// redder red than [error].
+  final Color destructiveInk;
+
+  /// The savings badge on "Change Your Plan", and the empty receipt circle on
+  /// Billing History.
+  final Color brandWash;
+
   /// The Expert Recommendation cards' outline — **5% black**, not a solid
   /// grey. The Figma API reports `stroke #000000 w=1.0` and puts the 0.05 in
   /// a separate `opacity` field, which is easy to miss and which this app has
@@ -551,6 +592,15 @@ class PrimaryColors {
     topicChipLabel: Color(0xB81B1F26),
     rowBorder: Color(0xFFCCCCCC),
     cardHairline: Color(0x0D000000),
+    statusIdleFill: Color(0xFFF3F4F6),
+    paymentWash: Color(0xFFEDF4FF),
+    radioRim: Color(0xFFB7C2CB),
+    fieldRim: Color(0xFFDCE4EA),
+    paymentHintInk: Color(0xFF929BA0),
+    statusIdleInk: Color(0xFF6B7280),
+    statusLiveInk: Color(0xFF4CAF50),
+    destructiveInk: Color(0xFFD32F2F),
+    brandWash: Color(0xFFEAF0FF),
     divider: Color(0xFFEDE9E3),
     accent: Color(0xFFF5A623),
     success: Color(0xFF34C759),
@@ -657,6 +707,15 @@ class PrimaryColors {
     rowBorder: Color(0xFF4A4747),
     // 5% black vanishes on a dark ground; the same weight in white.
     cardHairline: Color(0x14FFFFFF),
+    statusIdleFill: Color(0xFF2E3236),
+    paymentWash: Color(0x1F2F6FED),
+    radioRim: Color(0xFF5A6068),
+    fieldRim: Color(0xFF42484E),
+    paymentHintInk: Color(0xFF8A8F95),
+    statusIdleInk: Color(0xFF9BA3AE),
+    statusLiveInk: Color(0xFF5FD37C),
+    destructiveInk: Color(0xFFFF6B5E),
+    brandWash: Color(0x1F2F6FED),
     divider: Color(0xFF2A2828),
     accent: Color(0xFFF5A623),
     success: Color(0xFF34C759),

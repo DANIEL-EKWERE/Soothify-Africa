@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../data/models/session_offering.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/gradient_text.dart';
 import 'controller/booking_payment_controller.dart';
@@ -44,30 +43,15 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
                     style: CustomTextStyles.paymentSubtitle,
                   ),
                   SizedBox(height: 33.v),
-                  Obx(
-                    // Both cards are the full 342 the frame draws; without
-                    // this each sizes to its own label and they disagree.
-                    () => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _PlanCard(
-                          plan: SessionPlan.single,
-                          title: 'Single Session',
-                          amount: offering.single,
-                          unit: '/50-minute session',
-                          selected: controller.plan.value == SessionPlan.single,
-                        ),
-                        SizedBox(height: 17.v),
-                        _PlanCard(
-                          plan: SessionPlan.monthly,
-                          title: 'Monthly Plan',
-                          amount: offering.monthly,
-                          unit: '/monthly',
-                          selected:
-                              controller.plan.value == SessionPlan.monthly,
-                        ),
-                      ],
-                    ),
+                  // One card now, and it lists what the session includes.
+                  // The redrawn screen dropped the Monthly Plan card beside
+                  // it; `SessionPlan.monthly` and the prices behind it are
+                  // left in the model, so bringing it back is a matter of
+                  // drawing it again.
+                  _SessionCard(
+                    title: 'Single Session',
+                    amount: offering.single,
+                    unit: '/50-minute session',
                   ),
                   if (offering.hasCancellationPolicy) ...[
                     SizedBox(height: 32.v),
@@ -142,72 +126,85 @@ class _Header extends StatelessWidget {
 /// The chosen card is filled deep navy with white type; the other is white
 /// inside a blue hairline. That is how the frames draw Monthly and Single
 /// respectively, and it is the only selected state they give.
-class _PlanCard extends StatelessWidget {
-  const _PlanCard({
-    required this.plan,
+/// What the session gets you, as the designer's screenshot lists it.
+abstract final class SessionCardIncludes {
+  static const List<String> lines = [
+    'Full 1-on-1 personalized attention',
+    'Direct calendar booking link instantly unlocked',
+    'Flexible rescheduling up to 24 hours prior',
+  ];
+}
+
+/// The filled card the redrawn screen leads with — the price and what the
+/// session includes, on the brand's deep blue.
+class _SessionCard extends StatelessWidget {
+  const _SessionCard({
     required this.title,
     required this.amount,
     required this.unit,
-    required this.selected,
   });
 
-  final SessionPlan plan;
   final String title;
   final int amount;
   final String unit;
-  final bool selected;
+
+  static List<String> get includes => SessionCardIncludes.lines;
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<BookingPaymentController>();
-    final onFill = selected ? appTheme.onPrimary : null;
-
-    return GestureDetector(
-      onTap: () => controller.select(plan),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOut,
-        height: 103.v,
-        padding: EdgeInsets.symmetric(horizontal: 32.h),
-        decoration: BoxDecoration(
-          color: selected ? appTheme.planEmphasisFill : appTheme.surface,
-          borderRadius: BorderRadius.circular(12.h),
-          border: selected
-              ? null
-              : Border.all(color: appTheme.soothifyBlue),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: CustomTextStyles.planOptionTitle
-                  .copyWith(color: onFill),
+    final white = appTheme.onPrimary;
+    return Container(
+      padding: EdgeInsets.fromLTRB(24.h, 24.v, 24.h, 28.v),
+      decoration: BoxDecoration(
+        color: appTheme.planEmphasisFill,
+        borderRadius: BorderRadius.circular(16.h),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: CustomTextStyles.planOptionTitle.copyWith(color: white),
+          ),
+          SizedBox(height: 12.v),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: BookingPaymentController.money(amount),
+                  style: CustomTextStyles.planOptionPrice
+                      .copyWith(color: white),
+                ),
+                TextSpan(
+                  text: unit,
+                  style: CustomTextStyles.planOptionUnit.copyWith(color: white),
+                ),
+              ],
             ),
-            SizedBox(height: 16.v),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: BookingPaymentController.money(amount),
-                    style: CustomTextStyles.planOptionPrice
-                        .copyWith(color: onFill),
-                  ),
-                  TextSpan(
-                    text: unit,
-                    style: CustomTextStyles.planOptionUnit.copyWith(
-                      color: selected
-                          ? appTheme.onPrimary.withValues(alpha: 0.75)
-                          : null,
+          ),
+          SizedBox(height: 22.v),
+          for (final line in includes) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 2.v),
+                  child: Icon(Icons.check, size: 16.h, color: white),
+                ),
+                SizedBox(width: 12.h),
+                Expanded(
+                  child: Text(
+                    line,
+                    style: CustomTextStyles.sessionInclude.copyWith(
+                      color: white,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            if (line != includes.last) SizedBox(height: 14.v),
           ],
-        ),
+        ],
       ),
     );
   }

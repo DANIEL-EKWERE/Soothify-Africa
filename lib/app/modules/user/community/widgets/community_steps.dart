@@ -4,6 +4,64 @@ import '../../../../core/app_export.dart';
 import '../../../../widgets/gradient_text.dart';
 import '../controller/community_tab_controller.dart';
 
+/// What the Community tab shows while the forum is not being built — the
+/// designer's screenshot of 2026-10-05.
+///
+/// It replaces the welcome → username → topics walk entirely. Nothing below
+/// was deleted: [CommunityWelcomeStep] and the rest still exist, and the tab
+/// can be pointed back at them when the forum is picked up again.
+///
+/// The illustration is a stand-in. The frame is not on page 124:2, so the
+/// artwork could not be exported; `community/welcome.png` is the nearest
+/// thing the app already ships and wants replacing once the real one lands.
+class CommunityComingSoon extends StatelessWidget {
+  const CommunityComingSoon({super.key});
+
+  static const String heading = 'Your safe space is coming soon';
+
+  static const String body =
+      'We’re building a mindful space for you to connect, share your '
+      'practice, and grow with other members. We want to get it just right.';
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<CommunityTabController>();
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24.h, 40.v, 24.h, 24.v),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            heading,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.comingSoonHeading,
+          ),
+          SizedBox(height: 28.v),
+          Expanded(
+            child: Image.asset(
+              ImageConstant.imgCommunityWelcome,
+              fit: BoxFit.contain,
+            ),
+          ),
+          SizedBox(height: 28.v),
+          Text(
+            body,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.comingSoonBody,
+          ),
+          SizedBox(height: 28.v),
+          _PrimaryButton(
+            label: 'Explore Classes',
+            enabled: true,
+            onTap: controller.exploreClasses,
+          ),
+          SizedBox(height: 8.v),
+        ],
+      ),
+    );
+  }
+}
+
 /// The community's one-time welcome — Figma 135:5758.
 class CommunityWelcomeStep extends StatelessWidget {
   const CommunityWelcomeStep({super.key});

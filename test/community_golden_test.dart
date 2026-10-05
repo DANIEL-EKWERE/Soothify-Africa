@@ -7,6 +7,7 @@ import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/community_topic.dart';
 import 'package:soothifyafrica/app/modules/user/community/community_tab.dart';
 import 'package:soothifyafrica/app/modules/user/community/controller/community_tab_controller.dart';
+import 'package:soothifyafrica/app/modules/user/community/widgets/community_steps.dart';
 
 import 'helpers.dart';
 
@@ -66,7 +67,12 @@ void main() {
     await PrefUtils().init();
     final controller = Get.find<CommunityTabController>()..restore();
 
-    await pumpScreen(tester, const CommunityTab());
+    // The steps live inside the tab's Scaffold, which is what gives them
+    // their Material; pumped alone they need one of their own.
+    await pumpScreen(
+      tester,
+      const Scaffold(body: SafeArea(child: CommunityTopicsStep())),
+    );
 
     // The frame ships Depression outlined.
     expect(controller.isSelected(CommunityTopic.depression), isTrue);
@@ -89,23 +95,19 @@ void main() {
     await PrefUtils().init();
     Get.lazyPut(() => CommunityTabController());
 
-    await pumpScreen(tester, const CommunityTab());
+    // The tab itself now shows the holding screen, so the stage widgets are
+    // driven directly — they are still there, waiting for the forum to be
+    // picked up again.
     final controller = Get.find<CommunityTabController>();
-
     expect(controller.stage.value, CommunityStage.welcome);
 
-    // The welcome's button is held at "Coming soon" while the community is
-    // not being built, so the walk starts from the controller instead.
-    expect(find.text('Coming soon'), findsOneWidget);
-    expect(find.text('Continue'), findsNothing);
-    await tester.tap(find.text('Coming soon'));
-    await tester.pumpAndSettle();
-    expect(controller.stage.value, CommunityStage.welcome,
-        reason: 'the disabled button must not advance');
-
-    controller.dismissWelcome();
-    await tester.pumpAndSettle();
+    // Awaited: it writes the "seen" flag before it moves the stage.
+    await controller.dismissWelcome();
     expect(controller.stage.value, CommunityStage.username);
+    await pumpScreen(
+      tester,
+      const Scaffold(body: SafeArea(child: CommunityUsernameStep())),
+    );
 
     // Too short to commit: the forum handle is what other members see.
     controller.usernameDraft.value = 'ab';

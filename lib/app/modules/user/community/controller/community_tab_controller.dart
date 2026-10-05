@@ -1,4 +1,6 @@
 import '../../../../core/app_export.dart';
+import '../../../../data/models/app_tab.dart';
+import '../../shell/controller/shell_controller.dart';
 import '../../../../data/models/community_topic.dart';
 
 /// Which step of the community onboarding the tab is showing.
@@ -47,6 +49,14 @@ class CommunityTabController extends GetxController {
       stage.value = CommunityStage.username;
     } else {
       stage.value = CommunityStage.welcome;
+    }
+  }
+
+  /// "Explore Classes" on the holding screen — the library is what there is
+  /// to do instead.
+  void exploreClasses() {
+    if (Get.isRegistered<ShellController>()) {
+      Get.find<ShellController>().current.value = AppTab.discovery;
     }
   }
 

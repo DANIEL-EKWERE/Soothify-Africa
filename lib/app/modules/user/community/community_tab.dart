@@ -22,20 +22,21 @@ class CommunityTab extends GetView<CommunityTabController> {
       // All three steps carry the bottom navigation in the design, so they are
       // stages inside the tab rather than pushed routes.
       body: SafeArea(
-        child: Obx(
-          () => switch (controller.stage.value) {
-            CommunityStage.welcome => const CommunityWelcomeStep(),
-            CommunityStage.username => const CommunityUsernameStep(),
-            CommunityStage.topics => const _TopicsStep(),
-          },
-        ),
+        // The forum is not being built yet, so the tab shows the holding
+        // screen instead of the welcome -> username -> topics walk. The
+        // stages below still exist; restoring them is a matter of switching
+        // on `controller.stage` again.
+        child: const CommunityComingSoon(),
       ),
     );
   }
 }
 
-class _TopicsStep extends StatelessWidget {
-  const _TopicsStep();
+/// The topics grid the tab shows once the forum is being built again. Kept
+/// beside the holding screen so restoring it is one line in [CommunityTab],
+/// not a rewrite — and public so its test can still reach it.
+class CommunityTopicsStep extends StatelessWidget {
+  const CommunityTopicsStep({super.key});
 
   @override
   Widget build(BuildContext context) {

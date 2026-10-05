@@ -60,16 +60,19 @@ void main() {
     });
   }
 
-  testWidgets('opens on the Monthly Plan, which the frames draw filled',
+  testWidgets('one card now, and it lists what the session includes',
       (tester) async {
-    final c = await mount(tester, SessionOffering.therapy);
-    expect(c.plan.value, SessionPlan.monthly);
-    expect(c.amount, 75000);
+    await mount(tester, SessionOffering.therapy);
 
-    await tester.tap(find.text('Single Session'));
-    await tester.pumpAndSettle();
-    expect(c.plan.value, SessionPlan.single);
-    expect(c.amount, 25000);
+    // The redrawn screen dropped the Monthly Plan card beside Single Session.
+    expect(find.text('Single Session'), findsOneWidget);
+    expect(find.text('Monthly Plan'), findsNothing);
+    expect(find.textContaining('25,000'), findsOneWidget);
+    expect(find.textContaining('/50-minute session'), findsOneWidget);
+
+    for (final line in SessionCardIncludes.lines) {
+      expect(find.text(line), findsOneWidget, reason: line);
+    }
   });
 
   testWidgets('the therapist frame’s prices and policy are its own',

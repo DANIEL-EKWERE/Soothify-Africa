@@ -20,7 +20,6 @@ import 'package:soothifyafrica/app/modules/user/settings/account_settings_screen
 import 'package:soothifyafrica/app/modules/user/settings/controller/notification_settings_controller.dart';
 import 'package:soothifyafrica/app/modules/user/settings/controller/settings_controller.dart';
 import 'package:soothifyafrica/app/modules/user/settings/delete_account_screen.dart';
-import 'package:soothifyafrica/app/modules/user/settings/manage_subscription_screen.dart';
 import 'package:soothifyafrica/app/modules/user/settings/notification_settings_screen.dart';
 import 'package:soothifyafrica/app/modules/user/settings/policy_screen.dart';
 import 'package:soothifyafrica/app/modules/user/settings/user_profile_screen.dart';
@@ -55,7 +54,6 @@ void main() {
       Get.put(NotificationSettingsController());
 
       for (final (label, screen) in <(String, Widget)>[
-        ('manage_subscription', const ManageSubscriptionScreen()),
         ('account_settings', const AccountSettingsScreen()),
         ('delete_account', const DeleteAccountScreen()),
         ('notification_settings', const NotificationSettingsScreen()),

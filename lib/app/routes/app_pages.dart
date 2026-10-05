@@ -20,14 +20,18 @@ import '../modules/user/corporate/binding/corporate_binding.dart';
 import '../modules/user/settings/account_settings_screen.dart';
 import '../modules/user/settings/controller/notification_settings_controller.dart';
 import '../modules/user/settings/delete_account_screen.dart';
-import '../modules/user/settings/manage_subscription_screen.dart';
+import '../modules/user/subscription_manage/billing_history_screen.dart';
+import '../modules/user/subscription_manage/binding/subscription_manage_binding.dart';
+import '../modules/user/subscription_manage/change_plan_screen.dart';
+import '../modules/user/subscription_manage/your_subscription_screen.dart';
 import '../modules/user/settings/notification_settings_screen.dart';
 import '../modules/user/settings/policy_screen.dart';
 import '../modules/user/settings/user_profile_screen.dart';
 import '../modules/user/corporate/corporate_form_screen.dart';
 import '../modules/user/corporate/corporate_success_screen.dart';
-import '../modules/user/subscription/binding/subscription_offer_binding.dart';
-import '../modules/user/subscription/subscription_offer_screen.dart';
+import '../modules/user/trial_offer/binding/trial_offer_binding.dart';
+import '../modules/user/trial_offer/trial_offer_screen.dart';
+import '../modules/user/trial_offer/trial_payment_screen.dart';
 import '../modules/user/expert_application/binding/expert_application_binding.dart';
 import '../modules/user/expert_application/expert_application_screen.dart';
 import '../modules/user/expert_application/expert_intro_screen.dart';
@@ -309,8 +313,18 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.manageSubscription,
-      page: () => const ManageSubscriptionScreen(),
-      binding: SettingsBinding(),
+      page: () => const YourSubscriptionScreen(),
+      binding: SubscriptionManageBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.changePlan,
+      page: () => const ChangePlanScreen(),
+      binding: SubscriptionManageBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.billingHistory,
+      page: () => const BillingHistoryScreen(),
+      binding: SubscriptionManageBinding(),
     ),
     GetPage(
       name: AppRoutes.accountSettings,
@@ -348,8 +362,13 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.subscriptionOffer,
-      page: () => const SubscriptionOfferScreen(),
-      binding: SubscriptionOfferBinding(),
+      page: () => const TrialOfferScreen(),
+      binding: TrialOfferBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.trialPayment,
+      page: () => const TrialPaymentScreen(),
+      binding: TrialOfferBinding(),
     ),
     GetPage(
       name: AppRoutes.article,

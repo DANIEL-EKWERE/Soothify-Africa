@@ -512,6 +512,481 @@ class CustomTextStyles {
     color: Colors.white,
   );
 
+  /// The Community holding screen — the designer's screenshot of
+  /// 2026-10-05.
+  static TextStyle get comingSoonHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 26.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 33 / 26,
+    color: appTheme.actionFill,
+  );
+
+  static TextStyle get comingSoonBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 23 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// A line in the session card's "what you get" list.
+  static TextStyle get sessionInclude => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21 / 15,
+    color: appTheme.textPrimary,
+  );
+
+  // --- The trial pop-up and its payment screen ---
+  // Figma `311:25655`, `311:25477` and `311:25582`, redrawn 2026-10-05.
+
+  static TextStyle get trialTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 31.2 / 24,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21 / 14,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialRestore => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20.8 / 16,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  /// A timeline step's day, coloured by its caller.
+  static TextStyle get trialStep => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 15.6 / 12,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialStepBody => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18 / 12,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary.withValues(alpha: 0.88),
+  );
+
+  static TextStyle get trialSavingBadge => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 8.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 10.9 / 8,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialPlanTitle => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialPlanSub => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 13.6 / 10,
+    color: appTheme.onPrimary.withValues(alpha: 0.72),
+  );
+
+  static TextStyle get trialDue => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 18 / 12,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialRenews => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 15 / 10,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  static TextStyle get trialBenefit => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 11.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 14.3 / 11,
+    letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get trialFootnote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 14.4 / 12,
+    letterSpacing: 0.3,
+    color: appTheme.textPrimary,
+  );
+
+  /// The payment screen.
+  static TextStyle get paymentWordmark => TextStyle(
+    fontFamily: fontPacifico,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w400,
+    height: 35.1 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 26 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentBlurb => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18.2 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentSection => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentLink => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 17.7 / 13,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get paymentPlanName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentChip => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 13.6 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentChipPlain => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentMuted => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 17.7 / 13,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  static TextStyle get paymentValue => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 17.7 / 13,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentHint =>
+      paymentValue.copyWith(color: appTheme.paymentHintInk);
+
+  /// The trial credit, which the frame sets in green.
+  static TextStyle get paymentCredit => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.success,
+  );
+
+  static TextStyle get paymentTotalLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 20.5 / 15,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentTotalAmount => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 22.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 30 / 22,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get paymentFirstCharge => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 17.7 / 13,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentFinePrint => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 11.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16 / 11,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  static TextStyle get paymentMethodLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentWallet => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 1,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentFieldLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 16.4 / 12,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentApply => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get paymentVisa => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 11.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 15 / 11,
+    color: const Color(0xFF274889),
+  );
+
+  static TextStyle get paymentMastercard => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 9.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 12.3 / 9,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get paymentInfoGlyph => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 9.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 1,
+    color: appTheme.onPrimary,
+  );
+
+  // --- Your Subscription, Change Your Plan, Billing History ---
+  // Figma `308:25746` and siblings. NunitoSans throughout, which is what the
+  // redrawn set uses; the rest of Settings is Nunito.
+
+  /// "You currently don't have an active subscription." and the other card
+  /// headlines — NunitoSans ExtraBold 20.
+  static TextStyle get subscriptionHeadline => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 26 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  /// The grey paragraph under a headline.
+  static TextStyle get subscriptionBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20.5 / 15,
+    color: appTheme.textSecondary,
+  );
+
+  /// Status pills, the savings badge and "Current plan" — all 12 bold, each
+  /// coloured by its caller.
+  static TextStyle get subscriptionBadge => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 16.4 / 12,
+    color: appTheme.textSecondary,
+  );
+
+  static TextStyle get subscriptionPlanName => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 24 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get subscriptionPlanPrice => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 20 / 14,
+    color: appTheme.textSecondary,
+  );
+
+  /// "Payment Method", and a billing row's date.
+  static TextStyle get subscriptionLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20 / 14,
+    color: appTheme.textSecondary,
+  );
+
+  /// "Mastercard ending in •••••".
+  static TextStyle get subscriptionValue => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 20 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Update", "View past receipts", "Download PDF".
+  static TextStyle get subscriptionLink => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.soothifyBlue,
+  );
+
+  /// "Confirm Cancellation" — a link the design deliberately keeps quiet.
+  static TextStyle get subscriptionQuietLink =>
+      subscriptionLink.copyWith(color: appTheme.textSecondary);
+
+  /// "Cancel Subscription".
+  static TextStyle get subscriptionDestructive =>
+      subscriptionLink.copyWith(color: appTheme.destructiveInk);
+
+  /// "(billed as ₦150,000 once a year)".
+  static TextStyle get subscriptionCadence => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18 / 13,
+    color: appTheme.textSecondary,
+  );
+
+  /// The proration card's explanation.
+  static TextStyle get subscriptionNotice => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20 / 14,
+    color: appTheme.textSecondary,
+  );
+
+  /// A billing row's amount.
+  static TextStyle get subscriptionAmount => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 24 / 18,
+    color: appTheme.textPrimary,
+  );
+
   /// The Corporate form's field captions, and the line on its success card —
   /// Nunito Bold 14 over a 19.1 pitch. Figma `259:36101` / `259:36093`.
   static TextStyle get corporateLabel => TextStyle(
@@ -705,8 +1180,10 @@ class CustomTextStyles {
   static TextStyle get moodRecommendationIntro => TextStyle(
         fontFamily: fontNunitoSans,
         fontSize: 18.fSize,
-        fontWeight: FontWeight.w700,
-        fontVariations: _bold,
+        // 500, not Bold. The designer set this line lighter on 2026-10-05;
+        // it had been Bold since the screen was first measured.
+        fontWeight: FontWeight.w500,
+        fontVariations: const [FontVariation('wght', 500)],
         height: 21 / 18,
         color: appTheme.textPrimary,
       );

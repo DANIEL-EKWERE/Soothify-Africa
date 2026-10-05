@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/app_tab.dart';
 import '../../../../data/models/plan_tier.dart';
-import '../../../../data/models/subscription_offer.dart';
 import '../../../../data/repositories/subscription_repository.dart';
 import '../../../../routes/app_routes.dart';
 import '../../shell/controller/shell_controller.dart';
@@ -36,10 +35,7 @@ class PlansTabController extends BaseController {
 
   /// The redrawn screen sells the trial rather than a chosen tier, so the
   /// button no longer waits on a selection — the cards are not selectable.
-  void startTrial() => Get.toNamed(
-        AppRoutes.subscriptionOffer,
-        arguments: SubscriptionOffer.trial,
-      );
+  void startTrial() => Get.toNamed(AppRoutes.subscriptionOffer);
 
   /// "Speak with Corporate Team" — Figma "Corporate form" (`259:36101`).
   void openCorporateForm() => Get.toNamed(AppRoutes.corporateForm);

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../core/app_export.dart';
+import '../modules/user/ai_hub/controller/ai_hub_controller.dart';
 import 'ai_assist_button.dart';
+import 'ai_mini_player.dart';
 
 /// Holds the AI Therapy Assist button above the whole app.
 ///
@@ -34,6 +36,14 @@ class AiAssistOverlay extends StatelessWidget {
   /// push it did not make. Fed by [GetMaterialApp.routingCallback].
   static final RxnString route = RxnString();
 
+  /// Whether the assistant is showing as its floating panel rather than its
+  /// button — Figma "Maximize screen" (`259:58711`).
+  ///
+  /// The button used to open the hub outright. The frame puts this panel
+  /// between the two: the scene floats where the button was, and expanding
+  /// from there is what opens the hub.
+  static final RxBool expanded = false.obs;
+
   static void onRouting(Routing? routing) => route.value = routing?.current;
 
   /// The shell's bottom navigation. Parking the button over it would cover a
@@ -56,13 +66,25 @@ class AiAssistOverlay extends StatelessWidget {
               // LayoutBuilder so the button knows the area it may be dragged
               // within; without it a drag could put it off-screen.
               child: LayoutBuilder(
-                builder: (context, constraints) => Stack(
-                  children: [
-                    AiAssistButton(
-                      onTap: openAiAssist,
-                      bounds: constraints.biggest,
-                    ),
-                  ],
+                builder: (context, constraints) => Obx(
+                  () => Stack(
+                    children: [
+                      if (expanded.value)
+                        Positioned(
+                          top: 16.v,
+                          right: 16.h,
+                          child: AiMiniPlayer(
+                            onExpand: openAiAssist,
+                            onClose: () => expanded.value = false,
+                          ),
+                        )
+                      else
+                        AiAssistButton(
+                          onTap: openMiniPlayer,
+                          bounds: constraints.biggest,
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -73,9 +95,23 @@ class AiAssistOverlay extends StatelessWidget {
   }
 }
 
-/// What the button does — the AI Hub, Figma `176:56425` / `176:56395`.
+/// What the button does — floats the scene where it was standing.
+///
+/// The controller has to exist before the panel can draw the scene; nothing
+/// else puts it up until the hub route is opened.
+void openMiniPlayer() {
+  if (Get.currentRoute == AppRoutes.aiHub) return;
+  if (!Get.isRegistered<AiHubController>()) {
+    Get.put(AiHubController(), permanent: true);
+  }
+  AiAssistOverlay.expanded.value = true;
+}
+
+/// Expanding the panel — the AI Hub, Figma `176:56425` / `176:56395`.
 void openAiAssist() {
   // Tapping it again while the hub is open would stack a second copy.
   if (Get.currentRoute == AppRoutes.aiHub) return;
+  // The panel is what the hub expands from, so it stands down behind it.
+  AiAssistOverlay.expanded.value = false;
   Get.toNamed(AppRoutes.aiHub);
 }

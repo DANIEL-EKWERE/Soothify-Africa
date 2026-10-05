@@ -4,7 +4,6 @@ import '../../../../core/app_export.dart';
 import '../../../../data/models/settings_entry.dart';
 import '../../../../data/models/user_role.dart';
 import '../../../auth/language/controller/language_controller.dart';
-import '../../../../data/models/subscription_offer.dart';
 import '../policy_screen.dart';
 import '../../../../data/services/session_service.dart';
 import '../../../../data/services/theme_service.dart';
@@ -75,8 +74,7 @@ class SettingsController extends GetxController {
   }
 
   /// "Unlock Soothify Pro" on `259:37602`.
-  void openPlans() => Get.toNamed(AppRoutes.subscriptionOffer,
-      arguments: SubscriptionOffer.trial);
+  void openPlans() => Get.toNamed(AppRoutes.subscriptionOffer);
 
   void openEditAccount() => Get.toNamed(AppRoutes.userProfile);
 

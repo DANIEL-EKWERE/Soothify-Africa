@@ -38,11 +38,14 @@ class BookingPaymentController extends GetxController {
   static String money(int naira) =>
       '₦${NumberFormat.decimalPattern('en').format(naira)}';
 
-  /// No payment provider is wired. Rather than claim a charge went through,
-  /// this goes to the receipt the design draws and says nothing about money
-  /// having moved.
-  void proceed() =>
-      Get.toNamed(AppRoutes.paymentSuccess, arguments: offering);
+  /// "Proceed to Payment" — on to "Confirm booking" (`280:26699`), where the
+  /// care guarantee and the total are shown before paying.
+  void proceed() => Get.toNamed(AppRoutes.careGuarantee, arguments: offering);
+
+  /// "Pay with Paystack". No payment provider is wired yet. Rather than claim
+  /// a charge went through, this goes to the receipt the design draws and
+  /// says nothing about money having moved.
+  void pay() => Get.toNamed(AppRoutes.paymentSuccess, arguments: offering);
 
   /// "Continue" on the receipt — back into the booking flow the payment
   /// unlocks, replacing the receipt so it cannot be returned to.

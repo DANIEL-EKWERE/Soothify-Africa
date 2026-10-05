@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/modules/user/payment/booking_payment_screen.dart';
+import 'package:soothifyafrica/app/modules/user/payment/care_guarantee_screen.dart';
 import 'package:soothifyafrica/app/modules/user/payment/controller/booking_payment_controller.dart';
 import 'package:soothifyafrica/app/modules/user/payment/payment_success_screen.dart';
 
@@ -93,6 +94,20 @@ void main() {
     expect(find.text('Cancellation Policy'), findsNothing);
     expect(find.textContaining('Free cancellation or rescheduling'),
         findsOneWidget);
+  });
+
+  testWidgets('confirm booking carries the guarantee and the total',
+      (tester) async {
+    await mount(tester, SessionOffering.therapy,
+        screen: const CareGuaranteeScreen());
+    expect(find.text('Confirm booking'), findsOneWidget);
+    expect(find.text('The Soothify Care Guarantee'), findsOneWidget);
+    for (final promise in CareGuaranteeScreen.promises) {
+      expect(find.text(promise), findsOneWidget, reason: promise);
+    }
+    // The session line and the total, both the single-session price.
+    expect(find.text('₦25,000'), findsNWidgets(2));
+    expect(find.text('Pay with Paystack'), findsOneWidget);
   });
 
   testWidgets('the receipt’s scrambled line is corrected', (tester) async {

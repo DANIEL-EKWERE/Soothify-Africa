@@ -40,6 +40,7 @@ import '../modules/user/journal/expert_recommendation_screen.dart';
 import '../modules/user/article/binding/article_binding.dart';
 import '../modules/user/payment/binding/booking_payment_binding.dart';
 import '../modules/user/payment/booking_payment_screen.dart';
+import '../modules/user/payment/care_guarantee_screen.dart';
 import '../modules/user/payment/payment_success_screen.dart';
 import '../modules/user/videos/binding/videos_binding.dart';
 import '../modules/user/videos/videos_screen.dart';
@@ -380,11 +381,17 @@ class AppPages {
       page: () => const VideosScreen(),
       binding: VideosBinding(),
     ),
-    // Payment, then its receipt. Two routes rather than two stages of one,
-    // because the receipt must not be walked back into an unpaid form.
+    // Payment, the confirmation, then the receipt. Separate routes rather
+    // than stages of one, because the receipt must not be walked back into an
+    // unpaid form.
     GetPage(
       name: AppRoutes.bookingPayment,
       page: () => const BookingPaymentScreen(),
+      binding: BookingPaymentBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.careGuarantee,
+      page: () => const CareGuaranteeScreen(),
       binding: BookingPaymentBinding(),
     ),
     GetPage(

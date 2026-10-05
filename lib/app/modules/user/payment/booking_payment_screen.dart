@@ -259,7 +259,7 @@ class _CancellationPolicy extends StatelessWidget {
                 SizedBox(height: 12.5.v),
                 GestureDetector(
                   onTap: controller.openPolicy,
-                  child: Text('Payment & policy',
+                  child: Text('Payment & Policy',
                       style: CustomTextStyles.policyLink),
                 ),
               ],

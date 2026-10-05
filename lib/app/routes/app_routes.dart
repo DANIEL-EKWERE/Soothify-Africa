@@ -120,6 +120,10 @@ class AppRoutes {
   /// cancellation policy is spelled out.
   static const String bookingPayment = '/schedule/payment';
 
+  /// "Confirm booking" — the Soothify Care Guarantee and the total, between
+  /// the payment screen and the receipt. Takes the same [SessionOffering].
+  static const String careGuarantee = '/schedule/payment/confirm';
+
   /// The receipt. Takes the same [SessionOffering].
   static const String paymentSuccess = '/schedule/payment/success';
 

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/data/models/plan_tier.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_subscription_repository.dart';
 import 'package:soothifyafrica/app/modules/user/plans/controller/plans_tab_controller.dart';
@@ -111,5 +112,48 @@ void main() {
 
     expect(controller.period.value, BillingPeriod.annual);
     expect(controller.tiers, isNotEmpty);
+  });
+
+  testWidgets('a card takes its accent border only once it is tapped',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = Get.put(PlansTabController(MockSubscriptionRepository()));
+
+    await pumpScreen(tester, const PlansTab());
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+
+    Color rimOf(String name) {
+      final box = tester.widget<Container>(
+        find
+            .ancestor(of: find.text(name), matching: find.byType(Container))
+            .first,
+      );
+      return ((box.decoration! as BoxDecoration).border! as Border).top.color;
+    }
+
+    // Nothing is chosen yet, so every card rests on the 4% hairline.
+    expect(c.chosen.value, isNull);
+    for (final name in const [
+      'Soothify Core',
+      'Soothify Passport',
+      'Soothify Corporate Wellness',
+    ]) {
+      expect(rimOf(name), appTheme.cardRim);
+    }
+
+    await tester.tap(find.text('Soothify Core'));
+    await tester.pumpAndSettle();
+    expect(rimOf('Soothify Core'), appTheme.actionFill);
+    // And only that one.
+    expect(rimOf('Soothify Passport'), appTheme.cardRim);
+
+    // The filled card takes the orange, which is the only accent that shows
+    // against its own blue.
+    await tester.tap(find.text('Soothify Passport'));
+    await tester.pumpAndSettle();
+    expect(rimOf('Soothify Passport'), appTheme.planEmphasisOutline);
+    expect(rimOf('Soothify Core'), appTheme.cardRim);
   });
 }

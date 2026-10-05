@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../../data/models/booked_slot.dart';
 import '../../../../data/models/session_offering.dart';
 import '../controller/booking_payment_controller.dart';
 
@@ -11,9 +12,13 @@ import '../controller/booking_payment_controller.dart';
 class BookingPaymentBinding extends Bindings {
   @override
   void dependencies() {
-    final offering = Get.arguments is SessionOffering
-        ? Get.arguments as SessionOffering
-        : SessionOffering.therapy;
-    Get.lazyPut(() => BookingPaymentController(offering));
+    // Two shapes: the calendar sends a [BookedSlot] with the chosen time on
+    // it, and the older entry points send a bare offering.
+    final booked = Get.arguments is BookedSlot ? Get.arguments as BookedSlot : null;
+    final offering = booked?.offering ??
+        (Get.arguments is SessionOffering
+            ? Get.arguments as SessionOffering
+            : SessionOffering.therapy);
+    Get.lazyPut(() => BookingPaymentController(offering, booked: booked));
   }
 }

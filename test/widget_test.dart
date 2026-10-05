@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -287,6 +288,45 @@ void main() {
       // Position on the scale, not a name: the bands moved when four levels
       // became ten and will move again if more are added.
       expect(controller.level.index, lessThan(MoodLevel.neutral.index));
+    });
+  });
+
+  testWidgets('every mood illustration fills its canvas', (tester) async {
+    // The figures are drawn edge to edge. female_drained arrived with 70 of
+    // transparent margin baked into it, so at the same box it rendered
+    // noticeably smaller than the nine beside it.
+    await tester.runAsync(() async {
+      for (final figure in MoodFigure.values) {
+        for (final level in MoodLevel.values) {
+          final path = 'assets/images/mood/${figure.key}_${level.key}.png';
+          final codec = await ui.instantiateImageCodec(
+            await File(path).readAsBytes(),
+          );
+          final image = (await codec.getNextFrame()).image;
+          final pixels = (await image.toByteData(
+            format: ui.ImageByteFormat.rawRgba,
+          ))!;
+
+          var left = image.width, right = -1, top = image.height, bottom = -1;
+          for (var y = 0; y < image.height; y++) {
+            for (var x = 0; x < image.width; x++) {
+              if (pixels.getUint8((y * image.width + x) * 4 + 3) <= 24) {
+                continue;
+              }
+              if (x < left) left = x;
+              if (x > right) right = x;
+              if (y < top) top = y;
+              if (y > bottom) bottom = y;
+            }
+          }
+
+          expect((right - left + 1) / image.width, greaterThan(0.97),
+              reason: '$path does not fill its canvas across');
+          expect((bottom - top + 1) / image.height, greaterThan(0.97),
+              reason: '$path does not fill its canvas down');
+          image.dispose();
+        }
+      }
     });
   });
 }

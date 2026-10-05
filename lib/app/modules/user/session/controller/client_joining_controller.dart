@@ -50,12 +50,18 @@ class ClientJoiningController extends GetxController {
 
   /// Into the call itself, replacing the waiting room so Cancel inside the
   /// call does not step back onto it.
+  ///
+  /// The camera toggle above is the choice between a voice call and a video
+  /// one — the same bargain every pre-join screen offers. Nothing else in the
+  /// flow asks: the communication picker the design draws sits on a branch
+  /// that booking no longer takes.
   void join() {
     Get.offNamed(
       AppRoutes.booking,
       arguments: BookingEntry(
         offering: _invite?.offering ?? SessionOffering.therapy,
         stage: BookingStage.call,
+        mode: cameraOn.value ? CallMode.video : CallMode.phone,
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../data/models/booked_slot.dart';
 import '../../../../data/models/session_offering.dart';
 
 /// Picking the day the paid-for session actually happens — Figma
@@ -61,11 +62,19 @@ class BookingCalendarController extends GetxController {
   void nextMonth() =>
       month.value = DateTime(month.value.year, month.value.month + 1);
 
-  /// Nothing books anything yet — there is no scheduling service — so the
-  /// confirmation screen says the session is held, not that an instructor has
-  /// been told.
+  /// On to the payment screen, with the chosen time attached.
+  ///
+  /// `offNamed`, so the receipt's Continue cannot step back onto a calendar
+  /// offering to book the session a second time.
   void confirm() {
     if (!canConfirm) return;
-    Get.offNamed(AppRoutes.bookingConfirmed, arguments: summary);
+    Get.offNamed(
+      AppRoutes.bookingPayment,
+      arguments: BookedSlot(
+        offering: offering,
+        day: selected.value!,
+        slot: slot.value!,
+      ),
+    );
   }
 }

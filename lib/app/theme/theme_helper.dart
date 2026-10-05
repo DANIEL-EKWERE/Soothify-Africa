@@ -82,7 +82,7 @@ class PrimaryColors {
     required this.planEmphasisFill,
     required this.planOutlineMuted,
     required this.planEmphasisOutline,
-    required this.expertCardBorder,
+    required this.cardRim,
     required this.sessionCardRule,
     required this.callControlRim,
     required this.callEndFill,
@@ -285,11 +285,13 @@ class PrimaryColors {
   /// invert.
   final Color planEmphasisOutline;
 
-  /// The hairline around the expert dashboard's white cards. Black at 4% —
-  /// they were drawing in [textPrimary], which ringed every card in near
-  /// black. In dark mode it is white at 10%, since 4% of white over a dark
-  /// surface is no line at all.
-  final Color expertCardBorder;
+  /// The app's resting hairline on a white card — black at 4%. Loud enough
+  /// to separate a card from the page, quiet enough not to read as an
+  /// outline; a card that is *chosen* takes its accent colour instead.
+  ///
+  /// In dark mode it is white at 10%, since 4% of white over a dark surface
+  /// is no line at all.
+  final Color cardRim;
 
   /// The hairline between "Expert" and "Session Time" on the joining screen's
   /// detail card — a pale blue against that card's own paler blue.
@@ -598,7 +600,7 @@ class PrimaryColors {
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFFCBCBCB),
     planEmphasisOutline: Color(0xFFF09D39),
-    expertCardBorder: Color(0x0A000000),
+    cardRim: Color(0x0A000000),
     sessionCardRule: Color(0xFFC9D8EE),
     callControlRim: Color(0xFFBFC6CC),
     callEndFill: Color(0xFFF4443C),
@@ -713,7 +715,7 @@ class PrimaryColors {
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFF3F4347),
     planEmphasisOutline: Color(0xFFF09D39),
-    expertCardBorder: Color(0x1AFFFFFF),
+    cardRim: Color(0x1AFFFFFF),
     sessionCardRule: Color(0x332F6FED),
     callControlRim: Color(0xFF4A5157),
     callEndFill: Color(0xFFF4443C),

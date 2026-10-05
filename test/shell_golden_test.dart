@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_tab.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_subscription_repository.dart';
@@ -15,6 +16,7 @@ import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/shell/binding/shell_binding.dart';
 import 'package:soothifyafrica/app/modules/user/shell/tabs/home_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/shell/shell_screen.dart';
+import 'package:soothifyafrica/app/modules/user/shell/widgets/app_bottom_nav.dart';
 
 import 'helpers.dart';
 
@@ -87,4 +89,50 @@ void main() {
           matchesGoldenFile('goldens/shell_$name.png'));
     });
   }
+
+  testWidgets('the nav bar clears the system navigation buttons',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    // A phone with on-screen navigation buttons: 48 of system bar under the
+    // app. The design frame alone has none, which is why this never showed.
+    tester.view.viewPadding = const FakeViewPadding(bottom: 48 * 3);
+    tester.view.padding = const FakeViewPadding(bottom: 48 * 3);
+    addTearDown(() {
+      tester.view
+        ..resetViewPadding()
+        ..resetPadding();
+    });
+
+    Get.put(await ThemeService().init());
+    Get.put<ContentRepository>(MockContentRepository());
+    Get.put(await SessionService().init());
+    Get.put<ProfileRepository>(LocalProfileRepository());
+    Get.put<SubscriptionRepository>(MockSubscriptionRepository());
+    ShellBinding().dependencies();
+    Get.delete<HomeTabController>();
+    Get.put(HomeTabController(Get.find<ContentRepository>(),
+        now: fixedMorning));
+
+    await pumpScreen(tester, const ShellScreen());
+    await tester.pump(const Duration(milliseconds: 1200));
+    await tester.pumpAndSettle();
+
+    final bar = tester.getRect(find.byType(AppBottomNav));
+    // The whole bar is 74 plus the system inset — the inset is padding under
+    // it, not a bite out of it. It used to be a flat 74 with a SafeArea
+    // inside, so the tabs were squashed into 26 and sat behind the buttons.
+    expect(bar.height, closeTo(74 + 48, 0.5));
+
+    // And every tab sits above the system bar.
+    final floor = bar.bottom - 48;
+    for (final tab in AppTab.values) {
+      expect(
+        tester.getRect(find.text(tab.label).last).bottom,
+        lessThan(floor),
+        reason: '${tab.label} must not sit under the navigation buttons',
+      );
+    }
+  });
 }

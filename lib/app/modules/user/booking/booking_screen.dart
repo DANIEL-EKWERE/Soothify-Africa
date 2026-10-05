@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
@@ -5,6 +7,7 @@ import '../../../widgets/confetti_overlay.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/match_progress_bar.dart';
 import 'controller/booking_controller.dart';
+import '../booking_calendar/booking_confirmed_screen.dart';
 import 'widgets/gentle_support_sheet.dart';
 import 'widgets/matched_view.dart';
 
@@ -44,6 +47,7 @@ class BookingScreen extends GetView<BookingController> {
                         BookingStage.method => const _MethodStage(),
                         BookingStage.rating => const _RatingStage(),
                         BookingStage.feedback => const _FeedbackStage(),
+                        BookingStage.thanks => const _ThanksStage(),
                         BookingStage.call => const SizedBox.shrink(),
                       },
                     ),
@@ -220,6 +224,84 @@ class _MethodCard extends StatelessWidget {
           style: CustomTextStyles.featureBody,
         ),
       ),
+    );
+  }
+}
+
+/// "Thanks for sharing" — the end of a finished session.
+///
+/// The booking chain ends on its own acknowledgement screen; so does this.
+/// The designer supplied the booking one and not this, so it borrows its
+/// shape — the handshake, a line in the title gradient, and a countdown back
+/// to the app — with copy about the review rather than the booking.
+class _ThanksStage extends StatefulWidget {
+  const _ThanksStage();
+
+  static const message = 'Thank you for sharing. Your feedback helps us keep '
+      'every session safe, kind and worth coming back to';
+
+  @override
+  State<_ThanksStage> createState() => _ThanksStageState();
+}
+
+class _ThanksStageState extends State<_ThanksStage> {
+  late int _left = BookingConfirmedScreen.countdown.inSeconds;
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      if (_left <= 1) {
+        _tick?.cancel();
+        Get.find<BookingController>().leaveThanks();
+        return;
+      }
+      setState(() => _left -= 1);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 160.v),
+        Container(
+          height: 117.h,
+          width: 117.h,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: appTheme.brandWash,
+            shape: BoxShape.circle,
+          ),
+          child: CustomImageView(
+            imagePath: ImageConstant.imgSessionBooked,
+            height: 117.h,
+            width: 117.h,
+          ),
+        ),
+        SizedBox(height: 38.v),
+        GradientText(
+          _ThanksStage.message,
+          gradient: appTheme.titleGradient,
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.bookedMessage,
+        ),
+        const Spacer(),
+        Text(
+          'Redirecting you back to home in $_left sec',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.redirectNote,
+        ),
+        SizedBox(height: 8.v),
+      ],
     );
   }
 }

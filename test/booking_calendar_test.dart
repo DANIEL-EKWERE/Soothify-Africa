@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/booked_slot.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/modules/user/booking_calendar/booking_calendar_screen.dart';
 import 'package:soothifyafrica/app/modules/user/booking_calendar/booking_confirmed_screen.dart';
@@ -40,7 +41,53 @@ void main() {
     });
   }
 
-  testWidgets('the receipt leads to the calendar, not back to matching',
+  testWidgets('the calendar leads to payment, carrying the chosen time',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    Get.testMode = true;
+    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.bookingCalendar,
+          getPages: [
+            GetPage(
+              name: AppRoutes.bookingCalendar,
+              page: () => const BookingCalendarScreen(),
+            ),
+            GetPage(
+              name: AppRoutes.bookingPayment,
+              page: () => const Scaffold(body: Text('payment')),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    c.pickDay(DateTime(2026, 10, 14));
+    await tester.tap(find.text('11:00am'));
+    await tester.pumpAndSettle();
+    c.confirm();
+    await tester.pumpAndSettle();
+
+    // The day is chosen before the price now, and travels with it.
+    expect(Get.currentRoute, AppRoutes.bookingPayment);
+    final booked = Get.arguments as BookedSlot;
+    expect(booked.slot, '11:00am');
+    expect(booked.summary, 'Wednesday, 14 October at 11:00am');
+    expect(booked.offering, SessionOffering.therapy);
+  });
+
+  testWidgets('the receipt leads to the confirmation, not back to a calendar',
       (tester) async {
     useDesignFrame(tester);
     disableMotion(tester);
@@ -63,12 +110,12 @@ void main() {
               page: () => const Scaffold(body: Text('receipt')),
             ),
             GetPage(
-              name: AppRoutes.bookingCalendar,
-              page: () => const Scaffold(body: Text('calendar')),
+              name: AppRoutes.bookingConfirmed,
+              page: () => const Scaffold(body: Text('confirmed')),
             ),
             GetPage(
-              name: AppRoutes.booking,
-              page: () => const Scaffold(body: Text('matching')),
+              name: AppRoutes.bookingCalendar,
+              page: () => const Scaffold(body: Text('calendar')),
             ),
           ],
         ),
@@ -79,11 +126,10 @@ void main() {
     Get.find<BookingPaymentController>().done();
     await tester.pumpAndSettle();
 
-    // It used to land on AppRoutes.booking, which restarts at the matching
-    // interstitial — so paying put the user back on "Awesome! You matched
-    // with" and no booking was ever made.
-    expect(Get.currentRoute, AppRoutes.bookingCalendar);
-    expect(find.text('matching'), findsNothing);
+    // The day was picked before paying, so there is nothing left to choose:
+    // the receipt ends on the confirmation.
+    expect(Get.currentRoute, AppRoutes.bookingConfirmed);
+    expect(find.text('calendar'), findsNothing);
   });
 
   testWidgets('a day and a time are both needed before confirming',
@@ -105,15 +151,40 @@ void main() {
     expect(c.summary, 'Wednesday, 14 October at 11:00am');
   });
 
-  testWidgets('the confirmation names the slot that was picked',
+  for (final (name, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('booking confirmed, $name', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      Get.testMode = true;
+
+      await pumpScreen(tester, const BookingConfirmedScreen(),
+          brightness: brightness);
+      await precacheAll(tester, find.byType(BookingConfirmedScreen),
+          const ['assets/images/schedule/booked.png']);
+      await expectLater(find.byType(BookingConfirmedScreen),
+          matchesGoldenFile('goldens/booking_confirmed_$name.png'));
+    });
+  }
+
+  testWidgets('the confirmation counts itself down and leaves',
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
     Get.testMode = true;
 
     await pumpScreen(tester, const BookingConfirmedScreen());
-    expect(find.text('Your session is booked'), findsOneWidget);
-    expect(find.text('Done'), findsOneWidget);
+    expect(find.textContaining('scheduled successfully'), findsOneWidget);
+    // The frame carries no button, so it says how long it is staying.
+    expect(find.text('Redirecting you back to home in 3 sec'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Redirecting you back to home in 2 sec'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
   });
 
   test('the month steps either way', () {

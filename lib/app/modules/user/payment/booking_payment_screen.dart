@@ -42,6 +42,24 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
                     'your journey',
                     style: CustomTextStyles.paymentSubtitle,
                   ),
+                  // What is being paid for, now that the day is chosen before
+                  // the price rather than after it.
+                  if (controller.booked != null) ...[
+                    SizedBox(height: 14.v),
+                    Row(
+                      children: [
+                        Icon(Icons.event_outlined,
+                            size: 16.h, color: appTheme.soothifyBlue),
+                        SizedBox(width: 8.h),
+                        Expanded(
+                          child: Text(
+                            controller.booked!.summary,
+                            style: CustomTextStyles.paymentWhen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   SizedBox(height: 28.5.v),
                   // One card now, and it lists what the session includes.
                   // The redrawn screen dropped the Monthly Plan card beside

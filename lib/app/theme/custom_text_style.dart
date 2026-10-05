@@ -2617,6 +2617,46 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
+  /// The booking confirmation's three lines, painted on [titleGradient].
+  static TextStyle get bookedMessage => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 19.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 26 / 19,
+    color: appTheme.textPrimary,
+  );
+
+  /// The day and time under it.
+  static TextStyle get bookedWhen => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: const [FontVariation('wght', 600)],
+    height: 19 / 14,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  /// "Redirecting you back to home in 3 sec" — faint, near the bottom.
+  static TextStyle get redirectNote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18 / 13,
+    color: appTheme.textPrimary.withValues(alpha: 0.45),
+  );
+
+  /// "Monday, 28 September at 5:00pm" under the payment screen's subtitle.
+  static TextStyle get paymentWhen => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: const [FontVariation('wght', 600)],
+    height: 19 / 14,
+    color: appTheme.soothifyBlue,
+  );
+
   static TextStyle get planOptionTitle => TextStyle(
     fontFamily: fontNunitoSans,
     fontSize: 17.fSize,

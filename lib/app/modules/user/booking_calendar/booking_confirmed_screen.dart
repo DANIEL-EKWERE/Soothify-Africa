@@ -1,21 +1,69 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../widgets/custom_elevated_button.dart';
+import '../../../data/models/booked_slot.dart';
+import '../../../widgets/gradient_text.dart';
 
-/// "Your session is booked" — the end of the booking chain.
+/// "Your live session has been scheduled successfully" — the end of the
+/// booking chain, redrawn by the designer on 2026-10-05.
 ///
-/// Mirrors the receipt (`259:36140`) so the two reads of "it worked" look
-/// alike; the line beneath names the day that was picked.
-class BookingConfirmedScreen extends StatelessWidget {
+/// The frame carries no button: a handshake over the pale brand circle and
+/// three centred lines in the title gradient, under the same "Schedule"
+/// header the payment screen uses. So it takes itself off after a beat, and
+/// says so while it counts down.
+///
+/// Measured below the status bar: the illustration 117 across at 249.5, and
+/// the three lines on a 26 pitch from 404.
+class BookingConfirmedScreen extends StatefulWidget {
   const BookingConfirmedScreen({super.key});
+
+  /// How long the screen stands before it returns to the app.
+  static const countdown = Duration(seconds: 3);
+
+  static const message = 'Your live session has been scheduled successfully. '
+      'We’re looking forward to supporting your journey';
+
+  @override
+  State<BookingConfirmedScreen> createState() => _BookingConfirmedScreenState();
+}
+
+class _BookingConfirmedScreenState extends State<BookingConfirmedScreen> {
+  late int _left = BookingConfirmedScreen.countdown.inSeconds;
+  Timer? _tick;
+
+  @override
+  void initState() {
+    super.initState();
+    _tick = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      if (_left <= 1) {
+        _tick?.cancel();
+        _home();
+        return;
+      }
+      setState(() => _left -= 1);
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
+  }
+
+  void _home() {
+    _tick?.cancel();
+    Get.until((route) => Get.currentRoute == AppRoutes.shell);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final when = Get.arguments is String ? Get.arguments as String : '';
+    final booked = Get.arguments is BookedSlot ? Get.arguments as BookedSlot : null;
     return PopScope(
-      // Nothing behind this is worth returning to — the calendar it replaced
-      // would offer to book the same session again.
+      // The receipt behind this is paid for and done with; stepping back onto
+      // it would offer to pay again.
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _home();
@@ -25,68 +73,77 @@ class BookingConfirmedScreen extends StatelessWidget {
         body: SafeArea(
           child: Column(
             children: [
-              SizedBox(height: 141.v),
+              SizedBox(height: 22.v),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.h),
-                child: Container(
-                  height: 364.v,
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(horizontal: 24.h),
-                  decoration: BoxDecoration(
-                    color: appTheme.surface,
-                    borderRadius: BorderRadius.circular(8.h),
-                    border: Border.all(color: appTheme.rowBorder),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 95.h,
-                        height: 95.h,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: appTheme.success,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check_rounded,
-                          size: 56.h,
-                          color: appTheme.onPrimary,
-                        ),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: _home,
+                      child: CustomImageView(
+                        imagePath: ImageConstant.icBack,
+                        height: 18.h,
+                        width: 18.h,
+                        color: appTheme.textPrimary,
                       ),
-                      SizedBox(height: 34.v),
-                      Text(
-                        'Your session is booked',
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Schedule',
                         textAlign: TextAlign.center,
-                        style: CustomTextStyles.paymentSuccess,
+                        style: CustomTextStyles.appBarTitle,
                       ),
-                      if (when.isNotEmpty) ...[
-                        SizedBox(height: 12.v),
-                        Text(
-                          when,
-                          textAlign: TextAlign.center,
-                          style: CustomTextStyles.coachBlurb,
-                        ),
-                      ],
-                    ],
-                  ),
+                    ),
+                    SizedBox(width: 18.h),
+                  ],
                 ),
               ),
-              const Spacer(),
+              SizedBox(height: 199.v),
+              Container(
+                height: 117.h,
+                width: 117.h,
+                alignment: Alignment.center,
+                // The pale disc is the frame's, not the artwork's: the PNG is
+                // transparent behind the handshake.
+                decoration: BoxDecoration(
+                  color: appTheme.brandWash,
+                  shape: BoxShape.circle,
+                ),
+                child: CustomImageView(
+                  imagePath: ImageConstant.imgSessionBooked,
+                  height: 117.h,
+                  width: 117.h,
+                ),
+              ),
+              SizedBox(height: 38.v),
               Padding(
-                padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
-                child: CustomElevatedButton(
-                  text: 'Done',
-                  onPressed: _home,
+                padding: EdgeInsets.symmetric(horizontal: 24.h),
+                child: GradientText(
+                  BookingConfirmedScreen.message,
+                  gradient: appTheme.titleGradient,
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyles.bookedMessage,
                 ),
               ),
+              if (booked != null) ...[
+                SizedBox(height: 18.v),
+                Text(
+                  booked.summary,
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyles.bookedWhen,
+                ),
+              ],
+              const Spacer(),
+              Text(
+                'Redirecting you back to home in $_left sec',
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.redirectNote,
+              ),
+              SizedBox(height: 32.v),
             ],
           ),
         ),
       ),
     );
   }
-
-  static void _home() =>
-      Get.until((route) => Get.currentRoute == AppRoutes.shell);
 }

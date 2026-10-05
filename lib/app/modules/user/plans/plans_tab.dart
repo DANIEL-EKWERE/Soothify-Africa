@@ -34,14 +34,16 @@ class PlansTab extends GetView<PlansTabController> {
               SizedBox(height: 41.v),
               const _PeriodToggle(),
               SizedBox(height: 24.v),
-              Obx(() => Column(
-                    children: [
-                      for (final tier in controller.tiers) ...[
-                        _TierCard(tier: tier),
-                        SizedBox(height: 17.v),
-                      ],
+              Obx(
+                () => Column(
+                  children: [
+                    for (final tier in controller.tiers) ...[
+                      _TierCard(tier: tier),
+                      SizedBox(height: 17.v),
                     ],
-                  )),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -61,8 +63,11 @@ class _Header extends StatelessWidget {
         InkWell(
           onTap: controller.back,
           customBorder: const CircleBorder(),
-          child: Icon(Icons.chevron_left,
-              size: 24.h, color: appTheme.textPrimary),
+          child: Icon(
+            Icons.chevron_left,
+            size: 24.h,
+            color: appTheme.textPrimary,
+          ),
         ),
         Expanded(
           child: Text(
@@ -171,11 +176,10 @@ class _PeriodSegment extends StatelessWidget {
 
 /// One plan card.
 ///
-/// Two shapes from one widget: a white card ringed in the brand blue, and the
-/// filled card ringed in the brand orange — blue would disappear into its own
-/// fill. Each ends in its own button, which is what the card is asking for:
-/// the trial, the waitlist sheet, or the corporate form. Nothing here is
-/// selectable; the button is the choice.
+/// At rest every card sits on the app's 4% hairline. Tapping one rings it in
+/// its own accent — the brand blue on a white card, the brand orange on the
+/// filled one, where blue would disappear into its own fill. Each ends in
+/// its own button: the trial, the waitlist sheet, or the corporate form.
 class _TierCard extends StatelessWidget {
   const _TierCard({required this.tier});
 
@@ -189,44 +193,55 @@ class _TierCard extends StatelessWidget {
     // deep blue in dark mode, so its text must stay white with it.
     final foreground = onDark ? appTheme.onPrimary : appTheme.textPrimary;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(25.h, 34.v, 25.h, 34.v),
-      decoration: BoxDecoration(
-        color: onDark ? appTheme.planEmphasisFill : appTheme.surface,
-        borderRadius: BorderRadius.circular(16.h),
-        border: Border.all(
-          color:
-              onDark ? appTheme.planEmphasisOutline : appTheme.actionFill,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            tier.name,
-            style: CustomTextStyles.tierName.copyWith(color: foreground),
-          ),
-          SizedBox(height: 16.v),
-          Text(
-            tier.description,
-            style: CustomTextStyles.tierBody.copyWith(color: foreground),
-          ),
-          SizedBox(height: 28.v),
-          if (tier.hasPrice) ...[
-            _Price(tier: tier),
-            SizedBox(height: 24.v),
-          ],
-          if (tier.action != null)
-            _TierButton(
-              action: tier.action!,
-              onDark: onDark,
-              onTap: () => switch (tier.action!) {
-                PlanAction.trial => controller.startTrial(),
-                PlanAction.waitlist => PassportSheet.show(context),
-                PlanAction.corporate => controller.openCorporateForm(),
+    // Its own Obx. The card is built from the list's Obx but renders outside
+    // it, so reading `chosen` there would never register.
+    return Obx(
+      () => GestureDetector(
+        onTap: () => controller.choose(tier.id),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(25.h, 34.v, 25.h, 34.v),
+          decoration: BoxDecoration(
+            color: onDark ? appTheme.planEmphasisFill : appTheme.surface,
+            borderRadius: BorderRadius.circular(16.h),
+            border: Border.all(
+              color: switch ((controller.chosen.value == tier.id, onDark)) {
+                (false, _) => appTheme.cardRim,
+                (true, true) => appTheme.planEmphasisOutline,
+                (true, false) => appTheme.actionFill,
               },
             ),
-        ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tier.name,
+                style: CustomTextStyles.tierName.copyWith(color: foreground),
+              ),
+              SizedBox(height: 16.v),
+              Text(
+                tier.description,
+                style: CustomTextStyles.tierBody.copyWith(color: foreground),
+              ),
+              SizedBox(height: 28.v),
+              if (tier.hasPrice) ...[
+                _Price(tier: tier),
+                SizedBox(height: 24.v),
+              ],
+              if (tier.action != null)
+                _TierButton(
+                  action: tier.action!,
+                  onDark: onDark,
+                  onTap: () => switch (tier.action!) {
+                    PlanAction.trial => controller.startTrial(),
+                    PlanAction.waitlist => PassportSheet.show(context),
+                    PlanAction.corporate => controller.openCorporateForm(),
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../data/models/booked_slot.dart';
 import '../../../../data/models/coach.dart';
 import '../../../../data/models/session_offering.dart';
 
@@ -12,9 +13,13 @@ import '../../../../data/models/session_offering.dart';
 /// prices and in spelling the cancellation policy out. So one screen serves
 /// all three, taking the [SessionOffering].
 class BookingPaymentController extends GetxController {
-  BookingPaymentController(this.offering);
+  BookingPaymentController(this.offering, {this.booked});
 
   final SessionOffering offering;
+
+  /// When the session runs, chosen on the calendar before this screen. Null
+  /// only on the older entry points that open payment without a time.
+  final BookedSlot? booked;
 
   /// The frames draw Monthly Plan filled and Single Session outlined, which
   /// is the selected state — so Monthly is where the screen opens.
@@ -43,16 +48,19 @@ class BookingPaymentController extends GetxController {
   /// No payment provider is wired. Rather than claim a charge went through,
   /// this goes to the receipt the design draws and says nothing about money
   /// having moved.
-  void proceed() =>
-      Get.toNamed(AppRoutes.paymentSuccess, arguments: offering);
+  /// The receipt shares this controller's binding, so the chosen time has to
+  /// travel with it or the confirmation after it has nothing to name.
+  void proceed() => Get.toNamed(
+        AppRoutes.paymentSuccess,
+        arguments: booked ?? offering,
+      );
 
-  /// "Continue" on the receipt — on to the calendar, where the session the
-  /// payment just bought is actually placed.
+  /// "Continue" on the receipt — the confirmation, and the end of the chain.
   ///
-  /// This used to go to [AppRoutes.booking], which starts at the matching
-  /// interstitial: paying dropped the user back on "Awesome! You matched
-  /// with" and no booking was ever made.
-  void done() => Get.offNamed(AppRoutes.bookingCalendar, arguments: offering);
+  /// The calendar now runs before payment, so by here the session has a time
+  /// and has been paid for; there is nothing left to choose.
+  void done() =>
+      Get.offNamed(AppRoutes.bookingConfirmed, arguments: booked);
 
   /// The policy panel summarises; `280:26738` spells it out.
   void openPolicy() => Get.toNamed(AppRoutes.cancellationPolicy);

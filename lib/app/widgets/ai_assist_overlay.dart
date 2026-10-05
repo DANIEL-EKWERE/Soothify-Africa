@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/app_export.dart';
 import '../modules/user/ai_hub/controller/ai_hub_controller.dart';
+import '../modules/user/shell/widgets/app_bottom_nav.dart';
 import 'ai_assist_button.dart';
 import 'ai_mini_player.dart';
 
@@ -47,8 +48,8 @@ class AiAssistOverlay extends StatelessWidget {
   static void onRouting(Routing? routing) => route.value = routing?.current;
 
   /// The shell's bottom navigation. Parking the button over it would cover a
-  /// tab, so the draggable area stops short of it.
-  static const _navHeight = 74.0;
+  /// tab, so the draggable area stops short of it — of the whole bar,
+  /// including the system inset the bar now sits above.
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +62,9 @@ class AiAssistOverlay extends StatelessWidget {
             if (_hidden.contains(at)) return const SizedBox.shrink();
             return SafeArea(
               minimum: EdgeInsets.only(
-                bottom: at == AppRoutes.shell ? _navHeight.v : 0,
+                bottom: at == AppRoutes.shell
+                    ? AppBottomNav.heightFor(context)
+                    : 0,
               ),
               // LayoutBuilder so the button knows the area it may be dragged
               // within; without it a drag could put it off-screen.

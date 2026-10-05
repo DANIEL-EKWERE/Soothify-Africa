@@ -44,7 +44,7 @@ class ExpertSessionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.expertCardBorder),
+          border: Border.all(color: appTheme.cardRim),
         ),
         child: Row(
           children: [

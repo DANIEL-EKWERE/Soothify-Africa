@@ -15,6 +15,7 @@ class BookingBinding extends Bindings {
           return BookingController(
             offering: args.offering,
             startAt: args.stage,
+            startMode: args.mode,
           );
         }
         return BookingController(

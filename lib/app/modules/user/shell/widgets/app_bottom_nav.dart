@@ -31,13 +31,27 @@ class AppBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelected;
 
+  /// The bar's own height, before the system inset beneath it.
+  static const double barHeight = 74;
+
+  /// How tall the bar actually is on this device: its 74 plus whatever the
+  /// system navigation takes at the bottom.
+  static double heightFor(BuildContext context) =>
+      barHeight.h + MediaQuery.viewPaddingOf(context).bottom;
+
   @override
   Widget build(BuildContext context) {
+    // The inset pads *under* a full-height bar rather than being taken out of
+    // it. A SafeArea inside the 74 box subtracted the system navigation's
+    // height from the tabs instead, so on a phone with on-screen nav buttons
+    // the bar was squashed and sat behind them.
     return Container(
-      height: 74.h,
-      decoration: BoxDecoration(color: appTheme.surface),
-      child: SafeArea(
-        top: false,
+      color: appTheme.surface,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewPaddingOf(context).bottom,
+      ),
+      child: SizedBox(
+        height: barHeight.h,
         child: Row(
           children: [
             for (var i = 0; i < tabs.length; i++)

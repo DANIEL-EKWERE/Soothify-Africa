@@ -130,6 +130,54 @@ void main() {
     expect(PrefUtils().introSeen(), isTrue);
   });
 
+  testWidgets('Skip on the welcome screen opens the app', (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    Get.testMode = true;
+    Get.put(PersonalizeController());
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.personalize,
+          getPages: [
+            GetPage(
+              name: AppRoutes.personalize,
+              page: () => const PersonalizeScreen(),
+            ),
+            GetPage(
+              name: AppRoutes.shell,
+              page: () => const Scaffold(body: Text('shell')),
+            ),
+            GetPage(
+              name: AppRoutes.kyc,
+              page: () => const Scaffold(body: Text('kyc')),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Skip'));
+    await tester.pumpAndSettle();
+
+    // The app, not the questionnaire: Skip used to swap one set of questions
+    // for another.
+    expect(Get.currentRoute, AppRoutes.shell);
+    expect(find.text('kyc'), findsNothing);
+    // And the decision has to survive a relaunch, or resolveStartRoute sends
+    // them straight back to the questions they declined.
+    expect(PrefUtils().onboardingSkipped(), isTrue);
+  });
+
   test('Skip records that onboarding was declined', () async {
     await PrefUtils().init();
     // Navigation is a no-op here; this is about what Skip persists, and the

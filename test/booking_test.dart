@@ -43,6 +43,39 @@ void main() {
         ),
       );
 
+  testWidgets('posting a review ends on its own success screen',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = Get.put(
+      BookingController(
+        matchDuration: const Duration(milliseconds: 300),
+        offering: SessionOffering.therapy,
+        startAt: BookingStage.feedback,
+      ),
+    );
+
+    await pumpScreen(tester, const BookingScreen());
+    await precacheAll(tester, find.byType(BookingScreen),
+        const ['assets/images/schedule/booked.png']);
+
+    c.feedback.text = 'It helped.';
+    c.post();
+    await tester.pump();
+
+    // Not a toast and straight back to the dashboard: finishing a session
+    // ends the way booking one does.
+    expect(c.stage.value, BookingStage.thanks);
+    expect(find.textContaining('Thank you for sharing'), findsOneWidget);
+    expect(find.text('Redirecting you back to home in 3 sec'), findsOneWidget);
+
+    await expectLater(find.byType(BookingScreen),
+        matchesGoldenFile('goldens/booking_thanks.png'));
+
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+  });
+
   group('the session itself', () {
     Future<BookingController> toCall(
       WidgetTester tester, {

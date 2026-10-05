@@ -45,6 +45,9 @@ class ImageConstant {
       '$_images/explore/book_expert.png';
 
   static const String imgSessionCover = '$_images/schedule/session.png';
+
+  /// The handshake the booking confirmation leads with.
+  static const String imgSessionBooked = '$_images/schedule/booked.png';
   static const String imgHomeAvatar = '$_images/home/avatar.png';
 
   /// The floating AI assist button, exported whole — gradient disc, shadow

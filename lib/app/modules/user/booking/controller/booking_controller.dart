@@ -17,7 +17,7 @@ enum CallMode {
 }
 
 /// Where the booking flow currently is — Figma 135:20803 onward.
-enum BookingStage { matching, matched, method, call, rating, feedback }
+enum BookingStage { matching, matched, method, call, rating, feedback, thanks }
 
 /// What the booking route was opened with.
 ///
@@ -25,10 +25,19 @@ enum BookingStage { matching, matched, method, call, rating, feedback }
 /// interstitial. Joining a booked session from the notification feed has to
 /// enter at the call instead, so the stage travels with the offering.
 class BookingEntry {
-  const BookingEntry({required this.offering, required this.stage});
+  const BookingEntry({
+    required this.offering,
+    required this.stage,
+    this.mode,
+  });
 
   final SessionOffering offering;
   final BookingStage stage;
+
+  /// Voice or video, where the caller already knows. The waiting room does:
+  /// its camera toggle is the choice, made before the call opens. Null leaves
+  /// it to [BookingController], which falls back to voice.
+  final CallMode? mode;
 }
 
 /// Drives the booking flow after Schedule.
@@ -37,8 +46,18 @@ class BookingEntry {
 /// strictly in order, and a back press should step back through the flow
 /// rather than unwind a route stack the user never chose to build.
 class BookingController extends GetxController {
-  BookingController({Duration? matchDuration, this.offering, this.startAt})
-      : _matchDuration = matchDuration ?? const Duration(seconds: 3);
+  BookingController({
+    Duration? matchDuration,
+    this.offering,
+    this.startAt,
+    CallMode? startMode,
+  })  : _matchDuration = matchDuration ?? const Duration(seconds: 3),
+        _startMode = startMode;
+
+  /// How the call opens when the route is entered at [BookingStage.call].
+  /// The picker is not in that path, so without this every joined session
+  /// would open as a voice call.
+  final CallMode? _startMode;
 
   /// What was booked. Null only when the route is opened without one, which
   /// the app does not do — the receipt always passes it.
@@ -59,7 +78,7 @@ class BookingController extends GetxController {
   /// Where to begin. Null means the matching interstitial, which is how every
   /// route into this screen behaved before sessions could be joined.
   final BookingStage? startAt;
-  final Rxn<CallMode> mode = Rxn<CallMode>();
+  late final Rxn<CallMode> mode = Rxn<CallMode>(_startMode);
   final RxInt rating = 0.obs;
   final RxDouble matchProgress = 0.0.obs;
 
@@ -138,7 +157,10 @@ class BookingController extends GetxController {
   /// sheet. The design replaced both with one button that runs the booking
   /// properly — payment, then the calendar, then a confirmation.
   Future<void> bookSession() async {
-    await Get.toNamed(AppRoutes.bookingPayment, arguments: offering);
+    // The calendar first, then payment: you choose when the session runs and
+    // pay for that, rather than paying for an unscheduled one and picking a
+    // day off the receipt.
+    await Get.toNamed(AppRoutes.bookingCalendar, arguments: offering);
   }
 
   /// Opens the communication picker, and from there the call.
@@ -181,11 +203,18 @@ class BookingController extends GetxController {
 
   bool get canPost => feedback.text.trim().isNotEmpty;
 
+  /// Posting the review ends on its own success screen rather than dropping
+  /// the user back on the dashboard with a toast — the same acknowledgement
+  /// the booking chain ends with, so finishing a session reads like finishing
+  /// one. Nothing is sent yet; there is no feedback service.
   void post() {
     if (!canPost) return;
-    AppFeedback.info('Thanks — sending feedback is not built yet.');
-    Get.until((route) => Get.currentRoute == AppRoutes.shell);
+    stage.value = BookingStage.thanks;
   }
+
+  /// The success screen's countdown has run out.
+  void leaveThanks() =>
+      Get.until((route) => Get.currentRoute == AppRoutes.shell);
 
   /// Steps back through the flow; leaves the route only from the first stage.
   void back() {
@@ -203,6 +232,10 @@ class BookingController extends GetxController {
         stage.value = BookingStage.call;
       case BookingStage.feedback:
         stage.value = BookingStage.rating;
+      // The review is posted; there is nothing behind this but a form that
+      // would post it again.
+      case BookingStage.thanks:
+        leaveThanks();
     }
   }
 }

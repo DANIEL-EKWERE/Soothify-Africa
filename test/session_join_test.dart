@@ -167,6 +167,52 @@ void main() {
     // offNamed: the waiting room is gone, so Cancel in the call cannot land
     // back on it.
     expect(find.byType(ClientJoiningScreen), findsNothing);
+    // The camera was left on, so the call opens as a video one.
+    expect((Get.arguments as BookingEntry).mode, CallMode.video);
+  });
+
+  testWidgets('turning the camera off joins as a voice call', (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    Get.testMode = true;
+    // Long enough to reach the toggle before the room connects itself.
+    final c = Get.put(ClientJoiningController(
+      connecting: const Duration(seconds: 2),
+    ));
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.clientJoining,
+          getPages: [
+            GetPage(
+              name: AppRoutes.clientJoining,
+              page: () => const ClientJoiningScreen(),
+            ),
+            GetPage(
+              name: AppRoutes.booking,
+              page: () => const Scaffold(body: Text('booking')),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The toggle in the waiting room is what picks voice or video; nothing
+    // else in the flow asks.
+    c.toggleCamera();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
+
+    expect((Get.arguments as BookingEntry).mode, CallMode.phone);
   });
 
   test('the booking route can be entered at the call, not just at matching',

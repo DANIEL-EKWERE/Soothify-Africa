@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
+import 'package:soothifyafrica/app/data/models/booked_slot.dart';
 import 'package:soothifyafrica/app/modules/user/payment/booking_payment_screen.dart';
 import 'package:soothifyafrica/app/modules/user/payment/controller/booking_payment_controller.dart';
 import 'package:soothifyafrica/app/modules/user/payment/payment_success_screen.dart';
@@ -126,5 +127,29 @@ void main() {
       expect(BookingPaymentController.money(75000), '₦75,000');
       expect(BookingPaymentController.money(1000000), '₦1,000,000');
     });
+  });
+
+  testWidgets('the payment screen names the slot the calendar picked',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    Get.put(BookingPaymentController(
+      SessionOffering.therapy,
+      booked: BookedSlot(
+        offering: SessionOffering.therapy,
+        day: DateTime(2026, 10, 14),
+        slot: '11:00am',
+      ),
+    ));
+
+    await pumpScreen(tester, const BookingPaymentScreen());
+    await tester.pumpAndSettle();
+
+    // The day is chosen before the price now, so the screen says what is
+    // being paid for.
+    expect(find.text('Wednesday, 14 October at 11:00am'), findsOneWidget);
+
+    await expectLater(find.byType(BookingPaymentScreen),
+        matchesGoldenFile('goldens/payment_with_slot.png'));
   });
 }

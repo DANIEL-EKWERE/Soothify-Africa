@@ -29,20 +29,20 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
             const _Header(),
             Expanded(
               child: ListView(
-                padding: EdgeInsets.fromLTRB(24.h, 61.5.v, 24.h, 0),
+                padding: EdgeInsets.fromLTRB(24.h, 55.5.v, 24.h, 0),
                 children: [
                   GradientText(
                     'Ready for your session with ${controller.expertName}',
                     gradient: appTheme.titleGradient,
                     style: CustomTextStyles.paymentHeadline,
                   ),
-                  SizedBox(height: 22.v),
+                  SizedBox(height: 17.5.v),
                   Text(
                     'Secure your spot to unlock your calendar link and start '
                     'your journey',
                     style: CustomTextStyles.paymentSubtitle,
                   ),
-                  SizedBox(height: 33.v),
+                  SizedBox(height: 28.5.v),
                   // One card now, and it lists what the session includes.
                   // The redrawn screen dropped the Monthly Plan card beside
                   // it; `SessionPlan.monthly` and the prices behind it are
@@ -157,7 +157,7 @@ class _SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final white = appTheme.onPrimary;
     return Container(
-      padding: EdgeInsets.fromLTRB(24.h, 24.v, 24.h, 28.v),
+      padding: EdgeInsets.fromLTRB(24.h, 24.v, 24.h, 23.v),
       decoration: BoxDecoration(
         color: appTheme.planEmphasisFill,
         borderRadius: BorderRadius.circular(16.h),
@@ -192,9 +192,11 @@ class _SessionCard extends StatelessWidget {
               children: [
                 Padding(
                   padding: EdgeInsets.only(top: 2.v),
-                  child: Icon(Icons.check, size: 16.h, color: white),
+                  child: Icon(Icons.check, size: 12.h, color: white),
                 ),
-                SizedBox(width: 12.h),
+                // 44.5 of indent off the card's edge, as the screenshot sets
+                // it: 24 of padding, a 12 tick and 8.5 after it.
+                SizedBox(width: 8.5.h),
                 Expanded(
                   child: Text(
                     line,
@@ -205,7 +207,7 @@ class _SessionCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (line != includes.last) SizedBox(height: 14.v),
+            if (line != includes.last) SizedBox(height: 8.v),
           ],
         ],
       ),
@@ -222,7 +224,7 @@ class _CancellationPolicy extends StatelessWidget {
     final controller = Get.find<BookingPaymentController>();
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(17.h, 17.v, 24.h, 18.v),
+      padding: EdgeInsets.fromLTRB(17.h, 13.5.v, 24.h, 17.v),
       decoration: BoxDecoration(
         color: appTheme.policyPanel,
         borderRadius: BorderRadius.circular(8.h),
@@ -242,7 +244,7 @@ class _CancellationPolicy extends StatelessWidget {
                   style: CustomTextStyles.policyTitle),
             ],
           ),
-          SizedBox(height: 7.5.v),
+          SizedBox(height: 5.v),
           Padding(
             padding: EdgeInsets.only(left: 35.h),
             child: Column(
@@ -253,16 +255,16 @@ class _CancellationPolicy extends StatelessWidget {
                   'at least 24 hours before your scheduled session.',
                   style: CustomTextStyles.policyBody,
                 ),
-                SizedBox(height: 21.5.v),
+                SizedBox(height: 15.5.v),
                 Text(
                   'Cancellation made less than 24 hours before the session '
                   'are not eligible for a refund.',
                   style: CustomTextStyles.policyBody,
                 ),
-                SizedBox(height: 12.5.v),
+                SizedBox(height: 11.v),
                 GestureDetector(
                   onTap: controller.openPolicy,
-                  child: Text('Payment & policy',
+                  child: Text('Payment & Policy',
                       style: CustomTextStyles.policyLink),
                 ),
               ],

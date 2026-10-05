@@ -105,17 +105,37 @@ void main() {
         ),
       ),
     );
-    await tester.pump(SplashScreen.fade ~/ 2);
+    // How visible one of the two words is, 0 when it has left the tree.
+    // Scoped to the word itself: the route has fade transitions of its own,
+    // and they sit at 1 throughout.
+    double shown(String word) {
+      final fades = tester.widgetList<FadeTransition>(
+        find.ancestor(of: find.text(word), matching: find.byType(FadeTransition)),
+      );
+      return fades.isEmpty ? 0 : fades.first.opacity.value;
+    }
 
-    // At the mid-point the outgoing word has cleared and the incoming one has
-    // not started. Overlapping them — AnimatedSwitcher's default — leaves both
-    // at half opacity in the same spot, ghosting through each other.
-    final fades = tester
-        .widgetList<FadeTransition>(find.byType(FadeTransition))
-        .map((f) => f.opacity.value)
-        .toList();
-    expect(fades.where((o) => o > 0.05 && o < 0.95), isEmpty,
-        reason: 'no word should be caught half-faded against another');
+    final first = SplashScreen.prompts[0];
+    final second = SplashScreen.prompts[1];
+
+    // The outgoing word is wholly gone by the end of the fade out...
+    await tester.pump(const Duration(milliseconds: SplashScreen.fadeOutMs));
+    expect(shown(first), lessThan(0.02),
+        reason: 'the first word should have cleared completely');
+    expect(shown(second), lessThan(0.02));
+
+    // ...and nothing has arrived yet, right up to the end of the gap.
+    await tester.pump(const Duration(milliseconds: SplashScreen.gapMs - 20));
+    expect(shown(first), lessThan(0.02),
+        reason: 'the screen should hold empty for the whole gap');
+    expect(shown(second), lessThan(0.02));
+
+    // Then only the new word rises. Overlapping them — AnimatedSwitcher's
+    // default, and what mirrored intervals also give — leaves both at half
+    // opacity in the same spot, ghosting through each other.
+    await tester.pump(const Duration(milliseconds: SplashScreen.fadeOutMs ~/ 2));
+    expect(shown(second), greaterThan(0.02));
+    expect(shown(first), lessThan(0.02));
 
     await tester.pumpAndSettle();
     expect(find.text(SplashScreen.prompts[1]), findsOneWidget);

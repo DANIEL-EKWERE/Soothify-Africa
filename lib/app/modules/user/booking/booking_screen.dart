@@ -5,6 +5,7 @@ import '../../../widgets/confetti_overlay.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/match_progress_bar.dart';
 import 'controller/booking_controller.dart';
+import 'widgets/gentle_support_sheet.dart';
 import 'widgets/matched_view.dart';
 
 /// The booking flow after Schedule — Figma "Matching instructor" (135:20803),
@@ -223,53 +224,195 @@ class _MethodCard extends StatelessWidget {
   }
 }
 
+/// The session itself — Figma's two call frames, redrawn 2026-10-05.
+///
+/// Voice and video share everything but their backdrop: voice puts the
+/// expert's portrait, name and the running time on the app's own background;
+/// video fills the screen with their camera and insets the user's own. Both
+/// carry the gentle-support pill at the top left and the same three controls.
 class _CallStage extends StatelessWidget {
   const _CallStage();
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<BookingController>();
+    // Its own Obx: this widget is built outside the one that watches the
+    // stage, so reading `mode` there would not register.
+    return Obx(() => controller.mode.value == CallMode.video
+        ? const _VideoCall()
+        : const _VoiceCall());
+  }
+}
+
+class _VoiceCall extends StatelessWidget {
+  const _VoiceCall();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<BookingController>();
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SizedBox(height: 117.v),
-        ClipOval(
-          child: CustomImageView(
-            imagePath: ImageConstant.imgCoachCallAvatar,
-            height: 100.h,
-            width: 100.h,
-            fit: BoxFit.cover,
+        SizedBox(height: 16.v),
+        const Padding(
+          padding: EdgeInsets.only(left: 24),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: GentleSupportPill(),
           ),
         ),
-        SizedBox(height: 33.v),
-        Text(controller.coachName, style: CustomTextStyles.callName),
-        SizedBox(height: 8.v),
-        Text('0:30', style: CustomTextStyles.callName),
+        SizedBox(height: 32.v),
+        Center(
+          child: ClipOval(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgCoachCallAvatar,
+              height: 100.h,
+              width: 100.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SizedBox(height: 22.v),
+        Text(
+          controller.coachName,
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.callName,
+        ),
+        SizedBox(height: 10.v),
+        Text(
+          '0:30',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.callClock,
+        ),
+        SizedBox(height: 92.v),
+        const _CallControls(),
         const Spacer(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+      ],
+    );
+  }
+}
+
+/// The video call — the expert full bleed, the user inset above the controls.
+class _VideoCall extends StatelessWidget {
+  const _VideoCall();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        CustomImageView(
+          imagePath: ImageConstant.imgCoachVideo,
+          fit: BoxFit.cover,
+        ),
+        Positioned(
+          left: 24.h,
+          top: 16.v,
+          child: const GentleSupportPill(onVideo: true),
+        ),
+        // The user's own camera, sat just above the controls on the right.
+        Positioned(
+          right: 24.h,
+          bottom: 104.v,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12.h),
+            child: CustomImageView(
+              imagePath: ImageConstant.imgCoachPeers.first,
+              height: 202.v,
+              width: 152.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 24.v,
+          child: const _CallControls(onVideo: true),
+        ),
+      ],
+    );
+  }
+}
+
+/// Mic, camera and hang up.
+class _CallControls extends StatelessWidget {
+  const _CallControls({this.onVideo = false});
+
+  /// Over the video the two toggles are filled white; on the voice call they
+  /// are outlined, because there is no picture for them to stand out against.
+  final bool onVideo;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<BookingController>();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _CallButton(
+          icon: Icons.mic_none,
+          onTap: () {},
+          fill: onVideo ? appTheme.surface : appTheme.transparent,
+          rim: onVideo ? null : appTheme.callControlRim,
+        ),
+        SizedBox(width: 30.h),
+        _CallButton(
+          icon: Icons.videocam_outlined,
+          onTap: () {},
+          fill: onVideo ? appTheme.surface : appTheme.transparent,
+          rim: onVideo ? null : appTheme.callControlRim,
+        ),
+        SizedBox(width: 30.h),
+        _CallButton(
+          icon: Icons.call_end,
+          onTap: controller.endCall,
+          fill: appTheme.callEndFill,
+          tint: appTheme.onPrimary,
+        ),
+      ],
+    );
+  }
+}
+
+/// "Need gentle support?" — a way to reach the support team mid-session.
+class GentleSupportPill extends StatelessWidget {
+  const GentleSupportPill({super.key, this.onVideo = false});
+
+  /// Over the video it needs a backdrop of its own; on the voice call the
+  /// screen is already pale enough for the design's tint.
+  final bool onVideo;
+
+  static const label = 'Need gentle support?';
+
+  @override
+  Widget build(BuildContext context) {
+    final ink = onVideo ? appTheme.onPrimary : appTheme.soothifyBlue;
+    return InkWell(
+      onTap: () => GentleSupportSheet.show(context),
+      borderRadius: BorderRadius.circular(100.h),
+      child: Container(
+        height: 44.v,
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        decoration: BoxDecoration(
+          color: onVideo
+              ? appTheme.textPrimary.withValues(alpha: 0.45)
+              : appTheme.policyPanel,
+          borderRadius: BorderRadius.circular(100.h),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _CallButton(
-              icon: Icons.mic_none,
-              onTap: () {},
-              fill: appTheme.surfaceAlt,
+            CustomImageView(
+              imagePath: ImageConstant.icFlower,
+              height: 22.h,
+              width: 22.h,
+              color: ink,
             ),
-            SizedBox(width: 27.h),
-            _CallButton(
-              icon: Icons.videocam_outlined,
-              onTap: () {},
-              fill: appTheme.surfaceAlt,
-            ),
-            SizedBox(width: 27.h),
-            _CallButton(
-              icon: Icons.call_end,
-              onTap: controller.endCall,
-              fill: appTheme.error,
-              tint: appTheme.onPrimary,
-            ),
+            SizedBox(width: 10.h),
+            Text(label, style: CustomTextStyles.supportPill.copyWith(color: ink)),
           ],
         ),
-        SizedBox(height: 60.v),
-      ],
+      ),
     );
   }
 }
@@ -280,12 +423,14 @@ class _CallButton extends StatelessWidget {
     required this.onTap,
     required this.fill,
     this.tint,
+    this.rim,
   });
 
   final IconData icon;
   final VoidCallback onTap;
   final Color fill;
   final Color? tint;
+  final Color? rim;
 
   @override
   Widget build(BuildContext context) {
@@ -293,12 +438,16 @@ class _CallButton extends StatelessWidget {
       onTap: onTap,
       customBorder: const CircleBorder(),
       child: Container(
-        width: 53.h,
-        height: 53.h,
+        width: 68.h,
+        height: 68.h,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: fill, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+          color: fill,
+          shape: BoxShape.circle,
+          border: rim == null ? null : Border.all(color: rim!),
+        ),
         // Call controls were not exported; Material stands in for these three.
-        child: Icon(icon, size: 30.h, color: tint ?? appTheme.textPrimary),
+        child: Icon(icon, size: 32.h, color: tint ?? appTheme.textPrimary),
       ),
     );
   }

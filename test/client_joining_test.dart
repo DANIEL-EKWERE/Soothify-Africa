@@ -54,13 +54,15 @@ void main() {
     expect(find.text('Seesion Time'), findsNothing);
   });
 
-  testWidgets('the Care Guarantee is stated once, not twice', (tester) async {
+  testWidgets('the Care Guarantee is stated where the frame states it',
+      (tester) async {
     await mount(tester);
-    // `280:26643` prints the whole paragraph twice — bare under "Joining
-    // Call" and again in the titled panel. Saying it twice on one screen
-    // reads as a mistake, which is what it is.
+    // Twice, as `280:26643` draws it: bare under "Joining Call", where it
+    // reads as a promise made on arrival, and again inside the titled panel.
+    // It was shipping once; the designer's screenshot of 2026-10-05 settles
+    // that both are meant.
     expect(find.textContaining('protected under our Care Guarantee'),
-        findsOneWidget);
+        findsNWidgets(2));
     expect(find.text('Your Safe Space is Protected'), findsOneWidget);
   });
 

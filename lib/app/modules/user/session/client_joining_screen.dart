@@ -94,27 +94,36 @@ class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
             ),
             Expanded(
               child: ListView(
-                padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
+                padding: EdgeInsets.fromLTRB(24.h, 10.v, 24.h, 10.v),
                 children: [
                   Text('You’re joining a live session...',
                       style: CustomTextStyles.clientJoiningLead),
                   SizedBox(height: 24.v),
                   const Center(child: JoiningPulse()),
-                  SizedBox(height: 36.v),
+                  SizedBox(height: 20.v),
                   Text('Joining Call',
                       textAlign: TextAlign.center,
-                      style: CustomTextStyles.joiningHeading),
-                  SizedBox(height: 32.v),
+                      style: CustomTextStyles.clientJoiningHeading),
+                  SizedBox(height: 14.v),
+                  // The frame states the Care Guarantee here and again in the
+                  // panel below. It reads as a promise made on arrival and
+                  // then filed under a heading, so both are drawn.
+                  Text(
+                    ClientJoiningScreen.guarantee,
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.joiningGuarantee,
+                  ),
+                  SizedBox(height: 20.v),
                   const _SessionCard(),
-                  SizedBox(height: 32.v),
+                  SizedBox(height: 16.v),
                   const _SafeSpacePanel(),
-                  SizedBox(height: 30.v),
+                  SizedBox(height: 24.v),
                   const _Controls(),
                 ],
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
+              padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 24.v),
               child: CustomElevatedButton(
                 text: 'Cancel',
                 // Outlined, unlike the practitioner's filled Cancel.
@@ -146,11 +155,11 @@ class _SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ClientJoiningController>();
     return Container(
-      height: 98.v,
+      height: 92.v,
       padding: EdgeInsets.symmetric(horizontal: 16.h),
       decoration: BoxDecoration(
         color: appTheme.policyPanel,
-        borderRadius: BorderRadius.circular(8.h),
+        borderRadius: BorderRadius.circular(12.h),
       ),
       child: Row(
         children: [
@@ -169,6 +178,13 @@ class _SessionCard extends StatelessWidget {
               note: controller.service,
             ),
           ),
+          // The hairline the frame sets between the two halves.
+          Container(
+            width: 1,
+            height: 55.v,
+            color: appTheme.sessionCardRule,
+          ),
+          SizedBox(width: 13.h),
           Expanded(
             child: _Field(
               // The frame reads "Seesion Time".
@@ -214,11 +230,10 @@ class _SafeSpacePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(16.h, 16.v, 16.h, 16.v),
+      padding: EdgeInsets.fromLTRB(16.h, 14.v, 16.h, 14.v),
       decoration: BoxDecoration(
         color: appTheme.success.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.textPrimary),
+        borderRadius: BorderRadius.circular(12.h),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,14 +247,14 @@ class _SafeSpacePanel extends StatelessWidget {
               ),
               SizedBox(width: 16.h),
               Text('Your Safe Space is Protected',
-                  style: CustomTextStyles.careGuaranteeTitle),
+                  style: CustomTextStyles.safeSpaceTitle),
             ],
           ),
           SizedBox(height: 8.v),
           Padding(
             padding: EdgeInsets.only(left: 36.h),
             child: Text(ClientJoiningScreen.guarantee,
-                style: CustomTextStyles.careGuaranteeItem),
+                style: CustomTextStyles.safeSpaceBody),
           ),
         ],
       ),

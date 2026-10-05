@@ -73,4 +73,33 @@ void main() {
           find.byType(HomeTab), matchesGoldenFile('goldens/home_$name.png'));
     });
   }
+
+  testWidgets('the three Explore photos sit on one line', (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+
+    Get.put(await ThemeService().init());
+    Get.put<ContentRepository>(MockContentRepository());
+    Get.put(await SessionService().init());
+    Get.put(HomeTabController(Get.find<ContentRepository>(),
+        now: fixedMorning));
+
+    await pumpScreen(tester, const HomeTab());
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    // "Book a Licensed Expert" wraps to two lines where the other two
+    // captions fit one. Centred in the row, that made its photo ride 7 above
+    // its neighbours.
+    final tops = [
+      for (final hero in tester.widgetList<Hero>(find.byType(Hero)))
+        if ('${hero.tag}'.startsWith('explore-'))
+          tester.getTopLeft(find.byWidget(hero)).dy,
+    ];
+    expect(tops, hasLength(3));
+    for (final top in tops) {
+      expect(top, closeTo(tops.first, 0.5));
+    }
+  });
 }

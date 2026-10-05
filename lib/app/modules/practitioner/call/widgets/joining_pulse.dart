@@ -1,13 +1,19 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 
-/// The three concentric discs on the joining screen — Figma `259:59996`.
+/// The connecting mark on the joining screens — a pale halo, the brand disc
+/// inside it, and a thin arc sweeping round between the two.
 ///
-/// 152.5 across in `#EDF6FE` inside a 2.9 hairline, 119.1 in `#2F6FED`, and
-/// 77 in `#2F6FED` again. The frame stacks a `#E2EDFE` disc under the middle
-/// one at the same size, which is how a still frame draws a pulse — so the
-/// middle ring breathes between the two while the call connects.
+/// 138 across in `#EDF6FE`, a 92 disc in `#2F6FED` holding the camera glyph,
+/// and the arc at radius 55 — in the gap between the two, which is where the
+/// frame draws it. The arc is a spinner drawn still, the way
+/// a frame has to draw one, so it turns while the call connects.
+///
+/// It used to ring both discs in near black at 2.9 and 1.5 — a reading of the
+/// frame's outlines that put a heavy donut where the design has a soft halo.
 class JoiningPulse extends StatefulWidget {
   const JoiningPulse({super.key});
 
@@ -20,7 +26,7 @@ class _JoiningPulseState extends State<JoiningPulse>
   // `late final`, but initState touches it below — which is what forces the
   // construction to happen there. Left to build alone, a reduce-motion path
   // that never reads it would have dispose construct it, and that throws.
-  late final AnimationController _pulse = AnimationController(
+  late final AnimationController _spin = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1600),
   );
@@ -28,12 +34,12 @@ class _JoiningPulseState extends State<JoiningPulse>
   @override
   void initState() {
     super.initState();
-    _pulse.repeat(reverse: true);
+    _spin.repeat();
   }
 
   @override
   void dispose() {
-    _pulse.dispose();
+    _spin.dispose();
     super.dispose();
   }
 
@@ -42,11 +48,11 @@ class _JoiningPulseState extends State<JoiningPulse>
     // Nothing is actually connecting, and a perpetual animation stops any
     // test that waits for a still frame from ever settling.
     final still = MediaQuery.disableAnimationsOf(context);
-    if (still && _pulse.isAnimating) _pulse.stop();
+    if (still && _spin.isAnimating) _spin.stop();
 
     return SizedBox(
-      width: 152.5.h,
-      height: 152.5.h,
+      width: 138.h,
+      height: 138.h,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -54,35 +60,33 @@ class _JoiningPulseState extends State<JoiningPulse>
             decoration: BoxDecoration(
               color: appTheme.policyPanel,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.textPrimary, width: 2.9),
             ),
           ),
           AnimatedBuilder(
-            animation: _pulse,
-            builder: (context, child) => Container(
-              width: 119.1.h,
-              height: 119.1.h,
-              decoration: BoxDecoration(
-                color: Color.lerp(
-                  appTheme.trialBanner,
-                  appTheme.soothifyBlue,
-                  still ? 1 : _pulse.value,
-                ),
-                shape: BoxShape.circle,
+            animation: _spin,
+            builder: (context, _) => CustomPaint(
+              size: Size.square(138.h),
+              painter: _ArcPainter(
+                colour: appTheme.soothifyBlue,
+                radius: 55.h,
+                width: 3.h,
+                // The frame draws it low and to the right; from there it
+                // turns, because that is what the mark is for.
+                from: -math.pi / 4 + (still ? 0 : _spin.value * 2 * math.pi),
               ),
             ),
           ),
           Container(
-            width: 77.h,
-            height: 77.h,
+            width: 92.h,
+            height: 92.h,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: appTheme.soothifyBlue,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.textPrimary, width: 1.5),
             ),
             child: Icon(
               Icons.videocam_outlined,
-              size: 32.h,
+              size: 40.h,
               color: appTheme.onPrimary,
             ),
           ),
@@ -90,4 +94,46 @@ class _JoiningPulseState extends State<JoiningPulse>
       ),
     );
   }
+}
+
+class _ArcPainter extends CustomPainter {
+  const _ArcPainter({
+    required this.colour,
+    required this.radius,
+    required this.width,
+    required this.from,
+  });
+
+  final Color colour;
+  final double radius;
+  final double width;
+
+  /// Where the arc begins, in radians clockwise from three o'clock.
+  final double from;
+
+  /// How far it runs — a quarter and a half again, as the frame draws it.
+  static const _sweep = math.pi * 0.75;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final centre = Offset(size.width / 2, size.height / 2);
+    canvas.drawArc(
+      Rect.fromCircle(center: centre, radius: radius),
+      from,
+      _sweep,
+      false,
+      Paint()
+        ..color = colour
+        ..strokeWidth = width
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_ArcPainter old) =>
+      old.from != from ||
+      old.colour != colour ||
+      old.radius != radius ||
+      old.width != width;
 }

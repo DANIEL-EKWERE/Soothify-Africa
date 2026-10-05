@@ -82,7 +82,7 @@ class IntroScreen extends GetView<IntroController> {
               padding: EdgeInsets.symmetric(horizontal: 24.h),
               child: CustomElevatedButton(
                 text: 'Get started',
-                onPressed: controller.next,
+                onPressed: controller.start,
               ),
             ),
             SizedBox(height: 24.h),

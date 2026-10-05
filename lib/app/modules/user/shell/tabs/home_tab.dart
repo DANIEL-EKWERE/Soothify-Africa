@@ -222,6 +222,11 @@ class _ExploreSection extends StatelessWidget {
         SizedBox(height: 16.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Top, not centre. Centred, the one tile whose caption wraps is
+          // taller than the other two and the row lifts its photo clear of
+          // theirs — which is how "Book a Licensed Expert" ended up sitting
+          // 7 above its neighbours.
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final destination in controller.explore)
               _ExploreTile(
@@ -270,12 +275,18 @@ class _ExploreTile extends StatelessWidget {
             // Two lines, not one: the renamed destinations are far longer
             // than the words the frame was drawn with, and "Book a licensed
             // Expert" ellipsised to "Book a licensed Ex..." on one line.
-            Text(
-              destination.label,
-              textAlign: TextAlign.center,
-              style: CustomTextStyles.exploreLabel,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            //
+            // Two lines' worth of space whether or not the caption needs it,
+            // so every tile in the row is the same height.
+            SizedBox(
+              height: CustomTextStyles.exploreLabelLine * 2.h,
+              child: Text(
+                destination.label,
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.exploreLabel,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

@@ -573,12 +573,16 @@ class CustomTextStyles {
   );
 
   /// A line in the session card's "what you get" list.
+  ///
+  /// 14, not the frame's nominal 15: this project's bundled face sets wider
+  /// than Figma's, and at 15 "Flexible rescheduling up to 24 hours prior"
+  /// wrapped onto a second line the design does not have.
   static TextStyle get sessionInclude => TextStyle(
     fontFamily: fontNunito,
-    fontSize: 15.fSize,
+    fontSize: 14.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
-    height: 21 / 15,
+    height: 18 / 14,
     color: appTheme.textPrimary,
   );
 
@@ -2169,13 +2173,20 @@ class CustomTextStyles {
   );
 
   /// Explore tile caption.
+  /// An Explore tile's caption. The explicit line height is what lets the
+  /// row reserve exactly two lines for every tile, so a caption that wraps
+  /// does not make its own tile taller than the two beside it.
   static TextStyle get exploreLabel => TextStyle(
     fontFamily: fontNunitoSans,
     fontSize: 10.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
+    height: exploreLabelLine / 10,
     color: appTheme.textPrimary,
   );
+
+  /// One caption line, in logical pixels before scaling.
+  static const double exploreLabelLine = 14;
 
   /// Content card: category line, title, then author.
   static TextStyle get itemCategory => TextStyle(
@@ -2585,27 +2596,31 @@ class CustomTextStyles {
 
   /// "Ready for your session with ..." — painted on [titleGradient], which is
   /// what the sampled #234D9F -> #1F3A6E run turned out to be.
+  /// 19, not the frame's nominal 24. "Ready for your session with Baraqhat"
+  /// fills the 342 content width exactly in the designer's screenshot, on one
+  /// line; this project's bundled face sets wider, so it only fits at 19.
   static TextStyle get paymentHeadline => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 24.fSize,
+    fontSize: 19.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
-    height: 26 / 24,
+    height: 25 / 19,
     color: appTheme.textPrimary,
   );
 
   static TextStyle get paymentSubtitle => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 16.fSize,
+    fontSize: 15.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
-    height: 21 / 16,
+    height: 18.5 / 15,
     color: appTheme.textPrimary,
   );
 
   static TextStyle get planOptionTitle => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 20.fSize,
+    fontSize: 17.fSize,
+    height: 20 / 17,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
     color: appTheme.textPrimary,
@@ -2613,7 +2628,8 @@ class CustomTextStyles {
 
   static TextStyle get planOptionPrice => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 24.fSize,
+    fontSize: 20.fSize,
+    height: 24 / 20,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
     color: appTheme.textPrimary,
@@ -2622,7 +2638,8 @@ class CustomTextStyles {
   /// "/50-minute session" — the grey run after the figure.
   static TextStyle get planOptionUnit => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 16.fSize,
+    fontSize: 14.fSize,
+    height: 24 / 14,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
     color: appTheme.hintText,
@@ -2641,7 +2658,7 @@ class CustomTextStyles {
     fontSize: 13.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
-    height: 14.5 / 13,
+    height: 16 / 13,
     color: appTheme.soothifyBlue,
   );
 
@@ -3217,30 +3234,30 @@ class CustomTextStyles {
   /// The client joining screen — Figma `280:26643`.
   static TextStyle get clientJoiningLead => TextStyle(
     fontFamily: fontNunito,
-    fontSize: 16.fSize,
+    fontSize: 18.fSize,
     fontWeight: FontWeight.w500,
     fontVariations: const [FontVariation('wght', 500)],
-    height: 21.8 / 16,
+    height: 24.5 / 18,
     color: appTheme.textPrimary,
   );
 
-  /// "Expert" / "Session Time" and the date beneath — Nunito Sans 10 at 80%.
+  /// "Expert" / "Session Time" and the date beneath — Nunito Sans 12 at 80%.
   static TextStyle get sessionFieldLabel => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 10.fSize,
+    fontSize: 12.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
-    height: 13 / 10,
+    height: 16 / 12,
     letterSpacing: -0.2,
     color: appTheme.textPrimary.withValues(alpha: 0.8),
   );
 
   static TextStyle get sessionFieldValue => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 12.fSize,
+    fontSize: 17.fSize,
     fontWeight: FontWeight.w600,
     fontVariations: const [FontVariation('wght', 600)],
-    height: 15.6 / 12,
+    height: 22 / 17,
     letterSpacing: -0.2,
     color: appTheme.textPrimary,
   );
@@ -3261,6 +3278,109 @@ class CustomTextStyles {
     fontVariations: _bold,
     height: 21.8 / 16,
     color: appTheme.textPrimary,
+  );
+
+  /// The running time under the name on a call.
+  static TextStyle get callClock => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 22.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 30 / 22,
+    color: appTheme.textPrimary,
+  );
+
+  // --- "Need gentle support?" and its sheet ---
+
+  /// The pill above the call.
+  static TextStyle get supportPill => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 20 / 15,
+    color: appTheme.soothifyBlue,
+  );
+
+  static TextStyle get supportHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 27 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get supportBlurb => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20 / 14,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  /// 13, not 14: the longest two reasons fill the row in the design and this
+  /// project's bundled face sets wider, which broke both onto a second line.
+  static TextStyle get supportReason => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 19 / 13,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get supportFootnote => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 17 / 12,
+    color: appTheme.textPrimary.withValues(alpha: 0.6),
+  );
+
+  /// "Joining Call" on the client's side, which the redraw set larger than
+  /// the practitioner's. Its own style so bumping one does not move the other.
+  static TextStyle get clientJoiningHeading => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 20.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 27 / 20,
+    color: appTheme.textPrimary,
+  );
+
+  /// The Care Guarantee as the client's joining screen states it on arrival —
+  /// centred and grey, under "Joining Call".
+  static TextStyle get joiningGuarantee => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18 / 13,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
+  );
+
+  /// The green panel's heading and body on the client's joining screen. Set
+  /// apart from [careGuaranteeTitle] and [careGuaranteeItem], which the Care
+  /// Guarantee screen draws at its own, much smaller, sizes.
+  static TextStyle get safeSpaceTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 20.5 / 15,
+    color: appTheme.successInk,
+  );
+
+  static TextStyle get safeSpaceBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.5.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 17.5 / 12.5,
+    color: appTheme.textPrimary.withValues(alpha: 0.72),
   );
 
   static TextStyle get joiningBody => TextStyle(

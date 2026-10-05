@@ -7,6 +7,7 @@ import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/data/models/wellness_kyc.dart';
 import 'package:soothifyafrica/app/modules/user/booking/booking_screen.dart';
+import 'package:soothifyafrica/app/modules/user/booking/widgets/gentle_support_sheet.dart';
 import 'package:soothifyafrica/app/modules/user/booking/controller/booking_controller.dart';
 import 'package:soothifyafrica/app/widgets/confetti_overlay.dart';
 
@@ -41,6 +42,70 @@ void main() {
           offering: offering,
         ),
       );
+
+  group('the session itself', () {
+    Future<BookingController> toCall(
+      WidgetTester tester, {
+      required CallMode mode,
+      Brightness brightness = Brightness.light,
+    }) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final c = Get.put(
+        BookingController(
+          matchDuration: const Duration(milliseconds: 300),
+          offering: SessionOffering.therapy,
+          startAt: BookingStage.call,
+        ),
+      );
+      c.mode.value = mode;
+      await pumpScreen(tester, const BookingScreen(), brightness: brightness);
+      await precacheAll(tester, find.byType(BookingScreen), _art);
+      return c;
+    }
+
+    for (final (name, mode) in [
+      ('voice', CallMode.phone),
+      ('video', CallMode.video),
+    ]) {
+      testWidgets('the $name call', (tester) async {
+        await toCall(tester, mode: mode);
+        await expectLater(find.byType(BookingScreen),
+            matchesGoldenFile('goldens/call_$name.png'));
+      });
+    }
+
+    testWidgets('the pill raises the support sheet', (tester) async {
+      await toCall(tester, mode: CallMode.phone);
+      expect(find.text(GentleSupportPill.label), findsOneWidget);
+
+      await tester.tap(find.text(GentleSupportPill.label));
+      await tester.pumpAndSettle();
+
+      expect(find.text(GentleSupportSheet.heading), findsOneWidget);
+      for (final reason in GentleSupportSheet.reasons) {
+        expect(find.text(reason), findsOneWidget);
+      }
+      await expectLater(find.byType(GentleSupportSheet),
+          matchesGoldenFile('goldens/gentle_support_sheet.png'));
+    });
+
+    testWidgets('sending a reason closes the sheet and reports it',
+        (tester) async {
+      await toCall(tester, mode: CallMode.phone);
+      await tester.tap(find.text(GentleSupportPill.label));
+      await tester.pumpAndSettle();
+
+      // The second reason, so the choice is visibly the user's rather than
+      // the one the sheet opens on.
+      await tester.tap(find.text(GentleSupportSheet.reasons[1]));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Send to Support Team'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(GentleSupportSheet.heading), findsNothing);
+    });
+  });
 
   group('the match celebration', () {
     /// Runs matching out and stops partway through the burst.

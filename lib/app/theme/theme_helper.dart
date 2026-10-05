@@ -83,6 +83,9 @@ class PrimaryColors {
     required this.planOutlineMuted,
     required this.planEmphasisOutline,
     required this.expertCardBorder,
+    required this.sessionCardRule,
+    required this.callControlRim,
+    required this.callEndFill,
     required this.spaceChipBorder,
     required this.topicChipBorder,
     required this.unreadDot,
@@ -287,6 +290,17 @@ class PrimaryColors {
   /// black. In dark mode it is white at 10%, since 4% of white over a dark
   /// surface is no line at all.
   final Color expertCardBorder;
+
+  /// The hairline between "Expert" and "Session Time" on the joining screen's
+  /// detail card — a pale blue against that card's own paler blue.
+  final Color sessionCardRule;
+
+  /// The hairline round the mic and camera on the voice call. The frame draws
+  /// them as outlines on the app's own background, not as filled buttons.
+  final Color callControlRim;
+
+  /// The hang-up button. The design's red, which is warmer than [error].
+  final Color callEndFill;
 
   /// The red mark on an unread notification. `#F44336`, measured off
   /// `259:26851`; the Journal reuses it for its unread count badge and, at
@@ -585,6 +599,9 @@ class PrimaryColors {
     planOutlineMuted: Color(0xFFCBCBCB),
     planEmphasisOutline: Color(0xFFF09D39),
     expertCardBorder: Color(0x0A000000),
+    sessionCardRule: Color(0xFFC9D8EE),
+    callControlRim: Color(0xFFBFC6CC),
+    callEndFill: Color(0xFFF4443C),
     spaceChipBorder: Color(0xFFD7D7D7),
     topicChipBorder: Color(0x4D999999),
     unreadDot: Color(0xFFF44336),
@@ -697,6 +714,9 @@ class PrimaryColors {
     planOutlineMuted: Color(0xFF3F4347),
     planEmphasisOutline: Color(0xFFF09D39),
     expertCardBorder: Color(0x1AFFFFFF),
+    sessionCardRule: Color(0x332F6FED),
+    callControlRim: Color(0xFF4A5157),
+    callEndFill: Color(0xFFF4443C),
     spaceChipBorder: Color(0x33FFFFFF),
     topicChipBorder: Color(0x4DFFFFFF),
     unreadDot: Color(0xFFF44336),

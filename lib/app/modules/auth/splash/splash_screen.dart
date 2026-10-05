@@ -19,14 +19,23 @@ class SplashScreen extends StatefulWidget {
   /// How long the wordmark holds before the breathing prompts begin.
   static const brandHold = Duration(seconds: 3);
 
-  /// How long each prompt stays up. Paced for an actual breath rather than a
-  /// UI transition — this is the one moment the app asks you to slow down.
-  static const breathHold = Duration(milliseconds: 2600);
+  /// How long each prompt stays up, measured from the moment it is swapped
+  /// in. [fade] eats the first 2.2s of that, so the word stands fully lit for
+  /// 1.6 — paced for an actual breath rather than a UI transition, because
+  /// this is the one moment the app asks you to slow down.
+  static const breathHold = Duration(milliseconds: 3800);
 
-  /// Slow on purpose, and with a gap in the middle of it: the old word
-  /// clears, nothing is shown for a beat, then the next one arrives. At 700
-  /// the two words chased each other.
-  static const fade = Duration(milliseconds: 1800);
+  /// How long the outgoing word takes to reach nothing at all, and the same
+  /// again for the incoming one.
+  static const fadeOutMs = 600;
+
+  /// The empty beat between the two words — a second of nothing, so one has
+  /// plainly gone before the next arrives.
+  static const gapMs = 1000;
+
+  /// One swap, start to finish: out, the gap, then in.
+  static const fadeMs = fadeOutMs + gapMs + fadeOutMs;
+  static const fade = Duration(milliseconds: fadeMs);
 
   /// The prompts, in order.
   static const prompts = ['Inhale Deeply', 'Exhale Slowly'];
@@ -76,6 +85,12 @@ class _SplashScreenState extends State<SplashScreen> {
 class SplashView extends StatelessWidget {
   const SplashView({super.key, this.step = -1});
 
+  /// Where in [SplashScreen.fade] a word is wholly gone, and wholly absent:
+  /// the fade out ends here counting down, and the fade in starts here
+  /// counting up.
+  static const double _fadeStop =
+      1 - SplashScreen.fadeOutMs / SplashScreen.fadeMs;
+
   /// -1 shows the wordmark; 0 and up show the matching breathing prompt.
   final int step;
 
@@ -110,13 +125,17 @@ class SplashView extends StatelessWidget {
             // AnimatedSwitcher's default runs both children linearly across
             // the whole duration, so half way through "Inhale Deeply" and
             // "Exhale Slowly" are each at 50% in the same spot — they ghost
-            // through one another and the line visibly dims. Clearing the old
-            // word, holding the gap, then bringing the new one in reads as
-            // one slow breath instead of a dissolve.
-            // Out over the first third, in over the last third, and a beat
-            // of nothing between them.
-            switchOutCurve: const Interval(0, 0.35, curve: Curves.easeOut),
-            switchInCurve: const Interval(0.65, 1, curve: Curves.easeIn),
+            // through one another and the line visibly dims.
+            //
+            // Both curves are read against the controller's *value*, and the
+            // outgoing child's controller runs backwards from 1 to 0. So the
+            // outgoing word is gone once the value drops below `_fadeStop` —
+            // which is `fadeOut` into the swap — and the incoming one does
+            // not begin until its own value climbs past the same mark, which
+            // is `fadeOut + gap` in. Mirroring the intervals instead, as this
+            // did, left no empty beat at all: both met in the middle.
+            switchOutCurve: const Interval(_fadeStop, 1, curve: Curves.easeIn),
+            switchInCurve: const Interval(_fadeStop, 1, curve: Curves.easeOut),
             transitionBuilder: (child, animation) => FadeTransition(
               opacity: animation,
               child: ScaleTransition(

@@ -77,18 +77,12 @@ class IntroController extends GetxController {
     _restartTimer();
   }
 
-  /// The design shows the same "Get started" label on every slide, so the
-  /// button advances until the last panel and then leaves the carousel.
-  void next() {
-    if (isLast) {
-      finish();
-      return;
-    }
-    pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
+  /// "Get started" — out of the carousel, from any slide.
+  ///
+  /// It used to step to the next panel and only leave from the last one,
+  /// which made the one button on the screen read as "Next". The carousel
+  /// advances itself; the button is the way out of it.
+  Future<void> start() => finish();
 
   /// "Skip" — straight into the app without an account.
   ///

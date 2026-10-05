@@ -4,6 +4,9 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
 
 import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/intro_slide.dart';
@@ -84,6 +87,47 @@ void main() {
 
     await pumpScreen(tester, const IntroScreen());
     expect(find.text('Skip'), findsOneWidget);
+  });
+
+  testWidgets('Get started leaves the carousel from the first slide',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    Get.testMode = true;
+    final c = Get.put(IntroController(autoAdvance: Duration.zero));
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.intro,
+          getPages: [
+            GetPage(name: AppRoutes.intro, page: () => const IntroScreen()),
+            GetPage(
+              name: AppRoutes.personalize,
+              page: () => const Scaffold(body: Text('personalize')),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // From the first panel, not just the last: the button is the way out of
+    // the carousel, not a Next for it.
+    expect(c.index.value, 0);
+    await tester.tap(find.text('Get started'));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, AppRoutes.personalize);
+    expect(find.byType(IntroScreen), findsNothing);
+    expect(PrefUtils().introSeen(), isTrue);
   });
 
   test('Skip records that onboarding was declined', () async {

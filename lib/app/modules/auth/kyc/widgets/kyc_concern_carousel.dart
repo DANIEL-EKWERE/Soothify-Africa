@@ -128,11 +128,17 @@ class _KycConcernCarouselState extends State<KycConcernCarousel> {
                 ),
               ),
               SizedBox(height: 41.v),
-              Text(
-                _option.label,
-                textAlign: TextAlign.center,
-                style: CustomTextStyles.onboardingSlideTitle.copyWith(
-                  color: appTheme.onPrimary,
+              // Padded, so a label longer than the four the frame was drawn
+              // with wraps into the centred pair the design shows rather than
+              // running to both edges on one line.
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 32.h),
+                child: Text(
+                  _option.label,
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyles.onboardingSlideTitle.copyWith(
+                    color: appTheme.onPrimary,
+                  ),
                 ),
               ),
               SizedBox(height: 119.5.v),

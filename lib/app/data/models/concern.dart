@@ -6,7 +6,8 @@ enum Concern {
   stress('stress', 'Stress'),
   anxiety('anxiety', 'Anxiety'),
   sleepDisorder('sleep_disorder', 'Sleep disorder'),
-  depression('depression', 'Depression');
+  depression('depression', 'Depression'),
+  exploring('exploring', 'Just exploring');
 
   const Concern(this.key, this.label);
 

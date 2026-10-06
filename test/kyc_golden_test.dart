@@ -72,6 +72,33 @@ void main() {
           matchesGoldenFile('goldens/kyc_empty_$name.png'));
     });
 
+    for (final (gender, set) in [('female', 'female'), ('male', 'male')]) {
+      testWidgets('kyc concerns, the exploring option, $set, $name',
+          (tester) async {
+        final c = await arrange(tester, brightness, step: _concerns);
+        c.answers['gender'] = {gender};
+        c.answers.refresh();
+        await tester.pumpAndSettle();
+
+        // The fifth option, added 2026-10-06. Swiped to rather than tapped:
+        // the rail's focus is what paints the screen.
+        final rail = find.byType(PageView);
+        for (var i = 0; i < 4; i++) {
+          await tester.drag(rail, const Offset(-200, 0));
+          await tester.pumpAndSettle();
+        }
+        expect(
+          find.text('I\'m brand new to wellness, just exploring'),
+          findsOneWidget,
+        );
+
+        await expectLater(
+          find.byType(KycScreen),
+          matchesGoldenFile('goldens/kyc_exploring_${set}_$name.png'),
+        );
+      });
+    }
+
     testWidgets('kyc concerns, male figure, $name', (tester) async {
       final c = await arrange(tester, brightness, step: _concerns);
       // Answered a step earlier; the carousel reads it to pick the set.

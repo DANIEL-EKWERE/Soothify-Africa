@@ -149,6 +149,15 @@ class KycQuestion {
             illustrationMale: 'assets/images/concerns/depression_figure_male.png',
             backgroundArgb: 0xFF626A8A,
             accentArgb: 0xFFFFAE24),
+        // Added by the designer on 2026-10-06, with its own pair of figures.
+        // The four above all name something the user is carrying; this one is
+        // the answer for someone carrying nothing in particular, which the
+        // set had no room for.
+        KycOption('exploring', 'I\'m brand new to wellness, just exploring',
+            illustration: 'assets/images/concerns/exploring_figure.png',
+            illustrationMale: 'assets/images/concerns/exploring_figure_male.png',
+            backgroundArgb: 0xFF7B93E8,
+            accentArgb: 0xFFFFAE24),
       ],
     ),
     const KycQuestion(

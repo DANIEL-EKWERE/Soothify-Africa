@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/policy_section.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/gradient_text.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// The cancellation policy in full — Figma `280:26738`, new in the redrawn
 /// "Book a licensed Expert" section.
@@ -119,13 +120,13 @@ class CancellationPolicyScreen extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 16.v),
                   children: [
                     for (final section in sections) ...[
-                      Text(
+                      SoothifyText(
                         section.heading,
                         style: CustomTextStyles.policyScreenHeading,
                       ),
                       SizedBox(height: 8.v),
                       for (final paragraph in section.paragraphs) ...[
-                        Text(
+                        SoothifyText(
                           paragraph,
                           style: CustomTextStyles.policyScreenBody,
                         ),

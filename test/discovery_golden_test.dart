@@ -148,9 +148,9 @@ void main() {
     // The subscription card sits below the fold on an 844-tall frame, so the
     // row has to be brought into view before it can be tapped.
     // The card sells the same three tiers Plans does, by the same names.
-    await tester.ensureVisible(find.text('Soothify Passport'));
+    await tester.ensureVisible(findSoothify('Soothify Passport'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Soothify Passport'));
+    await tester.tap(findSoothify('Soothify Passport'));
     await tester.pumpAndSettle();
     expect(controller.selectedPlanId.value, 'passport');
     expect(find.text('One time'), findsNothing);

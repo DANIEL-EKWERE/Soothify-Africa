@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/membership.dart';
 import '../settings/widgets/settings_header.dart';
 import 'controller/subscription_manage_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// "Billing History" — Figma `308:25859`, with the empty state from
 /// `308:25844`.
@@ -87,7 +88,7 @@ class _InvoiceRow extends StatelessWidget {
             ],
           ),
           SizedBox(height: 18.v),
-          Text(
+          SoothifyText(
             invoice.description,
             style: CustomTextStyles.subscriptionPlanName,
           ),

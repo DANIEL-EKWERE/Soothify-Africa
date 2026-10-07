@@ -153,6 +153,10 @@ class ImageConstant {
   static const String imgStatMeditation = '$_images/profile/stat_meditation.png';
   static const String imgStatBalance = '$_images/profile/stat_balance.png';
 
+  /// The portrait on User Profile. The designer's illustration, drawn inside
+  /// its own pale disc, so the screen draws no circle of its own behind it.
+  static const String imgAvatarMemoji = '$_images/profile/avatar_memoji.png';
+
   static const String icHeart = '$_icons/ic_heart.svg';
   static const String icLock = '$_icons/lock.svg';
   static const String icPlay = '$_icons/play.svg';

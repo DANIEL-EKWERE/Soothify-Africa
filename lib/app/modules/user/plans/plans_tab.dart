@@ -5,6 +5,7 @@ import '../../../data/models/plan_tier.dart';
 import '../spaces/widgets/passport_sheet.dart';
 import '../../../widgets/gradient_text.dart';
 import 'controller/plans_tab_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// Plans — redrawn by the designer on 2026-10-02, measured from the
 /// screenshot they supplied rather than from the file (which still holds the
@@ -215,7 +216,7 @@ class _TierCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              SoothifyText(
                 tier.name,
                 style: CustomTextStyles.tierName.copyWith(color: foreground),
               ),

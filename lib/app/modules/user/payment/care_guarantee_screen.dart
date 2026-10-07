@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/session_offering.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/gradient_text.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// "Confirm booking" — Figma `280:26699`, titled *Soothify Care Guarantee
 /// Card (Client Checkout Screen)* on the page.
@@ -117,7 +118,7 @@ class _GuaranteePanel extends StatelessWidget {
                 width: 20.h,
               ),
               SizedBox(width: 16.h),
-              Text('The Soothify Care Guarantee',
+              SoothifyText('The Soothify Care Guarantee',
                   style: CustomTextStyles.careGuaranteeTitle),
             ],
           ),
@@ -125,7 +126,7 @@ class _GuaranteePanel extends StatelessWidget {
           for (final promise in CareGuaranteeScreen.promises)
             Padding(
               padding: EdgeInsets.only(left: 36.5.h, top: 8.v),
-              child: Text(promise,
+              child: SoothifyText(promise,
                   style: CustomTextStyles.careGuaranteeItem),
             ),
         ],

@@ -6,6 +6,7 @@ import '../../../widgets/filled_text_field.dart';
 import '../../../widgets/social_auth_button.dart';
 import '../../../widgets/gradient_text.dart';
 import 'controller/signin_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// Log in — Figma 1704:12254, with the error state from 1704:12316.
 ///
@@ -46,7 +47,7 @@ class SigninScreen extends GetView<SigninController> {
                 ],
               ),
               SizedBox(height: 8.h),
-              Text(
+              SoothifyText(
                 'Welcome back to SoothifyAfrica!',
                 style: CustomTextStyles.authBlurb,
               ),

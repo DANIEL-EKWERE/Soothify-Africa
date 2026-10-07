@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/custom_ghost_button.dart';
 import 'controller/settings_controller.dart';
 import 'widgets/settings_header.dart';
 
-/// "Delete Account" — Figma `259:37617`.
+/// "Delete Account" — redrawn by the designer on 2026-10-07.
 ///
-/// Measured below the status bar: the lead line at 131, the warning at 183
-/// across 342, and the ghost button at 470.
+/// It asks rather than warns: a question, what will be lost, and two answers.
+/// Keeping the account is the outlined one and comes first, so the destructive
+/// answer is neither the default nor the easier reach.
+///
+/// Measured below the status bar: the question at 105, the body from 131 on a
+/// 24 pitch, and the two actions at 429 and 496, both 52 tall.
 class DeleteAccountScreen extends GetView<SettingsController> {
   const DeleteAccountScreen({super.key});
 
-  static const String lead = 'We’re sorry to see you go.';
+  static const String lead = 'Delete your account?';
 
   static const String warning =
-      'Deleting your account is irreversible and means that you will no '
-      'longer be able to access your session history, stats, favorites, and '
-      'more.';
+      'This will permanently erase your profile, saved classes, and active '
+      'subscription. This action cannot be undone.';
 
   @override
   Widget build(BuildContext context) {
@@ -28,22 +32,38 @@ class DeleteAccountScreen extends GetView<SettingsController> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SettingsHeader(title: 'Delete Account'),
-            SizedBox(height: 24.v),
+            SizedBox(height: 46.v),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 23.h),
-              child: Text(lead, style: CustomTextStyles.settingsPageBody),
+              padding: EdgeInsets.symmetric(horizontal: 24.h),
+              child: Text(lead, style: CustomTextStyles.deleteAccountLead),
             ),
-            SizedBox(height: 28.v),
+            SizedBox(height: 18.v),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 23.h),
-              child: Text(warning, style: CustomTextStyles.settingsPageBody),
+              padding: EdgeInsets.symmetric(horizontal: 24.h),
+              child: Text(warning, style: CustomTextStyles.deleteAccountBody),
             ),
             const Spacer(),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 23.h),
+              padding: EdgeInsets.symmetric(horizontal: 24.h),
               child: CustomGhostButton(
-                text: 'Delete Account',
+                text: 'Cancel, keep my account',
+                onPressed: Get.back,
+              ),
+            ),
+            SizedBox(height: 15.v),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.h),
+              child: CustomElevatedButton(
+                text: 'Yes, delete Account',
                 onPressed: controller.confirmDeleteAccount,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: appTheme.destructiveFill,
+                  foregroundColor: appTheme.onPrimary,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.h),
+                  ),
+                ),
               ),
             ),
             SizedBox(height: 56.v),

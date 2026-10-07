@@ -82,11 +82,12 @@ class _KycConcernCarouselState extends State<KycConcernCarousel> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.h),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       widget.question.prompt,
-                      style: CustomTextStyles.onboardingTitle.copyWith(
+                      textAlign: TextAlign.center,
+                      style: CustomTextStyles.carouselPrompt.copyWith(
                         color: appTheme.onPrimary,
                       ),
                     ),
@@ -94,6 +95,7 @@ class _KycConcernCarouselState extends State<KycConcernCarousel> {
                       SizedBox(height: 15.v),
                       Text(
                         widget.question.subtitle!,
+                        textAlign: TextAlign.center,
                         style: CustomTextStyles.onboardingSubtitle.copyWith(
                           color: appTheme.onPrimary,
                         ),
@@ -209,19 +211,23 @@ class _Figure extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             // The frame lights the focused figure from behind; the extracted
-            // art carries no glow of its own.
+            // art carries no glow of its own. Wider than the figure and held
+            // near full strength through the middle, so it reads as a lamp
+            // behind them rather than a ring around them.
             if (focused)
               DecoratedBox(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
+                    stops: const [0, 0.45, 1],
                     colors: [
-                      appTheme.onPrimary.withValues(alpha: 0.22),
+                      appTheme.onPrimary.withValues(alpha: 0.38),
+                      appTheme.onPrimary.withValues(alpha: 0.18),
                       appTheme.onPrimary.withValues(alpha: 0),
                     ],
                   ),
                 ),
-                child: SizedBox(height: 224.v, width: 224.v),
+                child: SizedBox(height: 268.v, width: 268.v),
               ),
             if (artPath != null)
               Image.asset(artPath!, fit: BoxFit.contain)

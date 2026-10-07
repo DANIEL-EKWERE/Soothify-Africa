@@ -43,6 +43,9 @@ void main() {
 
   for (var i = 0; i < SplashScreen.prompts.length; i++) {
     testWidgets('splash prompt "${SplashScreen.prompts[i]}"', (tester) async {
+      // Without this the prompt draws in the test placeholder face, which is
+      // solid blocks — and the golden says nothing about its type.
+      await loadAppFonts();
       tester.view
         ..physicalSize = const Size(figmaDesignWidth * 3, figmaDesignHeight * 3)
         ..devicePixelRatio = 3.0;
@@ -67,6 +70,12 @@ void main() {
       expect(find.text(SplashScreen.prompts[i]), findsOneWidget);
       // The wordmark is gone once a prompt is up.
       expect(find.bySemanticsLabel('Soothify'), findsNothing);
+
+      // Captured, not just asserted: the prompt's type is the designer's own
+      // (Nunito Sans Bold 24 on a 24 line) and nothing else on this screen
+      // would show it moving.
+      await expectLater(find.byType(SplashView),
+          matchesGoldenFile('goldens/splash_prompt_$i.png'));
     });
   }
 

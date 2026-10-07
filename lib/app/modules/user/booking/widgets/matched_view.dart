@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../widgets/gradient_text.dart';
 import '../controller/booking_controller.dart';
+import '../../../../widgets/soothify_word.dart';
 
 /// The matched coach's profile — Figma "Matched with instructor" (135:20932).
 ///
@@ -191,7 +192,7 @@ class _Detail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(heading, style: CustomTextStyles.coachHeading),
+        SoothifyText(heading, style: CustomTextStyles.coachHeading),
         SizedBox(height: 4.v),
         for (final line in lines)
           Padding(

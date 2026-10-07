@@ -7,6 +7,7 @@ import '../../../widgets/custom_ghost_button.dart';
 import '../settings/widgets/settings_header.dart';
 import 'controller/subscription_manage_controller.dart';
 import 'widgets/subscription_pieces.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// "Your Subscription" — Figma `308:25746` (inactive) and `308:25763`
 /// (active), with the cancellation card from `308:25807` raised over it.
@@ -129,7 +130,7 @@ class _ActiveCard extends StatelessWidget {
         SizedBox(height: 8.v),
         Text(renewal, style: CustomTextStyles.subscriptionBody),
         SizedBox(height: 32.v),
-        Text(plan.brandedName,
+        SoothifyText(plan.brandedName,
             style: CustomTextStyles.subscriptionPlanName),
         SizedBox(height: 8.v),
         Text(plan.billed, style: CustomTextStyles.subscriptionPlanPrice),

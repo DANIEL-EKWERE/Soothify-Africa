@@ -62,6 +62,16 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
+  /// The concern carousel's question, which the frame fits on one line.
+  ///
+  /// Its own size rather than [onboardingTitle]'s 20: this project's bundled
+  /// face sets wider than Figma's, and at 20 "What brings you to your space
+  /// today?" broke onto a second line the design does not have. The plain KYC
+  /// questions keep the 20, so they are unaffected.
+  static TextStyle get carouselPrompt => onboardingTitle.copyWith(
+        fontSize: 18.fSize,
+      );
+
   /// "You Can Select More Than One Option" — Nunito Regular 16, tracking 0.3.
   static TextStyle get onboardingSubtitle => TextStyle(
     fontFamily: fontNunito,
@@ -2039,12 +2049,16 @@ class CustomTextStyles {
   );
 
   /// The splash's breathing prompts — white on the brand gradient.
+  /// "Inhale Deeply" / "Exhale Slowly" on the splash — the designer's panel
+  /// of 2026-10-07: Nunito Sans Bold 24 on a 24 line, no letter spacing. It
+  /// was Light 28 tracked out to 1.2, which was this app's reading of the
+  /// frame rather than the frame's own values.
   static TextStyle get breathPrompt => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 28.fSize,
-    fontWeight: FontWeight.w300,
-    fontVariations: const [FontVariation('wght', 300)],
-    letterSpacing: 1.2,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 24 / 24,
     color: appTheme.onPrimary,
   );
 
@@ -2166,7 +2180,7 @@ class CustomTextStyles {
 
   static TextStyle get homeCardBody => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 10.fSize,
+    fontSize: 11.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
     color: appTheme.onPrimary,
@@ -3327,6 +3341,26 @@ class CustomTextStyles {
     fontWeight: FontWeight.w500,
     fontVariations: const [FontVariation('wght', 500)],
     height: 30 / 22,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Delete your account?" — the question the screen opens with.
+  static TextStyle get deleteAccountLead => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 25 / 18,
+    color: appTheme.textPrimary,
+  );
+
+  /// What deleting costs, under it.
+  static TextStyle get deleteAccountBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 24 / 16,
     color: appTheme.textPrimary,
   );
 

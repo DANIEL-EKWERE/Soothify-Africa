@@ -86,6 +86,8 @@ class PrimaryColors {
     required this.sessionCardRule,
     required this.callControlRim,
     required this.callEndFill,
+    required this.avatarWash,
+    required this.destructiveFill,
     required this.spaceChipBorder,
     required this.topicChipBorder,
     required this.unreadDot,
@@ -303,6 +305,14 @@ class PrimaryColors {
 
   /// The hang-up button. The design's red, which is warmer than [error].
   final Color callEndFill;
+
+  /// The disc behind the portrait on User Profile. The frame's avatar is an
+  /// illustration drawn on transparency, so this is most of what shows.
+  final Color avatarWash;
+
+  /// "Yes, delete Account". The design's red, which is pinker than [error]
+  /// and than the call's hang-up button.
+  final Color destructiveFill;
 
   /// The red mark on an unread notification. `#F44336`, measured off
   /// `259:26851`; the Journal reuses it for its unread count badge and, at
@@ -604,6 +614,8 @@ class PrimaryColors {
     sessionCardRule: Color(0xFFC9D8EE),
     callControlRim: Color(0xFFBFC6CC),
     callEndFill: Color(0xFFF4443C),
+    avatarWash: Color(0xFFB8DFF2),
+    destructiveFill: Color(0xFFEE3B5B),
     spaceChipBorder: Color(0xFFD7D7D7),
     topicChipBorder: Color(0x4D999999),
     unreadDot: Color(0xFFF44336),
@@ -719,6 +731,8 @@ class PrimaryColors {
     sessionCardRule: Color(0x332F6FED),
     callControlRim: Color(0xFF4A5157),
     callEndFill: Color(0xFFF4443C),
+    avatarWash: Color(0xFF2B4D5E),
+    destructiveFill: Color(0xFFEE3B5B),
     spaceChipBorder: Color(0x33FFFFFF),
     topicChipBorder: Color(0x4DFFFFFF),
     unreadDot: Color(0xFFF44336),

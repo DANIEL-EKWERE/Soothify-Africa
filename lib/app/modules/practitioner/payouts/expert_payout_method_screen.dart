@@ -5,6 +5,7 @@ import '../../../data/models/payout_method.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../widgets/expert_header.dart';
 import 'controller/payout_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// Choosing where the money goes — Figma "Payout method" (`259:59463`, filed
 /// in the file under the name "Recent payouts").
@@ -28,7 +29,7 @@ class ExpertPayoutMethodScreen extends GetView<PayoutController> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
                 children: [
-                  Text(
+                  SoothifyText(
                     // The frame drops a verb: "Choose how you'd like to your
                     // payments from Soothify."
                     'Choose how you’d like to receive your payments from '

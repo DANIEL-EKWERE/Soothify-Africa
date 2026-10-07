@@ -6,6 +6,7 @@ import '../../../core/app_export.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../practitioner/call/widgets/joining_pulse.dart';
 import 'controller/client_joining_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// The client joining a booked session — Figma `280:26643`, new in the
 /// redrawn "Book a licensed Expert" section.
@@ -108,7 +109,7 @@ class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
                   // The frame states the Care Guarantee here and again in the
                   // panel below. It reads as a promise made on arrival and
                   // then filed under a heading, so both are drawn.
-                  Text(
+                  SoothifyText(
                     ClientJoiningScreen.guarantee,
                     textAlign: TextAlign.center,
                     style: CustomTextStyles.joiningGuarantee,
@@ -253,7 +254,7 @@ class _SafeSpacePanel extends StatelessWidget {
           SizedBox(height: 8.v),
           Padding(
             padding: EdgeInsets.only(left: 36.h),
-            child: Text(ClientJoiningScreen.guarantee,
+            child: SoothifyText(ClientJoiningScreen.guarantee,
                 style: CustomTextStyles.safeSpaceBody),
           ),
         ],

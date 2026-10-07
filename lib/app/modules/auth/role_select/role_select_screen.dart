@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/user_role.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import 'controller/role_select_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 class RoleSelectScreen extends GetView<RoleSelectController> {
   const RoleSelectScreen({super.key});
@@ -20,7 +21,7 @@ class RoleSelectScreen extends GetView<RoleSelectController> {
               const Spacer(),
               Text('Welcome', style: theme.textTheme.displaySmall),
               SizedBox(height: 8.v),
-              Text(
+              SoothifyText(
                 'How will you be using Soothify Africa?',
                 style: theme.textTheme.bodyMedium,
               ),

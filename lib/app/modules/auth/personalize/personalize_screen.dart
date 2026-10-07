@@ -31,15 +31,15 @@ class PersonalizeScreen extends GetView<PersonalizeController> {
               ),
               const Spacer(flex: 3),
               GradientText(
-                "Welcome! Let's Personalize Soothify for You!",
+                "Let's tailor your sanctuary.",
                 gradient: appTheme.titleGradient,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.onboardingSlideTitle,
               ),
               SizedBox(height: 21.h),
               Text(
-                'Help us understand your preferences to provide the best '
-                'experience.',
+                'A few quick preferences help us shape this space just '
+                'for you.',
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.onboardingBody,
               ),

@@ -9,6 +9,7 @@ import 'controller/kyc_controller.dart';
 import 'widgets/birth_year_picker.dart';
 import 'widgets/kyc_concern_carousel.dart';
 import 'widgets/kyc_option_tile.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// The KYC questionnaire — Figma section "Mobile / KYC".
 ///
@@ -121,7 +122,7 @@ class _Answers extends StatelessWidget {
             if (controller.isUnderage)
               Padding(
                 padding: EdgeInsets.only(bottom: 8.h),
-                child: Text(
+                child: SoothifyText(
                   KycQuestion.underageMessage,
                   textAlign: TextAlign.center,
                   style: CustomTextStyles.inlineError,

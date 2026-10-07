@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/widgets/soothify_word.dart';
 
 /// Loads every bundled face. Without this, golden renders fall back to the
 /// test font and every glyph becomes a box.
@@ -130,3 +131,17 @@ void disableMotion(WidgetTester tester) {
       const FakeAccessibilityFeatures(disableAnimations: true);
   addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
 }
+
+/// Finds text that may carry the brand's smile under its "oo".
+///
+/// [SoothifyText] splits "Soothify" into a `WidgetSpan`, so `find.text` no
+/// longer sees the whole string. Matching the widget by the string it was
+/// given finds it either way, and needs no semantics handle — which
+/// `find.bySemanticsLabel` would, since a widget test builds no semantics
+/// tree unless one is open.
+Finder findSoothify(String text) => find.byWidgetPredicate(
+      (w) =>
+          (w is SoothifyText && w.data == text) ||
+          (w is Text && w.data == text),
+      description: 'text "$text"',
+    );

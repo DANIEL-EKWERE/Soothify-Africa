@@ -49,9 +49,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
-    expect(find.text('Soothify Core'), findsOneWidget);
-    expect(find.text('Soothify Passport'), findsOneWidget);
-    expect(find.text('Soothify Corporate Wellness'), findsOneWidget);
+    expect(findSoothify('Soothify Core'), findsOneWidget);
+    expect(findSoothify('Soothify Passport'), findsOneWidget);
+    expect(findSoothify('Soothify Corporate Wellness'), findsOneWidget);
 
     // Only Core carries a price; the other two carry a link instead.
     expect(find.text('₦15,000'), findsOneWidget);
@@ -127,7 +127,7 @@ void main() {
     Color rimOf(String name) {
       final box = tester.widget<Container>(
         find
-            .ancestor(of: find.text(name), matching: find.byType(Container))
+            .ancestor(of: findSoothify(name), matching: find.byType(Container))
             .first,
       );
       return ((box.decoration! as BoxDecoration).border! as Border).top.color;
@@ -143,7 +143,7 @@ void main() {
       expect(rimOf(name), appTheme.cardRim);
     }
 
-    await tester.tap(find.text('Soothify Core'));
+    await tester.tap(findSoothify('Soothify Core'));
     await tester.pumpAndSettle();
     expect(rimOf('Soothify Core'), appTheme.actionFill);
     // And only that one.
@@ -151,7 +151,7 @@ void main() {
 
     // The filled card takes the orange, which is the only accent that shows
     // against its own blue.
-    await tester.tap(find.text('Soothify Passport'));
+    await tester.tap(findSoothify('Soothify Passport'));
     await tester.pumpAndSettle();
     expect(rimOf('Soothify Passport'), appTheme.planEmphasisOutline);
     expect(rimOf('Soothify Core'), appTheme.cardRim);

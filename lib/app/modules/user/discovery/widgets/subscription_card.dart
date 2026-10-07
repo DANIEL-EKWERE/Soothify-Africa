@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/subscription_plan.dart';
+import '../../../../widgets/soothify_word.dart';
 
 /// The "Unlock every feature" block — Figma 135:3467.
 ///
@@ -137,7 +138,7 @@ class _PlanRow extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
-              child: Text(
+              child: SoothifyText(
                 plan.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

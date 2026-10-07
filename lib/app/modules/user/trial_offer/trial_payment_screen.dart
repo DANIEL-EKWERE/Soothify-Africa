@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/membership.dart';
 import '../../../widgets/custom_ghost_button.dart';
 import 'controller/trial_offer_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// "Soothify payment" — Figma `311:25477` (credit card chosen, 390x1312) and
 /// `311:25582` (Apple Pay chosen, 390x977).
@@ -38,14 +39,17 @@ class TrialPaymentScreen extends GetView<TrialOfferController> {
           children: [
             SizedBox(height: 10.v),
             Center(
-              child: Text('Soothify', style: CustomTextStyles.paymentWordmark),
+              child: SoothifyText(
+                'Soothify',
+                style: CustomTextStyles.paymentWordmark,
+              ),
             ),
             SizedBox(height: 16.v),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 24.v),
                 children: [
-                  Text(
+                  SoothifyText(
                     'Try Soothify free for 7 days',
                     textAlign: TextAlign.center,
                     style: CustomTextStyles.paymentTitle,
@@ -64,29 +68,40 @@ class TrialPaymentScreen extends GetView<TrialOfferController> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Plan summary',
-                          style: CustomTextStyles.paymentSection),
+                      Text(
+                        'Plan summary',
+                        style: CustomTextStyles.paymentSection,
+                      ),
                       InkWell(
                         onTap: Get.back,
-                        child: Text('Change',
-                            style: CustomTextStyles.paymentLink),
+                        child: Text(
+                          'Change',
+                          style: CustomTextStyles.paymentLink,
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(height: 14.v),
                   Obx(() => _PlanSummary(plan: controller.plan.value)),
                   SizedBox(height: 20.v),
-                  Text('Payment method',
-                      style: CustomTextStyles.paymentSection),
+                  Text(
+                    'Payment method',
+                    style: CustomTextStyles.paymentSection,
+                  ),
                   SizedBox(height: 11.v),
                   Obx(() => _Methods(chosen: controller.method.value)),
                   SizedBox(height: 25.v),
-                  Text('Have a promo code?',
-                      style: CustomTextStyles.paymentFieldLabel),
+                  Text(
+                    'Have a promo code?',
+                    style: CustomTextStyles.paymentFieldLabel,
+                  ),
                   SizedBox(height: 8.v),
                   const _PromoRow(),
                   SizedBox(height: 20.v),
-                  Text(authorisation, style: CustomTextStyles.paymentFinePrint),
+                  SoothifyText(
+                    authorisation,
+                    style: CustomTextStyles.paymentFinePrint,
+                  ),
                   SizedBox(height: 24.v),
                   CustomGhostButton(
                     text: 'Start My Free Week',
@@ -138,15 +153,19 @@ class _PlanSummary extends StatelessWidget {
                     color: appTheme.paymentWash,
                     borderRadius: BorderRadius.circular(20.h),
                   ),
-                  child: Text('save ₦15,000 a year',
-                      style: CustomTextStyles.paymentChip),
+                  child: Text(
+                    'save ₦15,000 a year',
+                    style: CustomTextStyles.paymentChip,
+                  ),
                 ),
               ],
             ],
           ),
           SizedBox(height: 4.v),
           Text(
-            plan == MembershipPlan.annual ? 'Billed annually' : 'Billed monthly',
+            plan == MembershipPlan.annual
+                ? 'Billed annually'
+                : 'Billed monthly',
             style: CustomTextStyles.paymentMuted,
           ),
           SizedBox(height: 15.v),
@@ -162,12 +181,16 @@ class _PlanSummary extends StatelessWidget {
                   color: appTheme.paymentWash,
                   borderRadius: BorderRadius.circular(20.h),
                 ),
-                child: Text('7-day free trial',
-                    style: CustomTextStyles.paymentChipPlain),
+                child: Text(
+                  '7-day free trial',
+                  style: CustomTextStyles.paymentChipPlain,
+                ),
               ),
               const Spacer(),
-              Text('-${controller.firstCharge}',
-                  style: CustomTextStyles.paymentCredit),
+              Text(
+                '-${controller.firstCharge}',
+                style: CustomTextStyles.paymentCredit,
+              ),
             ],
           ),
           SizedBox(height: 15.v),
@@ -184,8 +207,10 @@ class _PlanSummary extends StatelessWidget {
             children: [
               Text('Total today', style: CustomTextStyles.paymentTotalLabel),
               const Spacer(),
-              Text(controller.dueToday,
-                  style: CustomTextStyles.paymentTotalAmount),
+              Text(
+                controller.dueToday,
+                style: CustomTextStyles.paymentTotalAmount,
+              ),
             ],
           ),
           SizedBox(height: 14.v),
@@ -197,8 +222,10 @@ class _PlanSummary extends StatelessWidget {
                   style: CustomTextStyles.paymentFinePrint,
                 ),
               ),
-              Text(controller.firstCharge,
-                  style: CustomTextStyles.paymentFirstCharge),
+              Text(
+                controller.firstCharge,
+                style: CustomTextStyles.paymentFirstCharge,
+              ),
             ],
           ),
           SizedBox(height: 12.v),
@@ -328,8 +355,10 @@ class _MethodOption extends StatelessWidget {
             ),
             SizedBox(width: 12.h),
             Expanded(
-              child: Text(method.label,
-                  style: CustomTextStyles.paymentMethodLabel),
+              child: Text(
+                method.label,
+                style: CustomTextStyles.paymentMethodLabel,
+              ),
             ),
             if (method == PaymentMethod.applePay)
               Row(
@@ -365,8 +394,10 @@ class _CardForm extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text('Debit and credit cards accepted',
-                    style: CustomTextStyles.paymentFinePrint),
+                child: Text(
+                  'Debit and credit cards accepted',
+                  style: CustomTextStyles.paymentFinePrint,
+                ),
               ),
               Text('VISA', style: CustomTextStyles.paymentVisa),
               SizedBox(width: 6.h),
@@ -404,12 +435,17 @@ class _CardForm extends StatelessWidget {
           SizedBox(height: 16.v),
           Row(
             children: [
-              Icon(Icons.lock_outline, size: 12.h,
-                  color: appTheme.textSecondary),
+              Icon(
+                Icons.lock_outline,
+                size: 12.h,
+                color: appTheme.textSecondary,
+              ),
               SizedBox(width: 6.h),
               Expanded(
-                child: Text('Your card details are encrypted and secure.',
-                    style: CustomTextStyles.paymentFinePrint),
+                child: Text(
+                  'Your card details are encrypted and secure.',
+                  style: CustomTextStyles.paymentFinePrint,
+                ),
               ),
             ],
           ),
@@ -420,11 +456,7 @@ class _CardForm extends StatelessWidget {
 }
 
 class _CardField extends StatelessWidget {
-  const _CardField({
-    required this.label,
-    required this.hint,
-    this.keyboard,
-  });
+  const _CardField({required this.label, required this.hint, this.keyboard});
 
   final String label;
   final String hint;

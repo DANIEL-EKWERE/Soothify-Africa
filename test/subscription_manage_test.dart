@@ -68,7 +68,7 @@ void main() {
 
     expect(find.text('Active · Free Trial'), findsOneWidget);
     expect(find.text('Subscription details'), findsOneWidget);
-    expect(find.text('Soothify Annual Membership'), findsOneWidget);
+    expect(findSoothify('Soothify Annual Membership'), findsOneWidget);
     expect(find.text('₦150,000 / year'), findsOneWidget);
     expect(find.text('Mastercard ending in •••••'), findsOneWidget);
     expect(find.textContaining('free trial ends on October 9, 2026'),

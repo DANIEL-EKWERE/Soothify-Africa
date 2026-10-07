@@ -124,48 +124,54 @@ class _AccountRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            controller.displayName,
-            style: CustomTextStyles.screenQuestion,
-          ),
-          SizedBox(
-            width: 55.h,
-            height: 55.h,
-            child: Stack(
-              children: [
-                ClipOval(
-                  child: CustomImageView(
-                    imagePath: ImageConstant.imgHomeAvatar,
-                    height: 55.h,
-                    width: 55.h,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 19.h,
-                    height: 19.h,
-                    decoration: BoxDecoration(
-                      color: appTheme.soothifyBlue,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: appTheme.onPrimary, width: 0.8),
-                    ),
-                    alignment: Alignment.center,
-                    // The glyph only — the blue disc and its white ring are
-                    // drawn above. The file used to carry its own circle too,
-                    // which this tint turned into a white blob filling the
-                    // badge, so the pencil was never visible.
+          Text(controller.displayName, style: CustomTextStyles.screenQuestion),
+          // The badge said the avatar was editable while nothing happened on
+          // tap. It opens the screen that actually changes it.
+          GestureDetector(
+            onTap: controller.openEditAccount,
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              width: 55.h,
+              height: 55.h,
+              child: Stack(
+                children: [
+                  ClipOval(
                     child: CustomImageView(
-                      imagePath: ImageConstant.icEditBadge,
-                      height: 11.h,
-                      width: 11.h,
-                      color: appTheme.onPrimary,
+                      imagePath: ImageConstant.imgHomeAvatar,
+                      height: 55.h,
+                      width: 55.h,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 19.h,
+                      height: 19.h,
+                      decoration: BoxDecoration(
+                        color: appTheme.soothifyBlue,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: appTheme.onPrimary,
+                          width: 0.8,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      // The glyph only — the blue disc and its white ring are
+                      // drawn above. The file used to carry its own circle too,
+                      // which this tint turned into a white blob filling the
+                      // badge, so the pencil was never visible.
+                      child: CustomImageView(
+                        imagePath: ImageConstant.icEditBadge,
+                        height: 11.h,
+                        width: 11.h,
+                        color: appTheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

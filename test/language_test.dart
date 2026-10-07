@@ -80,10 +80,25 @@ void main() {
   group('IntroSlide', () {
     test('carries the three designed panels', () {
       expect(IntroSlide.all, hasLength(3));
+      // The designer rewrote all three on 2026-10-07. The titles are pinned
+      // so a panel cannot go missing unnoticed; the bodies are not, because
+      // copy that lives in two places is copy that rots in one of them —
+      // this assertion was still naming "Personalized Therapy" long after
+      // the panel stopped being called that.
       expect(
         IntroSlide.all.map((s) => s.title),
-        ['Personalized Therapy', 'Guided Meditation', 'Community'],
+        [
+          'Your quiet space.',
+          'Stillness on your terms.',
+          'Breathe alongside others.',
+        ],
       );
+      for (final slide in IntroSlide.all) {
+        expect(slide.body, isNotEmpty);
+        expect(slide.assetPath, startsWith('assets/images/onboarding/'));
+      }
+      // Each panel says its own thing; the third used to repeat the second.
+      expect(IntroSlide.all.map((s) => s.body).toSet(), hasLength(3));
     });
   });
 }

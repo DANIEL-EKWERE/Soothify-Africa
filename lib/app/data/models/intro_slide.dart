@@ -1,7 +1,9 @@
 /// One panel of the "Welcome to Soothify" carousel.
 ///
-/// Copy and artwork come from the Figma section
-/// "Mobile / splash screen + Onboarding screen" (655:5253, 655:5273, 655:5294).
+/// Artwork comes from the Figma section "Mobile / splash screen + Onboarding
+/// screen" (655:5253, 655:5273, 655:5294); the copy is the designer's rewrite
+/// of 2026-10-07, which also settled the third panel — the file had been
+/// repeating the second one's body there.
 class IntroSlide {
   const IntroSlide({
     required this.title,
@@ -15,23 +17,21 @@ class IntroSlide {
 
   static const List<IntroSlide> all = [
     IntroSlide(
-      title: 'Personalized Therapy',
-      body: 'Connect with therapists who speak your language for regular '
-          'sessions to manage stress and improve mental health.',
+      title: 'Your quiet space.',
+      body: 'Connect with guides who speak your language for grounding '
+          'sessions to soften stress and protect your peace.',
       assetPath: 'assets/images/onboarding/therapy.png',
     ),
     IntroSlide(
-      title: 'Guided Meditation',
-      body: 'Access guided meditation sessions in your language to reduce '
-          'stress and enhance focus through daily mindfulness exercises.',
+      title: 'Stillness on your terms.',
+      body: 'Explore guided sessions in your language to quiet the noise, '
+          'sharpen your focus, and return to your centre.',
       assetPath: 'assets/images/onboarding/meditation.png',
     ),
     IntroSlide(
-      // The design repeats slide 2's body here, which reads like a
-      // copy-paste left in the file rather than final copy for Community.
-      title: 'Community',
-      body: 'Access guided meditation sessions in your language to reduce '
-          'stress and enhance focus through daily mindfulness exercises.',
+      title: 'Breathe alongside others.',
+      body: 'Find a quiet circle of shared experiences, gentle '
+          'accountability, and collective grounding.',
       assetPath: 'assets/images/onboarding/community.png',
     ),
   ];

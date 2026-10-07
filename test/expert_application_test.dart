@@ -110,7 +110,7 @@ void main() {
 
   testWidgets('the intro carries both of the frame’s actions', (tester) async {
     await mount(tester, screen: const ExpertIntroScreen());
-    expect(find.text('Join the Soothify Expert Network'), findsOneWidget);
+    expect(findSoothify('Join the Soothify Expert Network'), findsOneWidget);
     expect(find.textContaining('English or Pidgin'), findsOneWidget);
     expect(find.text('Start Application'), findsOneWidget);
     expect(find.text('Back'), findsOneWidget);

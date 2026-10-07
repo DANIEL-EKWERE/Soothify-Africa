@@ -142,7 +142,10 @@ class _Header extends StatelessWidget {
               imagePath: ImageConstant.icBell,
               height: 20.h,
               width: 20.h,
-              color: appTheme.textPrimary,
+              // The brand blue the dark-mode toggle beside it uses, not the
+              // near-black it was drawing in — the two are one cluster and
+              // the design tints them alike.
+              color: appTheme.brandDeep,
             ),
           ),
         ),

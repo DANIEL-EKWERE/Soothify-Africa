@@ -63,6 +63,8 @@ void main() {
       ]) {
         await pumpScreen(tester, screen, brightness: brightness);
         await tester.pumpAndSettle();
+        await precacheAll(tester, find.byWidget(screen),
+            const ['assets/images/profile/avatar_memoji.png']);
         await expectLater(find.byWidget(screen),
             matchesGoldenFile('goldens/${label}_$name.png'));
       }
@@ -79,10 +81,10 @@ void main() {
     await pumpScreen(tester, const UserProfileScreen());
     await tester.pumpAndSettle();
 
-    // The badge on the avatar, not the back arrow that comes before it.
+    // The "+" straddling the avatar, which the redraw put in place of the
+    // pencil badge — the pencil now sits beside the name instead.
     await tester.tap(find.ancestor(
-      of: find.byWidgetPredicate((w) =>
-          w is CustomImageView && w.imagePath == ImageConstant.icEditBadge),
+      of: find.byIcon(Icons.add),
       matching: find.byType(InkWell),
     ));
     await tester.pumpAndSettle();
@@ -307,13 +309,15 @@ void main() {
     for (final page in PolicyPage.values) {
       for (final section in PolicyScreen.body[page] ?? const []) {
         for (final paragraph in section.paragraphs) {
-          expect(paragraph, isNot(contains('sorry to see you go')));
-          expect(paragraph, isNot(contains('irreversible')));
+          expect(paragraph, isNot(contains(DeleteAccountScreen.lead)));
+          expect(paragraph, isNot(contains('permanently erase')));
         }
       }
     }
-    expect(PolicyScreen.pending, isNot(contains('sorry to see you go')));
-    expect(DeleteAccountScreen.lead, contains('sorry to see you go'));
+    expect(PolicyScreen.pending, isNot(contains(DeleteAccountScreen.lead)));
+    // The redraw of 2026-10-07 turned the warning into a question with two
+    // answers; the content pages must not pick either of them up.
+    expect(DeleteAccountScreen.lead, 'Delete your account?');
   });
 
   test('all three content pages carry the copy the designer supplied', () {

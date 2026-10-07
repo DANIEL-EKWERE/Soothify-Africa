@@ -157,7 +157,7 @@ void main() {
     expect(find.textContaining('Create an account'), findsOneWidget);
     expect(find.text('Sign up'), findsOneWidget);
     // The gear is a guest's way into Settings — the only frame that shows one.
-    expect(find.text('Unlock Soothify Pro'), findsOneWidget);
+    expect(findSoothify('Unlock Soothify Pro'), findsOneWidget);
 
   });
 

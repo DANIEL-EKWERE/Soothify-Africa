@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../widgets/gradient_text.dart';
 import '../controller/community_tab_controller.dart';
+import '../../../../widgets/soothify_word.dart';
 
 /// What the Community tab shows while the forum is not being built — the
 /// designer's screenshot of 2026-10-05.
@@ -73,7 +74,7 @@ class CommunityWelcomeStep extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(22.h, 78.v, 22.h, 19.v),
       child: Column(
         children: [
-          Text(
+          SoothifyText(
             'Welcome to Soothify Community',
             textAlign: TextAlign.center,
             style: CustomTextStyles.communityWelcomeTitle,

@@ -6,6 +6,7 @@ import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/expert_form_fields.dart';
 import '../../../widgets/step_progress_bar.dart';
 import 'controller/expert_application_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// The "Become an Expert" application — Figma `259:59145` (who you are),
 /// `259:59179` (languages), `259:59198` (credentials) and `259:59229`
@@ -272,7 +273,7 @@ class _Submitted extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: CustomTextStyles.expertSubmittedTitle),
                 SizedBox(height: 16.v),
-                Text(
+                SoothifyText(
                   'Thank you for applying to join Soothify. Our team is '
                   'reviewing your credentials and will reach out via email '
                   'within 24 to 48 hours once verified.',

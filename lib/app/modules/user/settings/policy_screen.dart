@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/policy_section.dart';
 import 'widgets/settings_header.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// Which of the three content pages is showing.
 enum PolicyPage {
@@ -186,16 +187,17 @@ class PolicyScreen extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(23.h, 0, 23.h, 32.v),
                 children: [
                   if (sections.isEmpty)
-                    Text(pending, style: CustomTextStyles.settingsPageBody)
+                    SoothifyText(pending,
+                        style: CustomTextStyles.settingsPageBody)
                   else
                     for (final section in sections) ...[
-                      Text(
+                      SoothifyText(
                         section.heading,
                         style: CustomTextStyles.settingsSectionHeading,
                       ),
                       SizedBox(height: 8.v),
                       for (final paragraph in section.paragraphs) ...[
-                        Text(
+                        SoothifyText(
                           paragraph,
                           style: CustomTextStyles.settingsPageBody,
                         ),

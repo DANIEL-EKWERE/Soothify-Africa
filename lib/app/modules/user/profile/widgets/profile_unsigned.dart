@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../controller/profile_tab_controller.dart';
+import '../../../../widgets/soothify_word.dart';
 
 /// Profile while browsing as a guest — Figma "Profile/unsigned/not logged in"
 /// (page 124:2, `176:34542`).
@@ -159,7 +160,7 @@ class _Action extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.h),
           border: filled ? null : Border.all(color: appTheme.actionFill),
         ),
-        child: Text(
+        child: SoothifyText(
           label,
           style: CustomTextStyles.subscribeLabel.copyWith(
             color: filled ? appTheme.onPrimary : appTheme.actionFill,

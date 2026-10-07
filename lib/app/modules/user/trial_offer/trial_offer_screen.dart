@@ -4,6 +4,7 @@ import '../../../core/app_export.dart';
 import '../../../data/models/membership.dart';
 import '../../../widgets/custom_ghost_button.dart';
 import 'controller/trial_offer_controller.dart';
+import '../../../widgets/soothify_word.dart';
 
 /// "Subscription pop up 1" — Figma `311:25655`, which replaced the pair of
 /// pop-ups at `259:59011` and `259:58598` on 2026-10-05.
@@ -65,7 +66,7 @@ class TrialOfferScreen extends GetView<TrialOfferController> {
                   SizedBox(height: 21.v),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 21.h),
-                    child: Text(
+                    child: SoothifyText(
                       'Every class on Soothify, free for a week. Cancel '
                       'anytime before day 7.',
                       textAlign: TextAlign.center,

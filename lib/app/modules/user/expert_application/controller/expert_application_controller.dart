@@ -27,7 +27,11 @@ class ExpertApplicationController extends GetxController {
   final RxBool submitted = false.obs;
 
   // Step 1 — who they are.
-  final Rxn<ExpertField> field = Rxn<ExpertField>();
+  //
+  /// More than one may apply: the question is "areas of expertise", and a
+  /// practitioner can be a licensed therapist *and* a yoga instructor. It
+  /// used to be a single choice, so picking a second one dropped the first.
+  final RxSet<ExpertField> fields = <ExpertField>{}.obs;
   final name = TextEditingController();
   final experience = TextEditingController();
   final about = TextEditingController();
@@ -88,7 +92,7 @@ class ExpertApplicationController extends GetxController {
     // Touching a text field bumps this, which is what re-evaluates the getter.
     _revision.value;
     return switch (step.value) {
-      ExpertApplicationStep.profile => field.value != null &&
+      ExpertApplicationStep.profile => fields.isNotEmpty &&
           name.text.trim().isNotEmpty &&
           experience.text.trim().isNotEmpty,
       ExpertApplicationStep.languages => languages.isNotEmpty,
@@ -99,7 +103,11 @@ class ExpertApplicationController extends GetxController {
     };
   }
 
-  void choose(ExpertField value) => field.value = value;
+  bool isChosen(ExpertField value) => fields.contains(value);
+
+  void choose(ExpertField value) {
+    if (!fields.remove(value)) fields.add(value);
+  }
 
   void toggleLanguage(ExpertLanguage value) {
     if (!languages.remove(value)) languages.add(value);

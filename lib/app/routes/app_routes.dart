@@ -44,6 +44,7 @@ class AppRoutes {
   /// A daily habit's history, and its reminder setup. Both take a
   /// [CheckinKind] argument.
   static const String daily = '/profile/daily';
+  static const String dailyStart = '/profile/daily/start';
   static const String dailyReminder = '/profile/daily/reminder';
 
   /// The community forum, reached from the Community tab's topic step.
@@ -121,6 +122,9 @@ class AppRoutes {
   static const String bookingPayment = '/schedule/payment';
 
   /// The receipt. Takes the same [SessionOffering].
+  /// "Confirm booking" — the Care Guarantee and the totals, the last thing
+  /// seen before paying.
+  static const String confirmBooking = '/schedule/payment/confirm';
   static const String paymentSuccess = '/schedule/payment/success';
 
   /// Picking the day the paid-for session happens, and the confirmation that
@@ -162,6 +166,7 @@ class AppRoutes {
   static const String billingHistory = '/settings/subscription/billing';
   static const String accountSettings = '/settings/account';
   static const String userProfile = '/settings/account/profile';
+  static const String updateAccount = '/settings/account/update';
   static const String deleteAccount = '/settings/account/delete';
   static const String notificationSettings = '/settings/notifications';
   static const String policy = '/settings/policy';

@@ -128,7 +128,7 @@ class _AccountRow extends StatelessWidget {
           // The badge said the avatar was editable while nothing happened on
           // tap. It opens the screen that actually changes it.
           GestureDetector(
-            onTap: controller.openEditAccount,
+            onTap: controller.openUserProfile,
             behavior: HitTestBehavior.opaque,
             child: SizedBox(
               width: 55.h,

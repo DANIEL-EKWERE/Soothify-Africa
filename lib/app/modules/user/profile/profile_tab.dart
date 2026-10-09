@@ -169,11 +169,10 @@ class _SectionTabs extends StatelessWidget {
 
 /// A section pill.
 ///
-/// The design draws all three identically — it ships no selected state. That
-/// was reproduced as-is while only Dashboard existed, but now that each pill
-/// switches real content, a control that never says where you are is a defect
-/// rather than fidelity. The selected pill takes the brand fill; confirm the
-/// intended treatment with the designer.
+/// The chosen one is outlined, not filled — the designer settled this on
+/// 2026-10-09. A filled pill was this app's own guess while the frames
+/// shipped no selected state at all, and it read as the screen's primary
+/// action rather than as where you are.
 class _SegmentPill extends StatelessWidget {
   const _SegmentPill({
     required this.label,
@@ -195,14 +194,17 @@ class _SegmentPill extends StatelessWidget {
         height: 30.h,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: selected ? appTheme.actionFill : appTheme.surface,
+          color: appTheme.surface,
           borderRadius: BorderRadius.circular(10.h),
-          border: Border.all(color: appTheme.segmentBorder),
+          border: Border.all(
+            color: selected ? appTheme.soothifyBlue : appTheme.cardRim,
+            width: selected ? 1.5 : 1,
+          ),
         ),
         child: Text(
           label,
           style: CustomTextStyles.segmentLabel.copyWith(
-            color: selected ? appTheme.onPrimary : appTheme.textPrimary,
+            color: selected ? appTheme.soothifyBlue : appTheme.textPrimary,
           ),
         ),
       ),

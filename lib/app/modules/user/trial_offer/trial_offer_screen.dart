@@ -210,17 +210,27 @@ class _PlanCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (plan.offerSaving.isNotEmpty) ...[
-                    Container(
-                      height: 19.v,
-                      padding: EdgeInsets.symmetric(horizontal: 4.h),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: appTheme.onPrimary,
-                        borderRadius: BorderRadius.circular(8.h),
-                      ),
-                      child: Text(
-                        plan.offerSaving,
-                        style: CustomTextStyles.trialSavingBadge,
+                    // Aligned, not stretched: a Container with an alignment
+                    // and no width fills whatever it is given, so the pill
+                    // ran the whole width of the card instead of hugging its
+                    // own label.
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        // No height and no alignment: either one makes a
+                        // Container fill the width it is offered, which is
+                        // what had the pill running the whole card. The
+                        // padding sizes it to its own label instead.
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.h, vertical: 3.v),
+                        decoration: BoxDecoration(
+                          color: appTheme.onPrimary,
+                          borderRadius: BorderRadius.circular(8.h),
+                        ),
+                        child: Text(
+                          plan.offerSaving,
+                          style: CustomTextStyles.trialSavingBadge,
+                        ),
                       ),
                     ),
                     SizedBox(height: 8.v),

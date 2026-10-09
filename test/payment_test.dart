@@ -11,6 +11,10 @@ import 'package:soothifyafrica/app/modules/user/payment/controller/booking_payme
 import 'package:soothifyafrica/app/modules/user/payment/payment_success_screen.dart';
 
 import 'helpers.dart';
+import 'package:soothifyafrica/app/modules/user/payment/care_guarantee_screen.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
+import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/payment_test.dart
@@ -88,12 +92,15 @@ void main() {
         findsNothing);
   });
 
-  testWidgets('a track frame carries the footnote instead of the panel',
+  testWidgets('a track frame carries the same panel as the therapist one',
       (tester) async {
+    // It used to reduce the refund rules to a line under the button. The
+    // rules do not depend on which discipline was booked, and the designer
+    // settled on the panel for all three on 2026-10-09.
     await mount(tester, SessionOffering.meditation);
-    expect(find.text('Cancellation Policy'), findsNothing);
+    expect(find.text('Cancellation Policy'), findsOneWidget);
     expect(find.textContaining('Free cancellation or rescheduling'),
-        findsOneWidget);
+        findsNothing);
   });
 
   testWidgets('the receipt’s scrambled line is corrected', (tester) async {
@@ -114,11 +121,6 @@ void main() {
           greaterThan(SessionOffering.meditation.single));
     });
 
-    test('only the therapist frame spells the policy out', () {
-      expect(SessionOffering.therapy.hasCancellationPolicy, isTrue);
-      expect(SessionOffering.meditation.hasCancellationPolicy, isFalse);
-      expect(SessionOffering.balance.hasCancellationPolicy, isFalse);
-    });
 
     test('a figure is grouped and carries its currency', () {
       // The frames print a bare "25,000"; the naira sign is this app's, so
@@ -151,5 +153,68 @@ void main() {
 
     await expectLater(find.byType(BookingPaymentScreen),
         matchesGoldenFile('goldens/payment_with_slot.png'));
+  });
+
+  group('confirm booking', () {
+    testWidgets('the booking chain goes through it, not straight to the receipt',
+        (tester) async {
+      useDesignFrame(tester);
+      disableMotion(tester);
+      await loadAppFonts();
+      Get.testMode = true;
+      Get.put(BookingPaymentController(
+        SessionOffering.meditation,
+        booked: BookedSlot(
+          offering: SessionOffering.meditation,
+          day: DateTime(2026, 10, 14),
+          slot: '11:00am',
+        ),
+      ));
+
+      await tester.pumpWidget(
+        Sizer(
+          builder: (_, _, _) => GetMaterialApp(
+            theme: theme,
+            builder: (context, widget) {
+              PrimaryColors.syncFrom(context);
+              return widget!;
+            },
+            initialRoute: AppRoutes.bookingPayment,
+            getPages: [
+              GetPage(
+                name: AppRoutes.bookingPayment,
+                page: () => const BookingPaymentScreen(),
+              ),
+              GetPage(
+                name: AppRoutes.confirmBooking,
+                page: () => const CareGuaranteeScreen(),
+              ),
+              GetPage(
+                name: AppRoutes.paymentSuccess,
+                page: () => const Scaffold(body: Text('receipt')),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // The screen was built and never reached — paying used to skip it.
+      expect(Get.currentRoute, AppRoutes.confirmBooking);
+      expect(find.text('Confirm booking'), findsOneWidget);
+      expect(find.text('Pay with Paystack'), findsOneWidget);
+      // Priced from the offering that was booked, not the therapy default.
+      expect(find.text('₦10,000'), findsNWidgets(2));
+
+      await expectLater(find.byType(CareGuaranteeScreen),
+          matchesGoldenFile('goldens/confirm_booking.png'));
+
+      await tester.tap(find.text('Pay with Paystack'));
+      await tester.pumpAndSettle();
+      expect(Get.currentRoute, AppRoutes.paymentSuccess);
+    });
   });
 }

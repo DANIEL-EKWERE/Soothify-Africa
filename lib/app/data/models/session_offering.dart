@@ -50,13 +50,6 @@ enum SessionOffering {
       ? matchingTitle
       : 'Pairing you with a wellness coach who suits your needs.';
 
-  /// Whether the booking screen spells the refund rules out in a panel.
-  ///
-  /// The therapist frame (`259:58862`) carries the full Cancellation Policy;
-  /// the two track frames (`259:58919`, `259:58941`) reduce it to one line
-  /// under the button. Cancelling a paid appointment with a person is the
-  /// higher-stakes case, which is presumably why.
-  bool get hasCancellationPolicy => this == SessionOffering.therapy;
 }
 
 /// Which of the two prices on the booking screen is chosen.

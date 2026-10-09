@@ -27,6 +27,7 @@ class MonthCalendar extends StatelessWidget {
     required this.onSelected,
     this.marked = const {},
     this.compactWeekdays = false,
+    this.showMonthLabel = true,
     this.selectedColor,
     this.style = MonthCalendarStyle.numbers,
     this.markBuilder,
@@ -35,6 +36,12 @@ class MonthCalendar extends StatelessWidget {
   final DateTime month;
   final DateTime? selected;
   final ValueChanged<DateTime> onSelected;
+
+  /// Whether the grid prints its own "October 2026" above the weekdays.
+  ///
+  /// False where the screen already names the month — the booking calendar
+  /// has a stepper with the month in it, and was printing it twice.
+  final bool showMonthLabel;
 
   /// Days with something recorded against them — dotted in the design's
   /// check-in calendars.
@@ -72,8 +79,10 @@ class MonthCalendar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label(month), style: CustomTextStyles.calendarMonth),
-        SizedBox(height: 16.v),
+        if (showMonthLabel) ...[
+          Text(label(month), style: CustomTextStyles.calendarMonth),
+          SizedBox(height: 16.v),
+        ],
         Row(
           children: [
             for (final d in _weekdays)

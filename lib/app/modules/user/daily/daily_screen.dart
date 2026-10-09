@@ -18,37 +18,128 @@ class DailyScreen extends GetView<DailyController> {
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(
-        child: Obx(() => ListView(
-              padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 32.v),
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 32.v),
+          children: [
+            _Header(title: controller.title),
+            SizedBox(height: 28.v),
+            // A week, not a month: the redraw shows seven marks under a
+            // month stepper, each one a day you either turned up for or
+            // did not.
+            const _WeekCard(),
+            // Its own Obx, around the part that actually changes. Wrapping
+            // the whole list meant one rebuild for everything and GetX
+            // could not see what the rest of it was watching.
+            Obx(
+              () => controller.doneToday.value
+                  ? const SizedBox.shrink()
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: 90.v),
+                        Text(
+                          controller.emptyState,
+                          textAlign: TextAlign.center,
+                          style: CustomTextStyles.emptyStateBody,
+                        ),
+                        SizedBox(height: 20.v),
+                        // Outlined: starting is an invitation, and the
+                        // screen has nothing else on it to compete with.
+                        _Button(
+                          label: controller.startLabel,
+                          onTap: controller.openStart,
+                        ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The month stepper and its seven days, on a card of their own.
+class _WeekCard extends StatelessWidget {
+  const _WeekCard();
+
+  static const _letters = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<DailyController>();
+    return Container(
+      padding: EdgeInsets.fromLTRB(16.h, 18.v, 16.h, 24.v),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(16.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Column(
+        children: [
+          Obx(
+            () => Row(
               children: [
-                _Header(title: controller.title),
-                SizedBox(height: 33.v),
-                MonthCalendar(
-                  month: controller.month.value,
-                  selected: controller.selected.value,
-                  onSelected: controller.selectDate,
-                  compactWeekdays: true,
+                InkWell(
+                  onTap: controller.previousMonth,
+                  customBorder: const CircleBorder(),
+                  child: Icon(Icons.chevron_left,
+                      size: 22.h, color: appTheme.textPrimary),
                 ),
-                SizedBox(height: 40.v),
-                Text(
-                  controller.emptyState,
-                  textAlign: TextAlign.center,
-                  style: CustomTextStyles.emptyStateBody,
+                Expanded(
+                  child: Text(
+                    MonthCalendar.label(controller.month.value),
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.coachHeading,
+                  ),
                 ),
-                SizedBox(height: 18.v),
-                _Button(
-                  label: 'Select date',
-                  enabled: controller.selected.value != null,
-                  onTap: () {},
-                ),
-                SizedBox(height: 13.v),
-                _Button(
-                  label: controller.startLabel,
-                  enabled: true,
-                  onTap: controller.openReminder,
+                InkWell(
+                  onTap: controller.nextMonth,
+                  customBorder: const CircleBorder(),
+                  child: Icon(Icons.chevron_right,
+                      size: 22.h, color: appTheme.textPrimary),
                 ),
               ],
-            )),
+            ),
+          ),
+          SizedBox(height: 20.v),
+          // Not its own Obx: `moodFor` reads nothing observable yet, and an
+          // Obx with no observable in it is what GetX reports as improper
+          // use. The stepper above rebuilds the whole card when the month
+          // changes, which is the only thing that moves these.
+          Builder(
+            builder: (context) => Row(
+              children: [
+                for (var i = 0; i < 7; i++)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 30.h,
+                          width: 30.h,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: appTheme.dayDotIdle,
+                            shape: BoxShape.circle,
+                          ),
+                          child: controller.moodFor(i) == null
+                              ? null
+                              : CustomImageView(
+                                  imagePath: controller.moodFor(i)!,
+                                  height: 30.h,
+                                  width: 30.h,
+                                ),
+                        ),
+                        SizedBox(height: 10.v),
+                        Text(_letters[i],
+                            style: CustomTextStyles.calendarWeekday),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -86,32 +177,25 @@ class _Header extends StatelessWidget {
 }
 
 class _Button extends StatelessWidget {
-  const _Button({
-    required this.label,
-    required this.enabled,
-    required this.onTap,
-  });
+  const _Button({required this.label, required this.onTap});
 
   final String label;
-  final bool enabled;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: enabled ? onTap : null,
+      onTap: onTap,
       borderRadius: BorderRadius.circular(8.h),
       child: Container(
         height: 52.v,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: enabled ? appTheme.actionFill : appTheme.actionFillDisabled,
+          color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
+          border: Border.all(color: appTheme.actionFill),
         ),
-        child: Text(
-          label,
-          style: CustomTextStyles.subscribeLabel,
-        ),
+        child: Text(label, style: CustomTextStyles.dailyWhenLabel),
       ),
     );
   }

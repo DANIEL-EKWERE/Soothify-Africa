@@ -71,10 +71,8 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
                     amount: offering.single,
                     unit: '/50-minute session',
                   ),
-                  if (offering.hasCancellationPolicy) ...[
-                    SizedBox(height: 32.v),
-                    const _CancellationPolicy(),
-                  ],
+                  SizedBox(height: 32.v),
+                  const _CancellationPolicy(),
                   // 32 between the panel and the action, as the frame draws
                   // it. Without this the button sat flush against the policy.
                   SizedBox(height: 32.v),
@@ -83,24 +81,9 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 46.v),
-              child: Column(
-                children: [
-                  CustomElevatedButton(
-                    text: 'Proceed to Payment',
-                    onPressed: controller.proceed,
-                  ),
-                  // The therapist frame carries the full policy panel instead
-                  // of this line; the two track frames carry the line.
-                  if (!offering.hasCancellationPolicy) ...[
-                    SizedBox(height: 27.v),
-                    Text(
-                      'Free cancellation or rescheduling up to 24 hours '
-                      'before your session',
-                      textAlign: TextAlign.center,
-                      style: CustomTextStyles.paymentFootnote,
-                    ),
-                  ],
-                ],
+              child: CustomElevatedButton(
+                text: 'Proceed to Payment',
+                onPressed: controller.proceed,
               ),
             ),
           ],

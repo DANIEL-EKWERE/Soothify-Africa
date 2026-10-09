@@ -51,7 +51,7 @@ class MoodRecommendationScreen
                 return ListView.separated(
                   padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
                   itemCount: controller.items.length,
-                  separatorBuilder: (_, _) => SizedBox(height: 37.v),
+                  separatorBuilder: (_, _) => SizedBox(height: 8.v),
                   itemBuilder: (context, i) => ContentReveal(
                     delay: Duration(milliseconds: 70 * i),
                     child: RecommendedCard(

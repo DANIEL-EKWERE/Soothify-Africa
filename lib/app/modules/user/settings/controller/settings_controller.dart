@@ -28,6 +28,23 @@ class SettingsController extends GetxController {
   /// The name "User Profile" prints under the avatar — the frame's own.
   String get fullName => 'Dera Ochukwu';
 
+  /// What the Update Account field shows when it is empty — the design puts
+  /// the name already on the account there as a hint, not as a value.
+  String get firstName => fullName.split(' ').first;
+
+  /// The one field on Update Account.
+  final TextEditingController name = TextEditingController();
+
+  @override
+  void onClose() {
+    name.dispose();
+    super.onClose();
+  }
+
+  /// "Update". Nothing persists a profile yet, so this returns rather than
+  /// claiming to have saved — the same bargain [saveProfile] makes.
+  void updateAccount() => Get.back();
+
   /// Nothing persists a profile yet, so Save Changes returns rather than
   /// claiming to have saved.
   void saveProfile() => Get.back();
@@ -76,7 +93,13 @@ class SettingsController extends GetxController {
   /// "Unlock Soothify Pro" on `259:37602`.
   void openPlans() => Get.toNamed(AppRoutes.subscriptionOffer);
 
-  void openEditAccount() => Get.toNamed(AppRoutes.userProfile);
+  /// "Edit Account Details" on Account Settings — the name, on its own
+  /// screen. The portrait is changed on [AppRoutes.userProfile], which the
+  /// avatar in Settings opens.
+  void openEditAccount() => Get.toNamed(AppRoutes.updateAccount);
+
+  /// The avatar in Settings, which wears an edit badge.
+  void openUserProfile() => Get.toNamed(AppRoutes.userProfile);
 
   void openDeleteAccount() => Get.toNamed(AppRoutes.deleteAccount);
 

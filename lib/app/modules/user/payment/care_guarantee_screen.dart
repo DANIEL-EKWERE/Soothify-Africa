@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../data/models/session_offering.dart';
+import 'controller/booking_payment_controller.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/soothify_word.dart';
@@ -17,7 +17,7 @@ import '../../../widgets/soothify_word.dart';
 /// under a 1px `#263238` hairline, its green heading at 265 and three 10pt
 /// promises from 289 at a 32 pitch; a 342x104 `#FEFEFE` summary at 429 with a
 /// 16 radius; and the action at 699.
-class CareGuaranteeScreen extends StatelessWidget {
+class CareGuaranteeScreen extends GetView<BookingPaymentController> {
   const CareGuaranteeScreen({super.key});
 
   /// What the panel promises, in the frame's order.
@@ -29,13 +29,11 @@ class CareGuaranteeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final offering = Get.arguments is SessionOffering
-        ? Get.arguments as SessionOffering
-        : SessionOffering.therapy;
-    final price = '₦${offering.single.toString().replaceAllMapped(
-          RegExp(r'(\d)(?=(\d{3})+$)'),
-          (m) => '${m[1]},',
-        )}';
+    // Through the controller, not the raw arguments: the calendar sends a
+    // BookedSlot now, and reading for a bare offering quietly priced every
+    // session as therapy. `money` is also the one place the figure is
+    // grouped and given its currency.
+    final price = BookingPaymentController.money(controller.offering.single);
 
     return Scaffold(
       backgroundColor: appTheme.background,
@@ -84,7 +82,12 @@ class CareGuaranteeScreen extends StatelessWidget {
               const Spacer(),
               CustomElevatedButton(
                 text: 'Pay with Paystack',
-                onPressed: () => Get.toNamed(AppRoutes.paymentSuccess),
+                // Carrying whatever brought us here, so the confirmation at
+                // the end of the chain can still name the day and time.
+                onPressed: () => Get.toNamed(
+                  AppRoutes.paymentSuccess,
+                  arguments: Get.arguments,
+                ),
               ),
               SizedBox(height: 93.v),
             ],
@@ -104,8 +107,10 @@ class _GuaranteePanel extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(16.h, 16.v, 16.h, 16.v),
       decoration: BoxDecoration(
         color: appTheme.careGuarantee,
-        borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.textPrimary),
+        // No outline: the frame draws the panel as a tint alone. It was
+        // ringed in near black, which is the same misreading the joining
+        // screen's green panel had.
+        borderRadius: BorderRadius.circular(12.h),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,11 +128,25 @@ class _GuaranteePanel extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8.v),
+          // Each promise is ticked in the frame, not bulleted or bare.
           for (final promise in CareGuaranteeScreen.promises)
             Padding(
-              padding: EdgeInsets.only(left: 36.5.h, top: 8.v),
-              child: SoothifyText(promise,
-                  style: CustomTextStyles.careGuaranteeItem),
+              padding: EdgeInsets.only(left: 6.h, top: 10.v),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 2.v),
+                    child: Icon(Icons.check,
+                        size: 16.h, color: appTheme.successInk),
+                  ),
+                  SizedBox(width: 10.h),
+                  Expanded(
+                    child: SoothifyText(promise,
+                        style: CustomTextStyles.careGuaranteeItem),
+                  ),
+                ],
+              ),
             ),
         ],
       ),

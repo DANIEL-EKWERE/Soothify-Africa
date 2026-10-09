@@ -1705,7 +1705,7 @@ class CustomTextStyles {
   /// the success ink.
   static TextStyle get careGuaranteeTitle => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 12.fSize,
+    fontSize: 15.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
     height: 16.4 / 12,
@@ -1714,10 +1714,10 @@ class CustomTextStyles {
 
   static TextStyle get careGuaranteeItem => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 10.fSize,
+    fontSize: 13.fSize,
     fontWeight: FontWeight.w400,
     fontVariations: _regular,
-    height: 13.6 / 10,
+    height: 18 / 13,
     color: appTheme.textPrimary.withValues(alpha: 0.88),
   );
 
@@ -2723,16 +2723,6 @@ class CustomTextStyles {
     decorationColor: appTheme.soothifyBlue,
   );
 
-  /// The centred line under "Proceed to Payment" on the two track frames.
-  static TextStyle get paymentFootnote => TextStyle(
-    fontFamily: fontNunitoSans,
-    fontSize: 14.fSize,
-    fontWeight: FontWeight.w400,
-    fontVariations: _regular,
-    height: 16.5 / 14,
-    color: appTheme.textPrimary,
-  );
-
   /// The one line inside the payment-success card.
   static TextStyle get paymentSuccess => TextStyle(
     fontFamily: fontNunitoSans,
@@ -3341,6 +3331,45 @@ class CustomTextStyles {
     fontWeight: FontWeight.w500,
     fontVariations: const [FontVariation('wght', 500)],
     height: 30 / 22,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Set Daily Pilates & Core Reminder" on the start screen.
+  static TextStyle get dailyReminderHeading => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 19.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 26 / 19,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get dailyReminderBlurb => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 22 / 15,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Morning" / "Afternoon" / "Evening".
+  static TextStyle get dailyWhenLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 25 / 18,
+    color: appTheme.actionFill,
+  );
+
+  /// "Update your Account Details" — the lead on the Update Account screen.
+  static TextStyle get updateAccountLead => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 17.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 24 / 17,
     color: appTheme.textPrimary,
   );
 

@@ -17,6 +17,7 @@ class SubscriptionCard extends StatelessWidget {
     required this.freeTrial,
     required this.onPlanSelected,
     required this.onFreeTrialChanged,
+    required this.ctaLabel,
     required this.onSubscribe,
   });
 
@@ -25,7 +26,12 @@ class SubscriptionCard extends StatelessWidget {
   final bool freeTrial;
   final ValueChanged<String> onPlanSelected;
   final ValueChanged<bool> onFreeTrialChanged;
-  final VoidCallback onSubscribe;
+  /// What the action says for the plan currently chosen — "Subscribe" for
+  /// Core, the waitlist or the corporate conversation for the other two.
+  final String ctaLabel;
+
+  /// Takes the card's own context: the Passport action raises a sheet.
+  final ValueChanged<BuildContext> onSubscribe;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +62,10 @@ class SubscriptionCard extends StatelessWidget {
             SizedBox(height: 13.v),
           ],
           SizedBox(height: 28.v),
-          _SubscribeButton(onTap: onSubscribe),
+          _SubscribeButton(
+            label: ctaLabel,
+            onTap: () => onSubscribe(context),
+          ),
         ],
       ),
     );
@@ -155,8 +164,9 @@ class _PlanRow extends StatelessWidget {
 }
 
 class _SubscribeButton extends StatelessWidget {
-  const _SubscribeButton({required this.onTap});
+  const _SubscribeButton({required this.label, required this.onTap});
 
+  final String label;
   final VoidCallback onTap;
 
   @override
@@ -171,7 +181,12 @@ class _SubscribeButton extends StatelessWidget {
           color: appTheme.actionFill,
           borderRadius: BorderRadius.circular(8.h),
         ),
-        child: Text('Subscribe', style: CustomTextStyles.subscribeLabel),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: CustomTextStyles.subscribeLabel,
+        ),
       ),
     );
   }

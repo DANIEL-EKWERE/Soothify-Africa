@@ -112,18 +112,23 @@ class _PlanOption extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (plan.hasSaving) ...[
-              Container(
-                height: 24.v,
-                padding: EdgeInsets.symmetric(horizontal: 10.h),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: appTheme.brandWash,
-                  borderRadius: BorderRadius.circular(16.h),
-                ),
-                child: Text(
-                  plan.saving,
-                  style: CustomTextStyles.subscriptionBadge
-                      .copyWith(color: appTheme.soothifyBlue),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  // No height and no alignment: either makes a Container
+                  // fill the width it is offered, which had the pill running
+                  // the whole card instead of hugging its own label.
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 14.h, vertical: 5.v),
+                  decoration: BoxDecoration(
+                    color: appTheme.brandWash,
+                    borderRadius: BorderRadius.circular(16.h),
+                  ),
+                  child: Text(
+                    plan.saving,
+                    style: CustomTextStyles.subscriptionBadge
+                        .copyWith(color: appTheme.soothifyBlue),
+                  ),
                 ),
               ),
               SizedBox(height: 12.v),

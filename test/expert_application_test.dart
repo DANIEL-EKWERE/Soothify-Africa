@@ -134,12 +134,16 @@ void main() {
     expect(c.step.value, ExpertApplicationStep.languages);
   });
 
-  testWidgets('languages are multi-select; expertise is not', (tester) async {
+  testWidgets('both expertise and languages are multi-select', (tester) async {
     final c = await mount(tester);
     c.choose(ExpertField.therapist);
     c.choose(ExpertField.pilates);
-    expect(c.field.value, ExpertField.pilates,
-        reason: 'one primary area, so the second answer replaces the first');
+    // "What are your primary areas of expertise?" — a practitioner can be a
+    // licensed therapist and a yoga instructor. Choosing a second one used
+    // to drop the first.
+    expect(c.fields, {ExpertField.therapist, ExpertField.pilates});
+    c.choose(ExpertField.pilates);
+    expect(c.fields, {ExpertField.therapist}, reason: 'tapping again clears');
 
     c.toggleLanguage(ExpertLanguage.english);
     c.toggleLanguage(ExpertLanguage.pidgin);

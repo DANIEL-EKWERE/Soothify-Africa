@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/filter_entry.dart';
@@ -10,6 +11,8 @@ import '../../../../data/models/media_item.dart';
 import '../../../../data/models/subscription_plan.dart';
 import '../../../../data/repositories/content_repository.dart';
 import '../../../../data/repositories/subscription_repository.dart';
+import '../../../../data/models/plan_tier.dart';
+import '../../spaces/widgets/passport_sheet.dart';
 
 /// Backs the Discovery tab — Figma "Discovery" (135:3363).
 class DiscoveryTabController extends BaseController {
@@ -57,8 +60,32 @@ class DiscoveryTabController extends BaseController {
 
   void toggleFreeTrial(bool value) => freeTrial.value = value;
 
+  /// What the chosen plan asks for, where it is not a subscription.
+  ///
+  /// Passport is a waitlist and Corporate is a conversation — the same two
+  /// the Plans screen offers — so the labels and the destinations come from
+  /// [PlanAction] rather than being written out twice.
+  PlanAction? get planAction => switch (selectedPlanId.value) {
+        'passport' => PlanAction.waitlist,
+        'corporate' => PlanAction.corporate,
+        _ => null,
+      };
+
+  /// What the card's action says. Core is the only one you can subscribe to.
+  String get ctaLabel => planAction?.label ?? 'Subscribe';
+
   /// The pop-up is the pitch the design puts behind this — `259:59011`.
-  void subscribe() => Get.toNamed(AppRoutes.subscriptionOffer);
+  void subscribe(BuildContext context) {
+    switch (planAction) {
+      case PlanAction.waitlist:
+        PassportSheet.show(context);
+      case PlanAction.corporate:
+        Get.toNamed(AppRoutes.corporateForm);
+      case PlanAction.trial:
+      case null:
+        Get.toNamed(AppRoutes.subscriptionOffer);
+    }
+  }
 
   /// Each shelf's "See All" opens the same grid, named by its heading.
   void openShelf(String shelf) =>

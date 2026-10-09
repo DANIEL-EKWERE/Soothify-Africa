@@ -26,6 +26,7 @@ import '../modules/user/subscription_manage/change_plan_screen.dart';
 import '../modules/user/subscription_manage/your_subscription_screen.dart';
 import '../modules/user/settings/notification_settings_screen.dart';
 import '../modules/user/settings/policy_screen.dart';
+import '../modules/user/settings/update_account_screen.dart';
 import '../modules/user/settings/user_profile_screen.dart';
 import '../modules/user/corporate/corporate_form_screen.dart';
 import '../modules/user/corporate/corporate_success_screen.dart';
@@ -45,6 +46,7 @@ import '../modules/user/journal/expert_recommendation_screen.dart';
 import '../modules/user/article/binding/article_binding.dart';
 import '../modules/user/payment/binding/booking_payment_binding.dart';
 import '../modules/user/payment/booking_payment_screen.dart';
+import '../modules/user/payment/care_guarantee_screen.dart';
 import '../modules/user/payment/payment_success_screen.dart';
 import '../modules/user/videos/binding/videos_binding.dart';
 import '../modules/user/videos/videos_screen.dart';
@@ -91,6 +93,7 @@ import '../modules/user/booking/booking_screen.dart';
 import '../modules/user/checkin/binding/checkin_binding.dart';
 import '../modules/user/daily/binding/daily_binding.dart';
 import '../modules/user/daily/daily_screen.dart';
+import '../modules/user/daily/daily_start_screen.dart';
 import '../modules/user/daily/reminder_screen.dart';
 import '../modules/user/checkin/checkin_screen.dart';
 import '../modules/user/ai_hub/ai_hub_screen.dart';
@@ -337,6 +340,11 @@ class AppPages {
       binding: SettingsBinding(),
     ),
     GetPage(
+      name: AppRoutes.updateAccount,
+      page: () => const UpdateAccountScreen(),
+      binding: SettingsBinding(),
+    ),
+    GetPage(
       name: AppRoutes.userProfile,
       page: () => const UserProfileScreen(),
       binding: SettingsBinding(),
@@ -407,6 +415,11 @@ class AppPages {
       page: () => const BookingConfirmedScreen(),
     ),
     GetPage(
+      name: AppRoutes.confirmBooking,
+      page: () => const CareGuaranteeScreen(),
+      binding: BookingPaymentBinding(),
+    ),
+    GetPage(
       name: AppRoutes.paymentSuccess,
       page: () => const PaymentSuccessScreen(),
       binding: BookingPaymentBinding(),
@@ -455,6 +468,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.daily,
       page: () => const DailyScreen(),
+      binding: DailyBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.dailyStart,
+      page: () => const DailyStartScreen(),
       binding: DailyBinding(),
     ),
     GetPage(

@@ -88,6 +88,7 @@ class PrimaryColors {
     required this.callEndFill,
     required this.avatarWash,
     required this.destructiveFill,
+    required this.dayDotIdle,
     required this.spaceChipBorder,
     required this.topicChipBorder,
     required this.unreadDot,
@@ -313,6 +314,9 @@ class PrimaryColors {
   /// "Yes, delete Account". The design's red, which is pinker than [error]
   /// and than the call's hang-up button.
   final Color destructiveFill;
+
+  /// A day on the habit strip with nothing recorded against it.
+  final Color dayDotIdle;
 
   /// The red mark on an unread notification. `#F44336`, measured off
   /// `259:26851`; the Journal reuses it for its unread count badge and, at
@@ -616,6 +620,7 @@ class PrimaryColors {
     callEndFill: Color(0xFFF4443C),
     avatarWash: Color(0xFFB8DFF2),
     destructiveFill: Color(0xFFEE3B5B),
+    dayDotIdle: Color(0xFFE9E5DF),
     spaceChipBorder: Color(0xFFD7D7D7),
     topicChipBorder: Color(0x4D999999),
     unreadDot: Color(0xFFF44336),
@@ -733,6 +738,7 @@ class PrimaryColors {
     callEndFill: Color(0xFFF4443C),
     avatarWash: Color(0xFF2B4D5E),
     destructiveFill: Color(0xFFEE3B5B),
+    dayDotIdle: Color(0xFF3A3A38),
     spaceChipBorder: Color(0x33FFFFFF),
     topicChipBorder: Color(0x4DFFFFFF),
     unreadDot: Color(0xFFF44336),

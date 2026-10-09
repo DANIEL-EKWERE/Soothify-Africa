@@ -77,6 +77,7 @@ class _BrowseView extends GetView<DiscoveryTabController> {
               freeTrial: controller.freeTrial.value,
               onPlanSelected: controller.selectPlan,
               onFreeTrialChanged: controller.toggleFreeTrial,
+              ctaLabel: controller.ctaLabel,
               onSubscribe: controller.subscribe,
             ),
           ),

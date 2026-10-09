@@ -35,18 +35,18 @@ class ExpertOptionRow extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 13.h),
         alignment: Alignment.centerLeft,
         decoration: BoxDecoration(
-          color: selected ? appTheme.actionFill : appTheme.surface,
+          // Outlined when chosen, never filled: the solid blue belongs to
+          // Next at the foot of the form. At rest the hairline is the app's
+          // 4% black — it was drawing in near black, which made every
+          // unchosen option look as emphatic as a chosen one.
+          color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
           border: Border.all(
-            color: selected ? appTheme.actionFill : appTheme.textPrimary,
+            color: selected ? appTheme.soothifyBlue : appTheme.cardRim,
+            width: selected ? 1.5 : 1,
           ),
         ),
-        child: Text(
-          label,
-          style: CustomTextStyles.optionLabel.copyWith(
-            color: selected ? appTheme.onPrimary : null,
-          ),
-        ),
+        child: Text(label, style: CustomTextStyles.optionLabel),
       ),
     );
   }
@@ -116,8 +116,10 @@ class ExpertFormField extends StatelessWidget {
 
 /// "Add file" — Figma `259:59198`.
 ///
-/// An 82x34 chip, radius 8, `#F9F9F9` inside a 1px black hairline, with a
-/// small upload glyph at its left and the label in blue.
+/// An 82x34 chip, radius 8, `#F9F9F9` inside a 1px hairline, with a small
+/// upload glyph at its left and the label in blue. The hairline is blue too:
+/// it was drawing in near black, so the chip read as disabled beside its own
+/// blue label.
 ///
 /// The frame draws only the empty state. Once a document is picked the chip
 /// gives way to a row naming it, with its size and a way to drop it — a slot
@@ -152,7 +154,7 @@ class ExpertUploadChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: appTheme.fieldFill,
             borderRadius: BorderRadius.circular(8.h),
-            border: Border.all(color: appTheme.textPrimary),
+            border: Border.all(color: appTheme.soothifyBlue),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

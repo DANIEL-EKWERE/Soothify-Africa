@@ -40,9 +40,10 @@ class ImageConstant {
   static const String imgJournalCompose = '$_images/journal/compose_fab.png';
   /// The expert application's intro artwork. The frame's own 346-square
   /// image was not exported; the "Book a Licensed Expert" Explore tile is the
-  /// same subject and already ships.
-  static const String imgExpertNetwork =
-      '$_images/explore/book_expert.png';
+  /// The designer's own, supplied 2026-10-09 — hands meeting in a circle.
+  /// It used to borrow the Explore tile's photo, which was the same subject
+  /// but a photograph among illustrations.
+  static const String imgExpertNetwork = '$_images/expert/network.png';
 
   static const String imgSessionCover = '$_images/schedule/session.png';
 

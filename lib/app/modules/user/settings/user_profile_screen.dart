@@ -16,47 +16,62 @@ import 'widgets/settings_header.dart';
 class UserProfileScreen extends GetView<SettingsController> {
   const UserProfileScreen({super.key});
 
-  /// The sheet the "+" raises. Static so the avatar can reach it.
+  /// The card the "+" raises.
+  ///
+  /// Not a bottom sheet: the frame floats it across the avatar's lower half,
+  /// 73 in from each edge, over a light scrim — so it reads as belonging to
+  /// the portrait rather than to the bottom of the screen.
+  ///
+  /// Measured: its top edge 265.5 below the safe area.
   static Future<void> showPhotoSources(BuildContext context) {
     final controller = Get.find<SettingsController>();
-    return showModalBottomSheet<void>(
+    return showDialog<void>(
       context: context,
-      backgroundColor: appTheme.transparent,
-      builder: (_) => Container(
-        margin: EdgeInsets.fromLTRB(73.h, 0, 73.h, 24.v),
-        decoration: BoxDecoration(
-          color: appTheme.surface,
-          borderRadius: BorderRadius.circular(8.h),
-        ),
-        clipBehavior: Clip.antiAlias,
+      barrierColor: Colors.black.withValues(alpha: 0.2),
+      builder: (_) => SafeArea(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            // Two sources, not the three the old frame drew: the Facebook
-            // upload is gone, and the gallery is the highlighted one.
-            for (final (label, highlighted) in const [
-              ('Take a photo', false),
-              ('Upload from gallery', true),
-            ])
-              InkWell(
-                onTap: () {
-                  Get.back();
-                  controller.pickPhoto(label);
-                },
-                child: Container(
-                  height: 43.v,
-                  width: double.infinity,
-                  alignment: Alignment.center,
-                  color:
-                      highlighted ? appTheme.background : appTheme.transparent,
-                  child: Text(
-                    label,
-                    style: highlighted
-                        ? CustomTextStyles.photoSourceSelected
-                        : CustomTextStyles.photoSource,
-                  ),
+            SizedBox(height: 265.5.v),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 73.h),
+              child: Material(
+                color: appTheme.surface,
+                borderRadius: BorderRadius.circular(8.h),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Two sources, not the three the old frame drew: the
+                    // Facebook upload is gone, and the gallery is the
+                    // highlighted one.
+                    for (final (label, highlighted) in const [
+                      ('Take a photo', false),
+                      ('Upload from gallery', true),
+                    ])
+                      InkWell(
+                        onTap: () {
+                          Get.back();
+                          controller.pickPhoto(label);
+                        },
+                        child: Container(
+                          height: 43.v,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          color: highlighted
+                              ? appTheme.background
+                              : appTheme.transparent,
+                          child: Text(
+                            label,
+                            style: highlighted
+                                ? CustomTextStyles.photoSourceSelected
+                                : CustomTextStyles.photoSource,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -164,13 +179,19 @@ class _Name extends StatelessWidget {
       children: [
         Text(controller.fullName, style: CustomTextStyles.profileName),
         SizedBox(width: 6.h),
-        Padding(
-          padding: EdgeInsets.only(top: 2.v),
-          child: CustomImageView(
-            imagePath: ImageConstant.icEditBadge,
-            height: 16.h,
-            width: 16.h,
-            color: appTheme.textPrimary,
+        // The pencil edits the name, which is a screen of its own — the "+"
+        // on the avatar above handles the portrait.
+        InkWell(
+          onTap: controller.openEditAccount,
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: EdgeInsets.only(top: 2.v, left: 2.h, right: 2.h),
+            child: CustomImageView(
+              imagePath: ImageConstant.icEditBadge,
+              height: 16.h,
+              width: 16.h,
+              color: appTheme.textPrimary,
+            ),
           ),
         ),
       ],

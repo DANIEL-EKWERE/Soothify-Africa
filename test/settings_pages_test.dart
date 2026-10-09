@@ -27,6 +27,7 @@ import 'package:soothifyafrica/app/modules/user/settings/policy_screen.dart';
 import 'package:soothifyafrica/app/modules/user/settings/user_profile_screen.dart';
 
 import 'helpers.dart';
+import 'package:soothifyafrica/app/modules/user/settings/update_account_screen.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/settings_pages_test.dart
@@ -91,6 +92,9 @@ void main() {
 
     expect(find.text('Take a photo'), findsOneWidget);
     expect(find.text('Upload from gallery'), findsOneWidget);
+
+    await expectLater(find.byType(MaterialApp),
+        matchesGoldenFile('goldens/user_profile_photo_sources.png'));
     // The redrawn sheet dropped it; the app has no Facebook sign-in anyway.
     expect(find.textContaining('facebook'), findsNothing);
   });
@@ -356,5 +360,50 @@ void main() {
             reason: '${page.title} showed ${other.title}');
       }
     }
+  });
+
+  testWidgets('the two edit marks on User Profile go to different screens',
+      (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    await putSettings();
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.userProfile,
+          getPages: [
+            GetPage(
+              name: AppRoutes.userProfile,
+              page: () => const UserProfileScreen(),
+            ),
+            GetPage(
+              name: AppRoutes.updateAccount,
+              page: () => const UpdateAccountScreen(),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The pencil beside the name edits the name.
+    await tester.tap(find.ancestor(
+      of: find.byWidgetPredicate((w) =>
+          w is CustomImageView && w.imagePath == ImageConstant.icEditBadge),
+      matching: find.byType(InkWell),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, AppRoutes.updateAccount);
+    expect(find.text(UpdateAccountScreen.lead), findsOneWidget);
+    expect(find.text('Name'), findsOneWidget);
+    expect(find.text('Update'), findsOneWidget);
   });
 }

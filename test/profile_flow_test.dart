@@ -16,6 +16,12 @@ import 'package:soothifyafrica/app/modules/user/daily/daily_screen.dart';
 import 'package:soothifyafrica/app/modules/user/daily/reminder_screen.dart';
 
 import 'helpers.dart';
+import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
+import 'package:soothifyafrica/app/modules/user/daily/daily_start_screen.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
+import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/profile_flow_test.dart
@@ -114,5 +120,79 @@ void main() {
     // Two months, as the frame stacks them.
     expect(find.text('August 2024'), findsOneWidget);
     expect(find.text('July 2024'), findsOneWidget);
+  });
+
+  testWidgets('the daily habit runs start -> reminder', (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+    Get.testMode = true;
+    Get.put<ContentRepository>(MockContentRepository());
+    Get.put(DailyController(CheckinKind.meditation, now: now));
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          theme: theme,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          initialRoute: AppRoutes.daily,
+          getPages: [
+            GetPage(name: AppRoutes.daily, page: () => const DailyScreen()),
+            GetPage(
+              name: AppRoutes.dailyStart,
+              page: () => const DailyStartScreen(),
+            ),
+            GetPage(
+              name: AppRoutes.dailyReminder,
+              page: () => const ReminderScreen(),
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The empty state only stands while nothing has been done today.
+    expect(find.text('Start Daily Pilates & Core'), findsOneWidget);
+    await tester.tap(find.text('Start Daily Pilates & Core'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+
+    expect(Get.currentRoute, AppRoutes.dailyStart);
+    expect(find.text('Recommended for you'), findsOneWidget);
+    expect(find.text('Set Daily Pilates & Core Reminder'), findsOneWidget);
+    for (final (label, _) in DailyStartScreen.whens) {
+      expect(find.text(label), findsOneWidget);
+    }
+
+    await expectLater(find.byType(DailyStartScreen),
+        matchesGoldenFile('goldens/daily_start.png'));
+
+    // Any of the three opens the screen that sets the reminder, seeded with
+    // that rough hour.
+    await tester.tap(find.text('Evening'));
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, AppRoutes.dailyReminder);
+    expect(Get.find<DailyController>().reminderAt.value.hour, 19);
+  });
+
+  testWidgets('a finished day drops the empty state', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = Get.put(DailyController(CheckinKind.meditation, now: now));
+
+    await pumpScreen(tester, const DailyScreen());
+    expect(find.text('Start Daily Pilates & Core'), findsOneWidget);
+
+    c.doneToday.value = true;
+    await tester.pumpAndSettle();
+
+    // The invitation is for a day with nothing on it.
+    expect(find.text('Start Daily Pilates & Core'), findsNothing);
+    expect(find.textContaining('haven’t completed'), findsNothing);
   });
 }

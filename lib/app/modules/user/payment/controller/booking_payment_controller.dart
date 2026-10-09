@@ -48,10 +48,14 @@ class BookingPaymentController extends GetxController {
   /// No payment provider is wired. Rather than claim a charge went through,
   /// this goes to the receipt the design draws and says nothing about money
   /// having moved.
-  /// The receipt shares this controller's binding, so the chosen time has to
-  /// travel with it or the confirmation after it has nothing to name.
+  /// On to "Confirm booking" — the Care Guarantee and the totals — which is
+  /// where the payment is actually started.
+  ///
+  /// That screen was built and never reached: this used to jump straight to
+  /// the receipt, so nobody ever saw what they were agreeing to. The chosen
+  /// time travels along, since the confirmation at the end names it.
   void proceed() => Get.toNamed(
-        AppRoutes.paymentSuccess,
+        AppRoutes.confirmBooking,
         arguments: booked ?? offering,
       );
 

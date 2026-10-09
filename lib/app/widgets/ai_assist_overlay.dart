@@ -83,7 +83,11 @@ class AiAssistOverlay extends StatelessWidget {
                         )
                       else
                         AiAssistButton(
-                          onTap: openMiniPlayer,
+                          // Straight to the hub. The panel in between was
+                          // read off `259:58711`, but it puts a second thing
+                          // to dismiss in front of the one the button is
+                          // for.
+                          onTap: openAiAssist,
                           bounds: constraints.biggest,
                         ),
                     ],
@@ -98,7 +102,10 @@ class AiAssistOverlay extends StatelessWidget {
   }
 }
 
-/// What the button does — floats the scene where it was standing.
+/// Floats the scene where the button was standing.
+///
+/// **Nothing calls this.** The button goes straight to the hub now; the panel
+/// `259:58711` draws is kept, with this, so bringing it back is one line.
 ///
 /// The controller has to exist before the panel can draw the scene; nothing
 /// else puts it up until the hub route is opened.

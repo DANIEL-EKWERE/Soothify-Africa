@@ -106,7 +106,7 @@ class _ProfileStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('What is your primary area of expertise?',
+        Text('What are your primary areas of expertise?',
             style: CustomTextStyles.expertFormLabel),
         SizedBox(height: 16.v),
         Obx(
@@ -115,7 +115,7 @@ class _ProfileStep extends StatelessWidget {
               for (final field in ExpertField.values) ...[
                 ExpertOptionRow(
                   label: field.label,
-                  selected: controller.field.value == field,
+                  selected: controller.isChosen(field),
                   onTap: () => controller.choose(field),
                 ),
                 if (field != ExpertField.values.last) SizedBox(height: 16.v),

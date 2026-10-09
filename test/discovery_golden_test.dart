@@ -11,6 +11,8 @@ import 'package:soothifyafrica/app/modules/user/discovery/controller/discovery_t
 import 'package:soothifyafrica/app/modules/user/discovery/discovery_tab.dart';
 
 import 'helpers.dart';
+import 'package:soothifyafrica/app/modules/user/spaces/widgets/passport_sheet.dart';
+import 'package:soothifyafrica/app/data/models/plan_tier.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/discovery_golden_test.dart
@@ -154,5 +156,50 @@ void main() {
     await tester.pumpAndSettle();
     expect(controller.selectedPlanId.value, 'passport');
     expect(find.text('One time'), findsNothing);
+  });
+
+  testWidgets('the upsell action follows the plan that is chosen',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    // The waitlist sheet reads a previously-left address when it mounts.
+    await PrefUtils().init();
+    final c = DiscoveryTabController(
+      MockContentRepository(),
+      MockSubscriptionRepository(),
+    );
+    Get.put(c);
+    await pumpScreen(tester, const DiscoveryTab());
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pumpAndSettle();
+
+    // Core is the only one you can subscribe to.
+    expect(c.selectedPlanId.value, 'core');
+    expect(findSoothify('Subscribe'), findsOneWidget);
+
+    // The card is below the fold; the row has to be settled into view
+    // before it can be tapped.
+    await tester.ensureVisible(findSoothify('Soothify Passport'));
+    await tester.pumpAndSettle();
+    await tester.tap(findSoothify('Soothify Passport'));
+    await tester.pumpAndSettle();
+    expect(c.selectedPlanId.value, 'passport');
+    expect(find.text(PlanAction.waitlist.label), findsOneWidget);
+
+    // And it raises the same sheet the Plans screen and Spaces raise. The
+    // action sits at the very bottom of the card, below the fold.
+    await tester.ensureVisible(find.text(PlanAction.waitlist.label));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(PlanAction.waitlist.label));
+    await tester.pumpAndSettle();
+    expect(find.text(PassportSheet.heading), findsOneWidget);
+    Get.back();
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(findSoothify('Soothify Corporate Wellness'));
+    await tester.pumpAndSettle();
+    await tester.tap(findSoothify('Soothify Corporate Wellness'));
+    await tester.pumpAndSettle();
+    expect(find.text(PlanAction.corporate.label), findsOneWidget);
   });
 }

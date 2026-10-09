@@ -198,4 +198,42 @@ void main() {
     expect(c.monthLabel, 'September 2026');
     expect(c.offering, SessionOffering.therapy);
   });
+
+  testWidgets('a chosen time is outlined in blue, not filled', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+
+    await pumpScreen(tester, const BookingCalendarScreen());
+
+    Border borderOf(String slot) {
+      final box = tester.widget<Container>(
+        find
+            .ancestor(of: find.text(slot), matching: find.byType(Container))
+            .first,
+      );
+      return (box.decoration! as BoxDecoration).border! as Border;
+    }
+    Color fillOf(String slot) {
+      final box = tester.widget<Container>(
+        find
+            .ancestor(of: find.text(slot), matching: find.byType(Container))
+            .first,
+      );
+      return (box.decoration! as BoxDecoration).color!;
+    }
+
+    const slot = '11:00am';
+    expect(borderOf(slot).top.color, appTheme.cardHairline);
+
+    await tester.tap(find.text(slot));
+    await tester.pumpAndSettle();
+
+    expect(c.slot.value, slot);
+    expect(borderOf(slot).top.color, appTheme.soothifyBlue);
+    // Outlined, not filled — the solid blue belongs to Confirm booking.
+    expect(fillOf(slot), appTheme.surface);
+    // And only the one that was tapped.
+    expect(borderOf('9:00am').top.color, appTheme.cardHairline);
+  });
 }

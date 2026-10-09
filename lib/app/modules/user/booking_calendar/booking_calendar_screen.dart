@@ -5,10 +5,10 @@ import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/month_calendar.dart';
 import 'controller/booking_calendar_controller.dart';
 
-/// "Book your session" — the calendar the receipt leads to.
+/// "Schedule" — picking when the session runs.
 ///
-/// The step the flow was missing: after paying, this is where the session is
-/// actually placed in the week.
+/// Since the flow was reordered this comes straight after matching, before
+/// payment: the time is chosen first and travels with the booking.
 class BookingCalendarScreen extends GetView<BookingCalendarController> {
   const BookingCalendarScreen({super.key});
 
@@ -54,52 +54,73 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                     style: CustomTextStyles.coachSection,
                   ),
                   SizedBox(height: 20.v),
-                  Obx(
-                    () => Row(
+                  // The month sits on a card of its own, as the design draws
+                  // it: white, rounded, lifted off the page's pale blue.
+                  Container(
+                    padding: EdgeInsets.fromLTRB(16.h, 16.v, 16.h, 18.v),
+                    decoration: BoxDecoration(
+                      color: appTheme.surface,
+                      borderRadius: BorderRadius.circular(16.h),
+                      border: Border.all(color: appTheme.cardRim),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        InkWell(
-                          onTap: controller.previousMonth,
-                          customBorder: const CircleBorder(),
-                          child: Icon(Icons.chevron_left,
-                              size: 22.h, color: appTheme.textPrimary),
-                        ),
-                        Expanded(
-                          child: Text(
-                            controller.monthLabel,
-                            textAlign: TextAlign.center,
-                            style: CustomTextStyles.coachHeading,
+                        Obx(
+                          () => Row(
+                            children: [
+                              InkWell(
+                                onTap: controller.previousMonth,
+                                customBorder: const CircleBorder(),
+                                child: Icon(Icons.chevron_left,
+                                    size: 22.h, color: appTheme.textPrimary),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  controller.monthLabel,
+                                  textAlign: TextAlign.center,
+                                  style: CustomTextStyles.coachHeading,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: controller.nextMonth,
+                                customBorder: const CircleBorder(),
+                                child: Icon(Icons.chevron_right,
+                                    size: 22.h, color: appTheme.textPrimary),
+                              ),
+                            ],
                           ),
                         ),
-                        InkWell(
-                          onTap: controller.nextMonth,
-                          customBorder: const CircleBorder(),
-                          child: Icon(Icons.chevron_right,
-                              size: 22.h, color: appTheme.textPrimary),
+                        SizedBox(height: 16.v),
+                        Obx(
+                          () => MonthCalendar(
+                            month: controller.month.value,
+                            selected: controller.selected.value,
+                            onSelected: controller.pickDay,
+                            // The stepper above already names the month; the
+                            // grid was printing it a second time.
+                            showMonthLabel: false,
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                  SizedBox(height: 12.v),
-                  Obx(
-                    () => MonthCalendar(
-                      month: controller.month.value,
-                      selected: controller.selected.value,
-                      onSelected: controller.pickDay,
                     ),
                   ),
                   SizedBox(height: 28.v),
                   Text('Pick a time', style: CustomTextStyles.coachSection),
                   SizedBox(height: 12.v),
+                  // Full-width rows, one per line, as the design draws them.
                   Obx(
-                    () => Wrap(
-                      spacing: 10.h,
-                      runSpacing: 10.v,
+                    () => Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final slot in BookingCalendarController.slots)
+                        for (final slot in BookingCalendarController.slots) ...[
                           _Slot(
                             label: slot,
                             chosen: controller.slot.value == slot,
                           ),
+                          if (slot != BookingCalendarController.slots.last)
+                            SizedBox(height: 10.v),
+                        ],
                       ],
                     ),
                   ),
@@ -136,20 +157,23 @@ class _Slot extends StatelessWidget {
       onTap: () => controller.pickSlot(label),
       borderRadius: BorderRadius.circular(8.h),
       child: Container(
-        height: 40.v,
-        padding: EdgeInsets.symmetric(horizontal: 16.h),
+        height: 44.v,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: chosen ? appTheme.actionFill : appTheme.surface,
+          color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
+          // Choosing a time rings it in blue rather than filling it: the
+          // filled treatment belongs to Confirm booking, and two solid blues
+          // on one screen read as two actions.
           border: Border.all(
-            color: chosen ? appTheme.actionFill : appTheme.cardHairline,
+            color: chosen ? appTheme.soothifyBlue : appTheme.cardHairline,
+            width: chosen ? 1.5 : 1,
           ),
         ),
         child: Text(
           label,
           style: CustomTextStyles.coachChip.copyWith(
-            color: chosen ? appTheme.onPrimary : appTheme.textPrimary,
+            color: chosen ? appTheme.soothifyBlue : appTheme.textPrimary,
           ),
         ),
       ),

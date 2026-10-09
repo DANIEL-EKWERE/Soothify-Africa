@@ -42,9 +42,11 @@ class StatusBadge extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        height: 24.v,
-        padding: EdgeInsets.symmetric(horizontal: 10.h),
-        alignment: Alignment.center,
+        // No height and no alignment: either makes a Container fill the
+        // width it is offered, and the Align around it passes that width
+        // straight through — so the pill ran the whole card instead of
+        // hugging its own label.
+        padding: EdgeInsets.symmetric(horizontal: 14.h, vertical: 5.v),
         decoration: BoxDecoration(
           color: live
               ? appTheme.statusLiveInk.withValues(alpha: 0.26)

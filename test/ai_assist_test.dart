@@ -219,7 +219,7 @@ void main() {
       );
     });
 
-    testWidgets('tapping it floats the mini player in its place',
+    testWidgets('tapping it opens the AI Hub, and it steps aside there',
         (tester) async {
       useDesignFrame(tester);
       await mountApp(tester, at: AppRoutes.shell);
@@ -228,25 +228,11 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
 
-      // The panel stands where the button was, so the two never show at once.
-      expect(find.byType(AiMiniPlayer), findsOneWidget);
-      expect(find.byType(AiAssistButton), findsNothing);
-    });
-
-    testWidgets('expanding the mini player opens the AI Hub, and it steps '
-        'aside there', (tester) async {
-      useDesignFrame(tester);
-      await mountApp(tester, at: AppRoutes.shell);
-
-      await tester.tap(find.byType(AiAssistButton));
-      await tester.pump();
-      await tester.tap(find.byIcon(Icons.open_in_full));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-
+      // Straight there: the mini player used to stand in between, which put
+      // a second thing to dismiss in front of the one the button is for.
       expect(find.text('ai hub'), findsOneWidget);
-      // The hub is what the panel expands into, so neither floats over it.
       expect(find.byType(AiMiniPlayer), findsNothing);
+      // The hub is the button's own destination, so it must not float there.
       expect(find.byType(AiAssistButton), findsNothing);
     });
 

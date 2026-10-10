@@ -192,4 +192,42 @@ void main() {
     expect(filled, isNotEmpty,
         reason: 'the chosen day should be filled with daySelected');
   });
+
+  testWidgets('the chosen profile section is outlined, not filled',
+      (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    final c = ProfileTabController(
+        _FakeProfileRepository(), _FakeSession(guest: false));
+    Get.put(c);
+    await pumpScreen(tester, const ProfileTab());
+
+    Border borderOf(String label) => (tester
+            .widget<Container>(find
+                .ancestor(of: find.text(label), matching: find.byType(Container))
+                .first)
+            .decoration! as BoxDecoration)
+        .border! as Border;
+    Color fillOf(String label) => (tester
+            .widget<Container>(find
+                .ancestor(of: find.text(label), matching: find.byType(Container))
+                .first)
+            .decoration! as BoxDecoration)
+        .color!;
+
+    // Dashboard is where Profile opens.
+    expect(borderOf('Dashboard').top.color, appTheme.soothifyBlue);
+    // Outlined: a filled pill reads as the screen's primary action rather
+    // than as where you are.
+    expect(fillOf('Dashboard'), appTheme.surface);
+    expect(borderOf('History').top.color, appTheme.cardRim);
+
+    await tester.tap(find.text('History'));
+    await tester.pumpAndSettle();
+
+    expect(c.section.value, ProfileSection.history);
+    expect(borderOf('History').top.color, appTheme.soothifyBlue);
+    expect(fillOf('History'), appTheme.surface);
+    expect(borderOf('Dashboard').top.color, appTheme.cardRim);
+  });
 }

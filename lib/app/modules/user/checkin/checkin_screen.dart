@@ -34,7 +34,11 @@ class CheckinScreen extends GetView<CheckinController> {
             Obx(() => _Header(
                   title: controller.kind.title,
                   showingEntry: controller.showingEntry.value,
-                  onAction: controller.backToCalendar,
+                  // The calendar glyph goes back; the ⋮ opens the latest
+                  // entry, and is dimmed when there is not one.
+                  onAction: controller.showingEntry.value
+                      ? controller.backToCalendar
+                      : (controller.hasEntries ? controller.openLatest : null),
                 )),
             Expanded(
               child: Obx(
@@ -59,7 +63,9 @@ class _Header extends StatelessWidget {
 
   final String title;
   final bool showingEntry;
-  final VoidCallback onAction;
+
+  /// Null when there is nothing for the glyph to open.
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -84,14 +90,16 @@ class _Header extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: showingEntry ? onAction : null,
+            onTap: onAction,
             child: CustomImageView(
               imagePath: showingEntry
                   ? ImageConstant.icCalendarSearch
                   : ImageConstant.icMoreVertical,
               height: 22.h,
               width: showingEntry ? 20.h : 6.h,
-              color: appTheme.textPrimary,
+              color: onAction == null
+                  ? appTheme.textPrimary.withValues(alpha: 0.3)
+                  : appTheme.textPrimary,
             ),
           ),
         ],

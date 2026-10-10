@@ -14,6 +14,8 @@ import 'package:soothifyafrica/app/modules/user/checkin/checkin_screen.dart';
 import 'package:soothifyafrica/app/modules/user/checkin/controller/checkin_controller.dart';
 
 import 'helpers.dart';
+import 'package:soothifyafrica/app/widgets/custom_image_view.dart';
+import 'package:soothifyafrica/app/core/utils/image_constant.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/checkin_golden_test.dart
@@ -122,5 +124,52 @@ void main() {
 
     expect(c.showingEntry.value, isFalse);
     expect(find.text('August 2024'), findsOneWidget);
+  });
+
+  testWidgets('the overflow opens the most recent entry', (tester) async {
+    final c = await mount(tester);
+
+    // The calendar is what the screen opens on.
+    expect(c.showingEntry.value, isFalse);
+    expect(c.hasEntries, isTrue);
+
+    // The glyph used to carry no action at all — it said the screen had more
+    // to show and then did nothing.
+    await tester.tap(find.byWidgetPredicate((w) =>
+        w is CustomImageView &&
+        w.imagePath == ImageConstant.icMoreVertical));
+    await tester.pumpAndSettle();
+
+    expect(c.showingEntry.value, isTrue);
+    expect(c.entry.value, isNotNull);
+    // The latest day with something recorded against it.
+    expect(c.selected.value, DateTime(2024, 8, 2));
+  });
+
+  testWidgets('the overflow is dimmed with nothing recorded', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    await PrefUtils().init();
+    Get.put<MoodRepository>(LocalMoodRepository(now: _now));
+    Get.put<KycRepository>(LocalKycRepository());
+    final c = Get.put(CheckinController(
+      Get.find<MoodRepository>(),
+      Get.find<KycRepository>(),
+      CheckinKind.mood,
+      now: _now,
+    ));
+    await pumpScreen(tester, const CheckinScreen());
+    await tester.pumpAndSettle();
+
+    expect(c.hasEntries, isFalse);
+    final glyph = tester.widget<CustomImageView>(find.byWidgetPredicate((w) =>
+        w is CustomImageView &&
+        w.imagePath == ImageConstant.icMoreVertical));
+    expect(glyph.color!.a, lessThan(0.5));
+
+    // And tapping it does nothing rather than opening an empty entry.
+    await tester.tap(find.byWidget(glyph));
+    await tester.pumpAndSettle();
+    expect(c.showingEntry.value, isFalse);
   });
 }

@@ -86,6 +86,19 @@ class CheckinController extends BaseController {
 
   void backToCalendar() => showingEntry.value = false;
 
+  /// Whether there is a latest entry for the header's ⋮ to open.
+  bool get hasEntries => marked.isNotEmpty;
+
+  /// The ⋮ on the calendar — straight to the most recent entry.
+  ///
+  /// It had no action at all, which is worse than not drawing it: the glyph
+  /// says the screen has more to show and then does nothing.
+  Future<void> openLatest() async {
+    if (!hasEntries) return;
+    final latest = marked.reduce((a, b) => a.isAfter(b) ? a : b);
+    await selectDate(latest);
+  }
+
   /// Every entry, keyed by day, so a calendar cell can be drawn without a
   /// repository call per square.
   final RxMap<DateTime, MoodLevel> levels = <DateTime, MoodLevel>{}.obs;

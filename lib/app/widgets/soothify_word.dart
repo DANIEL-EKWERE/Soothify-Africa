@@ -129,7 +129,9 @@ class _Smile extends CustomPainter {
     // Inset a little, so the mouth sits inside the eyes rather than running
     // the full width of both.
     final inset = (right - left) * 0.14;
-    final top = baseline + em * 0.06;
+    // Clear of the glyphs rather than tucked under them: at 0.06 the arc
+    // nearly touched the o's and read as an underline.
+    final top = baseline + em * 0.17;
     final depth = em * 0.16;
 
     canvas.drawPath(

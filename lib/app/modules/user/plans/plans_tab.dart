@@ -194,55 +194,41 @@ class _TierCard extends StatelessWidget {
     // deep blue in dark mode, so its text must stay white with it.
     final foreground = onDark ? appTheme.onPrimary : appTheme.textPrimary;
 
-    // Its own Obx. The card is built from the list's Obx but renders outside
-    // it, so reading `chosen` there would never register.
-    return Obx(
-      () => GestureDetector(
-        onTap: () => controller.choose(tier.id),
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: EdgeInsets.fromLTRB(25.h, 34.v, 25.h, 34.v),
-          decoration: BoxDecoration(
-            color: onDark ? appTheme.planEmphasisFill : appTheme.surface,
-            borderRadius: BorderRadius.circular(16.h),
-            border: Border.all(
-              color: switch ((controller.chosen.value == tier.id, onDark)) {
-                (false, _) => appTheme.cardRim,
-                (true, true) => appTheme.planEmphasisOutline,
-                (true, false) => appTheme.actionFill,
+    return Container(
+      padding: EdgeInsets.fromLTRB(25.h, 34.v, 25.h, 34.v),
+      decoration: BoxDecoration(
+        color: onDark ? appTheme.planEmphasisFill : appTheme.surface,
+        borderRadius: BorderRadius.circular(16.h),
+        // Always the resting hairline. The cards are not selectable —
+        // each one carries the button that acts on it — so an accent
+        // outline on tap was a second way of choosing that led nowhere.
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SoothifyText(
+            tier.name,
+            style: CustomTextStyles.tierName.copyWith(color: foreground),
+          ),
+          SizedBox(height: 16.v),
+          Text(
+            tier.description,
+            style: CustomTextStyles.tierBody.copyWith(color: foreground),
+          ),
+          SizedBox(height: 28.v),
+          if (tier.hasPrice) ...[_Price(tier: tier), SizedBox(height: 24.v)],
+          if (tier.action != null)
+            _TierButton(
+              action: tier.action!,
+              onDark: onDark,
+              onTap: () => switch (tier.action!) {
+                PlanAction.trial => controller.startTrial(),
+                PlanAction.waitlist => PassportSheet.show(context),
+                PlanAction.corporate => controller.openCorporateForm(),
               },
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SoothifyText(
-                tier.name,
-                style: CustomTextStyles.tierName.copyWith(color: foreground),
-              ),
-              SizedBox(height: 16.v),
-              Text(
-                tier.description,
-                style: CustomTextStyles.tierBody.copyWith(color: foreground),
-              ),
-              SizedBox(height: 28.v),
-              if (tier.hasPrice) ...[
-                _Price(tier: tier),
-                SizedBox(height: 24.v),
-              ],
-              if (tier.action != null)
-                _TierButton(
-                  action: tier.action!,
-                  onDark: onDark,
-                  onTap: () => switch (tier.action!) {
-                    PlanAction.trial => controller.startTrial(),
-                    PlanAction.waitlist => PassportSheet.show(context),
-                    PlanAction.corporate => controller.openCorporateForm(),
-                  },
-                ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

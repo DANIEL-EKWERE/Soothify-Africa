@@ -16,13 +16,6 @@ class PlansTabController extends BaseController {
   final Rx<BillingPeriod> period = BillingPeriod.monthly.obs;
   final RxList<PlanTier> tiers = <PlanTier>[].obs;
 
-  /// Which card the user has tapped, by [PlanTier.id]. Null until one is —
-  /// the screen opens with nothing chosen, every card on the resting
-  /// hairline.
-  final RxnString chosen = RxnString();
-
-  void choose(String id) => chosen.value = id;
-
 
   @override
   void onInit() {

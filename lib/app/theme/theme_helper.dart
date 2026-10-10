@@ -81,7 +81,6 @@ class PrimaryColors {
     required this.periodToggleBorder,
     required this.planEmphasisFill,
     required this.planOutlineMuted,
-    required this.planEmphasisOutline,
     required this.cardRim,
     required this.sessionCardRule,
     required this.callControlRim,
@@ -280,13 +279,6 @@ class PrimaryColors {
   /// card is outlined in [actionFill] now — but it stays as the app's plain
   /// card hairline.
   final Color planOutlineMuted;
-
-  /// The outline on the emphasised plan card. The white cards are ringed in
-  /// the brand blue, which would vanish against [planEmphasisFill], so the
-  /// filled one takes the brand orange instead — the same `#F09D39` the auth
-  /// CTA uses, in both themes, because it sits on a surface that does not
-  /// invert.
-  final Color planEmphasisOutline;
 
   /// The app's resting hairline on a white card — black at 4%. Loud enough
   /// to separate a card from the page, quiet enough not to read as an
@@ -613,7 +605,6 @@ class PrimaryColors {
     periodToggleBorder: Color(0xFFD7D7D7),
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFFCBCBCB),
-    planEmphasisOutline: Color(0xFFF09D39),
     cardRim: Color(0x0A000000),
     sessionCardRule: Color(0xFFC9D8EE),
     callControlRim: Color(0xFFBFC6CC),
@@ -731,7 +722,6 @@ class PrimaryColors {
     periodToggleBorder: Color(0x33FFFFFF),
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFF3F4347),
-    planEmphasisOutline: Color(0xFFF09D39),
     cardRim: Color(0x1AFFFFFF),
     sessionCardRule: Color(0x332F6FED),
     callControlRim: Color(0xFF4A5157),

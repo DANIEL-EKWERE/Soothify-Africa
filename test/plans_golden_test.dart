@@ -114,11 +114,10 @@ void main() {
     expect(controller.tiers, isNotEmpty);
   });
 
-  testWidgets('a card takes its accent border only once it is tapped',
-      (tester) async {
+  testWidgets('every card rests on the same hairline', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(PlansTabController(MockSubscriptionRepository()));
+    Get.put(PlansTabController(MockSubscriptionRepository()));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pump(const Duration(milliseconds: 600));
@@ -133,27 +132,21 @@ void main() {
       return ((box.decoration! as BoxDecoration).border! as Border).top.color;
     }
 
-    // Nothing is chosen yet, so every card rests on the 4% hairline.
-    expect(c.chosen.value, isNull);
-    for (final name in const [
+    const names = [
       'Soothify Core',
       'Soothify Passport',
       'Soothify Corporate Wellness',
-    ]) {
+    ];
+    for (final name in names) {
       expect(rimOf(name), appTheme.cardRim);
     }
 
+    // Tapping a card does nothing to it: the cards are not selectable, and
+    // each carries the button that acts on it.
     await tester.tap(findSoothify('Soothify Core'));
     await tester.pumpAndSettle();
-    expect(rimOf('Soothify Core'), appTheme.actionFill);
-    // And only that one.
-    expect(rimOf('Soothify Passport'), appTheme.cardRim);
-
-    // The filled card takes the orange, which is the only accent that shows
-    // against its own blue.
-    await tester.tap(findSoothify('Soothify Passport'));
-    await tester.pumpAndSettle();
-    expect(rimOf('Soothify Passport'), appTheme.planEmphasisOutline);
-    expect(rimOf('Soothify Core'), appTheme.cardRim);
+    for (final name in names) {
+      expect(rimOf(name), appTheme.cardRim);
+    }
   });
 }

@@ -264,6 +264,61 @@ class MockContentRepository implements ContentRepository {
       categoryId: 'discovery-popular',
       practitionerName: 'Jacob Samuel',
     ),
+    // Stretch & Restore's own shelves — Figma `259:31210`. Separate items
+    // rather than repointing 7-9 and 10-11, which Discovery's Popular shelf
+    // and Pilates' Audio & Mindset draw from: the redrawn frame gives this
+    // section five covers of its own.
+    MediaItem(
+      id: '40',
+      title: 'Vinyasa Flow',
+      coverAsset: '${ImageConstant.contentDir}/yoga_vinyasa.png',
+      type: MediaType.video,
+      durationSeconds: 2700,
+      rating: 4.6,
+      categoryId: 'yoga-flow',
+      practitionerName: 'Jacob Samuel',
+    ),
+    MediaItem(
+      id: '41',
+      title: 'Hatha Yoga',
+      coverAsset: '${ImageConstant.contentDir}/yoga_hatha.png',
+      type: MediaType.video,
+      durationSeconds: 2700,
+      rating: 4.6,
+      categoryId: 'yoga-flow',
+      practitionerName: 'Jacob Samuel',
+    ),
+    MediaItem(
+      id: '42',
+      title: 'Restorative Yoga',
+      coverAsset: '${ImageConstant.contentDir}/yoga_restorative.png',
+      type: MediaType.video,
+      durationSeconds: 2700,
+      rating: 4.6,
+      categoryId: 'yoga-flow',
+      practitionerName: 'Jacob Samuel',
+    ),
+    MediaItem(
+      id: '43',
+      title: 'Guided Sleep Stories',
+      coverAsset: '${ImageConstant.contentDir}/rest_sleep.png',
+      type: MediaType.audio,
+      durationSeconds: 2700,
+      rating: 4.6,
+      categoryId: 'rest-sleep',
+      practitionerName: 'Jacob Samuel',
+    ),
+    MediaItem(
+      id: '44',
+      // The frame's own trailing comma is dropped; it is a typo.
+      title: 'Ambient Nature Soundscapes',
+      coverAsset: '${ImageConstant.contentDir}/rest_ambient.png',
+      type: MediaType.audio,
+      durationSeconds: 2700,
+      rating: 4.6,
+      categoryId: 'rest-sleep',
+      practitionerName: 'Jacob Samuel',
+    ),
     MediaItem(
       id: '10',
       title: 'Breaking Bad Habit',
@@ -336,8 +391,8 @@ class MockContentRepository implements ContentRepository {
   static const Map<String, List<String>> _shelves = {
     'voice-overs': ['4', '5', '6'],
     'sound-effects': ['10', '11'],
-    'yoga-flow': ['7', '8', '9'],
-    'sounds': ['10', '11'],
+    'yoga-flow': ['40', '41', '42'],
+    'sounds': ['43', '44'],
     // The Videos screen's two rows (`259:60948`). The frame repeats the same
     // artwork across both, so these reuse existing covers rather than
     // pretending to a catalogue that does not exist.

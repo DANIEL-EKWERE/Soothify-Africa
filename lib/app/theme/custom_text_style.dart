@@ -1362,17 +1362,24 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
-  /// The same label once the chip is filled.
-  static TextStyle get filterChipLabelSelected =>
-      filterChipLabel.copyWith(color: appTheme.onPrimary);
-
-  /// The "See More..." link closing a chip group — Nunito Sans Black 10.
-  static TextStyle get filterSeeMore => TextStyle(
+  /// The count on the filter glyph — Nunito Sans Black 10.
+  static TextStyle get filterBadge => TextStyle(
     fontFamily: fontNunitoSans,
     fontSize: 10.fSize,
     fontWeight: FontWeight.w900,
     fontVariations: const [FontVariation('wght', 900)],
     height: 13 / 10,
+    color: appTheme.textPrimary,
+  );
+
+  /// A row in the menu that drops out of the filter glyph — Nunito Medium
+  /// 10, centred in its pill.
+  static TextStyle get filterMenuItem => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 10.fSize,
+    fontWeight: FontWeight.w500,
+    fontVariations: const [FontVariation('wght', 500)],
+    height: 13.64 / 10,
     color: appTheme.textPrimary,
   );
 
@@ -3361,6 +3368,16 @@ class CustomTextStyles {
     fontVariations: _regular,
     height: 25 / 18,
     color: appTheme.actionFill,
+  );
+
+  /// An article's title under its cover on the Articles shelf.
+  static TextStyle get articleCardTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 15.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21 / 15,
+    color: appTheme.textPrimary,
   );
 
   /// "Update your Account Details" — the lead on the Update Account screen.

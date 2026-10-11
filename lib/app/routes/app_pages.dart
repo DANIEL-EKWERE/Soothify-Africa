@@ -456,6 +456,12 @@ class AppPages {
       transition: Transition.downToUp,
     ),
     GetPage(
+      name: AppRoutes.filterApproach,
+      page: () => const FiltersScreen(kind: FilterKind.approach),
+      binding: FiltersBinding(),
+      transition: Transition.downToUp,
+    ),
+    GetPage(
       name: AppRoutes.shelf,
       page: () => const ShelfScreen(),
       binding: ShelfBinding(),

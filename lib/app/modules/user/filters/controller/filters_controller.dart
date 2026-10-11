@@ -1,12 +1,12 @@
 import '../../../../core/app_export.dart';
 import '../../../../data/models/media_filter.dart';
 
-/// One controller for the whole filter flow, not one per sheet.
+/// One controller per visit to a filter sheet.
 ///
-/// The three sheets edit a single working copy of the library's filters, so a
-/// duration ticked on the first sheet survives a trip to Style and back. The
-/// binding creates it on the first sheet only; the deeper two reuse it, and
-/// GetX disposes it when that first route pops.
+/// The sheet edits a working copy of the library's filters and only hands it
+/// back on Apply, so backing out changes nothing. Only one sheet is open at a
+/// time — the glyph's menu chooses which — so the controller lives and dies
+/// with that one route.
 class FiltersController extends GetxController {
   FiltersController(FilterSelection initial) : selection = initial.copy().obs;
 
@@ -29,15 +29,6 @@ class FiltersController extends GetxController {
 
   int get count => selection.value.count;
 
-  /// Hands the working copy back to whoever opened the flow. From a deeper
-  /// sheet this returns to the sheet below, which passes it on in turn — see
-  /// [openSheet] — so Apply always means apply, at any depth.
+  /// Hands the working copy back to whoever opened the sheet.
   void apply() => Get.back(result: selection.value);
-
-  /// Opens Style or More Filters over the current sheet. If the user applies
-  /// down there, this sheet closes too and carries the result up.
-  Future<void> openSheet(String route) async {
-    final result = await Get.toNamed(route);
-    if (result is FilterSelection) Get.back(result: result);
-  }
 }

@@ -7,8 +7,10 @@
 /// same call [LibrarySection] already makes for the library itself.
 library;
 
-/// Which of the three sheets is on screen.
-enum FilterKind { duration, more, style }
+/// Which sheet is on screen. The menu behind the filter glyph lists all
+/// four; the file draws only the first three, so [approach] is empty until
+/// the designer supplies its options.
+enum FilterKind { duration, more, style, approach }
 
 /// One group of chips. The order here is the order the frames draw them, and
 /// [options] is in the frames' reading order (left column, then right).
@@ -69,7 +71,12 @@ enum FilterGroup {
     'Small Stability Ball',
   ]),
   music('Music', ['Music', 'No Music']),
-  style('Style', []);
+  style('Style', []),
+  // Listed in the dropdown (`259:31474`) but drawn nowhere: the file has
+  // Duration, More Filters and Style frames and no fourth. Left empty rather
+  // than invented, so the day the options arrive they go here and the sheet
+  // fills itself.
+  approach('Approach', []);
 
   const FilterGroup(this.label, this.options);
 

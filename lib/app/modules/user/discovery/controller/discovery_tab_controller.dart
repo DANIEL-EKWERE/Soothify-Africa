@@ -91,8 +91,8 @@ class DiscoveryTabController extends BaseController {
   void openShelf(String shelf) =>
       Get.toNamed(AppRoutes.shelf, arguments: shelf);
 
-  Future<void> openFilters() async {
-    final applied = await openFilterSheets(filters.value);
+  Future<void> openFilters(BuildContext anchor) async {
+    final applied = await openFilterSheets(anchor, filters.value);
     if (applied == null) return;
     filters.value = applied;
     await load();

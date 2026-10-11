@@ -26,7 +26,9 @@ class ContentSearchRow extends StatelessWidget {
   final int filterCount;
 
   final VoidCallback onSearch;
-  final VoidCallback onFilters;
+
+  /// Handed the glyph's context — see [FilterGlyph.onTap].
+  final ValueChanged<BuildContext> onFilters;
 
   @override
   Widget build(BuildContext context) {

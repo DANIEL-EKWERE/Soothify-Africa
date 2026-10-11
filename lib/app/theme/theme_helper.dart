@@ -119,6 +119,7 @@ class PrimaryColors {
     required this.filterChipFill,
     required this.filterChipBorder,
     required this.filterRule,
+    required this.menuRim,
     required this.topicChipLabel,
     required this.rowBorder,
     required this.cardHairline,
@@ -388,6 +389,11 @@ class PrimaryColors {
   /// The 2px rule between groups on More Filters.
   final Color filterRule;
 
+  /// The outline of the filter menu that drops out of the filter glyph —
+  /// #263238 at 10%, twice the weight of the pills inside it so the card
+  /// still reads as a card against the screen it floats over.
+  final Color menuRim;
+
   /// An unselected topic chip's outline — #999999 at 30%.
   final Color topicChipBorder;
 
@@ -641,8 +647,11 @@ class PrimaryColors {
     moodTrackInactive: Color(0xFFDADADA),
     moodThumb: Color(0xFF2F6FED),
     filterChipFill: Color(0xFFFEFEFE),
-    filterChipBorder: Color(0xFF263238),
+    // 30%, as the frames draw it. At full strength it read as a box rather
+    // than a hairline.
+    filterChipBorder: Color(0x4D263238),
     filterRule: Color(0xFF999999),
+    menuRim: Color(0x1A263238),
     topicChipLabel: Color(0xB81B1F26),
     rowBorder: Color(0xFFCCCCCC),
     cardHairline: Color(0x0D000000),
@@ -762,8 +771,9 @@ class PrimaryColors {
     moodTrackInactive: Color(0xFFDADADA),
     moodThumb: Color(0xFF2F6FED),
     filterChipFill: Color(0xFF423F3F),
-    filterChipBorder: Color(0xFFFEFEFE),
+    filterChipBorder: Color(0x4DFEFEFE),
     filterRule: Color(0xFF5A5757),
+    menuRim: Color(0x1FFFFFFF),
     topicChipLabel: Color(0xDEFFFFFF),
     rowBorder: Color(0xFF4A4747),
     // 5% black vanishes on a dark ground; the same weight in white.

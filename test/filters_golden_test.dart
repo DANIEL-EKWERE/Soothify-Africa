@@ -15,6 +15,8 @@ import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/data/models/media_filter.dart';
 import 'package:soothifyafrica/app/modules/user/filters/controller/filters_controller.dart';
 import 'package:soothifyafrica/app/modules/user/filters/filters_screen.dart';
+import 'package:soothifyafrica/app/widgets/filter_glyph.dart';
+import 'package:soothifyafrica/app/widgets/filter_menu.dart';
 
 import 'helpers.dart';
 
@@ -106,6 +108,32 @@ void main() {
     expect(controller.canApply, isFalse);
   });
 
+  /// The selected variants in the file — More Filters `259:30410`, Style
+  /// `259:30732` — outline the chip in soothify blue and leave the fill and
+  /// the label alone. It used to fill the chip instead.
+  testWidgets('a ticked chip is outlined, not filled', (tester) async {
+    await mount(
+      tester,
+      FilterKind.more,
+      initial: FilterSelection()..toggle(FilterGroup.focus, 'Basics'),
+    );
+
+    BoxDecoration decorationOf(String label) {
+      final box = tester.widget<Container>(
+        find.ancestor(of: find.text(label), matching: find.byType(Container)),
+      );
+      return box.decoration! as BoxDecoration;
+    }
+
+    final ticked = decorationOf('Basics');
+    final plain = decorationOf('Morning');
+
+    expect(ticked.border!.top.color, appTheme.soothifyBlue);
+    expect(plain.border!.top.color, appTheme.filterChipBorder);
+    // The fill does not move, which is what makes the outline readable.
+    expect(ticked.color, plain.color);
+  });
+
   test('the design typos do not ship', () {
     final all = [for (final g in FilterGroup.values) ...g.options];
     expect(all, contains('Strength'));
@@ -141,7 +169,7 @@ void main() {
   /// The whole point of the sheets: the library's glyph opens them and what
   /// is applied comes back. The glyph used to raise "Filters are not built
   /// yet".
-  testWidgets('the library glyph opens the sheets and takes the result back', (
+  testWidgets('the glyph drops a menu and the chosen sheet applies back', (
     tester,
   ) async {
     useDesignFrame(tester);
@@ -167,38 +195,164 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    library.openFilters();
+    // The glyph opens the menu, not a sheet.
+    await tester.tap(find.byType(FilterGlyph));
+    await tester.pumpAndSettle();
+    expect(find.byType(FiltersScreen), findsNothing);
+    for (final (label, _) in filterMenuItems) {
+      expect(find.text(label), findsOneWidget, reason: '$label is missing');
+    }
+
+    await tester.tap(find.text('Duration'));
     await tester.pumpAndSettle();
     expect(find.byType(FiltersScreen), findsOneWidget);
-    expect(find.text('Duration'), findsOneWidget);
 
-    // Through to Style and back out again, carrying the tick with it.
     await tester.tap(find.text('20 minutes'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FiltersScreen), findsNothing);
+    expect(find.byType(LibraryScreen), findsOneWidget);
+    expect(library.filters.value.count, 1);
+    expect(
+      library.filters.value.isSelected(FilterGroup.duration, '20 minutes'),
+      isTrue,
+    );
+
+    // And the sheet's controller went with it.
+    expect(Get.isRegistered<FiltersController>(), isFalse);
+
+    // Reopening seeds the next sheet from what is applied, so a second trip
+    // adds to the selection rather than replacing it.
+    await tester.tap(find.byType(FilterGlyph));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Style'));
     await tester.pumpAndSettle();
-    expect(find.text('Mindfulness'), findsOneWidget);
-
     await tester.tap(find.text('Mindfulness'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Apply'));
     await tester.pumpAndSettle();
 
-    // Applying from the deeper sheet unwinds the whole flow, not one level.
-    expect(find.byType(FiltersScreen), findsNothing);
-    expect(find.byType(LibraryScreen), findsOneWidget);
     expect(library.filters.value.count, 2);
-    expect(
-      library.filters.value.isSelected(FilterGroup.duration, '20 minutes'),
-      isTrue,
-    );
     expect(
       library.filters.value.isSelected(FilterGroup.style, 'Mindfulness'),
       isTrue,
     );
+  });
 
-    // And the flow's controller went with it.
-    expect(Get.isRegistered<FiltersController>(), isFalse);
+  /// The menu is its own designed surface — a card hung off the glyph,
+  /// overlapping the search row — so it is worth a picture of its own.
+  for (final (name, brightness) in [
+    ('light', Brightness.light),
+    ('dark', Brightness.dark),
+  ]) {
+    testWidgets('the glyph menu, $name', (tester) async {
+      useDesignFrame(tester);
+      disableMotion(tester);
+      await loadAppFonts();
+      Get.put<ContentRepository>(MockContentRepository());
+      Get.put(
+        LibraryController(
+          Get.find<ContentRepository>(),
+          LibrarySection.balance,
+        ),
+      );
+
+      await tester.pumpWidget(
+        Sizer(
+          builder: (_, _, _) => GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: theme,
+            darkTheme: darkTheme,
+            themeMode: brightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            getPages: AppPages.pages,
+            builder: (context, widget) {
+              PrimaryColors.syncFrom(context);
+              return widget!;
+            },
+            home: const LibraryScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // The mock shelves answer after 400ms; without waiting them out the
+      // test ends on a pending timer.
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FilterGlyph));
+      await tester.pumpAndSettle();
+
+      // The whole app, not the LibraryScreen: the menu is a route of its
+      // own in the overlay, so it is not inside the screen's subtree.
+      await expectLater(
+        find.byType(GetMaterialApp),
+        matchesGoldenFile('goldens/filter_menu_$name.png'),
+      );
+    });
+  }
+
+  testWidgets('dismissing the menu opens nothing', (tester) async {
+    useDesignFrame(tester);
+    await loadAppFonts();
+    Get.put<ContentRepository>(MockContentRepository());
+    Get.put(
+      LibraryController(Get.find<ContentRepository>(), LibrarySection.balance),
+    );
+
+    await tester.pumpWidget(
+      Sizer(
+        builder: (_, _, _) => GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: theme,
+          getPages: AppPages.pages,
+          builder: (context, widget) {
+            PrimaryColors.syncFrom(context);
+            return widget!;
+          },
+          home: const LibraryScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FilterGlyph));
+    await tester.pumpAndSettle();
+    // Anywhere off the card: the barrier takes the tap.
+    await tester.tapAt(const Offset(30, 700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('More filters'), findsNothing);
+    expect(find.byType(FiltersScreen), findsNothing);
+  });
+
+  /// Approach is the fourth row in the menu and the one frame the file never
+  /// drew. It must still land somewhere.
+  testWidgets('Approach opens a sheet that says it is unfinished', (
+    tester,
+  ) async {
+    await mount(tester, FilterKind.approach);
+
+    expect(find.text('Approach'), findsOneWidget);
+    expect(find.textContaining('on the way'), findsOneWidget);
+    expect(Get.find<FiltersController>().canApply, isFalse);
+  });
+
+  /// The frames close every odd chip group with "See More...", which opens
+  /// nothing. It is not shipped.
+  testWidgets('no sheet carries a See More link', (tester) async {
+    for (final kind in FilterKind.values) {
+      await mount(tester, kind);
+      expect(
+        find.textContaining('See More'),
+        findsNothing,
+        reason: '${kind.name} still has one',
+      );
+      Get.reset();
+    }
   });
 
   testWidgets('backing out of the sheets changes nothing', (tester) async {
@@ -228,7 +382,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    library.openFilters();
+    await tester.tap(find.byType(FilterGlyph));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Duration'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('30 minutes'));
     await tester.pumpAndSettle();

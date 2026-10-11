@@ -11,12 +11,16 @@ class FilterGlyph extends StatelessWidget {
   const FilterGlyph({super.key, required this.count, required this.onTap});
 
   final int count;
-  final VoidCallback onTap;
+
+  /// Called with the glyph's own context: the menu hangs off this box, so
+  /// every screen carrying a glyph gets the menu in the same place without
+  /// measuring it.
+  final ValueChanged<BuildContext> onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: () => onTap(context),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -46,7 +50,7 @@ class FilterGlyph extends StatelessWidget {
                   widthFactor: 1,
                   child: Text(
                     '$count',
-                    style: CustomTextStyles.filterSeeMore.copyWith(
+                    style: CustomTextStyles.filterBadge.copyWith(
                       color: appTheme.onPrimary,
                     ),
                   ),

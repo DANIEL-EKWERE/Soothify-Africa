@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1019884263236",
+    "project_id": "soothify-africa",
+    "storage_bucket": "soothify-africa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019884263236:android:d53d06666146a111a96911",
+        "android_client_info": {
+          "package_name": "com.soothify.africa.soothifyafrica"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqao3v80Hlru3wGvdEz6gJBB_L2qK_62s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

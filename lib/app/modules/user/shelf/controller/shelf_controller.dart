@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import '../../../../core/app_export.dart';
 import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
@@ -40,8 +42,8 @@ class ShelfController extends BaseController {
 
   void open(MediaItem item) => openMedia(item, source: shelf);
 
-  Future<void> openFilters() async {
-    final applied = await openFilterSheets(filters.value);
+  Future<void> openFilters(BuildContext anchor) async {
+    final applied = await openFilterSheets(anchor, filters.value);
     if (applied == null) return;
     filters.value = applied;
     await load();

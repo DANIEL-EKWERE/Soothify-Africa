@@ -7,6 +7,7 @@ import '../../../data/models/media_item.dart';
 import '../../../widgets/skeleton.dart';
 import '../discovery/widgets/discovery_card.dart';
 import 'controller/library_controller.dart';
+import '../../../data/models/article.dart';
 
 /// Meditation and Balance — Figma 135:11744 and 135:20551.
 ///
@@ -50,6 +51,7 @@ class LibraryScreen extends GetView<LibraryController> {
                           items: controller.shelves[block.title] ?? const [],
                         ),
                         LibraryFeature() => _FeatureCard(block: block),
+                        LibraryArticles() => const _Articles(),
                         LibraryPromo() => _PromoCard(block: block),
                       },
                       SizedBox(height: 32.v),
@@ -299,6 +301,61 @@ class _PromoCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The Articles shelf — two pieces side by side, cover above the title.
+///
+/// Both redrawn frames close on this; neither draws a "See All" beside it.
+class _Articles extends StatelessWidget {
+  const _Articles();
+
+  @override
+  Widget build(BuildContext context) {
+    final articles = Article.values.toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Articles', style: CustomTextStyles.sectionTitle),
+        SizedBox(height: 16.v),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final article in articles) ...[
+              Expanded(
+                child: InkWell(
+                  onTap: () =>
+                      Get.toNamed(AppRoutes.article, arguments: article),
+                  borderRadius: BorderRadius.circular(8.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.h),
+                        child: CustomImageView(
+                          imagePath: article.coverAsset,
+                          height: 136.v,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(height: 12.v),
+                      Text(
+                        article.title,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: CustomTextStyles.articleCardTitle,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (article != articles.last) SizedBox(width: 16.h),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }

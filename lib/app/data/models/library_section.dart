@@ -43,6 +43,12 @@ class LibraryFeature extends LibraryBlock {
 /// The closing promo card — "Pilates & Core sessions" / "Stretch & Restore sessions".
 ///
 /// No section heading above it, a smaller icon, and radius 8 rather than 12.
+/// The Articles shelf both redrawn frames close on — two pieces, side by
+/// side, cover above a two-line title.
+class LibraryArticles extends LibraryBlock {
+  const LibraryArticles();
+}
+
 class LibraryPromo extends LibraryBlock {
   const LibraryPromo({
     required this.title,
@@ -61,30 +67,34 @@ class LibraryPromo extends LibraryBlock {
 
 /// Which library the shelf screen is showing.
 ///
-/// Meditation (Figma 135:11744) and Balance (135:20551) are the same frame
-/// with different copy and blocks, so they share one screen.
+/// Meditation and Balance are the same frame with different copy and
+/// blocks, so they share one screen.
+///
+/// Redrawn by the designer: `259:24767` (Pilates & Core) and `259:31210`
+/// (Stretch & Restore). Both now open on **Movement**, and both close on an
+/// **Articles** shelf. The shelf ids are unchanged — they key the content
+/// repository, and only the headings were renamed.
 enum LibrarySection {
   meditation('meditation', 'Pilates & Core', [
-    LibraryShelf('Voice Overs', 'voice-overs'),
-    LibraryFeature(
-      heading: 'Sleep Stories',
-      title: 'Sleep stories',
-      body: 'Calm narratives to help you sleep better',
-      asset: 'assets/images/library/sleep_stories.png',
-    ),
-    LibraryShelf('Sound Effects', 'sound-effects'),
+    // Two shelves, as the frame's two "See All" links say. "Home Reformer
+    // Guides" reads like a third, but it sits 43 under Movement — it is a
+    // card's title pill, not a heading.
+    LibraryShelf('Movement', 'voice-overs'),
+    LibraryShelf('Audio & Mindset', 'sound-effects'),
+    LibraryArticles(),
     LibraryPromo(
       title: 'Pilates & Core sessions',
-      body: 'Speak with a meditation therapist',
+      body: 'Speak with a Pilates training coach',
       asset: 'assets/images/library/meditation_session.png',
       iconSize: 50,
     ),
   ]),
   balance('balance', 'Stretch & Restore', [
-    LibraryShelf('Yoga flow', 'yoga-flow'),
-    LibraryShelf('Sounds', 'sounds'),
+    LibraryShelf('Movement', 'yoga-flow'),
+    LibraryShelf('Rest & Sleep', 'sounds'),
+    LibraryArticles(),
     LibraryPromo(
-      title: 'Stretch & Restore sessions',
+      title: 'Stretch & Restore',
       // The design's own leading space is dropped; it is a typo, not spacing.
       body: 'Schedule a wellness session with a coach today',
       asset: 'assets/images/library/balance_session.png',

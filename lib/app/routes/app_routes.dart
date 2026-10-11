@@ -83,15 +83,17 @@ class AppRoutes {
   /// after a card is picked, not before the list.
   static const String bookExpert = '/book-expert';
 
-  /// The three filter sheets behind a library's filter glyph. One route each
-  /// so no screen has to read its own kind out of the arguments; the
-  /// arguments carry only the library's current [FilterSelection], and the
-  /// applied selection comes back as the pop result.
+  /// The filter sheets behind a library's filter glyph. One route each so no
+  /// screen has to read its own kind out of the arguments; the arguments
+  /// carry only the library's current [FilterSelection], and the applied
+  /// selection comes back as the pop result.
   ///
-  /// [filterDuration] is the entry point — it links through to the other two.
+  /// There is no entry point among them: the glyph drops a menu listing all
+  /// four — see `showFilterMenu` — and that menu opens one of these.
   static const String filterDuration = '/filters/duration';
   static const String filterMore = '/filters/more';
   static const String filterStyle = '/filters/style';
+  static const String filterApproach = '/filters/approach';
 
   /// A shelf's "See All" grid. Takes the shelf name as its argument, so one
   /// route serves every shelf in the app.

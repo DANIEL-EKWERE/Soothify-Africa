@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import '../../../../core/app_export.dart';
 import '../../../../core/utils/filter_entry.dart';
 import '../../../../core/utils/wellness_entry.dart';
@@ -68,8 +70,8 @@ class LibraryController extends BaseController {
   /// 135:12833. Only duration narrows the shelves today: it is the one group
   /// the content model can answer. The rest are recorded and go to the API
   /// once there is one.
-  Future<void> openFilters() async {
-    final applied = await openFilterSheets(filters.value);
+  Future<void> openFilters(BuildContext anchor) async {
+    final applied = await openFilterSheets(anchor, filters.value);
     if (applied == null) return;
     filters.value = applied;
     await load();

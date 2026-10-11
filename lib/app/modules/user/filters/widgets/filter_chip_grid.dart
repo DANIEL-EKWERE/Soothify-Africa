@@ -7,9 +7,9 @@ import '../controller/filters_controller.dart';
 /// A group's chips, two to a row — the layout every chip group in the filter
 /// frames uses.
 ///
-/// 162x37 pills with a 20 radius, 18 apart across and 8 down. The trailing
-/// odd cell carries the group's "See More..." link, which is where the frames
-/// put it whenever a group has an odd number of chips.
+/// 162x37 pills with a 20 radius, 18 apart across and 8 down. The frames
+/// close every odd group with a "See More..." link; it is dropped here, so
+/// an odd group simply leaves its last cell empty.
 class FilterChipGrid extends StatelessWidget {
   const FilterChipGrid({super.key, required this.group});
 
@@ -23,10 +23,7 @@ class FilterChipGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<FiltersController>();
     final options = group.options;
-    // The odd cell at the end is the "See More..." slot in the frames. With
-    // an even count — Music — the grid fills exactly and no link is drawn.
-    final hasSeeMore = options.length.isOdd;
-    final rows = ((options.length + (hasSeeMore ? 1 : 0)) / 2).ceil();
+    final rows = (options.length / 2).ceil();
 
     return Column(
       children: [
@@ -45,7 +42,6 @@ class FilterChipGrid extends StatelessWidget {
                         onTap: () => controller.toggle(group, options[i]),
                       ),
                     ),
-                    _ when hasSeeMore => const _SeeMore(),
                     _ => SizedBox(height: chipHeight.v),
                   },
                 ),
@@ -79,13 +75,15 @@ class _Chip extends StatelessWidget {
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 8.h),
         decoration: BoxDecoration(
-          // The frames draw only the unselected chip, which already carries a
-          // hairline — so selection fills the pill rather than outlining it,
-          // the way the primary action button reads elsewhere in the app.
-          color: selected ? appTheme.actionFill : appTheme.filterChipFill,
+          // Selection swaps the hairline for a blue one and changes nothing
+          // else — the fill and the label stay put, as the selected variants
+          // of More Filters (`259:30410`) and Style (`259:30732`) draw it.
+          color: appTheme.filterChipFill,
           borderRadius: BorderRadius.circular(20.h),
           border: Border.all(
-            color: selected ? appTheme.actionFill : appTheme.filterChipBorder,
+            color: selected
+                ? appTheme.soothifyBlue
+                : appTheme.filterChipBorder,
           ),
         ),
         child: Text(
@@ -93,33 +91,7 @@ class _Chip extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
-          style: selected
-              ? CustomTextStyles.filterChipLabelSelected
-              : CustomTextStyles.filterChipLabel,
-        ),
-      ),
-    );
-  }
-}
-
-/// The frames close an odd group with this link, aligned to the column's left
-/// edge and centred against the row.
-///
-/// There is nothing behind it yet: the frames show seven teachers and seven
-/// body parts with no longer list drawn anywhere, so tapping says as much
-/// rather than expanding to the same seven.
-class _SeeMore extends StatelessWidget {
-  const _SeeMore();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: FilterChipGrid.chipHeight.v,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: InkWell(
-          onTap: () => AppFeedback.info('That is the full list for now.'),
-          child: Text('See More...', style: CustomTextStyles.filterSeeMore),
+          style: CustomTextStyles.filterChipLabel,
         ),
       ),
     );

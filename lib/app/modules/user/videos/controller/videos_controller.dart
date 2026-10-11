@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/filter_entry.dart';
@@ -66,8 +68,8 @@ class VideosController extends BaseController {
   void open(MediaItem item, {required String source}) =>
       openMedia(item, source: source);
 
-  Future<void> openFilters() async {
-    final applied = await openFilterSheets(filters.value);
+  Future<void> openFilters(BuildContext anchor) async {
+    final applied = await openFilterSheets(anchor, filters.value);
     if (applied == null) return;
     filters.value = applied;
     await load();

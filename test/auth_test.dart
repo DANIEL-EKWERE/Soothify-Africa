@@ -8,6 +8,8 @@ import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/modules/auth/signin/controller/signin_controller.dart';
 import 'package:soothifyafrica/app/modules/auth/signup/controller/signup_controller.dart';
 
+import 'helpers.dart';
+
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(Get.reset);
@@ -27,7 +29,11 @@ void main() {
     late SignupController c;
 
     setUp(() async {
-      c = SignupController(await SessionService().init(), LocalKycRepository());
+      c = SignupController(
+        await SessionService().init(),
+        LocalKycRepository(),
+        StubAuthRepository(),
+      );
     });
 
     test('Create Account stays blocked until every field is valid', () {
@@ -87,7 +93,7 @@ void main() {
 
     setUp(() async {
       session = await SessionService().init();
-      c = SigninController(session, LocalKycRepository());
+      c = SigninController(session, LocalKycRepository(), StubAuthRepository());
     });
 
     test('Proceed stays blocked without both fields', () {

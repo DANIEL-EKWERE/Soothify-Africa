@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../../core/utils/pref_utils.dart';
 import '../models/user_role.dart';
+import '../repositories/api_device_token_repository.dart';
+import '../repositories/device_token_repository.dart';
 
 /// Holds who is using the app and in which role.
 ///
@@ -33,6 +35,14 @@ class SessionService extends GetxService {
   /// Signing out returns to guest browsing rather than to the sign-up wall —
   /// the same state a user who never registered is in.
   Future<void> signOut() async {
+    // Before the credentials go: unregistering needs the very token it is
+    // about to clear. Pushes aimed at the account that just left must not
+    // keep arriving on this phone.
+    final tokens = Get.isRegistered<DeviceTokenRepository>()
+        ? Get.find<DeviceTokenRepository>()
+        : null;
+    if (tokens is ApiDeviceTokenRepository) await tokens.unregister();
+
     role.value = null;
     await PrefUtils().clearSession();
   }

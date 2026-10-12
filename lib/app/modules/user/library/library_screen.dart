@@ -343,7 +343,7 @@ class _Articles extends StatelessWidget {
                       SizedBox(height: 12.v),
                       Text(
                         article.title,
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: CustomTextStyles.articleCardTitle,
                       ),

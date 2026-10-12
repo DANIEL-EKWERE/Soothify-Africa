@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:soothifyafrica/app/data/models/user_role.dart';
+import 'package:soothifyafrica/app/data/repositories/auth_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -8,6 +10,70 @@ import 'package:get/get.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/widgets/soothify_word.dart';
+
+
+/// Stands in for [AuthRepository] in tests.
+///
+/// The real one drives Google's and Apple's SDKs, which cannot run in a test
+/// — so what is exercised here is what the controllers do with each answer:
+/// a role, a cancellation (null), or a failure.
+class StubAuthRepository implements AuthRepository {
+  StubAuthRepository({this.role = UserRole.user, this.error});
+
+  /// What a successful sign-in returns. Null stands for the user dismissing
+  /// the provider's own sheet.
+  final UserRole? role;
+
+  /// Thrown instead, when a test wants the failure path.
+  final Object? error;
+
+  int googleCalls = 0;
+  int appleCalls = 0;
+
+  @override
+  Future<UserRole?> signInWithGoogle() async {
+    googleCalls++;
+    if (error != null) throw error!;
+    return role;
+  }
+
+  @override
+  Future<UserRole?> signInWithApple() async {
+    appleCalls++;
+    if (error != null) throw error!;
+    return role;
+  }
+}
+
+/// Every cover a library screen can draw.
+///
+/// Shared rather than copied per test file. It was duplicated, one copy
+/// drifted to a subset, and the screens behind it rendered their article
+/// titles two pixels off — because an asset that is not precached resolves
+/// late and the layout settles after the golden is taken.
+const libraryCovers = <String>[
+  'assets/images/explore/pilates_core.png',
+  'assets/images/explore/stretch_restore.png',
+  'assets/images/library/balance_session.png',
+  'assets/images/library/meditation_session.png',
+  'assets/images/library/sleep_stories.png',
+  'assets/images/content/cover_d.png',
+  'assets/images/content/yoga_vinyasa.png',
+  'assets/images/content/yoga_hatha.png',
+  'assets/images/content/yoga_restorative.png',
+  'assets/images/content/rest_sleep.png',
+  'assets/images/content/rest_ambient.png',
+  'assets/images/content/cover_a.png',
+  'assets/images/content/cover_b.png',
+  'assets/images/content/cover_c.png',
+  'assets/images/content/unshakeable.png',
+  'assets/images/content/hope_in_the_shadows.png',
+  'assets/images/content/breaking_bad_habit.png',
+  'assets/images/content/daily_focus.png',
+  'assets/images/content/breath_work.png',
+  'assets/images/content/mindfulness.png',
+];
+
 
 /// Loads every bundled face. Without this, golden renders fall back to the
 /// test font and every glyph becomes a box.

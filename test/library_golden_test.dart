@@ -19,29 +19,6 @@ import 'package:soothifyafrica/app/data/models/article.dart';
 ///   flutter test --update-goldens test/library_golden_test.dart
 // PNGs only: precacheImage decodes raster data, and handing it an SVG
 // fails with "Invalid image data". flutter_svg loads those itself.
-const _covers = [
-  'assets/images/explore/pilates_core.png',
-  'assets/images/explore/stretch_restore.png',
-  'assets/images/library/balance_session.png',
-  'assets/images/library/meditation_session.png',
-  'assets/images/library/sleep_stories.png',
-  'assets/images/content/cover_d.png',
-  // Stretch & Restore's own five, lifted from the redrawn frame.
-  'assets/images/content/yoga_vinyasa.png',
-  'assets/images/content/yoga_hatha.png',
-  'assets/images/content/yoga_restorative.png',
-  'assets/images/content/rest_sleep.png',
-  'assets/images/content/rest_ambient.png',
-  'assets/images/content/cover_a.png',
-  'assets/images/content/cover_b.png',
-  'assets/images/content/cover_c.png',
-  'assets/images/content/unshakeable.png',
-  'assets/images/content/hope_in_the_shadows.png',
-  'assets/images/content/breaking_bad_habit.png',
-  'assets/images/content/daily_focus.png',
-  'assets/images/content/breath_work.png',
-  'assets/images/content/mindfulness.png',
-];
 
 void main() {
   setUp(() {
@@ -67,7 +44,7 @@ void main() {
             brightness: brightness);
         await tester.pump(const Duration(milliseconds: 600));
         await tester.pumpAndSettle();
-        await precacheAll(tester, find.byType(LibraryScreen), _covers);
+        await precacheAll(tester, find.byType(LibraryScreen), libraryCovers);
 
         await expectLater(find.byType(LibraryScreen),
             matchesGoldenFile('goldens/library_${section.id}_$name.png'));

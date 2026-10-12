@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/user_role.dart';
+import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/kyc_repository.dart';
 import '../../../../data/services/session_service.dart';
 
 class SigninController extends BaseController {
-  SigninController(this._session, this._kyc);
+  SigninController(this._session, this._kyc, this._auth);
 
   final SessionService _session;
   final KycRepository _kyc;
+  final AuthRepository _auth;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -76,9 +78,29 @@ class SigninController extends BaseController {
   void forgotPassword() =>
       AppFeedback.info('Password recovery arrives with the backend.');
 
-  void continueWithGoogle() =>
-      AppFeedback.info('Google sign-in arrives with the backend.');
+  /// The two social buttons the frames draw.
+  ///
+  /// Each runs the provider's own flow; a verified identity token goes to
+  /// the Django API, which answers with our session. A null result means the
+  /// user dismissed the provider's sheet — that is a decision, not an error,
+  /// so nothing is said about it.
+  Future<void> continueWithGoogle() => _social(_auth.signInWithGoogle);
 
-  void continueWithApple() =>
-      AppFeedback.info('Apple sign-in arrives with the backend.');
+  Future<void> continueWithApple() => _social(_auth.signInWithApple);
+
+  Future<void> _social(Future<UserRole?> Function() signIn) async {
+    if (isLoading.value) return;
+    errorText.value = null;
+
+    final role = await guard(signIn);
+    if (role == null) return;
+
+    await _session.setRole(role);
+    // Taking an account supersedes a skipped onboarding — same reason as
+    // submit() above.
+    await PrefUtils().setOnboardingSkipped(false);
+
+    final complete = await _kyc.isComplete();
+    Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
+  }
 }

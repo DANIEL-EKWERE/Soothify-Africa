@@ -22,6 +22,8 @@ import 'helpers.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/filters_golden_test.dart
+
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -282,6 +284,7 @@ void main() {
       // test ends on a pending timer.
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pumpAndSettle();
+      await precacheAll(tester, find.byType(LibraryScreen), libraryCovers);
 
       await tester.tap(find.byType(FilterGlyph));
       await tester.pumpAndSettle();

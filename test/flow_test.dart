@@ -227,6 +227,7 @@ void main() {
     final signup = SignupController(
       Get.find<SessionService>(),
       Get.find<KycRepository>(),
+      StubAuthRepository(),
     );
     signup.fullname.value = 'Dera';
     signup.email.value = 'dera@example.com';

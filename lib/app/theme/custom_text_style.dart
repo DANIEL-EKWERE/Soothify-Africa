@@ -3373,7 +3373,7 @@ class CustomTextStyles {
   /// An article's title under its cover on the Articles shelf.
   static TextStyle get articleCardTitle => TextStyle(
     fontFamily: fontNunitoSans,
-    fontSize: 15.fSize,
+    fontSize: 14.fSize,
     fontWeight: FontWeight.w700,
     fontVariations: _bold,
     height: 21 / 15,

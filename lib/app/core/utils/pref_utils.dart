@@ -23,6 +23,10 @@ class PrefUtils {
   static const _kCommunityWelcomeSeen = 'communityWelcomeSeen';
   static const _kCommunityUsername = 'communityUsername';
   static const _kWellnessKycPrefix = 'wellnessKyc_';
+  static const _kDeviceToken = 'deviceToken';
+  static const _kReminderPrefix = 'reminder_';
+  static const _kAccessToken = 'accessToken';
+  static const _kRefreshToken = 'refreshToken';
 
   /// Safe to call from anywhere that needs preferences before main() has run,
   /// such as a test or a service's own init.
@@ -43,6 +47,13 @@ class PrefUtils {
   /// on the order they run in.
   @visibleForTesting
   static void resetForTesting() => _prefs = null;
+
+  /// Whether [init] has run.
+  ///
+  /// For the few reads that are a convenience rather than a requirement —
+  /// restoring a form to what was last saved — so they can skip instead of
+  /// tripping the assertion below in a test that never needed preferences.
+  static bool get isReady => _prefs != null;
 
   /// Reads and writes used to no-op silently when [init] had not run, which
   /// turned an ordering mistake into preferences that quietly stopped
@@ -149,6 +160,42 @@ class PrefUtils {
   Future<void> setNotificationPreference(String key, bool value) async =>
       _store.setBool(key, value);
 
+  /// The push token last registered with the backend. Stored so an unchanged
+  /// token is not re-sent on every launch.
+  String get deviceToken => _store.getString(_kDeviceToken) ?? '';
+  Future<void> setDeviceToken(String value) async =>
+      _store.setString(_kDeviceToken, value);
+
+  /// The SimpleJWT pair from `POST /api/v1/auth/login/`.
+  ///
+  /// Empty until the app's sign-in talks to the backend, which it does not
+  /// yet — everything authenticated therefore no-ops rather than failing.
+  /// The access token lives 30 minutes, so it is read per request and never
+  /// cached in a long-lived object.
+  String get accessToken => _store.getString(_kAccessToken) ?? '';
+  String get refreshToken => _store.getString(_kRefreshToken) ?? '';
+
+  Future<void> setTokens({
+    required String access,
+    required String refresh,
+  }) async {
+    await _store.setString(_kAccessToken, access);
+    await _store.setString(_kRefreshToken, refresh);
+  }
+
+  /// A habit's reminder, as `HabitReminder.encode` wrote it, or empty.
+  ///
+  /// Keyed per habit so setting one never disturbs another, and read at
+  /// launch to re-arm the alarms Android drops when the app is force-stopped.
+  String reminder(String habit) =>
+      _store.getString('$_kReminderPrefix$habit') ?? '';
+
+  Future<void> setReminder(String habit, String encoded) async =>
+      _store.setString('$_kReminderPrefix$habit', encoded);
+
+  Future<void> clearReminder(String habit) async =>
+      _store.remove('$_kReminderPrefix$habit');
+
   bool wellnessKycDone(String track) =>
       _store.getBool('$_kWellnessKycPrefix$track') ?? false;
   Future<void> setWellnessKycDone(String track) async =>
@@ -156,6 +203,14 @@ class PrefUtils {
 
   Future<void> clearSession() async {
     await _store.remove(_kUserRole);
+    // Credentials are the session. Leaving them behind would let the next
+    // person on the phone act as the last one.
+    await _store.remove(_kAccessToken);
+    await _store.remove(_kRefreshToken);
+    // Not the push token: it identifies the install, not the account, and
+    // survives signing out. Unregistering it is the API's job — see
+    // ApiDeviceTokenRepository.unregister.
+
     // The handle is part of the session: a different account must not inherit
     // the previous one's forum identity.
     await _store.remove(_kCommunityUsername);

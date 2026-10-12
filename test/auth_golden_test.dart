@@ -34,6 +34,7 @@ void main() {
       Get.put(SignupController(
         Get.find<SessionService>(),
         LocalKycRepository(),
+        StubAuthRepository(),
       ));
 
       await pumpScreen(tester, const SignupScreen(), brightness: brightness);
@@ -51,6 +52,7 @@ void main() {
       Get.put(SigninController(
         Get.find<SessionService>(),
         Get.find<KycRepository>(),
+        StubAuthRepository(),
       ));
 
       await pumpScreen(tester, const SigninScreen(), brightness: brightness);
@@ -68,6 +70,7 @@ void main() {
       final c = Get.put(SigninController(
         Get.find<SessionService>(),
         Get.find<KycRepository>(),
+        StubAuthRepository(),
       ));
 
       await pumpScreen(tester, const SigninScreen(), brightness: brightness);
@@ -93,10 +96,12 @@ void main() {
       Get.put(SignupController(
         Get.find<SessionService>(),
         LocalKycRepository(),
+        StubAuthRepository(),
       ));
       Get.put(SigninController(
         Get.find<SessionService>(),
         LocalKycRepository(),
+        StubAuthRepository(),
       ));
 
       await pumpScreen(tester, screen);
@@ -116,6 +121,7 @@ void main() {
     Get.put(SignupController(
       Get.find<SessionService>(),
       LocalKycRepository(),
+      StubAuthRepository(),
     ));
 
     await pumpScreen(tester, const SignupScreen());

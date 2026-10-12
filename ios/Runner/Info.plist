@@ -45,5 +45,23 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<!-- Google Sign-In hands control back to the app through this scheme.
+	     It is REVERSED_CLIENT_ID from GoogleService-Info.plist; without it
+	     the consent screen opens and never returns. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1019884263236-e57oavubo57ija01ho7umrghtm1gljjj</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

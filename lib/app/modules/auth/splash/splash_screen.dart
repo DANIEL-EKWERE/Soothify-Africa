@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/repositories/kyc_repository.dart';
+import '../../../data/services/push_service.dart';
 import '../../../data/services/session_service.dart';
 import 'start_route.dart';
 
@@ -19,15 +20,12 @@ class SplashScreen extends StatefulWidget {
   /// How long the wordmark holds before the breathing prompts begin.
   static const brandHold = Duration(seconds: 3);
 
-  /// How long each prompt stays up, measured from the moment it is swapped
-  /// in. [fade] eats the first 2.2s of that, so the word stands fully lit for
-  /// 1.6 — paced for an actual breath rather than a UI transition, because
-  /// this is the one moment the app asks you to slow down.
-  static const breathHold = Duration(milliseconds: 3800);
-
   /// How long the outgoing word takes to reach nothing at all, and the same
   /// again for the incoming one.
-  static const fadeOutMs = 600;
+  ///
+  /// 1.4s each way. 600 read as a UI transition and 1000 was still brisk
+  /// for the one screen whose whole job is to slow you down.
+  static const fadeOutMs = 1400;
 
   /// The empty beat between the two words — a second of nothing, so one has
   /// plainly gone before the next arrives.
@@ -36,6 +34,17 @@ class SplashScreen extends StatefulWidget {
   /// One swap, start to finish: out, the gap, then in.
   static const fadeMs = fadeOutMs + gapMs + fadeOutMs;
   static const fade = Duration(milliseconds: fadeMs);
+
+  /// How long a word stands fully lit, once it has finished arriving.
+  static const litMs = 1600;
+
+  /// How long each prompt stays up, measured from the moment it is swapped
+  /// in — the swap itself, then [litMs] of stillness.
+  ///
+  /// Derived rather than written down: this was a literal 3800 alongside a
+  /// comment claiming 1.6s of stillness, which stopped being true the moment
+  /// the fade changed. Now it cannot drift.
+  static const breathHold = Duration(milliseconds: fadeMs + litMs);
 
   /// The prompts, in order.
   static const prompts = ['Inhale Deeply', 'Exhale Slowly'];
@@ -72,6 +81,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
     Get.offAllNamed(route);
+
+    // A notification the user tapped to launch the app is held until there
+    // is something to push onto — which is now, after the splash has handed
+    // over. Pushing it before this point lands on a stack `offAllNamed` is
+    // about to throw away.
+    if (Get.isRegistered<PushService>()) Get.find<PushService>().openPending();
   }
 
   @override
@@ -164,12 +179,3 @@ class SplashView extends StatelessWidget {
     );
   }
 }
-// noted another issue, the kyc screens, the grid card never get selected for the "next" button to get activated.
-
-// secondly the mood icon when clicked, eas supposed to toggle the theming of the app, but it doesn't.
-
-// thirdly the the ai therapy assist, doesn't get drawn to the edge of the screen when dragged and left at the middle of the screen.
-
-// cd "/home/daniel/Desktop/flutter apps/SoothifyAfrica/soothifyafrica" && flutter test -r compact 2>&1 | tail -c 200
-
-// what's the meaning of that command?

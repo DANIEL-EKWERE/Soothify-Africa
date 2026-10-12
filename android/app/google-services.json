@@ -12,7 +12,28 @@
           "package_name": "com.soothify.africa.soothifyafrica"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1019884263236-04pcbudg7jgok75bvdie2u2kjttcdcnj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.soothify.africa.soothifyafrica",
+            "certificate_hash": "89bc653682531ddf641c3de8f7fa0655dd1b6cda"
+          }
+        },
+        {
+          "client_id": "1019884263236-63o9nkj38isho6uvgn30k74tsk71ilmh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.soothify.africa.soothifyafrica",
+            "certificate_hash": "e496c00d63cf4e49f3b4dd46506d9b3f86f4c20c"
+          }
+        },
+        {
+          "client_id": "1019884263236-bhpga07feimbufo2dmb1cej5uailr4jl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDqao3v80Hlru3wGvdEz6gJBB_L2qK_62s"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019884263236-bhpga07feimbufo2dmb1cej5uailr4jl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1019884263236-e57oavubo57ija01ho7umrghtm1gljjj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.soothify.africa.soothifyafrica"
+              }
+            }
+          ]
         }
       }
     }

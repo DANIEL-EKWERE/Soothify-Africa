@@ -1,5 +1,10 @@
 import 'package:get/get.dart';
 
+import '../network/api_client.dart';
+import 'pref_utils.dart';
+
+import '../../data/repositories/api_auth_repository.dart';
+import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/content_repository.dart';
 import '../../data/repositories/journal_repository.dart';
 import '../../data/repositories/local_journal_repository.dart';
@@ -27,6 +32,22 @@ import '../../data/repositories/subscription_repository.dart';
 class InitialBindings extends Bindings {
   @override
   void dependencies() {
+    // main() registers this before runApp, because PushService needs it
+    // sooner than this binding runs. Guarded so a test — which reaches this
+    // binding without going through main() — still gets one.
+    if (!Get.isRegistered<ApiClient>()) {
+      Get.put(
+        ApiClient(accessToken: () => PrefUtils().accessToken),
+        permanent: true,
+      );
+    }
+    // Google and Apple sign-in, behind the same interface the auth
+    // controllers take, so a test can hand them a stub instead.
+    Get.lazyPut<AuthRepository>(
+      () => ApiAuthRepository(Get.find<ApiClient>()),
+      fenix: true,
+    );
+
     Get.lazyPut<MoodRepository>(() => LocalMoodRepository(), fenix: true);
     // Backs the Home screen's Recommended list and Popular Articles. Still
     // the mock while there is no backend — swapping in the Django-backed

@@ -1,4 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Android 13+ asks before any notification can be shown at all. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- A habit reminder set for 9:00 has to arrive at 9:00. The user grants
+         this one from Settings; the app asks, and falls back to an inexact
+         reminder if they decline. USE_EXACT_ALARM is deliberately NOT
+         declared: Play restricts it to alarm clocks and calendars, and a
+         wellness reminder is neither. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!-- Scheduled reminders live in AlarmManager, which a reboot clears;
+         the boot receiver below re-registers them. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="@string/appName"
         android:name="${applicationName}"
@@ -30,6 +43,33 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- The white-on-transparent bell. Without this, Android silhouettes
+             the launcher icon and shows a solid white square. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <!-- A push that arrives with no channel of its own lands on the same
+             high-importance channel the app creates at startup, rather than
+             on a silent default one. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="high_importance_channel" />
+
+        <!-- flutter_local_notifications: fires a scheduled reminder, and
+             re-registers the pending ones after a reboot or an update. -->
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

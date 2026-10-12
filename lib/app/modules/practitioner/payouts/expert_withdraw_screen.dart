@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/app_export.dart';
-import '../../../data/models/payout_method.dart';
+import '../../../data/models/bank_destination.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../widgets/expert_header.dart';
 import '../widgets/expert_money.dart';
@@ -58,6 +58,7 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
                             controller.markEdited();
                             // Re-evaluates canProceed and the balance note.
                             controller.method.refresh();
+                            controller.chosenDestination.refresh();
                           },
                           decoration: InputDecoration(
                             isDense: true,
@@ -78,14 +79,19 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
                   Center(
                     child: Container(
                       height: 39.v,
-                      padding: EdgeInsets.symmetric(horizontal: 10.h),
-                      alignment: Alignment.center,
+                      padding: EdgeInsets.symmetric(horizontal: 14.h),
                       decoration: BoxDecoration(
                         color: appTheme.policyPanel,
                         borderRadius: BorderRadius.circular(24.h),
                       ),
-                      child: Text('How much do you want to withdraw',
-                          style: CustomTextStyles.withdrawPrompt),
+                      // `widthFactor: 1`, not `alignment: center` on the
+                      // Container: an aligned Container expands to its
+                      // constraints, and the frame's pill hugs its words.
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text('How much do you want to withdraw',
+                            style: CustomTextStyles.withdrawPrompt),
+                      ),
                     ),
                   ),
                   SizedBox(height: 16.v),
@@ -129,77 +135,128 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
   }
 }
 
-/// Three 109x86 tiles in a row; the chosen one takes the blue outline.
+/// One 109x86 tile per account on file, the chosen one outlined in blue.
+///
+/// The frame draws three, which is three saved accounts rather than three
+/// payment methods: the row grows and shrinks with what the expert has
+/// added, and scrolls sideways past the three the frame had room for.
 class _DestinationTiles extends StatelessWidget {
   const _DestinationTiles();
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PayoutController>();
-    return Obx(
-      () => Row(
-        children: [
-          for (final method in PayoutMethod.values) ...[
-            Expanded(
-              child: GestureDetector(
-                onTap: () => controller.choose(method),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: 86.v,
-                  padding: EdgeInsets.all(9.h),
-                  decoration: BoxDecoration(
-                    color: appTheme.surface,
-                    borderRadius: BorderRadius.circular(8.h),
-                    border: Border.all(
-                      color: controller.method.value == method
-                          ? appTheme.soothifyBlue
-                          : appTheme.textPrimary,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 24.h,
-                        height: 24.h,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color:
-                              appTheme.textPrimary.withValues(alpha: 0.08),
-                          shape: BoxShape.circle,
-                        ),
-                        // The frame puts an institution mark here. The bank
-                        // logos were never exported, so this stands in —
-                        // better than the empty disc it was drawing.
-                        child: Icon(Icons.account_balance,
-                            size: 13.h, color: appTheme.textPrimary),
-                      ),
-                      const Spacer(),
-                      // Bank Transfer's tile is headed by the account and
-                      // says the method beneath; the other two have no
-                      // account, and their labels already take both lines.
-                      Text(
-                        method.account ?? method.label,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: CustomTextStyles.destinationTitle,
-                      ),
-                      if (method.account != null) ...[
-                        SizedBox(height: 4.v),
-                        Text(method.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: CustomTextStyles.destinationSubtitle),
-                      ],
-                    ],
-                  ),
-                ),
+    return Obx(() {
+      final destinations = controller.destinations;
+      if (destinations.isEmpty) {
+        // Unreachable from Withdraw — that button sends an expert with no
+        // account to the chooser instead — but the screen is a route, and a
+        // route can be opened directly.
+        return _AddFirstDestination(onTap: controller.addDestination);
+      }
+      return SizedBox(
+        height: 86.v,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: destinations.length,
+          separatorBuilder: (_, _) => SizedBox(width: 8.h),
+          itemBuilder: (context, i) => _DestinationTile(
+            destination: destinations[i],
+            selected: controller.chosenDestination.value == i,
+            onTap: () => controller.chooseDestination(i),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _DestinationTile extends StatelessWidget {
+  const _DestinationTile({
+    required this.destination,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final BankDestination destination;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 109.h,
+        padding: EdgeInsets.all(9.h),
+        decoration: BoxDecoration(
+          color: appTheme.surface,
+          borderRadius: BorderRadius.circular(8.h),
+          // Unselected tiles take the card rim, not a near-black outline.
+          border: Border.all(
+            color: selected ? appTheme.soothifyBlue : appTheme.cardRim,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 24.h,
+              height: 24.h,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: appTheme.textPrimary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
               ),
+              // The frame puts an institution mark here. The bank logos were
+              // never exported, so this stands in.
+              child: Icon(Icons.account_balance,
+                  size: 13.h, color: appTheme.textPrimary),
             ),
-            if (method != PayoutMethod.values.last) SizedBox(width: 8.h),
+            const Spacer(),
+            Text(
+              destination.bank,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CustomTextStyles.destinationTitle,
+            ),
+            SizedBox(height: 4.v),
+            Text(BankDestination.kind,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: CustomTextStyles.destinationSubtitle),
           ],
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Stands in for the row when there is nothing to withdraw into.
+class _AddFirstDestination extends StatelessWidget {
+  const _AddFirstDestination({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8.h),
+      child: Container(
+        height: 86.v,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.h),
+          border: Border.all(color: appTheme.soothifyBlue),
+        ),
+        child: Text('+  Add a payout account',
+            style: CustomTextStyles.subscribeLabel
+                .copyWith(color: appTheme.soothifyBlue)),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../data/models/bank_destination.dart';
 import '../../../data/models/payout_method.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../widgets/expert_header.dart';
@@ -34,7 +35,8 @@ class ExpertPayoutMethodScreen extends GetView<PayoutController> {
 }
 
 /// What the screen shows once a destination is on file — Figma's populated
-/// "Payout method".
+/// "Payout method". This is also where the Earnings card's edit pencil, the
+/// one beside "Bank ****…", lands.
 class _SavedDestination extends GetView<PayoutController> {
   const _SavedDestination();
 
@@ -48,7 +50,11 @@ class _SavedDestination extends GetView<PayoutController> {
           child: ListView(
             padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
             children: [
-              Text('Payout Method', style: CustomTextStyles.expertSection),
+              // The frame sets this heading at 20, a step above the section
+              // headings elsewhere — it is the screen's own title.
+              Text('Payout Method',
+                  style: CustomTextStyles.expertSection
+                      .copyWith(fontSize: 20.fSize)),
               SizedBox(height: 8.v),
               Text(
                 'This is where your earnings will be sent. You can edit your '
@@ -56,83 +62,24 @@ class _SavedDestination extends GetView<PayoutController> {
                 style: CustomTextStyles.expertBlurb,
               ),
               SizedBox(height: 32.v),
-              Container(
-                padding: EdgeInsets.all(16.h),
-                decoration: BoxDecoration(
-                  color: appTheme.surface,
-                  borderRadius: BorderRadius.circular(8.h),
-                  border: Border.all(color: appTheme.cardRim),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // One card per account: the frame draws a single Access Bank
+              // row, but the withdrawal screen's three tiles are three of
+              // these, and they are edited from here.
+              Obx(
+                () => Column(
                   children: [
-                    Container(
-                      width: 36.h,
-                      height: 36.h,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: appTheme.textPrimary.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.account_balance,
-                          size: 18.h, color: appTheme.textPrimary),
-                    ),
-                    SizedBox(width: 16.h),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Bank Transfer (NGN)',
-                              style: CustomTextStyles.expertCardMeta),
-                          SizedBox(height: 6.v),
-                          Text(controller.bank.value,
-                              style: CustomTextStyles.expertOutcomeTitle),
-                          SizedBox(height: 6.v),
-                          Text(controller.savedAccountNumber,
-                              style: CustomTextStyles.expertRowLabel),
-                          SizedBox(height: 6.v),
-                          Text(controller.savedAccountName,
-                              style: CustomTextStyles.expertRowLabel),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 12.h, vertical: 5.v),
-                          decoration: BoxDecoration(
-                            color: appTheme.success.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(8.h),
-                          ),
-                          child: Text('Active',
-                              style: CustomTextStyles.expertCardMeta
-                                  .copyWith(color: appTheme.success)),
+                    for (var i = 0; i < controller.destinations.length; i++)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 16.v),
+                        child: _DestinationCard(
+                          destination: controller.destinations[i],
+                          onEdit: () => controller.editDestination(i),
                         ),
-                        SizedBox(height: 16.v),
-                        InkWell(
-                          onTap: () =>
-                              Get.toNamed(AppRoutes.expertBankDetails),
-                          customBorder: const CircleBorder(),
-                          child: Container(
-                            width: 27.h,
-                            height: 27.h,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: appTheme.statusIdleFill,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.edit_outlined,
-                                size: 15.h, color: appTheme.textPrimary),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
                   ],
                 ),
               ),
-              SizedBox(height: 24.v),
+              SizedBox(height: 8.v),
               const Assurance(),
             ],
           ),
@@ -142,7 +89,7 @@ class _SavedDestination extends GetView<PayoutController> {
           child: SizedBox(
             width: double.infinity,
             child: InkWell(
-              onTap: () => Get.toNamed(AppRoutes.expertBankDetails),
+              onTap: controller.addDestination,
               borderRadius: BorderRadius.circular(8.h),
               child: Container(
                 height: 52.v,
@@ -166,6 +113,94 @@ class _SavedDestination extends GetView<PayoutController> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// One account on file: the bank, the number, the name on it, an Active chip
+/// and the pencil that reopens the form on this account.
+class _DestinationCard extends StatelessWidget {
+  const _DestinationCard({required this.destination, required this.onEdit});
+
+  final BankDestination destination;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16.h),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 36.h,
+            height: 36.h,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: appTheme.textPrimary.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.account_balance,
+                size: 18.h, color: appTheme.textPrimary),
+          ),
+          SizedBox(width: 16.h),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Bank Transfer (NGN)',
+                    style: CustomTextStyles.expertCardMeta),
+                SizedBox(height: 6.v),
+                Text(destination.bank,
+                    style: CustomTextStyles.expertOutcomeTitle),
+                SizedBox(height: 6.v),
+                Text(destination.accountNumber,
+                    style: CustomTextStyles.expertRowLabel),
+                SizedBox(height: 6.v),
+                Text(destination.accountName,
+                    style: CustomTextStyles.expertRowLabel),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding:
+                    EdgeInsets.symmetric(horizontal: 12.h, vertical: 5.v),
+                decoration: BoxDecoration(
+                  color: appTheme.success.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8.h),
+                ),
+                child: Text('Active',
+                    style: CustomTextStyles.expertCardMeta
+                        .copyWith(color: appTheme.success)),
+              ),
+              SizedBox(height: 16.v),
+              InkWell(
+                onTap: onEdit,
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 27.h,
+                  height: 27.h,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: appTheme.statusIdleFill,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.edit_outlined,
+                      size: 15.h, color: appTheme.textPrimary),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -195,7 +230,7 @@ class _Chooser extends GetView<PayoutController> {
                   Obx(
                     () => Column(
                       children: [
-                        for (final method in PayoutMethod.values) ...[
+                        for (final method in PayoutMethod.offered) ...[
                           _MethodCard(
                             method: method,
                             selected: controller.method.value == method,
@@ -242,7 +277,7 @@ class _MethodCard extends StatelessWidget {
           color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
           border: Border.all(
-            color: selected ? appTheme.soothifyBlue : appTheme.textPrimary,
+            color: selected ? appTheme.soothifyBlue : appTheme.cardRim,
           ),
         ),
         child: Row(

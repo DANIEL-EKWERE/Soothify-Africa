@@ -41,6 +41,10 @@ class ExpertSession {
     return '$label, ${_clock(startsAt)} - ${_clock(endsAt)}';
   }
 
+  /// Just the times — "10:00 AM - 10:30 AM". The session-notes frame prints
+  /// the service and these on one line, with no day in front of them.
+  String get hours => '${_clock(startsAt)} - ${_clock(endsAt)}';
+
   static String _clock(DateTime t) {
     final hour = t.hour % 12 == 0 ? 12 : t.hour % 12;
     final minute = t.minute.toString().padLeft(2, '0');

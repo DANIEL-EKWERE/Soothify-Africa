@@ -1,5 +1,6 @@
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
+import '../../../../data/models/bank_destination.dart';
 import '../../../../data/models/expert_earnings.dart';
 import '../../../../data/models/expert_session.dart';
 import '../../../../data/models/expert_tab.dart';
@@ -23,6 +24,14 @@ class ExpertDashboardController extends BaseController {
   final Rxn<ExpertEarnings> earnings = Rxn<ExpertEarnings>();
   final RxList<AvailabilitySlot> slots = <AvailabilitySlot>[].obs;
 
+  /// The accounts payouts can land in.
+  ///
+  /// Kept here rather than on [PayoutController] because the payout screens
+  /// are bound per route: the controller behind them is disposed when the
+  /// last of them is popped, and an account added on the way through has to
+  /// outlive that.
+  final RxList<BankDestination> destinations = <BankDestination>[].obs;
+
   DateTime get now => _now();
 
   /// The dashboard previews three; Schedule lists them all.
@@ -40,12 +49,26 @@ class ExpertDashboardController extends BaseController {
           _repository.upcomingSessions(),
           _repository.earnings(),
           _repository.availability(),
+          _repository.payoutDestinations(),
         ]);
         name.value = results[0] as String;
         sessions.assignAll(results[1] as List<ExpertSession>);
         earnings.value = results[2] as ExpertEarnings;
         slots.assignAll(results[3] as List<AvailabilitySlot>);
+        destinations.assignAll(results[4] as List<BankDestination>);
       });
+
+  /// Adds a destination, or overwrites the one being edited.
+  ///
+  /// Local only: nothing persists payout accounts yet, and writing them to
+  /// preferences would put an account number on the device in clear.
+  void saveDestination(BankDestination destination, {int? at}) {
+    if (at != null && at >= 0 && at < destinations.length) {
+      destinations[at] = destination;
+    } else {
+      destinations.add(destination);
+    }
+  }
 
   void seeAllSessions() =>
       Get.find<ExpertShellController>().show(ExpertTab.schedule);

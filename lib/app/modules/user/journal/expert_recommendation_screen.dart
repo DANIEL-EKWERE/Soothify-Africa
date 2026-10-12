@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/expert_recommendation.dart';
+import '../../../widgets/expert_content_card.dart';
 import 'controller/expert_recommendation_controller.dart';
 
 /// One recommendation in full — Figma "Journal" (`259:60842`).
@@ -43,7 +44,7 @@ class ExpertRecommendationScreen
             SizedBox(height: 36.5.v),
             Text('Recommended Content', style: CustomTextStyles.shelfHeading),
             SizedBox(height: 20.5.v),
-            _ContentCard(
+            ExpertContentCard(
               content: controller.recommendation.content,
               onOpen: controller.open,
             ),
@@ -141,91 +142,6 @@ class _ExpertCard extends StatelessWidget {
                 Text(recommendation.note,
                     style: CustomTextStyles.expertNoteBody),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ContentCard extends StatelessWidget {
-  const _ContentCard({required this.content, required this.onOpen});
-
-  final ExpertContent content;
-  final VoidCallback onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(17.h),
-      decoration: AppDecoration.card,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          GestureDetector(
-            onTap: onOpen,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8.h),
-                  child: CustomImageView(
-                    imagePath: content.coverAsset,
-                    height: 148.v,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Container(
-                  width: 46.h,
-                  height: 46.h,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: appTheme.onPrimary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    size: 26.h,
-                    color: appTheme.soothifyBlue,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 15.v),
-          Row(
-            children: [
-              Icon(
-                Icons.play_circle_outline,
-                size: 16.h,
-                color: appTheme.soothifyBlue,
-              ),
-              SizedBox(width: 6.h),
-              Text(content.kind.label,
-                  style: CustomTextStyles.expertContentKind),
-            ],
-          ),
-          SizedBox(height: 11.v),
-          Text(content.title, style: CustomTextStyles.expertContentTitle),
-          SizedBox(height: 13.v),
-          Text(content.meta, style: CustomTextStyles.expertMeta),
-          SizedBox(height: 19.5.v),
-          GestureDetector(
-            onTap: onOpen,
-            child: Container(
-              height: 39.v,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: appTheme.soothifyBlue,
-                borderRadius: BorderRadius.circular(8.h),
-              ),
-              child: Text(
-                content.kind.action,
-                style: CustomTextStyles.expertContentTitle
-                    .copyWith(color: appTheme.onPrimary),
-              ),
             ),
           ),
         ],

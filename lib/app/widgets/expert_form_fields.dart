@@ -66,6 +66,7 @@ class ExpertFormField extends StatelessWidget {
     this.maxLines = 1,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.none,
+    this.hint,
   });
 
   final String label;
@@ -74,6 +75,10 @@ class ExpertFormField extends StatelessWidget {
   final int? maxLines;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
+
+  /// The grey prompt inside an empty box. The session-notes frame writes one
+  /// into both of its boxes; the application form leaves them bare.
+  final String? hint;
 
   @override
   Widget build(BuildContext context) {
@@ -99,13 +104,17 @@ class ExpertFormField extends StatelessWidget {
             textAlignVertical: TextAlignVertical.top,
             style: CustomTextStyles.optionLabel,
             cursorColor: appTheme.soothifyBlue,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
               filled: false,
               contentPadding: EdgeInsets.zero,
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
+              hintText: hint,
+              hintMaxLines: 3,
+              hintStyle: CustomTextStyles.optionLabel
+                  .copyWith(color: appTheme.hintText),
             ),
           ),
         ),

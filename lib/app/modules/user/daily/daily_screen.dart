@@ -195,7 +195,7 @@ class _Button extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.h),
           border: Border.all(color: appTheme.actionFill),
         ),
-        child: Text(label, style: CustomTextStyles.dailyWhenLabel),
+        child: Text(label, style: CustomTextStyles.dailyWhenLabel.copyWith(fontSize: 16.fSize, fontWeight: FontWeight.w800)),
       ),
     );
   }

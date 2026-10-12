@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/custom_elevated_button.dart';
+import '../../../widgets/expert_content_card.dart';
 import '../../../widgets/expert_form_fields.dart';
 import '../widgets/expert_session_card.dart';
 import '../dashboard/controller/expert_dashboard_controller.dart';
@@ -15,10 +16,9 @@ import 'controller/session_notes_controller.dart';
 /// 422 with its box at 451, "Recommendation" at 646 with its box at 675, and
 /// "Save" at 1279.
 ///
-/// The frame also carries a "Recommended Content" block at 1033 — the same
-/// card the client sees on their Journal tab. It is the *result* of the
-/// recommendation the expert writes, so it is not drawn here: nothing has
-/// been recommended yet at the point this screen is filled in.
+/// The frame then draws the recommended content at 854 — the same card the
+/// client sees on their Journal tab — a repeat of the opening line beneath
+/// it, and Save at 1267.
 class SessionNotesScreen extends GetView<SessionNotesController> {
   const SessionNotesScreen({super.key});
 
@@ -63,13 +63,14 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                   ),
                   SizedBox(height: 26.v),
                   if (session != null)
+                    // No chip on this frame: the session is over, so there
+                    // is no call to join. The third line carries the service
+                    // and the hours rather than the day.
                     ExpertSessionCard(
                       session: session,
                       now: Get.find<ExpertDashboardController>().now,
-                      actionLabel: 'Join call',
-                      onAction: () => AppFeedback.info(
-                        'Joining the call is not built yet.',
-                      ),
+                      timeLabel: '${session.service} * ${session.hours}',
+                      showTimeIcon: false,
                     ),
                   SizedBox(height: 37.v),
                   Text('How did the session go',
@@ -82,6 +83,10 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                     controller: controller.summary,
                     height: 175,
                     maxLines: null,
+                    // The frame writes the same prompt into both boxes.
+                    hint: 'How did the session go? Add notes about the '
+                        'client’s progress, key topics discussed, '
+                        'observations or next steps',
                   ),
                   SizedBox(height: 33.v),
                   ExpertFormField(
@@ -89,6 +94,29 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                     controller: controller.recommendation,
                     height: 175,
                     maxLines: null,
+                    hint: 'How did the session go? Add notes about the '
+                        'client’s progress, key topics discussed, '
+                        'observations or next steps',
+                  ),
+                  SizedBox(height: 21.v),
+                  Obx(() {
+                    final content = controller.content.value;
+                    if (content == null) return const SizedBox.shrink();
+                    return ExpertContentCard(
+                      content: content,
+                      onOpen: controller.openContent,
+                      // The notes frame leaves the cover clean and crops it
+                      // shallower than the journal's.
+                      showPlayOverlay: false,
+                      coverHeight: 116,
+                      actionLabel: 'Watch Video',
+                    );
+                  }),
+                  SizedBox(height: 27.v),
+                  Text(
+                    'Keep track of your sessions and client progress, key '
+                    'insight and next steps.',
+                    style: CustomTextStyles.expertCardMeta,
                   ),
                   SizedBox(height: 40.v),
                   CustomElevatedButton(
@@ -128,11 +156,16 @@ class _OutcomeChips extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 10.h),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
+                  // The frame fills the chosen chip with the same amber its
+                  // auth CTA uses, not with the app's action blue, and the
+                  // chip it fills carries no rim.
                   color: controller.outcome.value == outcome
-                      ? appTheme.actionFill
+                      ? appTheme.authAccent
                       : appTheme.surface,
                   borderRadius: BorderRadius.circular(8.h),
-                  border: Border.all(color: appTheme.cardBorder),
+                  border: controller.outcome.value == outcome
+                      ? null
+                      : Border.all(color: appTheme.cardRim),
                 ),
                 child: Text(
                   outcome.label,

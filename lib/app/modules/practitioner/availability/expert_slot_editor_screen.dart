@@ -75,7 +75,9 @@ class _TimeWheels extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 30.h,
+            // The frame sets the two columns' centres 112 apart; at 30 they
+            // sat 88 and the pair read as one number with a colon in it.
+            width: 54.h,
             child: Text(':',
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.slotWheelFocused),
@@ -355,7 +357,9 @@ class _DayCircle extends StatelessWidget {
           shape: BoxShape.circle,
           // No ring once it is filled: the fill is the state, and a hairline
           // around the blue read as an outline nobody asked for.
-          border: selected ? null : Border.all(color: appTheme.cardRim),
+          border: selected
+              ? null
+              : Border.all(color: appTheme.dayRingIdle),
         ),
         child: Text(
           letter,

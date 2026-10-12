@@ -82,6 +82,7 @@ class PrimaryColors {
     required this.planEmphasisFill,
     required this.planOutlineMuted,
     required this.cardRim,
+    required this.dayRingIdle,
     required this.sessionCardRule,
     required this.callControlRim,
     required this.callEndFill,
@@ -288,6 +289,12 @@ class PrimaryColors {
   /// In dark mode it is white at 10%, since 4% of white over a dark surface
   /// is no line at all.
   final Color cardRim;
+
+  /// The ring on an unchosen day circle — the weekday pickers on Update
+  /// Availability and the habit reminder. Mid grey, not the 4% a card takes:
+  /// the frame draws seven visible rings, and at a card's weight they
+  /// disappeared.
+  final Color dayRingIdle;
 
   /// The hairline between "Expert" and "Session Time" on the joining screen's
   /// detail card — a pale blue against that card's own paler blue.
@@ -612,6 +619,7 @@ class PrimaryColors {
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFFCBCBCB),
     cardRim: Color(0x0A000000),
+    dayRingIdle: Color(0xFF999999),
     sessionCardRule: Color(0xFFC9D8EE),
     callControlRim: Color(0xFFBFC6CC),
     callEndFill: Color(0xFFF4443C),
@@ -732,6 +740,7 @@ class PrimaryColors {
     planEmphasisFill: Color(0xFF0A399A),
     planOutlineMuted: Color(0xFF3F4347),
     cardRim: Color(0x1AFFFFFF),
+    dayRingIdle: Color(0xFF6E6B6B),
     sessionCardRule: Color(0x332F6FED),
     callControlRim: Color(0xFF4A5157),
     callEndFill: Color(0xFFF4443C),

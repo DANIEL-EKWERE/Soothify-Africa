@@ -34,25 +34,11 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
             return ListView(
               padding: EdgeInsets.fromLTRB(24.h, 33.v, 24.h, 32.v),
               children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: Get.back,
-                      child: CustomImageView(
-                        imagePath: ImageConstant.icChevronLeft,
-                        height: 24.h,
-                        width: 24.h,
-                        color: appTheme.textPrimary,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text('Earnings',
-                          textAlign: TextAlign.center,
-                          style: CustomTextStyles.appBarTitle),
-                    ),
-                    SizedBox(width: 24.h),
-                  ],
-                ),
+                // No back chevron: Earnings is one of the bar's four tabs,
+                // and there is nothing behind it to go back to.
+                Text('Earnings',
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.appBarTitle),
                 SizedBox(height: 32.v),
                 _BalanceCard(earnings: earnings),
                 SizedBox(height: 10.v),
@@ -104,20 +90,55 @@ class _BalanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('Available Earnings',
-              style: CustomTextStyles.expertBalanceCaption
-                  .copyWith(color: appTheme.onPrimary)),
-          SizedBox(height: 4.v),
-          Text(money(earnings?.available ?? 0),
-              style: CustomTextStyles.expertBalanceAmount
-                  .copyWith(color: appTheme.onPrimary)),
+          // The wallet and the figure sit together at the card's left edge —
+          // the frame ranges both left and only the note beneath is centred.
+          Row(
+            children: [
+              Container(
+                width: 34.h,
+                height: 34.h,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: appTheme.onPrimary.withValues(alpha: 0.16),
+                  shape: BoxShape.circle,
+                ),
+                child: CustomImageView(
+                  imagePath: ImageConstant.icWallet,
+                  height: 19.h,
+                  width: 19.h,
+                  color: appTheme.onPrimary,
+                ),
+              ),
+              SizedBox(width: 17.h),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Available Earnings',
+                        style: CustomTextStyles.expertBalanceCaption
+                            .copyWith(color: appTheme.onPrimary)),
+                    SizedBox(height: 4.v),
+                    Text(money(earnings?.available ?? 0),
+                        style: CustomTextStyles.expertBalanceAmount
+                            .copyWith(color: appTheme.onPrimary)),
+                  ],
+                ),
+              ),
+            ],
+          ),
           SizedBox(height: 20.v),
           // White on the gradient, not the app's blue fill: on this card the
           // action has to read against the brand, not disappear into it.
           SizedBox(
             width: double.infinity,
             child: InkWell(
-              onTap: () => Get.toNamed(AppRoutes.expertWithdraw),
+              // With no account on file the money has nowhere to land, so
+              // the first withdrawal goes through the payout-method chooser.
+              onTap: () => Get.toNamed(
+                Get.find<ExpertDashboardController>().destinations.isEmpty
+                    ? AppRoutes.expertPayoutMethod
+                    : AppRoutes.expertWithdraw,
+              ),
               borderRadius: BorderRadius.circular(8.h),
               child: Container(
                 height: 52.v,
@@ -179,12 +200,19 @@ class _PayoutDetails extends StatelessWidget {
                         style: CustomTextStyles.expertRowLabel),
                     SizedBox(width: 20.h),
                     Flexible(
-                      child: Text(
-                        earnings?.payoutMethod ?? '—',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: CustomTextStyles.expertRowLabel,
-                      ),
+                      // The account on file, not the frame's placeholder:
+                      // its "Bank ****1234" and its saved card's
+                      // "0234 5678 890" never agreed with each other.
+                      child: Obx(() {
+                        final saved =
+                            Get.find<ExpertDashboardController>().destinations;
+                        return Text(
+                          saved.isEmpty ? 'Not set' : saved.first.masked,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: CustomTextStyles.expertRowLabel,
+                        );
+                      }),
                     ),
                   ],
                 ),

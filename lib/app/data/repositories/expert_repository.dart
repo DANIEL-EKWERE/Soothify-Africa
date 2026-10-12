@@ -1,3 +1,4 @@
+import '../models/bank_destination.dart';
 import '../models/expert_earnings.dart';
 import '../models/expert_session.dart';
 
@@ -10,6 +11,11 @@ abstract class ExpertRepository {
   Future<List<ExpertSession>> upcomingSessions();
 
   Future<ExpertEarnings> earnings();
+
+  /// The accounts payouts can land in. Empty means the expert has never
+  /// added one, which is what sends Withdraw to the payout-method chooser
+  /// instead of to the amount screen.
+  Future<List<BankDestination>> payoutDestinations();
 
   Future<List<AvailabilitySlot>> availability();
 

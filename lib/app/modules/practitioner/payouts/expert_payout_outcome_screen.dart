@@ -73,12 +73,19 @@ class ExpertPayoutOutcomeScreen extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
               child: CustomElevatedButton(
                 text: 'Continue',
-                // Back to Earnings, not back one step: the step behind is the
-                // form that was just submitted.
-                onPressed: () => Get.until(
-                  (route) => route.settings.name == AppRoutes.shell ||
-                      route.settings.name == AppRoutes.practitionerDashboard,
-                ),
+                // Never back one step: the step behind is the form that was
+                // just submitted. A saved account lands on Payout method, so
+                // the expert sees what is now on file; a withdrawal goes
+                // straight back to Earnings.
+                onPressed: () {
+                  Get.until(
+                    (route) => route.settings.name == AppRoutes.shell ||
+                        route.settings.name == AppRoutes.practitionerDashboard,
+                  );
+                  if (outcome == PayoutOutcome.methodUpdated) {
+                    Get.toNamed(AppRoutes.expertPayoutMethod);
+                  }
+                },
               ),
             ),
           ],

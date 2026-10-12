@@ -109,6 +109,11 @@ class ImageConstant {
   /// `ion:wallet-outline` — the expert bar's Earnings tab and the earnings
   /// card's badge. Supplied by the designer; it was not exportable.
   static const String icWallet = '$_icons/ic_wallet.svg';
+
+  /// The scalloped verification badge beside a verified expert's name.
+  /// Supplied by the designer, and carries its own brand blue — it is not
+  /// tinted at the call site.
+  static const String icVerifiedBadge = '$_icons/ic_verified_badge.svg';
   static const String icVideo = '$_icons/ic_video.svg';
   static const String icHeadphone = '$_icons/ic_headphone.svg';
   static const String icArrowRightSm = '$_icons/ic_arrow_right_sm.svg';

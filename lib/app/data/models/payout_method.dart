@@ -25,6 +25,14 @@ enum PayoutMethod {
 
   const PayoutMethod(this.label, this.blurb, {this.account});
 
+  /// What the chooser actually puts in front of an expert.
+  ///
+  /// The screens this flow goes through draw Bank Transfer alone — it is the
+  /// only one with a form and a destination behind it. The other two keep
+  /// their copy here for the earlier frame and for when their own screens
+  /// arrive, rather than offering a choice that dead-ends in "not built yet".
+  static const List<PayoutMethod> offered = [PayoutMethod.bankTransfer];
+
   final String label;
 
   final String blurb;

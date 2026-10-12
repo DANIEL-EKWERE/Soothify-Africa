@@ -176,7 +176,14 @@ class _Field extends StatelessWidget {
           style: CustomTextStyles.expertRowLabel,
           decoration: const InputDecoration(
             border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            // The app's input theme fills its fields; this one is already
+            // inside a white box, and the fill was drawing a second box
+            // inside the first.
+            filled: false,
             isDense: true,
+            contentPadding: EdgeInsets.zero,
           ),
         ),
       ),

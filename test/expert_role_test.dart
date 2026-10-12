@@ -130,7 +130,9 @@ void main() {
     expect(find.text('Available Earnings'), findsOneWidget);
     expect(find.text('Next automatic payout'), findsOneWidget);
     expect(find.text('Payout method'), findsOneWidget);
-    expect(find.text('Bank ****1234'), findsOneWidget);
+    // The account on file, not the frame's placeholder: its saved card
+    // reads "0234 5678 890", whose last four digits are 8890.
+    expect(find.text('Bank ****8890'), findsOneWidget);
   });
 
   testWidgets('the dashboard screen mounts on its own', (tester) async {

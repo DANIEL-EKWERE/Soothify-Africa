@@ -53,7 +53,7 @@ class JournalComposeScreen extends GetView<JournalComposeController> {
                 ),
               ),
             ),
-            const _MessageField(),
+            // const _MessageField(),
           ],
         ),
       ),

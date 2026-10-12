@@ -108,11 +108,13 @@ class _Greeting extends StatelessWidget {
                         style: CustomTextStyles.expertName2,
                       ),
                     ),
+                    SizedBox(width: 4.h),
+                    // The designer's own verification badge, drawn in brand
+                    // blue already — the generic tick circle stood in here.
                     CustomImageView(
-                      imagePath: ImageConstant.icTickCircle,
-                      height: 24.h,
-                      width: 24.h,
-                      color: appTheme.soothifyBlue,
+                      imagePath: ImageConstant.icVerifiedBadge,
+                      height: 16.h,
+                      width: 16.h,
                     ),
                   ],
                 ),

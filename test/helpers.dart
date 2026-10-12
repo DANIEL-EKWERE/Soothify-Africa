@@ -142,6 +142,7 @@ Future<void> pumpScreen(
   Widget child, {
   Brightness brightness = Brightness.light,
   bool motion = false,
+  List<GetPage<dynamic>>? pages,
 }) async {
   if (!motion) disableMotion(tester);
   await tester.pumpWidget(
@@ -156,6 +157,9 @@ Future<void> pumpScreen(
           PrimaryColors.syncFrom(context);
           return widget!;
         },
+        // Only for screens whose buttons leave: without the route named on
+        // the way out, GetX throws rather than navigating.
+        getPages: pages,
         home: child,
       ),
     ),

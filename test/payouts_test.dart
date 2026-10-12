@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
+import 'package:soothifyafrica/app/data/models/bank_destination.dart';
 import 'package:soothifyafrica/app/data/models/payout_method.dart';
 import 'package:soothifyafrica/app/data/repositories/expert_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_expert_repository.dart';
 import 'package:soothifyafrica/app/modules/practitioner/dashboard/controller/expert_dashboard_controller.dart';
 import 'package:soothifyafrica/app/modules/practitioner/payouts/controller/payout_controller.dart';
+import 'package:soothifyafrica/app/modules/practitioner/payouts/expert_bank_details_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/payouts/expert_payout_method_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/payouts/expert_payouts_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/payouts/expert_withdraw_screen.dart';
@@ -30,6 +33,7 @@ void main() {
     WidgetTester tester,
     Widget screen, {
     Brightness brightness = Brightness.light,
+    List<GetPage<dynamic>>? pages,
   }) async {
     useDesignFrame(tester);
     await loadAppFonts();
@@ -38,7 +42,7 @@ void main() {
       ExpertDashboardController(Get.find<ExpertRepository>(), now: now),
     );
     final c = Get.put(PayoutController(dashboard));
-    await pumpScreen(tester, screen, brightness: brightness);
+    await pumpScreen(tester, screen, brightness: brightness, pages: pages);
     // Let the repository's latency pass so the balance lands.
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
@@ -62,6 +66,25 @@ void main() {
 
       await expectLater(find.byType(ExpertPayoutMethodScreen),
           matchesGoldenFile('goldens/expert_payout_method_$name.png'));
+    });
+
+    testWidgets('payout method chooser, $name', (tester) async {
+      final c = await mount(tester, const ExpertPayoutMethodScreen(),
+          brightness: brightness);
+      // The first withdrawal: nothing is on file, so the chooser shows.
+      c.destinations.clear();
+      await tester.pumpAndSettle();
+
+      await expectLater(find.byType(ExpertPayoutMethodScreen),
+          matchesGoldenFile('goldens/expert_payout_chooser_$name.png'));
+    });
+
+    testWidgets('bank details, $name', (tester) async {
+      await mount(tester, const ExpertBankDetailsScreen(),
+          brightness: brightness);
+
+      await expectLater(find.byType(ExpertBankDetailsScreen),
+          matchesGoldenFile('goldens/expert_bank_details_$name.png'));
     });
 
     testWidgets('recent payouts, $name', (tester) async {
@@ -109,15 +132,107 @@ void main() {
     expect(c.method.value, PayoutMethod.mobileMoney);
   });
 
-  testWidgets('the method screen lists all three, with the frame’s copy',
+  testWidgets('the tiles are the accounts on file, not the three methods',
       (tester) async {
-    await mount(tester, const ExpertPayoutMethodScreen());
+    final c = await mount(tester, const ExpertWithdrawScreen());
+    expect(c.destinations, hasLength(1));
+    expect(find.text('Access Bank'), findsOneWidget);
+    expect(find.text('Bank Transfer'), findsOneWidget);
+
+    c.destinations.addAll(const [
+      BankDestination(
+        bank: 'Kuda Bank',
+        accountNumber: '2200110011',
+        accountName: 'Baraqhat Ibrahim',
+      ),
+      BankDestination(
+        bank: 'Opay',
+        accountNumber: '9900110022',
+        accountName: 'Baraqhat Ibrahim',
+      ),
+    ]);
+    await tester.pumpAndSettle();
+    expect(find.text('Kuda Bank'), findsOneWidget);
+    expect(find.text('Bank Transfer'), findsNWidgets(3));
+
+    expect(c.chosenDestination.value, 0);
+    c.chooseDestination(2);
+    await tester.pumpAndSettle();
+    expect(c.chosenDestination.value, 2);
+  });
+
+  testWidgets('with an account on file the method screen shows it',
+      (tester) async {
+    final c = await mount(tester, const ExpertPayoutMethodScreen());
+    expect(c.hasDestination, isTrue);
+    expect(find.text('Payout Method'), findsOneWidget);
+    expect(find.text('Access Bank'), findsOneWidget);
+    expect(find.text('0234 5678 890'), findsOneWidget);
+    expect(find.text('Active'), findsOneWidget);
+    expect(find.text('Back to Earnings'), findsOneWidget);
+    // The frame's account number has eleven digits; the last four win.
+    expect(c.savedDestination, 'Bank ****8890');
+  });
+
+  testWidgets('with nothing on file it offers Bank Transfer', (tester) async {
+    final c = await mount(tester, const ExpertPayoutMethodScreen());
+    // The first withdrawal: nothing has been added yet.
+    c.destinations.clear();
+    await tester.pumpAndSettle();
     expect(find.text('Payout method'), findsOneWidget);
-    for (final method in PayoutMethod.values) {
-      expect(find.text(method.label), findsOneWidget);
-    }
+    // The frame draws one card, not three: the other two methods have no
+    // form behind them.
+    expect(find.text(PayoutMethod.bankTransfer.label), findsOneWidget);
+    expect(find.text(PayoutMethod.paystackCard.label), findsNothing);
+    expect(find.text(PayoutMethod.mobileMoney.label), findsNothing);
     expect(find.text('paystack'), findsOneWidget);
     expect(find.text('Proceed'), findsOneWidget);
+  });
+
+  testWidgets('the form adds an account, and editing one replaces it',
+      (tester) async {
+    final c = await mount(
+      tester,
+      const ExpertPayoutMethodScreen(),
+      // Saving leaves for the confirmation, and the pencil for the form.
+      pages: [
+        GetPage(
+          name: AppRoutes.expertPayoutOutcome,
+          page: () => const SizedBox.shrink(),
+        ),
+        GetPage(
+          name: AppRoutes.expertBankDetails,
+          page: () => const SizedBox.shrink(),
+        ),
+      ],
+    );
+    c.destinations.clear();
+
+    c.chooseBank('Kuda Bank');
+    c.accountNumber.text = '2200110011';
+    c.accountName.text = 'Baraqhat Ibrahim';
+    expect(c.canSaveBank, isTrue);
+    c.saveBankDetails();
+    expect(c.destinations, hasLength(1));
+    expect(c.destinations.first.bank, 'Kuda Bank');
+    expect(c.destinations.first.masked, 'Bank ****0011');
+
+    await tester.pumpAndSettle();
+
+    // The pencil fills the form with what is on file; saving overwrites that
+    // account rather than adding a second copy of it.
+    c.editDestination(0);
+    expect(c.accountName.text, 'Baraqhat Ibrahim');
+    c.accountName.text = 'B. Ibrahim';
+    c.saveBankDetails();
+    expect(c.destinations, hasLength(1));
+    expect(c.destinations.first.accountName, 'B. Ibrahim');
+
+    // And "+ Add New Payout Method" starts from an empty form.
+    c.addDestination();
+    expect(c.bank.value, isEmpty);
+    expect(c.accountNumber.text, isEmpty);
+    expect(c.canSaveBank, isFalse);
   });
 
   testWidgets('the history lists every payout in naira', (tester) async {
@@ -136,6 +251,15 @@ void main() {
       expect(PayoutMethod.paystackCard.blurb, contains('(Naira)'));
       expect(PayoutMethod.paystackCard.blurb, isNot(contains('Naria')));
       expect(PayoutMethod.mobileMoney.blurb, endsWith('(select network)'));
+    });
+
+    test('the masked row takes the last four digits of the account', () {
+      const d = BankDestination(
+        bank: 'Access Bank',
+        accountNumber: '0234 5678 890',
+        accountName: 'Baraqhat Ibrahim',
+      );
+      expect(d.masked, 'Bank ****8890');
     });
 
     test('only Bank Transfer names an account', () {

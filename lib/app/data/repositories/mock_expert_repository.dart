@@ -1,4 +1,5 @@
 import '../../core/utils/image_constant.dart';
+import '../models/bank_destination.dart';
 import '../models/expert_earnings.dart';
 import '../models/expert_session.dart';
 import 'expert_repository.dart';
@@ -52,6 +53,23 @@ class MockExpertRepository implements ExpertRepository {
   Future<ExpertEarnings> earnings() async {
     await Future<void>.delayed(_latency);
     return ExpertEarnings.sample(now: _now);
+  }
+
+  /// Seeded with the one account the frames show saved — the "Payout method"
+  /// card's Access Bank row. Held in memory, so anything added during a run
+  /// lasts as long as the run.
+  List<BankDestination>? _destinations;
+
+  @override
+  Future<List<BankDestination>> payoutDestinations() async {
+    await Future<void>.delayed(_latency);
+    return _destinations ??= const [
+      BankDestination(
+        bank: 'Access Bank',
+        accountNumber: '0234 5678 890',
+        accountName: 'Baraqhat Ibrahim',
+      ),
+    ];
   }
 
   List<AvailabilitySlot>? _slots;

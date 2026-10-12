@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../data/models/bank_destination.dart';
 import '../../../../data/models/expert_earnings.dart';
 import '../../../../data/models/payout_method.dart';
 import '../../dashboard/controller/expert_dashboard_controller.dart';
@@ -96,26 +97,75 @@ class PayoutController extends GetxController {
         accountName.text.trim().isNotEmpty;
   }
 
+  /// Which account a withdrawal is heading to — the index of the outlined
+  /// tile under "Destination of funds".
+  final RxInt chosenDestination = 0.obs;
+
+  /// The accounts on file. Owned by the dashboard controller, which outlives
+  /// these routes.
+  List<BankDestination> get destinations => _dashboard.destinations;
+
+  bool get hasDestination => destinations.isNotEmpty;
+
+  void chooseDestination(int index) => chosenDestination.value = index;
+
+  /// The row the Earnings card prints beside "Payout method".
+  String get savedDestination =>
+      hasDestination ? destinations.first.masked : 'Not set';
+
+  /// Which account the form is editing, or null when it is adding one.
+  int? _editing;
+
+  /// The edit pencil beside an account. Fills the form with what is on file,
+  /// so saving replaces that account rather than adding a second copy of it.
+  void editDestination(int index) {
+    final existing = destinations[index];
+    _editing = index;
+    bank.value = existing.bank;
+    accountNumber.text = existing.accountNumber;
+    accountName.text = existing.accountName;
+    touchBank();
+    Get.toNamed(AppRoutes.expertBankDetails);
+  }
+
+  /// "+ Add New Payout Method", and the first trip through the form. Clears
+  /// whatever the last edit left behind.
+  void addDestination() {
+    _editing = null;
+    bank.value = '';
+    accountNumber.clear();
+    accountName.clear();
+    touchBank();
+    Get.toNamed(AppRoutes.expertBankDetails);
+  }
+
   /// Saved locally for now — there is no payouts API — then the frame's
-  /// confirmation, which returns to Earnings rather than to this form.
+  /// confirmation.
   void saveBankDetails() {
     if (!canSaveBank) return;
-    _saved.value = '${bank.value} ****'
-        '${accountNumber.text.trim().substring(accountNumber.text.trim().length - 4)}';
+    _dashboard.saveDestination(
+      BankDestination(
+        bank: bank.value,
+        accountNumber: accountNumber.text.trim(),
+        accountName: accountName.text.trim(),
+      ),
+      at: _editing,
+    );
+    _editing = null;
     Get.toNamed(
       AppRoutes.expertPayoutOutcome,
       arguments: PayoutOutcome.methodUpdated,
     );
   }
 
-  /// The destination on file, or empty when none has been added. Decides
-  /// whether the payout-method screen shows the chooser or the saved card.
-  final RxString _saved = ''.obs;
-  String get savedDestination => _saved.value;
-  bool get hasDestination => _saved.value.isNotEmpty;
-
-  String get savedAccountName => accountName.text.trim();
-  String get savedAccountNumber => accountNumber.text.trim();
+  /// Where Withdraw on the Earnings card goes.
+  ///
+  /// With nothing on file the money has nowhere to land, so the first trip
+  /// is through the payout-method chooser; afterwards it is straight to the
+  /// amount, which lists the accounts as destinations.
+  void startWithdrawal() => Get.toNamed(
+        hasDestination ? AppRoutes.expertWithdraw : AppRoutes.expertPayoutMethod,
+      );
 
   int get requested => int.tryParse(amount.text.replaceAll(',', '').trim()) ?? 0;
 
@@ -145,7 +195,7 @@ class PayoutController extends GetxController {
   /// their own yet, so they still say so rather than pretending.
   void proceed() {
     if (method.value == PayoutMethod.bankTransfer) {
-      Get.toNamed(AppRoutes.expertBankDetails);
+      addDestination();
       return;
     }
     AppFeedback.info(
@@ -155,7 +205,7 @@ class PayoutController extends GetxController {
 
   /// The Withdraw button on the amount screen.
   void withdraw() {
-    if (!canProceed) return;
+    if (!canProceed || !hasDestination) return;
     Get.toNamed(
       AppRoutes.expertPayoutOutcome,
       arguments: PayoutOutcome.withdrawalSent,

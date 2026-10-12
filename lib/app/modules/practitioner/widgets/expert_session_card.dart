@@ -21,9 +21,11 @@ class ExpertSessionCard extends StatelessWidget {
     super.key,
     required this.session,
     required this.now,
-    required this.actionLabel,
-    required this.onAction,
+    this.actionLabel,
+    this.onAction,
     this.onTap,
+    this.timeLabel,
+    this.showTimeIcon = true,
   });
 
   final ExpertSession session;
@@ -32,11 +34,19 @@ class ExpertSessionCard extends StatelessWidget {
   final DateTime now;
 
   /// "Join call" on the dashboard and Schedule; the Notes tab asks for
-  /// something else.
-  final String actionLabel;
+  /// something else. Null on the session-notes frame, which draws the card
+  /// with no chip at all.
+  final String? actionLabel;
 
-  final VoidCallback onAction;
+  final VoidCallback? onAction;
   final VoidCallback? onTap;
+
+  /// Replaces the clock row's words. The session-notes frame prints
+  /// "1-on-1 Therapy * 10:00 AM - 10:30 AM" there rather than the day.
+  final String? timeLabel;
+
+  /// That same row carries no glyph on the notes frame.
+  final bool showTimeIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -83,39 +93,41 @@ class ExpertSessionCard extends StatelessWidget {
                   ),
                   SizedBox(height: 8.v),
                   _MetaRow(
-                    icon: Icons.schedule_outlined,
-                    label: session.when(now),
+                    icon: showTimeIcon ? Icons.schedule_outlined : null,
+                    label: timeLabel ?? session.when(now),
                   ),
                 ],
               ),
             ),
-            SizedBox(width: 4.h),
-            GestureDetector(
-              onTap: onAction,
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                height: 32.v,
-                padding: EdgeInsets.symmetric(horizontal: 6.h),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: appTheme.soothifyBlue.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(8.h),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.videocam_outlined,
-                      size: 14.h,
-                      color: appTheme.soothifyBlue,
-                    ),
-                    SizedBox(width: 6.h),
-                    Text(actionLabel,
-                        style: CustomTextStyles.expertCardAction),
-                  ],
+            if (actionLabel != null && onAction != null) ...[
+              SizedBox(width: 4.h),
+              GestureDetector(
+                onTap: onAction,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 32.v,
+                  padding: EdgeInsets.symmetric(horizontal: 6.h),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: appTheme.soothifyBlue.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(8.h),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.videocam_outlined,
+                        size: 14.h,
+                        color: appTheme.soothifyBlue,
+                      ),
+                      SizedBox(width: 6.h),
+                      Text(actionLabel!,
+                          style: CustomTextStyles.expertCardAction),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -137,7 +149,8 @@ IconData _serviceIcon(String service) {
 class _MetaRow extends StatelessWidget {
   const _MetaRow({required this.icon, required this.label});
 
-  final IconData icon;
+  /// Null on the notes frame's third line, which carries no glyph.
+  final IconData? icon;
   final String label;
 
   @override
@@ -146,9 +159,11 @@ class _MetaRow extends StatelessWidget {
       children: [
         // The frame sets the glyph at 90 and the words at 108 — 3 of gap,
         // not 6. The extra was costing the end of "10:30 AM".
-        Icon(icon,
-            size: 15.h, color: appTheme.textPrimary.withValues(alpha: 0.8)),
-        SizedBox(width: 3.h),
+        if (icon != null) ...[
+          Icon(icon,
+              size: 15.h, color: appTheme.textPrimary.withValues(alpha: 0.8)),
+          SizedBox(width: 3.h),
+        ],
         Flexible(
           child: Text(
             label,

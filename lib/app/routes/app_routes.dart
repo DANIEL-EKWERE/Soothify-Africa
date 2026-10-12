@@ -213,4 +213,26 @@ class AppRoutes {
 
   /// The full payout history, behind Earnings' "See All".
   static const String expertPayouts = '/practitioner/payouts';
+
+  /// Where a bank transfer should land, and the confirmation both the
+  /// payout-method and withdrawal journeys end on.
+  static const String expertBankDetails = '/practitioner/payout-method/bank';
+  static const String expertPayoutOutcome = '/practitioner/payout-outcome';
+
+  /// The expert's own notification feed — bookings and session reminders.
+  static const String expertNotifications = '/practitioner/notifications';
+
+  /// The expert's live session, once the waiting room connects.
+  static const String expertCall = '/practitioner/call';
+
+  /// The beat the questionnaire ends on — "Curating your sanctuary...".
+  static const String curating = '/curating';
+
+  /// What Soothify guarantees a practitioner — reached from their Settings.
+  static const String careProtection = '/practitioner/care-protection';
+
+  /// The expert's own profile. A pushed route rather than a tab: the live
+  /// design's expert bar has four tabs and this is not one of them, so the
+  /// dashboard's header avatar is what opens it.
+  static const String expertProfile = '/practitioner/profile';
 }

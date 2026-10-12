@@ -12,6 +12,12 @@ import '../../../../core/app_export.dart';
 /// frame draws it. The arc is a spinner drawn still, the way
 /// a frame has to draw one, so it turns while the call connects.
 ///
+/// Two movements, not one. The arc goes round, and a ring swells out of the
+/// disc and fades as it reaches the halo's edge — the radial half, which is
+/// what makes this read as *connecting* rather than merely *loading*. Paced
+/// at a slow breath, because this is a wellness app and the user is being
+/// asked to wait.
+///
 /// It used to ring both discs in near black at 2.9 and 1.5 — a reading of the
 /// frame's outlines that put a heavy donut where the design has a soft halo.
 class JoiningPulse extends StatefulWidget {
@@ -21,8 +27,11 @@ class JoiningPulse extends StatefulWidget {
   State<JoiningPulse> createState() => _JoiningPulseState();
 }
 
+// TickerProviderStateMixin, not the Single one: there are two controllers
+// here, and SingleTickerProviderStateMixin asserts the moment a second
+// ticker is created.
 class _JoiningPulseState extends State<JoiningPulse>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   // `late final`, but initState touches it below — which is what forces the
   // construction to happen there. Left to build alone, a reduce-motion path
   // that never reads it would have dispose construct it, and that throws.
@@ -31,15 +40,24 @@ class _JoiningPulseState extends State<JoiningPulse>
     duration: const Duration(milliseconds: 1600),
   );
 
+  /// The outward ripple. Slower than the spin on purpose: two movements at
+  /// the same tempo read as one stuttering thing.
+  late final AnimationController _swell = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
+
   @override
   void initState() {
     super.initState();
     _spin.repeat();
+    _swell.repeat();
   }
 
   @override
   void dispose() {
     _spin.dispose();
+    _swell.dispose();
     super.dispose();
   }
 
@@ -48,7 +66,10 @@ class _JoiningPulseState extends State<JoiningPulse>
     // Nothing is actually connecting, and a perpetual animation stops any
     // test that waits for a still frame from ever settling.
     final still = MediaQuery.disableAnimationsOf(context);
-    if (still && _spin.isAnimating) _spin.stop();
+    if (still) {
+      if (_spin.isAnimating) _spin.stop();
+      if (_swell.isAnimating) _swell.stop();
+    }
 
     return SizedBox(
       width: 138.h,
@@ -62,6 +83,19 @@ class _JoiningPulseState extends State<JoiningPulse>
               shape: BoxShape.circle,
             ),
           ),
+          if (!still)
+            AnimatedBuilder(
+              animation: _swell,
+              builder: (context, _) => CustomPaint(
+                size: Size.square(138.h),
+                painter: _SwellPainter(
+                  colour: appTheme.soothifyBlue,
+                  t: _swell.value,
+                  from: 46.h,
+                  to: 69.h,
+                ),
+              ),
+            ),
           AnimatedBuilder(
             animation: _spin,
             builder: (context, _) => CustomPaint(
@@ -136,4 +170,50 @@ class _ArcPainter extends CustomPainter {
       old.colour != colour ||
       old.radius != radius ||
       old.width != width;
+}
+
+/// A ring leaving the disc and fading into the halo.
+///
+/// Drawn rather than animated with widgets so the fade and the growth stay in
+/// step: an expanding `Container` would have to animate a size and an opacity
+/// separately, and they drift.
+class _SwellPainter extends CustomPainter {
+  const _SwellPainter({
+    required this.colour,
+    required this.t,
+    required this.from,
+    required this.to,
+  });
+
+  final Color colour;
+
+  /// 0 at the disc's edge, 1 at the halo's.
+  final double t;
+
+  final double from;
+  final double to;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final centre = Offset(size.width / 2, size.height / 2);
+    // Two rings half a cycle apart, so the gap between them never reads as a
+    // stall. Squared falloff: a linear fade still looks bright at the edge.
+    for (final phase in const [0.0, 0.5]) {
+      final p = (t + phase) % 1;
+      final opacity = (1 - p) * (1 - p) * 0.45;
+      if (opacity <= 0.01) continue;
+      canvas.drawCircle(
+        centre,
+        from + (to - from) * p,
+        Paint()
+          ..color = colour.withValues(alpha: opacity)
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SwellPainter old) =>
+      old.t != t || old.colour != colour || old.from != from || old.to != to;
 }

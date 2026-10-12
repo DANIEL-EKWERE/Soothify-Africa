@@ -8,6 +8,7 @@ import 'package:soothifyafrica/app/data/models/expert_session.dart';
 import 'package:soothifyafrica/app/data/repositories/expert_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_expert_repository.dart';
 import 'package:soothifyafrica/app/modules/practitioner/availability/controller/slot_editor_controller.dart';
+import 'package:soothifyafrica/app/modules/practitioner/availability/expert_availability_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/availability/expert_slot_editor_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/call/controller/joining_session_controller.dart';
 import 'package:soothifyafrica/app/modules/practitioner/call/joining_session_screen.dart';
@@ -128,6 +129,50 @@ void main() {
             matchesGoldenFile('goldens/expert_slot_editor_$name.png'));
       });
     }
+
+    /// Every row in the frame carries a switch, some on and some off. There
+    /// was none, which left no way to close a slot without deleting it.
+    testWidgets('a slot can be closed to booking', (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final dashboard = await seedExpert(tester);
+      await tester.pump(const Duration(milliseconds: 600));
+      Get.testMode = true;
+      await pumpScreen(tester, const ExpertAvailabilityScreen());
+
+      final slot = dashboard.slots.first;
+      expect(slot.enabled, isTrue);
+
+      dashboard.toggleSlot(slot);
+      await tester.pumpAndSettle();
+
+      expect(dashboard.slots.first.enabled, isFalse);
+      expect(find.byType(Switch), findsWidgets);
+    });
+
+    /// The frame puts the month grid behind a calendar glyph on the repeat
+    /// card, with Cancel and Done beneath it. It used to sit open on the
+    /// page, which is not what the frame draws.
+    testWidgets('the calendar opens from the repeat card, not the page',
+        (tester) async {
+      final c = await mount(tester);
+
+      // Nothing on the page until the glyph is pressed.
+      expect(find.text('Done'), findsNothing);
+
+      await tester.tap(find.byType(InkWell).at(1));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
+
+      // Cancel leaves the chosen day alone.
+      final before = c.day.value;
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(c.day.value, before);
+      expect(find.text('Done'), findsNothing);
+    });
 
     testWidgets('the title’s misspelling is corrected', (tester) async {
       await mount(tester);

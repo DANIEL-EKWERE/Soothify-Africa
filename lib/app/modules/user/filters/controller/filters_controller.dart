@@ -29,6 +29,13 @@ class FiltersController extends GetxController {
 
   int get count => selection.value.count;
 
+  /// Empties the sheet. Only the working copy — nothing reaches the library
+  /// until Apply, so clearing and backing out leaves what was applied alone.
+  void clearAll() {
+    selection.value.clear();
+    selection.refresh();
+  }
+
   /// Hands the working copy back to whoever opened the sheet.
   void apply() => Get.back(result: selection.value);
 }

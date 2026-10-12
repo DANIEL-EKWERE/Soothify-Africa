@@ -51,15 +51,11 @@ enum NotificationKind {
 enum NotificationFilter {
   all('All'),
   sessions('Sessions'),
-  whatsNew("What's new", badge: true);
+  whatsNew("What's new");
 
-  const NotificationFilter(this.label, {this.badge = false});
+  const NotificationFilter(this.label);
 
   final String label;
-
-  /// Whether the chip carries the small "New" tag beside its label. Only
-  /// "What's new" does.
-  final bool badge;
 }
 
 class AppNotification {

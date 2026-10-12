@@ -112,10 +112,13 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
               child: Obx(
+                // "Withdraw", not "Proceed": the frame labels it for the
+                // thing it does, and it ends on the confirmation rather than
+                // doubling back to the method chooser.
                 () => CustomElevatedButton(
-                  text: 'Proceed',
+                  text: 'Withdraw',
                   isEnabled: controller.canProceed,
-                  onPressed: controller.openMethod,
+                  onPressed: controller.withdraw,
                 ),
               ),
             ),
@@ -160,11 +163,17 @@ class _DestinationTiles extends StatelessWidget {
                       Container(
                         width: 24.h,
                         height: 24.h,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color:
                               appTheme.textPrimary.withValues(alpha: 0.08),
                           shape: BoxShape.circle,
                         ),
+                        // The frame puts an institution mark here. The bank
+                        // logos were never exported, so this stands in —
+                        // better than the empty disc it was drawing.
+                        child: Icon(Icons.account_balance,
+                            size: 13.h, color: appTheme.textPrimary),
                       ),
                       const Spacer(),
                       // Bank Transfer's tile is headed by the account and

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/custom_elevated_button.dart';
@@ -35,9 +36,7 @@ class ExpertSlotEditorScreen extends GetView<SlotEditorController> {
                 padding: EdgeInsets.fromLTRB(24.h, 37.v, 24.h, 24.v),
                 children: [
                   const _TimeWheels(),
-                  SizedBox(height: 22.v),
-                  const _DayPicker(),
-                  SizedBox(height: 21.v),
+                  SizedBox(height: 40.v),
                   const _RepeatCard(),
                 ],
               ),
@@ -156,30 +155,6 @@ class _WheelState extends State<_Wheel> {
 /// The month, as `259:60133` pops it over the picker. Inline here rather than
 /// a dialog: the frame draws it in the flow of the screen, between the wheels
 /// and the repeat card.
-class _DayPicker extends StatelessWidget {
-  const _DayPicker();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<SlotEditorController>();
-    return Obx(
-      () => Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 14.v),
-        decoration: BoxDecoration(
-          color: appTheme.surface,
-          borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.cardBorder),
-        ),
-        child: MonthCalendar(
-          month: controller.month.value,
-          selected: controller.day.value,
-          onSelected: controller.selectDay,
-        ),
-      ),
-    );
-  }
-}
-
 /// "Everyday" over seven day circles.
 class _RepeatCard extends StatelessWidget {
   const _RepeatCard();
@@ -204,15 +179,35 @@ class _RepeatCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: appTheme.surface,
           borderRadius: BorderRadius.circular(8.h),
-          border: Border.all(color: appTheme.textBlack),
+          border: Border.all(color: appTheme.cardRim),
         ),
+        padding: EdgeInsets.symmetric(horizontal: 16.h),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: controller.toggleEveryday,
-              behavior: HitTestBehavior.opaque,
-              child: Text('Everyday', style: CustomTextStyles.slotRepeat),
+            // The frame ranges the word left and puts a calendar at the
+            // right of the same line. The month grid used to sit open on the
+            // page above; it belongs behind this glyph, as a dialog.
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: controller.toggleEveryday,
+                    behavior: HitTestBehavior.opaque,
+                    child:
+                        Text('Everyday', style: CustomTextStyles.slotRepeat),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => _pickDate(context, controller),
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icCalendarOutline,
+                    height: 22.h,
+                    width: 22.h,
+                    color: appTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 16.v),
             Row(
@@ -233,6 +228,103 @@ class _RepeatCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The month grid, as the frame shows it — a centred card with the month and
+/// its arrows, the dates, and Cancel / Done beneath a rule.
+Future<void> _pickDate(
+  BuildContext context,
+  SlotEditorController controller,
+) async {
+  final chosen = await showDialog<DateTime>(
+    context: context,
+    builder: (context) {
+      var month = DateTime(controller.day.value.year, controller.day.value.month);
+      var picked = controller.day.value;
+      return StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          backgroundColor: appTheme.surface,
+          insetPadding: EdgeInsets.symmetric(horizontal: 24.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.h),
+          ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16.h, 16.v, 16.h, 8.v),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // MonthCalendar draws no arrows, so the dialog carries its
+                // own month row — the frame has one either side of the name.
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () => setState(
+                        () => month = DateTime(month.year, month.month - 1),
+                      ),
+                      child: Icon(Icons.chevron_left,
+                          size: 24.h, color: appTheme.textPrimary),
+                    ),
+                    Expanded(
+                      child: Text(
+                        DateFormat('MMMM yyyy').format(month),
+                        textAlign: TextAlign.center,
+                        style: CustomTextStyles.expertRowLabel,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () => setState(
+                        () => month = DateTime(month.year, month.month + 1),
+                      ),
+                      child: Icon(Icons.chevron_right,
+                          size: 24.h, color: appTheme.textPrimary),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 8.v),
+                MonthCalendar(
+                  month: month,
+                  selected: picked,
+                  onSelected: (date) => setState(() => picked = date),
+                  showMonthLabel: false,
+                  // Amber, as the frame marks the chosen day — not the brand
+                  // blue the other calendars in the app use.
+                  selectedColor: appTheme.daySelected,
+                ),
+                SizedBox(height: 8.v),
+                Divider(height: 1.v, color: appTheme.cardRim),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text('Cancel',
+                            style: CustomTextStyles.expertRowLabel),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 24.v,
+                      child: VerticalDivider(
+                        width: 1.h,
+                        color: appTheme.cardRim,
+                      ),
+                    ),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(picked),
+                        child: Text('Done',
+                            style: CustomTextStyles.expertRowLabel),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+  if (chosen != null) controller.selectDay(chosen);
 }
 
 class _DayCircle extends StatelessWidget {
@@ -261,7 +353,9 @@ class _DayCircle extends StatelessWidget {
           // app's own.
           color: selected ? appTheme.actionFill : appTheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: appTheme.textPrimary),
+          // No ring once it is filled: the fill is the state, and a hairline
+          // around the blue read as an outline nobody asked for.
+          border: selected ? null : Border.all(color: appTheme.cardRim),
         ),
         child: Text(
           letter,

@@ -5,6 +5,9 @@
 enum SettingsEntry {
   manageSubscription('Manage subscription', 'ic_settings_subscription'),
   account('Account', 'ic_settings_account'),
+  // The expert's list only. Drawn in the brand blue on its frame — the one
+  // row there that is an offer rather than a setting.
+  careProtection('Care & protection hub', 'ic_security'),
   themeToggle('Light Mode', 'ic_settings_moon'),
   changeLanguage('Change Language', 'ic_settings_language'),
   notifications('Notifications', 'ic_settings_notifications'),
@@ -31,4 +34,20 @@ enum SettingsEntry {
   String get asset => 'assets/icons/$_icon.svg';
 
   bool get hasToggle => this == SettingsEntry.themeToggle;
+
+  /// What each role sees. The frames draw two different lists: the expert
+  /// has no Account row and is not offered "Become an Expert", and carries
+  /// the protection hub instead.
+  static const forClient = [
+    manageSubscription, account, themeToggle, changeLanguage, notifications,
+    becomeExpert, privacyPolicy, terms, about, logout,
+  ];
+
+  static const forExpert = [
+    manageSubscription, careProtection, themeToggle, changeLanguage,
+    notifications, privacyPolicy, terms, about, logout,
+  ];
+
+  /// The row the frame singles out in blue.
+  bool get isHighlighted => this == careProtection;
 }

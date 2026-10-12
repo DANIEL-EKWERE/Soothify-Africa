@@ -117,6 +117,8 @@ class KycController extends BaseController {
       await _repository.markComplete();
       return true;
     });
-    if (ok == true) Get.offAllNamed(AppRoutes.shell);
+    // Not straight to the shell: the frame ends the questionnaire on
+    // "Curating your sanctuary...", which then hands over.
+    if (ok == true) Get.offAllNamed(AppRoutes.curating);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/filter_pill.dart';
 import '../../../data/models/app_notification.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/skeleton.dart';
@@ -147,57 +148,14 @@ class _Filters extends StatelessWidget {
       child: Row(
         children: [
           for (final f in NotificationFilter.values) ...[
-            Obx(() {
-              final selected = controller.filter.value == f;
-              return InkWell(
+            Obx(
+              () => FilterPill(
+                label: f.label,
+                selected: controller.filter.value == f,
                 onTap: () => controller.select(f),
-                borderRadius: BorderRadius.circular(10.h),
-                // No `alignment` on the chip's own box — with one set it
-                // expands to the row instead of hugging its label.
-                child: Container(
-                  height: 20.v,
-                  padding: EdgeInsets.symmetric(horizontal: 11.h),
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? appTheme.soothifyBlue
-                        : appTheme.transparent,
-                    borderRadius: BorderRadius.circular(10.h),
-                    border: selected
-                        ? null
-                        : Border.all(color: appTheme.chipOutline),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        f.label,
-                        style: selected
-                            ? CustomTextStyles.notificationChipSelected
-                            : CustomTextStyles.notificationChip,
-                      ),
-                      if (f.badge) ...[
-                        SizedBox(width: 6.h),
-                        // Accent rather than the brand blue: the chip itself
-                        // turns blue when selected, and a blue tag on blue
-                        // would vanish.
-                        Container(
-                          height: 14.v,
-                          padding: EdgeInsets.symmetric(horizontal: 5.h),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: appTheme.accent,
-                            borderRadius: BorderRadius.circular(7.h),
-                          ),
-                          child: Text('New',
-                              style: CustomTextStyles.notificationChipBadge),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            }),
-            SizedBox(width: 11.h),
+              ),
+            ),
+            SizedBox(width: 8.h),
           ],
         ],
       ),

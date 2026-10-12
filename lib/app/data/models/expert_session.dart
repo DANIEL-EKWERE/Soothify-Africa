@@ -63,10 +63,24 @@ class AvailabilitySlot {
     required this.day,
     required this.from,
     required this.to,
+    this.enabled = true,
   });
 
   final String id;
   final DateTime day;
+
+  /// Whether clients can book this slot. The frame draws the list with some
+  /// rows switched on and some off, and the switch was missing entirely —
+  /// which left no way to close a slot without deleting it.
+  final bool enabled;
+
+  AvailabilitySlot copyWith({bool? enabled}) => AvailabilitySlot(
+        id: id,
+        day: day,
+        from: from,
+        to: to,
+        enabled: enabled ?? this.enabled,
+      );
 
   /// Minutes from midnight, so a slot is comparable and sortable without a
   /// date attached.

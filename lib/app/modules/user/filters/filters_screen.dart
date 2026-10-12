@@ -80,6 +80,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<FiltersController>();
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.h),
       child: Row(
@@ -100,7 +101,21 @@ class _Header extends StatelessWidget {
               style: CustomTextStyles.filterHeading,
             ),
           ),
-          SizedBox(width: 24.h),
+          // On every sheet, not just one: a questionnaire you can only add to
+          // is a trap, and the frames put this on the sheet they drew it on
+          // because that is the sheet they drew.
+          Obx(
+            () => InkWell(
+              onTap: controller.canApply ? controller.clearAll : null,
+              child: Text(
+                'Clear all',
+                style: controller.canApply
+                    ? CustomTextStyles.filterClearAll
+                    : CustomTextStyles.filterClearAll
+                        .copyWith(color: appTheme.paymentHintInk),
+              ),
+            ),
+          ),
         ],
       ),
     );

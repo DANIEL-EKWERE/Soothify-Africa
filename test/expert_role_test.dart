@@ -115,7 +115,7 @@ void main() {
     expect(find.text('Add Session Notes'), findsOneWidget);
   });
 
-  testWidgets('all five tabs are reachable', (tester) async {
+  testWidgets('every tab is reachable', (tester) async {
     await mount(tester);
     final shell = Get.find<ExpertShellController>();
     for (final tab in ExpertTab.values) {
@@ -139,33 +139,34 @@ void main() {
   });
 
   group('the expert nav', () {
-    test('has five tabs, and each carries exactly one glyph source', () {
-      expect(ExpertTab.values, hasLength(5));
+    /// Four, not five. A Profile tab was built from a copy of the design
+    /// file; every expert frame in the live one — dashboard, earnings,
+    /// payouts — draws these four. The profile is reached from the
+    /// dashboard's header avatar instead.
+    test('has four tabs, and each carries exactly one glyph source', () {
+      expect(ExpertTab.values, hasLength(4));
       for (final tab in ExpertTab.values) {
         expect((tab.asset == null) != (tab.icon == null), isTrue,
             reason: '${tab.name} must have an asset or an icon, not both');
       }
     });
 
-    test('reuses the client exports only where the glyph is the same', () {
-      // home-smile and face-smile are the client bar's; calendar, wallet and
-      // note-edit are the expert bar's own and were not exportable.
-      expect(ExpertTab.home.asset, isNotNull);
-      expect(ExpertTab.profile.asset, isNotNull);
-      for (final tab in [
-        ExpertTab.schedule,
-        ExpertTab.earnings,
-        ExpertTab.notes,
-      ]) {
-        expect(tab.icon, isNotNull);
+    /// Every tab draws a real SVG now. The middle three were Material
+    /// stand-ins while the glyphs could not be exported; the designer
+    /// supplied the wallet, and calendar and note-edit were already shipped.
+    test('every tab draws an exported glyph, not a Material stand-in', () {
+      for (final tab in ExpertTab.values) {
+        expect(tab.asset, isNotNull, reason: '${tab.name} has no SVG');
+        expect(tab.icon, isNull, reason: '${tab.name} still uses Material');
       }
+      expect(ExpertTab.earnings.asset, contains('ic_wallet'));
     });
 
     test('is labelled from the frame, not from the layers it was built on',
         () {
       // The design's text layers are still named "Plans" and "Discovery".
       expect(ExpertTab.values.map((t) => t.label),
-          ['Home', 'Schedule', 'Earnings', 'Notes', 'Profile']);
+          ['Home', 'Schedule', 'Earnings', 'Notes']);
     });
   });
 

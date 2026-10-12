@@ -99,6 +99,16 @@ class ImageConstant {
   /// `akar-icons:video` (259:60795), `basil:headphone-solid` (259:60837) and
   /// the 16px row chevron (259:60799).
   static const String icNoteEdit = '$_icons/ic_note_edit.svg';
+
+  /// The institution mark on a payout destination, and the shield on the
+  /// Paystack assurance. Both supplied by the designer; neither was
+  /// exportable, and both were standing in as Material icons.
+  static const String icBank = '$_icons/ic_bank.svg';
+  static const String icShieldPrivacy = '$_icons/ic_shield_privacy.svg';
+
+  /// `ion:wallet-outline` — the expert bar's Earnings tab and the earnings
+  /// card's badge. Supplied by the designer; it was not exportable.
+  static const String icWallet = '$_icons/ic_wallet.svg';
   static const String icVideo = '$_icons/ic_video.svg';
   static const String icHeadphone = '$_icons/ic_headphone.svg';
   static const String icArrowRightSm = '$_icons/ic_arrow_right_sm.svg';

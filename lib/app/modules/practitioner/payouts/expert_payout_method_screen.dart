@@ -21,7 +21,162 @@ class ExpertPayoutMethodScreen extends GetView<PayoutController> {
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(
-        child: Column(
+        // Two states in one frame set: the chooser until a destination has
+        // been added, then the card showing what is on file.
+        child: Obx(
+          () => controller.hasDestination
+              ? const _SavedDestination()
+              : const _Chooser(),
+        ),
+      ),
+    );
+  }
+}
+
+/// What the screen shows once a destination is on file — Figma's populated
+/// "Payout method".
+class _SavedDestination extends GetView<PayoutController> {
+  const _SavedDestination();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 33.v),
+        const ExpertHeader(title: 'Payout method'),
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
+            children: [
+              Text('Payout Method', style: CustomTextStyles.expertSection),
+              SizedBox(height: 8.v),
+              Text(
+                'This is where your earnings will be sent. You can edit your '
+                'details anytime.',
+                style: CustomTextStyles.expertBlurb,
+              ),
+              SizedBox(height: 32.v),
+              Container(
+                padding: EdgeInsets.all(16.h),
+                decoration: BoxDecoration(
+                  color: appTheme.surface,
+                  borderRadius: BorderRadius.circular(8.h),
+                  border: Border.all(color: appTheme.cardRim),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36.h,
+                      height: 36.h,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: appTheme.textPrimary.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.account_balance,
+                          size: 18.h, color: appTheme.textPrimary),
+                    ),
+                    SizedBox(width: 16.h),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Bank Transfer (NGN)',
+                              style: CustomTextStyles.expertCardMeta),
+                          SizedBox(height: 6.v),
+                          Text(controller.bank.value,
+                              style: CustomTextStyles.expertOutcomeTitle),
+                          SizedBox(height: 6.v),
+                          Text(controller.savedAccountNumber,
+                              style: CustomTextStyles.expertRowLabel),
+                          SizedBox(height: 6.v),
+                          Text(controller.savedAccountName,
+                              style: CustomTextStyles.expertRowLabel),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.h, vertical: 5.v),
+                          decoration: BoxDecoration(
+                            color: appTheme.success.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8.h),
+                          ),
+                          child: Text('Active',
+                              style: CustomTextStyles.expertCardMeta
+                                  .copyWith(color: appTheme.success)),
+                        ),
+                        SizedBox(height: 16.v),
+                        InkWell(
+                          onTap: () =>
+                              Get.toNamed(AppRoutes.expertBankDetails),
+                          customBorder: const CircleBorder(),
+                          child: Container(
+                            width: 27.h,
+                            height: 27.h,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: appTheme.statusIdleFill,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.edit_outlined,
+                                size: 15.h, color: appTheme.textPrimary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 24.v),
+              const Assurance(),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 12.v),
+          child: SizedBox(
+            width: double.infinity,
+            child: InkWell(
+              onTap: () => Get.toNamed(AppRoutes.expertBankDetails),
+              borderRadius: BorderRadius.circular(8.h),
+              child: Container(
+                height: 52.v,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.h),
+                  border: Border.all(color: appTheme.soothifyBlue),
+                ),
+                child: Text('+  Add New Payout Method',
+                    style: CustomTextStyles.subscribeLabel
+                        .copyWith(color: appTheme.soothifyBlue)),
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
+          child: CustomElevatedButton(
+            text: 'Back to Earnings',
+            onPressed: Get.back,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Choosing how to be paid, before anything is on file.
+class _Chooser extends GetView<PayoutController> {
+  const _Chooser();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
           children: [
             SizedBox(height: 33.v),
             const ExpertHeader(title: 'Payout method'),
@@ -51,7 +206,7 @@ class ExpertPayoutMethodScreen extends GetView<PayoutController> {
                     ),
                   ),
                   SizedBox(height: 16.v),
-                  const _Assurance(),
+                  const Assurance(),
                 ],
               ),
             ),
@@ -63,9 +218,7 @@ class ExpertPayoutMethodScreen extends GetView<PayoutController> {
               ),
             ),
           ],
-        ),
-      ),
-    );
+        );
   }
 }
 
@@ -100,10 +253,13 @@ class _MethodCard extends StatelessWidget {
               child: Container(
                 width: 36.h,
                 height: 36.h,
+                alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: appTheme.textPrimary.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
+                child: Icon(method.glyph,
+                    size: 18.h, color: appTheme.textPrimary),
               ),
             ),
             SizedBox(width: 16.h),
@@ -132,33 +288,42 @@ class _MethodCard extends StatelessWidget {
 }
 
 /// The green panel naming who processes the payment.
-class _Assurance extends StatelessWidget {
-  const _Assurance();
+/// The green Paystack note both payout screens end on.
+class Assurance extends StatelessWidget {
+  const Assurance({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // A shield at the left with the words beside it, both ranged left — the
+    // frame's own arrangement. This was centred, with no shield at all, and
+    // carried a near-black outline the frame does not draw.
     return Container(
-      height: 94.v,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24.h),
+      padding: EdgeInsets.fromLTRB(16.h, 18.v, 16.h, 18.v),
       decoration: BoxDecoration(
         color: appTheme.success.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.textPrimary),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            // The frame writes "All payment are processed securely by
-            // Paystack."
-            'All payments are processed securely by Paystack.',
-            textAlign: TextAlign.center,
-            style: CustomTextStyles.payoutAssurance,
+          Icon(Icons.shield_outlined, size: 20.h, color: appTheme.success),
+          SizedBox(width: 12.h),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  // The frame writes "All payment are processed securely by
+                  // Paystack."
+                  'All payments are processed securely by Paystack.',
+                  style: CustomTextStyles.payoutAssurance,
+                ),
+                SizedBox(height: 10.v),
+                Text('paystack', style: CustomTextStyles.payoutProcessor),
+              ],
+            ),
           ),
-          SizedBox(height: 18.v),
-          Text('paystack', style: CustomTextStyles.payoutProcessor),
         ],
       ),
     );

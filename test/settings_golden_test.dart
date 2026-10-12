@@ -53,7 +53,9 @@ void main() {
 
     await pumpScreen(tester, const SettingsScreen());
 
-    for (final entry in SettingsEntry.values) {
+    // The client's list: the expert's carries a protection hub this
+    // screen does not show for a signed-in user.
+    for (final entry in SettingsEntry.forClient) {
       expect(find.text(entry.label), findsOneWidget,
           reason: '${entry.label} is missing from Settings');
     }

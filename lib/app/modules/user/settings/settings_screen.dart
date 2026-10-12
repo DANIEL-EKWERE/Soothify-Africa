@@ -29,7 +29,7 @@ class SettingsScreen extends GetView<SettingsController> {
               SizedBox(height: 8.v),
             ],
             SizedBox(height: 16.v),
-            const _ExpertModeDoor(),
+            if (!controller.isPractitioner) const _ExpertModeDoor(),
             SizedBox(height: 16.v),
             Center(
               child: GradientText(
@@ -198,11 +198,19 @@ class _SettingsRow extends StatelessWidget {
               imagePath: entry.asset,
               height: 20.h,
               width: 20.h,
-              color: appTheme.textPrimary,
+              color: entry.isHighlighted
+                  ? appTheme.soothifyBlue
+                  : appTheme.textPrimary,
             ),
             SizedBox(width: 16.h),
             Expanded(
-              child: Text(entry.label, style: CustomTextStyles.settingsRow),
+              child: Text(
+                entry.label,
+                style: entry.isHighlighted
+                    ? CustomTextStyles.settingsRow
+                        .copyWith(color: appTheme.soothifyBlue)
+                    : CustomTextStyles.settingsRow,
+              ),
             ),
             if (entry.hasToggle)
               Obx(() {

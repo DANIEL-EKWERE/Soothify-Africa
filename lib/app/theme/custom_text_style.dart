@@ -1179,6 +1179,19 @@ class CustomTextStyles {
       );
 
   /// A filter chip's label; [notificationChipSelected] once chosen.
+  /// A filter pill's label — Nunito Sans Bold 12. Bold in both states; only
+  /// the colour changes when it is selected.
+  static TextStyle get filterPill => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.textPrimary,
+  );
+
+  static TextStyle get filterPillSelected =>
+      filterPill.copyWith(color: appTheme.onPrimary);
+
   static TextStyle get notificationChip => TextStyle(
         fontFamily: fontNunitoSans,
         fontSize: 12.fSize,
@@ -1340,6 +1353,25 @@ class CustomTextStyles {
     fontVariations: _bold,
     height: 20.8 / 16,
     color: appTheme.textPrimary,
+  );
+
+  /// "Curating your sanctuary..." — Nunito Sans Bold 24, the frame's own.
+  static TextStyle get curatingHeading => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Clear all" in a filter sheet's header — Nunito Sans Bold 12.
+  static TextStyle get filterClearAll => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    color: appTheme.soothifyBlue,
   );
 
   /// A chip group's label on More Filters — Nunito Sans Bold 14.
@@ -2934,6 +2966,36 @@ class CustomTextStyles {
     fontVariations: _semiBold,
     height: 18.2 / 14,
     letterSpacing: -0.2,
+    color: appTheme.textPrimary,
+  );
+
+  /// A field label on the bank-details form — Nunito Sans Bold 16.
+  static TextStyle get expertFieldLabel => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// Its placeholder — "Select Bank".
+  static TextStyle get expertFieldHint => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21 / 16,
+    color: appTheme.paymentHintInk,
+  );
+
+  /// The bold line on a payout confirmation — Nunito Sans Bold 16.
+  static TextStyle get expertOutcomeTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21 / 16,
     color: appTheme.textPrimary,
   );
 

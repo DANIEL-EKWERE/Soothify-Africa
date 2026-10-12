@@ -55,6 +55,14 @@ class ExpertDashboardController extends BaseController {
 
   void openAvailability() => Get.toNamed(AppRoutes.expertAvailability);
 
+  /// Opens or closes a slot to booking. Local only — nothing persists
+  /// availability yet — but the switch has to move when it is pressed.
+  void toggleSlot(AvailabilitySlot slot) {
+    final i = slots.indexWhere((s) => s.id == slot.id);
+    if (i < 0) return;
+    slots[i] = slot.copyWith(enabled: !slot.enabled);
+  }
+
   /// The Quick Action, and the Notes tab's rows. Notes are written per
   /// session, so one has to be chosen first — the frame is titled "Dami's
   /// session notes".
@@ -71,13 +79,8 @@ class ExpertDashboardController extends BaseController {
   void joinCall(ExpertSession session) =>
       Get.toNamed(AppRoutes.expertJoinSession, arguments: session);
 
-  /// The dashboard draws a bell, and nothing is behind it.
-  ///
-  /// The one `Notification` frame in the expert row (`259:61271`) carries the
-  /// *client* nav bar — Home / Plans / Discovery / Community / Profile — so it
-  /// is a client screen filed in the wrong row, not this role's. Sending an
-  /// expert to the client feed would show them "commented on your post" rows
-  /// that are not theirs.
-  void openNotifications() =>
-      AppFeedback.info('Expert notifications are not built yet.');
+  /// The bell. A note here used to claim the expert `Notification` frame was
+  /// a client screen filed in the wrong row, read off its nav bar; the live
+  /// file draws it with the expert's own bar, so it is this role's.
+  void openNotifications() => Get.toNamed(AppRoutes.expertNotifications);
 }

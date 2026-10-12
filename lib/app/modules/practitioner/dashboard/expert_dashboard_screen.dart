@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../data/services/theme_service.dart';
 import '../../../widgets/gradient_text.dart';
 import '../../../widgets/skeleton.dart';
 import '../widgets/expert_money.dart';
@@ -65,12 +66,18 @@ class _Greeting extends StatelessWidget {
     final controller = Get.find<ExpertDashboardController>();
     return Row(
       children: [
-        ClipOval(
-          child: CustomImageView(
-            imagePath: ImageConstant.imgHomeAvatar,
-            height: 44.h,
-            width: 44.h,
-            fit: BoxFit.cover,
+        // The live design's expert bar has no Profile tab, so this avatar is
+        // the way in — it was decorative before.
+        InkWell(
+          onTap: () => Get.toNamed(AppRoutes.expertProfile),
+          customBorder: const CircleBorder(),
+          child: ClipOval(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgHomeAvatar,
+              height: 44.h,
+              width: 44.h,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         SizedBox(width: 7.h),
@@ -80,13 +87,34 @@ class _Greeting extends StatelessWidget {
             children: [
               Text('Welcome back,', style: CustomTextStyles.expertGreeting),
               SizedBox(height: 1.v),
+              // The frame sets the badge immediately after the name, not at
+              // the end of the line: "Baraqhat" is 83 wide from x=75 and the
+              // 24 glyph starts at 158.
               Obx(
-                () => GradientText(
-                  controller.name.value.isEmpty ? ' ' : controller.name.value,
-                  gradient: LinearGradient(
-                    colors: [appTheme.soothifyBlue, appTheme.expertIntroInk],
-                  ),
-                  style: CustomTextStyles.expertName2,
+                () => Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: GradientText(
+                        controller.name.value.isEmpty
+                            ? ' '
+                            : controller.name.value,
+                        gradient: LinearGradient(
+                          colors: [
+                            appTheme.soothifyBlue,
+                            appTheme.expertIntroInk,
+                          ],
+                        ),
+                        style: CustomTextStyles.expertName2,
+                      ),
+                    ),
+                    CustomImageView(
+                      imagePath: ImageConstant.icTickCircle,
+                      height: 24.h,
+                      width: 24.h,
+                      color: appTheme.soothifyBlue,
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 1.v),
@@ -96,6 +124,23 @@ class _Greeting extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8.h),
+        // The frame's right cluster is the dark-mode toggle then the bell —
+        // `circum:dark` at x=291 and the 44 bell at 321. The toggle was
+        // missing here, as it had been on Home.
+        GestureDetector(
+          onTap: () => Get.find<ThemeService>().toggle(context),
+          behavior: HitTestBehavior.opaque,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 3.h, vertical: 10.v),
+            child: CustomImageView(
+              imagePath: ImageConstant.icDarkMode,
+              height: 24.h,
+              width: 24.h,
+              color: appTheme.brandDeep,
+            ),
+          ),
+        ),
+        SizedBox(width: 6.h),
         InkWell(
           onTap: controller.openNotifications,
           customBorder: const CircleBorder(),
@@ -112,7 +157,9 @@ class _Greeting extends StatelessWidget {
               imagePath: ImageConstant.icBell,
               height: 20.h,
               width: 20.h,
-              color: appTheme.textPrimary,
+              // Blue, like the toggle beside it — the same correction Home's
+              // bell already carries. It was drawing near-black.
+              color: appTheme.brandDeep,
             ),
           ),
         ),
@@ -154,9 +201,10 @@ class _EarningsCard extends StatelessWidget {
                       color: appTheme.soothifyBlue.withValues(alpha: 0.64),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: 18.h,
+                    child: CustomImageView(
+                      imagePath: ImageConstant.icWallet,
+                      height: 20.h,
+                      width: 20.h,
                       color: appTheme.onPrimary,
                     ),
                   ),
@@ -248,7 +296,7 @@ class _QuickActions extends StatelessWidget {
       children: [
         Expanded(
           child: _ActionTile(
-            icon: Icons.calendar_today_outlined,
+            iconPath: ImageConstant.icCalendarOutline,
             title: 'Update Availability',
             body: 'Set your available days and time slots.',
             onTap: controller.openAvailability,
@@ -257,7 +305,7 @@ class _QuickActions extends StatelessWidget {
         SizedBox(width: 8.h),
         Expanded(
           child: _ActionTile(
-            icon: Icons.edit_note_outlined,
+            iconPath: ImageConstant.icNoteEdit,
             title: 'Add Session Notes',
             body: 'Keep track of your sessions and client progress.',
             onTap: controller.openSessionNotes,
@@ -270,13 +318,13 @@ class _QuickActions extends StatelessWidget {
 
 class _ActionTile extends StatelessWidget {
   const _ActionTile({
-    required this.icon,
+    required this.iconPath,
     required this.title,
     required this.body,
     required this.onTap,
   });
 
-  final IconData icon;
+  final String iconPath;
   final String title;
   final String body;
   final VoidCallback onTap;
@@ -297,15 +345,38 @@ class _ActionTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 40.h,
-              height: 40.h,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: appTheme.soothifyBlue.withValues(alpha: 0.16),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 20.h, color: appTheme.soothifyBlue),
+            // The glyph and the arrow share a row: the frame puts the 40
+            // badge at the card's left and a 20 arrow at its right edge, both
+            // on y=780.
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40.h,
+                  height: 40.h,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: appTheme.soothifyBlue.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                  ),
+                  child: CustomImageView(
+                    imagePath: iconPath,
+                    height: 22.h,
+                    width: 22.h,
+                    color: appTheme.soothifyBlue,
+                  ),
+                ),
+                const Spacer(),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.v),
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icArrowRight,
+                    height: 20.h,
+                    width: 20.h,
+                    color: appTheme.textPrimary,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 11.v),
             Text(title,

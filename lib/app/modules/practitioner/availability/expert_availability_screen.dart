@@ -112,7 +112,19 @@ class _SlotRow extends StatelessWidget {
             ),
           ),
           Text(slot.range, style: CustomTextStyles.expertSlotDetail),
-          SizedBox(width: 12.h),
+          SizedBox(width: 10.h),
+          // The frame puts a switch on every row — on for the slots a client
+          // can book, off for the ones held back.
+          Transform.scale(
+            scale: 0.7,
+            child: Switch.adaptive(
+              value: slot.enabled,
+              onChanged: (_) =>
+                  Get.find<ExpertDashboardController>().toggleSlot(slot),
+              activeThumbColor: appTheme.onPrimary,
+              activeTrackColor: appTheme.soothifyBlue,
+            ),
+          ),
           // The frame pairs each row with a wheel picker (`259:60077`),
           // drawn as its own full screen rather than a sheet.
           InkWell(

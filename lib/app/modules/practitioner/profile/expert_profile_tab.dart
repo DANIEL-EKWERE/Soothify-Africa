@@ -42,10 +42,17 @@ class ExpertProfileTab extends GetView<ExpertDashboardController> {
               ),
               SizedBox(height: 32.v),
               Text(
-                'The expert profile has no design yet. Your availability, '
-                'session notes and earnings are on their own tabs.',
+                'Your availability, session notes and earnings are on their '
+                'own tabs.',
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.expertCardMeta,
+              ),
+              SizedBox(height: 24.v),
+              // The expert's Settings had no door at all — the list existed
+              // and nothing opened it, which also stranded the protection hub.
+              CustomGhostButton(
+                text: 'Settings',
+                onPressed: () => Get.toNamed(AppRoutes.settings),
               ),
               const Spacer(),
               CustomGhostButton(

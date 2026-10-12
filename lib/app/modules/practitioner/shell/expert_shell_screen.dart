@@ -6,7 +6,6 @@ import '../../user/shell/widgets/app_bottom_nav.dart';
 import '../dashboard/expert_dashboard_screen.dart';
 import '../earnings/expert_earnings_tab.dart';
 import '../notes/expert_notes_tab.dart';
-import '../profile/expert_profile_tab.dart';
 import '../schedule/expert_schedule_tab.dart';
 import 'controller/expert_shell_controller.dart';
 
@@ -25,7 +24,6 @@ class ExpertShellScreen extends GetView<ExpertShellController> {
         ExpertTab.schedule => const ExpertScheduleTab(),
         ExpertTab.earnings => const ExpertEarningsTab(),
         ExpertTab.notes => const ExpertNotesTab(),
-        ExpertTab.profile => const ExpertProfileTab(),
       };
 
   @override

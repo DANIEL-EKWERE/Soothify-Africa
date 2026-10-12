@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// How an expert is paid — Figma "Payout method" (`259:59463`, filed in the
 /// file under the name "Recent payouts").
 ///
@@ -31,4 +33,12 @@ enum PayoutMethod {
   /// Transfer carries one in the frame — the other two tiles have no room,
   /// because their labels already wrap to two lines.
   final String? account;
+
+  /// The mark the frame puts beside each method. The providers' own logos
+  /// were never exported, so these stand in.
+  IconData get glyph => switch (this) {
+        PayoutMethod.bankTransfer => Icons.account_balance,
+        PayoutMethod.paystackCard => Icons.credit_card,
+        PayoutMethod.mobileMoney => Icons.smartphone,
+      };
 }

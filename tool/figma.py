@@ -25,9 +25,17 @@ import json, os, sys, time, urllib.error, urllib.request, urllib.parse, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tool" / ".figma_cache"
-# The design moved to a new file. Override with FIGMA_FILE_KEY if it moves
-# again; the old file was WCc0XlMxVrypxll8CqWhPp.
-KEY = os.environ.get("FIGMA_FILE_KEY", "NJjQwgwMr44oDKuaaHHKbn")
+# Two files exist and it is easy to read the wrong one.
+#
+#   WCc0XlMxVrypxll8CqWhPp  "SoothifyAfrica"    <- the live one, 3 pages
+#   NJjQwgwMr44oDKuaaHHKbn  "Soothify Africa 1" <- a copy
+#
+# This pointed at the copy for a while, on the belief that the design had
+# moved. It had not: checked on 2026-10-12, the live file was modified that
+# morning and the copy the evening before, and the two disagree (the copy's
+# expert nav bar carries a fifth Profile tab the live one does not). Trust
+# `pages`, which prints lastModified, over any memory of which is current.
+KEY = os.environ.get("FIGMA_FILE_KEY", "WCc0XlMxVrypxll8CqWhPp")
 # Longest 429 wait worth sitting through; past this the quota is spent.
 MAX_WAIT = 180
 

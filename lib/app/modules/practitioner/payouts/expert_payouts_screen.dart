@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../earnings/expert_earnings_tab.dart';
 import '../../../data/models/expert_earnings.dart';
 import '../widgets/expert_header.dart';
-import '../widgets/expert_money.dart';
 import 'controller/payout_controller.dart';
 
 /// The full payout history — Figma "Recent payouts" (`259:59782`).
@@ -37,46 +37,18 @@ class ExpertPayoutsScreen extends GetView<PayoutController> {
                     ],
                   );
                 }
+                // The same 343x92 card the Earnings screen lists, 8 apart —
+                // the frame draws one component in both places.
                 return ListView.separated(
-                  padding: EdgeInsets.fromLTRB(24.h, 46.v, 24.h, 32.v),
+                  padding: EdgeInsets.fromLTRB(24.h, 24.v, 24.h, 32.v),
                   itemCount: payouts.length,
-                  separatorBuilder: (_, _) => SizedBox(height: 37.v),
-                  itemBuilder: (context, i) => _PayoutRow(payout: payouts[i]),
+                  separatorBuilder: (_, _) => SizedBox(height: 8.v),
+                  itemBuilder: (context, i) => PayoutCard(payout: payouts[i]),
                 );
               }),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PayoutRow extends StatelessWidget {
-  const _PayoutRow({required this.payout});
-
-  final Payout payout;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 14.h),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(payout.label, style: CustomTextStyles.expertRowLabel),
-                SizedBox(height: 8.v),
-                Text(payoutDay(payout.paidOn),
-                    style: CustomTextStyles.expertPayoutDate),
-              ],
-            ),
-          ),
-          Text(money(payout.amount),
-              style: CustomTextStyles.expertPayoutAmount),
-        ],
       ),
     );
   }

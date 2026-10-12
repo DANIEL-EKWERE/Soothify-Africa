@@ -117,13 +117,14 @@ void main() {
     expect(controller.visible, hasLength(12));
   });
 
-  testWidgets("only What's new carries the New tag", (tester) async {
+  /// The chips carry no tag. A "New" badge was invented for "What's new";
+  /// the design draws three plain pills and nothing else.
+  testWidgets('the chips are plain pills, with no tag', (tester) async {
     await mount(tester);
-    expect(find.text('New'), findsOneWidget);
-    expect(
-      NotificationFilter.values.where((f) => f.badge).toList(),
-      [NotificationFilter.whatsNew],
-    );
+    expect(find.text('New'), findsNothing);
+    for (final f in NotificationFilter.values) {
+      expect(find.text(f.label), findsOneWidget);
+    }
   });
 
   test('timestamps are computed, not the frame\'s typos', () {

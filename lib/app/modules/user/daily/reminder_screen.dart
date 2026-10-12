@@ -151,7 +151,9 @@ class _DayToggle extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? appTheme.actionFill : appTheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: appTheme.segmentBorder),
+          // Same as the availability circles: once it is filled the ring is
+          // a second outline around a state the colour already carries.
+          border: selected ? null : Border.all(color: appTheme.segmentBorder),
         ),
         child: Text(
           label,

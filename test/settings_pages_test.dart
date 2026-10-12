@@ -244,9 +244,34 @@ void main() {
     expect(Get.currentRoute, AppRoutes.practitionerDashboard);
   });
 
+  /// Two lists now: the frames draw a different one for each role. The
+  /// expert has no Account row and is not offered "Become an Expert", and
+  /// carries the protection hub instead.
+  test('the expert sees their own list, not the client\'s', () {
+    expect(
+      SettingsEntry.forExpert.map((e) => e.label),
+      [
+        'Manage subscription',
+        'Care & protection hub',
+        'Light Mode',
+        'Change Language',
+        'Notifications',
+        'Privacy Policy',
+        'Terms & Conditions',
+        'About Us',
+        'Logout',
+      ],
+    );
+    expect(SettingsEntry.forExpert, isNot(contains(SettingsEntry.account)));
+    expect(
+      SettingsEntry.forClient,
+      isNot(contains(SettingsEntry.careProtection)),
+    );
+  });
+
   test('the rows are in the order the screen draws them', () {
     expect(
-      SettingsEntry.values.map((e) => e.label),
+      SettingsEntry.forClient.map((e) => e.label),
       [
         'Manage subscription',
         'Account',

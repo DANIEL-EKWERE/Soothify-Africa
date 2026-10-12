@@ -167,7 +167,7 @@ class _Summary extends StatelessWidget {
       decoration: BoxDecoration(
         color: appTheme.surface,
         borderRadius: BorderRadius.circular(16.h),
-        border: Border.all(color: appTheme.textPrimary),
+        border: Border.all(color: appTheme.cardRim),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

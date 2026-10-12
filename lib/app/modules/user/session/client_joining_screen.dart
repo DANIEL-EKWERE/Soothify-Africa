@@ -322,7 +322,7 @@ class _Control extends StatelessWidget {
             decoration: BoxDecoration(
               color: appTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.textBlack),
+              border: Border.all(color: appTheme.cardRim),
             ),
             child: Icon(icon, size: 18.h, color: appTheme.textPrimary),
           ),

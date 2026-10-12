@@ -14,6 +14,14 @@ import '../modules/practitioner/payouts/expert_payout_method_screen.dart';
 import '../modules/practitioner/payouts/expert_payouts_screen.dart';
 import '../modules/practitioner/payouts/expert_withdraw_screen.dart';
 import '../modules/practitioner/shell/binding/expert_shell_binding.dart';
+import '../modules/practitioner/payouts/expert_bank_details_screen.dart';
+import '../modules/practitioner/payouts/expert_payout_outcome_screen.dart';
+import '../modules/auth/kyc/curating_screen.dart';
+import '../modules/practitioner/call/expert_call_screen.dart';
+import '../modules/practitioner/notifications/controller/expert_notifications_controller.dart';
+import '../modules/practitioner/notifications/expert_notifications_screen.dart';
+import '../modules/practitioner/profile/expert_profile_tab.dart';
+import '../modules/practitioner/protection/care_protection_screen.dart';
 import '../modules/practitioner/shell/expert_shell_screen.dart';
 import '../modules/user/article/article_screen.dart';
 import '../modules/user/corporate/binding/corporate_binding.dart';
@@ -273,6 +281,38 @@ class AppPages {
       name: AppRoutes.expertPayouts,
       page: () => const ExpertPayoutsScreen(),
       bindings: [ExpertShellBinding(), PayoutBinding()],
+    ),
+    GetPage(
+      name: AppRoutes.expertBankDetails,
+      page: () => const ExpertBankDetailsScreen(),
+      bindings: [ExpertShellBinding(), PayoutBinding()],
+    ),
+    GetPage(
+      name: AppRoutes.expertPayoutOutcome,
+      page: () => const ExpertPayoutOutcomeScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.expertNotifications,
+      page: () => const ExpertNotificationsScreen(),
+      binding: BindingsBuilder.put(ExpertNotificationsController.new),
+    ),
+    GetPage(
+      name: AppRoutes.expertCall,
+      page: () => const ExpertCallScreen(),
+      binding: ExpertShellBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.curating,
+      page: () => const CuratingScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.careProtection,
+      page: () => const CareProtectionScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.expertProfile,
+      page: () => const ExpertProfileTab(),
+      binding: ExpertShellBinding(),
     ),
     GetPage(
       name: AppRoutes.expertAvailability,

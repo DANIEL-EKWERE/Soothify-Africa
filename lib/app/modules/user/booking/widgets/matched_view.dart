@@ -171,7 +171,7 @@ class _InterestChip extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 10.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.h),
-        border: Border.all(color: appTheme.textPrimary),
+        border: Border.all(color: appTheme.cardRim),
       ),
       child: Center(
         widthFactor: 1,

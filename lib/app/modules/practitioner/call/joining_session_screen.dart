@@ -172,7 +172,7 @@ class _QuietHint extends StatelessWidget {
       decoration: BoxDecoration(
         color: appTheme.success.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.textPrimary),
+        border: Border.all(color: appTheme.cardRim),
       ),
       child: Text(
         // The frame writes "in a quite space for  the best experience".
@@ -243,7 +243,7 @@ class _Control extends StatelessWidget {
             decoration: BoxDecoration(
               color: appTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.textPrimary, width: 0.7),
+              border: Border.all(color: appTheme.cardRim, width: 0.7),
             ),
             child: Icon(icon, size: 18.h, color: appTheme.textPrimary),
           ),

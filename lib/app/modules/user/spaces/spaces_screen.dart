@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/filter_pill.dart';
 import '../../../data/models/wellness_space.dart';
 import 'controller/spaces_controller.dart';
 import 'widgets/space_card.dart';
@@ -130,14 +131,14 @@ class _Filters extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
-          height: 34.v,
+          height: 30.v,
           child: Obx(
             () => ListView(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 24.h),
               children: [
                 for (final category in SpaceCategory.values) ...[
-                  _Chip(
+                  FilterPill(
                     label: category.label,
                     selected: controller.category.value == category,
                     onTap: () => controller.choose(category),
@@ -182,43 +183,6 @@ class _Filters extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Chip extends StatelessWidget {
-  const _Chip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16.h),
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 13.h),
-        decoration: BoxDecoration(
-          color: selected ? appTheme.soothifyBlue : appTheme.surface,
-          borderRadius: BorderRadius.circular(16.h),
-          border: Border.all(
-            color: selected ? appTheme.soothifyBlue : appTheme.spaceChipBorder,
-          ),
-        ),
-        child: Text(
-          label,
-          style: selected
-              ? CustomTextStyles.spaceChipSelected
-              : CustomTextStyles.spaceChip,
-        ),
-      ),
     );
   }
 }

@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 import 'nav_destination.dart';
 
 /// The expert role's bottom navigation — Figma "Expert dashboard"
-/// (`259:59239`) and every other frame in that row.
+/// (`3792:29745`) and every other frame in that row.
+///
+/// Four tabs, not five. A fifth "Profile" was built from a copy of the
+/// design file; the live one draws Home / Schedule / Earnings / Notes on the
+/// dashboard, the earnings screen and the payouts screens alike. The
+/// expert's profile is reached from the avatar in the dashboard header
+/// instead — see `AppRoutes.expertProfile`.
 ///
 /// The designer built this bar by reusing the client one: its text layers are
 /// still named "Plans" and "Discovery" while reading "Schedule" and
@@ -12,10 +18,9 @@ import 'nav_destination.dart';
 /// the client's with different words.
 enum ExpertTab implements NavDestination {
   home('Home', asset: 'nav_home'),
-  schedule('Schedule', icon: Icons.calendar_today_outlined),
-  earnings('Earnings', icon: Icons.account_balance_wallet_outlined),
-  notes('Notes', icon: Icons.edit_note_outlined),
-  profile('Profile', asset: 'nav_profile');
+  schedule('Schedule', asset: 'ic_calendar_outline'),
+  earnings('Earnings', asset: 'ic_wallet'),
+  notes('Notes', asset: 'ic_note_edit');
 
   const ExpertTab(this.label, {String? asset, this.icon})
       : _asset = asset,
@@ -26,14 +31,15 @@ enum ExpertTab implements NavDestination {
 
   final String? _asset;
 
-  /// Home and Profile draw the same `home-smile` and `face-smile` the client
-  /// bar does, so they use the app's own exports.
+  /// Every tab now draws a real glyph: `home-smile` is the client bar's own
+  /// export, and `akar-icons:calendar`, `ion:wallet-outline` and
+  /// `ci:note-edit` are the expert bar's. The middle three stood in as
+  /// Material icons for a while because the images endpoint was out of
+  /// quota and the wallet had never been exported at all.
   @override
   String? get asset => _asset == null ? null : 'assets/icons/$_asset.svg';
 
-  /// The three middle glyphs are the expert bar's own and were not
-  /// exportable — the images endpoint was out of quota — so Material's
-  /// outlines stand in. Swap for the real SVGs when they can be pulled.
+  /// Kept on the interface, and now unused: every tab has its own SVG.
   @override
   final IconData? icon;
 }

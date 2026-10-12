@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/expert_earnings.dart';
-import '../../../widgets/custom_elevated_button.dart';
 import '../dashboard/controller/expert_dashboard_controller.dart';
 import '../widgets/expert_money.dart';
 
-/// Earnings — Figma "Earning screen" (`259:59366`).
+/// Earnings — Figma "Earning screen" (`3905:32063`).
 ///
-/// Measured: the title at 70, the balance block from 149 with "Withdraw" at
-/// 224 and its footnote at 268, a two-up summary at 343, the payout rows at
-/// 477 and 557, "Recent payouts" at 615 with See All, then payout lines from
-/// 673 at a 100 pitch.
+/// Rebuilt from the frame rather than approximated. The screen is four cards,
+/// not a flat column:
+///
+///   * a 342x183 brand-gradient card at 125 holding the balance and the
+///     Withdraw button, with the service-charge note inside it;
+///   * two 167x118 white tiles at 318 — this week and total earned;
+///   * a 342x135 white card at 460 carrying the next payout date, a rule,
+///     the payout method and a 27 round edit button;
+///   * "Recent payouts" at 615, then 343x92 white cards at a 100 pitch.
 ///
 /// The frame prints the balances in naira and the payout rows in dollars.
 /// Naira throughout — see [ExpertEarnings.currencyNote].
@@ -30,49 +34,32 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
             return ListView(
               padding: EdgeInsets.fromLTRB(24.h, 33.v, 24.h, 32.v),
               children: [
-                Center(
-                  child: Text('Earnings', style: CustomTextStyles.appBarTitle),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: Get.back,
+                      child: CustomImageView(
+                        imagePath: ImageConstant.icChevronLeft,
+                        height: 24.h,
+                        width: 24.h,
+                        color: appTheme.textPrimary,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text('Earnings',
+                          textAlign: TextAlign.center,
+                          style: CustomTextStyles.appBarTitle),
+                    ),
+                    SizedBox(width: 24.h),
+                  ],
                 ),
-                SizedBox(height: 46.v),
-                Center(
-                  child: Column(
-                    children: [
-                      Text('Available Earnings',
-                          style: CustomTextStyles.expertBalanceCaption),
-                      SizedBox(height: 4.v),
-                      Text(money(earnings?.available ?? 0),
-                          style: CustomTextStyles.expertBalanceAmount),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 26.v),
-                CustomElevatedButton(
-                  text: 'Withdraw',
-                  onPressed: () => Get.toNamed(AppRoutes.expertWithdraw),
-                ),
-                SizedBox(height: 15.v),
-                Center(
-                  child: Text('10% bank service charges applies.',
-                      style: CustomTextStyles.expertBalanceCaption),
-                ),
-                SizedBox(height: 43.v),
+                SizedBox(height: 32.v),
+                _BalanceCard(earnings: earnings),
+                SizedBox(height: 10.v),
                 _Summary(earnings: earnings),
-                SizedBox(height: 50.v),
-                _DetailRow(
-                  label: 'Next automatic payout',
-                  value: earnings == null
-                      ? '—'
-                      : payoutDay(earnings.nextPayout),
-                ),
-                SizedBox(height: 39.v),
-                InkWell(
-                  onTap: () => Get.toNamed(AppRoutes.expertPayoutMethod),
-                  child: _DetailRow(
-                    label: 'Payout method',
-                    value: earnings?.payoutMethod ?? '—',
-                  ),
-                ),
-                SizedBox(height: 37.v),
+                SizedBox(height: 24.v),
+                _PayoutDetails(earnings: earnings),
+                SizedBox(height: 24.v),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -85,13 +72,141 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
                     ),
                   ],
                 ),
-                SizedBox(height: 37.v),
-                for (final payout in earnings?.payouts ?? const <Payout>[])
-                  _PayoutRow(payout: payout),
+                SizedBox(height: 16.v),
+                for (final payout in earnings?.payouts ?? const <Payout>[]) ...[
+                  PayoutCard(payout: payout),
+                  SizedBox(height: 8.v),
+                ],
               ],
             );
           }),
         ),
+      ),
+    );
+  }
+}
+
+/// The balance, the Withdraw button and the service-charge note, all inside
+/// the one brand-gradient card the frame draws.
+class _BalanceCard extends StatelessWidget {
+  const _BalanceCard({required this.earnings});
+
+  final ExpertEarnings? earnings;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(16.h, 24.v, 16.h, 24.v),
+      decoration: BoxDecoration(
+        gradient: appTheme.moodCardGradient,
+        borderRadius: BorderRadius.circular(8.h),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text('Available Earnings',
+              style: CustomTextStyles.expertBalanceCaption
+                  .copyWith(color: appTheme.onPrimary)),
+          SizedBox(height: 4.v),
+          Text(money(earnings?.available ?? 0),
+              style: CustomTextStyles.expertBalanceAmount
+                  .copyWith(color: appTheme.onPrimary)),
+          SizedBox(height: 20.v),
+          // White on the gradient, not the app's blue fill: on this card the
+          // action has to read against the brand, not disappear into it.
+          SizedBox(
+            width: double.infinity,
+            child: InkWell(
+              onTap: () => Get.toNamed(AppRoutes.expertWithdraw),
+              borderRadius: BorderRadius.circular(8.h),
+              child: Container(
+                height: 52.v,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: appTheme.onPrimary,
+                  borderRadius: BorderRadius.circular(8.h),
+                ),
+                child: Text('Withdraw',
+                    style: CustomTextStyles.subscribeLabel
+                        .copyWith(color: appTheme.soothifyBlue)),
+              ),
+            ),
+          ),
+          SizedBox(height: 12.v),
+          Text('10% bank service charges applies.',
+              style: CustomTextStyles.expertBalanceCaption
+                  .copyWith(color: appTheme.onPrimary)),
+        ],
+      ),
+    );
+  }
+}
+
+/// The next payout date and the method, in one card with a rule between and
+/// a round edit button at its right.
+class _PayoutDetails extends StatelessWidget {
+  const _PayoutDetails({required this.earnings});
+
+  final ExpertEarnings? earnings;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(17.h, 17.v, 17.h, 17.v),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Column(
+        children: [
+          _DetailRow(
+            label: 'Next automatic payout',
+            value: switch (earnings) {
+              null => '—',
+              final e => payoutDay(e.nextPayout),
+            },
+          ),
+          SizedBox(height: 20.v),
+          Divider(height: 1.v, color: appTheme.cardRim),
+          SizedBox(height: 20.v),
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Text('Payout method',
+                        style: CustomTextStyles.expertRowLabel),
+                    SizedBox(width: 20.h),
+                    Flexible(
+                      child: Text(
+                        earnings?.payoutMethod ?? '—',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: CustomTextStyles.expertRowLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () => Get.toNamed(AppRoutes.expertPayoutMethod),
+                customBorder: const CircleBorder(),
+                child: Container(
+                  width: 27.h,
+                  height: 27.h,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: appTheme.statusIdleFill,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.edit_outlined,
+                      size: 15.h, color: appTheme.textPrimary),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -115,6 +230,7 @@ class _Summary extends StatelessWidget {
             sessions: earnings?.thisWeekSessions ?? 0,
           ),
         ),
+        SizedBox(width: 8.h),
         Expanded(
           child: _SummaryCell(
             caption: 'Total earned',
@@ -140,18 +256,30 @@ class _SummaryCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(caption, style: CustomTextStyles.expertBalanceCaption),
-        SizedBox(height: 4.v),
-        Text(money(amount), style: CustomTextStyles.expertBalanceAmount),
-        SizedBox(height: 4.v),
-        Text(
-          '$sessions ${sessions == 1 ? 'session' : 'sessions'}',
-          style: CustomTextStyles.expertBalanceCaption,
-        ),
-      ],
+    // A card of its own, 167x118 in the frame, not a bare column. No fixed
+    // height: the three lines plus padding come to a touch over 118 once the
+    // bundled face is used, and a hard height just overflows.
+    return Container(
+      padding: EdgeInsets.fromLTRB(17.h, 22.v, 17.h, 22.v),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(caption, style: CustomTextStyles.expertBalanceCaption),
+          SizedBox(height: 4.v),
+          Text(money(amount), style: CustomTextStyles.expertBalanceAmount),
+          SizedBox(height: 4.v),
+          Text(
+            '$sessions ${sessions == 1 ? 'session' : 'sessions'}',
+            style: CustomTextStyles.expertBalanceCaption,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -174,21 +302,31 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-class _PayoutRow extends StatelessWidget {
-  const _PayoutRow({required this.payout});
+/// One payout, as the frame draws it: a 343x92 white card, the label over
+/// its date on the left and the amount at the right.
+///
+/// Public because the "Recent payouts" screen lists the same card.
+class PayoutCard extends StatelessWidget {
+  const PayoutCard({super.key, required this.payout});
 
   final Payout payout;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 37.v),
+    return Container(
+      height: 92.v,
+      padding: EdgeInsets.symmetric(horizontal: 14.h),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(8.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(payout.label, style: CustomTextStyles.expertRowLabel),
                 SizedBox(height: 8.v),

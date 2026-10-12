@@ -16,7 +16,12 @@ class SettingsController extends GetxController {
   final ThemeService _theme;
   final SessionService _session;
 
-  List<SettingsEntry> get entries => SettingsEntry.values;
+  bool get isPractitioner => _session.isPractitioner;
+
+  /// The list for whoever is signed in — see [SettingsEntry.forExpert].
+  List<SettingsEntry> get entries => _session.isPractitioner
+      ? SettingsEntry.forExpert
+      : SettingsEntry.forClient;
 
   /// The design's own placeholder name. Nothing persists a display name yet —
   /// sign-up captures one but never stores it — so this is honest placeholder
@@ -63,6 +68,8 @@ class SettingsController extends GetxController {
   /// the three content pages — they had simply never been wired up.
   Future<void> open(SettingsEntry entry) async {
     switch (entry) {
+      case SettingsEntry.careProtection:
+        Get.toNamed(AppRoutes.careProtection);
       case SettingsEntry.manageSubscription:
         await Get.toNamed(AppRoutes.manageSubscription);
       case SettingsEntry.account:

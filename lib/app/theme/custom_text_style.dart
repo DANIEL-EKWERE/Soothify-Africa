@@ -650,13 +650,16 @@ class CustomTextStyles {
     color: appTheme.textPrimary.withValues(alpha: 0.88),
   );
 
+  /// The pill it sits in is white in both themes, so its ink cannot follow
+  /// the palette: on the dark one textPrimary is near-white, and the label
+  /// dissolved into its own background.
   static TextStyle get trialSavingBadge => TextStyle(
     fontFamily: fontNunito,
     fontSize: 8.fSize,
     fontWeight: FontWeight.w600,
     fontVariations: _semiBold,
     height: 10.9 / 8,
-    color: appTheme.textPrimary,
+    color: appTheme.onFixedLight,
   );
 
   static TextStyle get trialPlanTitle => TextStyle(

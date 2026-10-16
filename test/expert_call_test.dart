@@ -54,6 +54,10 @@ void main() {
       final c = Get.put(JoiningSessionController(session: session));
       await pumpScreen(tester, const JoiningSessionScreen(),
           brightness: brightness);
+      // The client's portrait renders blank in a golden unless it is
+      // decoded first.
+      await precacheAll(tester, find.byType(JoiningSessionScreen),
+          const ['assets/images/notifications/avatar_female.png']);
       return c;
     }
 

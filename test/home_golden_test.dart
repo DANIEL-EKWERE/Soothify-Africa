@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/core/app_export.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
+import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/shell/tabs/home_tab.dart';
@@ -73,6 +73,37 @@ void main() {
           find.byType(HomeTab), matchesGoldenFile('goldens/home_$name.png'));
     });
   }
+
+  testWidgets('the portrait opens Settings', (tester) async {
+    useDesignFrame(tester);
+    disableMotion(tester);
+    await loadAppFonts();
+
+    Get.put(await ThemeService().init());
+    Get.put<ContentRepository>(MockContentRepository());
+    final session = Get.put(await SessionService().init());
+    // The portrait only shows once there is an account behind it.
+    await session.setRole(UserRole.user);
+    Get.put(HomeTabController(Get.find<ContentRepository>(),
+        now: fixedMorning));
+
+    await pumpScreen(
+      tester,
+      const HomeTab(),
+      pages: [
+        GetPage(
+          name: AppRoutes.settings,
+          page: () => const Scaffold(body: Text('settings')),
+        ),
+      ],
+    );
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(ClipOval).first);
+    await tester.pumpAndSettle();
+    expect(Get.currentRoute, AppRoutes.settings);
+  });
 
   testWidgets('the three Explore photos sit on one line', (tester) async {
     useDesignFrame(tester);

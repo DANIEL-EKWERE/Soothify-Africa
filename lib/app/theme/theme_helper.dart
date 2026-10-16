@@ -69,6 +69,7 @@ class PrimaryColors {
     required this.textMuted,
     required this.textSubtitle,
     required this.onPrimary,
+    required this.onFixedLight,
     required this.cardBorder,
     required this.optionBorder,
     required this.segmentBorder,
@@ -236,6 +237,11 @@ class PrimaryColors {
   final Color textMuted;
   final Color textSubtitle;
   final Color onPrimary;
+
+  /// Ink for a chip that is white in both themes — the saving badge on the
+  /// trial offer's gradient card. [textPrimary] flips to near-white in the
+  /// dark palette, which left that label white on white.
+  final Color onFixedLight;
 
   // Lines
   final Color cardBorder;
@@ -606,6 +612,7 @@ class PrimaryColors {
     textMuted: Color(0xB81B1F26),
     textSubtitle: Color(0xE6323233),
     onPrimary: Color(0xFFFFFFFF),
+    onFixedLight: Color(0xFF263238),
     cardBorder: Color(0x0D000000),
     optionBorder: Color(0x0D263238),
     segmentBorder: Color(0x80263238),
@@ -727,6 +734,7 @@ class PrimaryColors {
     textMuted: Color(0xB8FEFEFE),
     textSubtitle: Color(0xE6FEFEFE),
     onPrimary: Color(0xFFFFFFFF),
+    onFixedLight: Color(0xFF263238),
     cardBorder: Color(0x14FFFFFF),
     optionBorder: Color(0x14FFFFFF),
     segmentBorder: Color(0x66FFFFFF),

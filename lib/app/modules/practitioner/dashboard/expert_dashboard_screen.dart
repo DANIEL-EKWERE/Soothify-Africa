@@ -294,26 +294,34 @@ class _QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ExpertDashboardController>();
-    return Row(
-      children: [
-        Expanded(
-          child: _ActionTile(
-            iconPath: ImageConstant.icCalendarOutline,
-            title: 'Update Availability',
-            body: 'Set your available days and time slots.',
-            onTap: controller.openAvailability,
+    // IntrinsicHeight and stretch, not a fixed height on each tile: the
+    // bundled NunitoSans wraps "Keep track of your sessions and client
+    // progress." onto three lines, and at the frame's 151 the third was
+    // being cut through the middle by the card's own padding. The taller
+    // tile now sets the height and the shorter one matches it.
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _ActionTile(
+              iconPath: ImageConstant.icCalendarOutline,
+              title: 'Update Availability',
+              body: 'Set your available days and time slots.',
+              onTap: controller.openAvailability,
+            ),
           ),
-        ),
-        SizedBox(width: 8.h),
-        Expanded(
-          child: _ActionTile(
-            iconPath: ImageConstant.icNoteEdit,
-            title: 'Add Session Notes',
-            body: 'Keep track of your sessions and client progress.',
-            onTap: controller.openSessionNotes,
+          SizedBox(width: 8.h),
+          Expanded(
+            child: _ActionTile(
+              iconPath: ImageConstant.icNoteEdit,
+              title: 'Add Session Notes',
+              body: 'Keep track of your sessions and client progress.',
+              onTap: controller.openSessionNotes,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -337,7 +345,8 @@ class _ActionTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8.h),
       child: Container(
-        height: 151.v,
+        // A floor, not a ceiling: the frame's 151 with nothing to clip.
+        constraints: BoxConstraints(minHeight: 151.v),
         padding: EdgeInsets.fromLTRB(13.h, 21.v, 13.h, 13.v),
         decoration: BoxDecoration(
           color: appTheme.surface,
@@ -386,13 +395,9 @@ class _ActionTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: CustomTextStyles.expertActionTitle),
             SizedBox(height: 8.v),
-            Expanded(
-              child: Text(
-                body,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: CustomTextStyles.expertActionBody,
-              ),
+            Text(
+              body,
+              style: CustomTextStyles.expertActionBody,
             ),
           ],
         ),

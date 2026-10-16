@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/expert_session.dart';
-import '../../../widgets/custom_elevated_button.dart';
+import '../../../widgets/custom_ghost_button.dart';
 import '../widgets/expert_header.dart';
 import 'controller/joining_session_controller.dart';
 import 'widgets/joining_pulse.dart';
@@ -64,7 +64,9 @@ class JoiningSessionScreen extends GetView<JoiningSessionController> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
-              child: CustomElevatedButton(
+              // Outlined: Cancel is the way out of this screen, not the
+              // thing it is for.
+              child: CustomGhostButton(
                 text: 'Cancel',
                 onPressed: controller.cancel,
               ),
@@ -76,7 +78,11 @@ class JoiningSessionScreen extends GetView<JoiningSessionController> {
   }
 }
 
-/// Client on the left, when on the right.
+/// Who and when — the frame's pale blue card: the client's portrait, their
+/// name and service, a hairline, then a calendar and the session's hours.
+///
+/// It was drawing two bare columns of text: no portrait, no rule, no
+/// calendar, and no card behind them.
 class _Details extends StatelessWidget {
   const _Details({required this.session});
 
@@ -84,16 +90,28 @@ class _Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<JoiningSessionController>();
-    final now = controller.session?.startsAt ?? DateTime.now();
-    return Padding(
-      // The frame puts "Client" at x=92 and "Session Time" at x=238, whose
-      // own box runs to 386 — four short of the screen edge. Split evenly
-      // and the time ellipsises at "11:0…".
-      padding: EdgeInsets.only(left: 68.h, right: 4.h),
+    // The hours are the session's own, so "now" is its start: this screen is
+    // opened at the appointment, and a real clock would make the label drift
+    // to "Sep 28" the day before.
+    final at = session.startsAt;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 14.v),
+      decoration: BoxDecoration(
+        color: appTheme.policyPanel,
+        borderRadius: BorderRadius.circular(12.h),
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          ClipOval(
+            child: CustomImageView(
+              imagePath: session.avatarAsset,
+              height: 40.h,
+              width: 40.h,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 11.h),
           Expanded(
             child: _Field(
               // The frame writes "Client".
@@ -102,12 +120,32 @@ class _Details extends StatelessWidget {
               detail: session.service,
             ),
           ),
+          // The hairline the frame sets between the two halves.
+          Container(width: 1, height: 55.v, color: appTheme.sessionCardRule),
+          SizedBox(width: 13.h),
           Expanded(
-            child: _Field(
-              // The frame writes "Seesion Time".
-              caption: 'Session Time',
-              value: session.when(now).split(', ').last,
-              detail: _date(session.startsAt),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 2.v),
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icCalendarSmall,
+                    height: 19.h,
+                    width: 19.h,
+                  ),
+                ),
+                SizedBox(width: 8.h),
+                Expanded(
+                  child: _Field(
+                    // The frame writes "Seesion Time".
+                    caption: 'Session Time',
+                    // Start to end, which is what the frame prints.
+                    value: session.hours,
+                    detail: _date(at),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -145,8 +183,10 @@ class _Field extends StatelessWidget {
       children: [
         Text(caption, style: CustomTextStyles.joiningCaption),
         SizedBox(height: 4.v),
+        // Two lines allowed: "10:00 AM - 11:00 AM" wraps in the narrower
+        // column rather than ellipsising to "11:0…".
         Text(value,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: CustomTextStyles.joiningValue),
         SizedBox(height: 4.v),
@@ -164,21 +204,33 @@ class _QuietHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A shield at the left with the words beside it, both ranged left — the
+    // frame's arrangement. This was centred, with no shield and a rim the
+    // frame does not draw.
     return Container(
-      height: 64.v,
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 24.h),
-      alignment: Alignment.center,
+      padding: EdgeInsets.fromLTRB(16.h, 16.v, 16.h, 16.v),
       decoration: BoxDecoration(
         color: appTheme.success.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8.h),
-        border: Border.all(color: appTheme.cardRim),
+        borderRadius: BorderRadius.circular(12.h),
       ),
-      child: Text(
-        // The frame writes "in a quite space for  the best experience".
-        'Make sure you’re in a quiet space for the best experience.',
-        textAlign: TextAlign.center,
-        style: CustomTextStyles.joiningHint,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomImageView(
+            imagePath: ImageConstant.icSecurity,
+            height: 20.h,
+            width: 20.h,
+          ),
+          SizedBox(width: 16.h),
+          Expanded(
+            child: Text(
+              // The frame writes "in a quite space for  the best experience".
+              'Make sure you’re in a quiet space for the best experience.',
+              style: CustomTextStyles.joiningHint,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -243,7 +295,9 @@ class _Control extends StatelessWidget {
             decoration: BoxDecoration(
               color: appTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.cardRim, width: 0.7),
+              // Light grey, not the 4% a card takes: these are 36 circles
+              // on the background, and at a card's weight the ring vanished.
+              border: Border.all(color: appTheme.fieldRim),
             ),
             child: Icon(icon, size: 18.h, color: appTheme.textPrimary),
           ),

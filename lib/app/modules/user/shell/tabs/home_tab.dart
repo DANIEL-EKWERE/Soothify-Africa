@@ -70,12 +70,18 @@ class _Header extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (!guest) ...[
-          ClipOval(
-            child: CustomImageView(
-              imagePath: ImageConstant.imgHomeAvatar,
-              height: 44.h,
-              width: 44.h,
-              fit: BoxFit.cover,
+          // The portrait is the way into Settings — the frame gives the
+          // profile no other entry point from this tab.
+          GestureDetector(
+            onTap: () => Get.toNamed(AppRoutes.settings),
+            behavior: HitTestBehavior.opaque,
+            child: ClipOval(
+              child: CustomImageView(
+                imagePath: ImageConstant.imgHomeAvatar,
+                height: 44.h,
+                width: 44.h,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           SizedBox(width: 7.h),

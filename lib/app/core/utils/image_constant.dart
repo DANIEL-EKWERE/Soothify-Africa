@@ -110,6 +110,15 @@ class ImageConstant {
   /// card's badge. Supplied by the designer; it was not exportable.
   static const String icWallet = '$_icons/ic_wallet.svg';
 
+  /// The 19 calendar beside "Session Time" on both joining-call screens.
+  /// Supplied by the designer, in brand blue.
+  static const String icCalendarSmall = '$_icons/ic_calendar_small.svg';
+
+  /// The camera inside the joining disc — the designer's own, a wider mark
+  /// than the Material stand-in that was there, drawn in white already.
+  /// Not [icVideoCall]: that is the questionnaire's camcorder tile.
+  static const String icJoiningCamera = '$_icons/ic_joining_camera.svg';
+
   /// The scalloped verification badge beside a verified expert's name.
   /// Supplied by the designer, and carries its own brand blue — it is not
   /// tinted at the call site.

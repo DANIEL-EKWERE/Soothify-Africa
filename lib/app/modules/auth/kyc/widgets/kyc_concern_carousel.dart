@@ -26,8 +26,14 @@ class KycConcernCarousel extends StatefulWidget {
 }
 
 class _KycConcernCarouselState extends State<KycConcernCarousel> {
-  /// Wide enough that both neighbours show at the edges, as the frame draws.
-  late final PageController _rail = PageController(viewportFraction: 0.62);
+  /// Narrow enough that the neighbours genuinely show at the edges.
+  ///
+  /// At the frame's 0.62 each page was 242 of the 390 wide, so a neighbour
+  /// scaled to 0.72 and centred in its own page showed about 40 — a sliver
+  /// readable as artwork bleeding off, not as another card. People were
+  /// missing that the rail slides at all. At 0.52 a neighbour's own centre
+  /// sits just past the screen edge, so close to half of it is on screen.
+  late final PageController _rail = PageController(viewportFraction: 0.52);
 
   int _focused = 0;
 
@@ -205,8 +211,9 @@ class _Figure extends StatelessWidget {
       child: AnimatedScale(
         duration: const Duration(milliseconds: 250),
         // The neighbours are drawn smaller as well as clipped, which is what
-        // makes the focused one read as in focus.
-        scale: focused ? 1 : 0.72,
+        // makes the focused one read as in focus — but not so much smaller
+        // that the half of one at the edge stops reading as a figure.
+        scale: focused ? 1 : 0.78,
         child: Stack(
           alignment: Alignment.center,
           children: [

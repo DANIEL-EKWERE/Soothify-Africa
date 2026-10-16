@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/expert_session.dart';
 import 'package:soothifyafrica/app/data/repositories/expert_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_expert_repository.dart';

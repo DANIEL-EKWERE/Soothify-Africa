@@ -19,9 +19,15 @@ class ApiClient {
     http.Client? client,
     String? baseUrl,
     String Function()? accessToken,
+    String Function()? refreshToken,
+    Future<void> Function(String access, String refresh)? onTokens,
+    Future<void> Function()? onSignedOut,
   }) : _client = client ?? http.Client(),
        _baseUrl = baseUrl ?? defaultBaseUrl,
-       _accessToken = accessToken ?? (() => '');
+       _accessToken = accessToken ?? (() => ''),
+       _refreshToken = refreshToken ?? (() => ''),
+       _onTokens = onTokens,
+       _onSignedOut = onSignedOut;
 
   /// Overridable at build time so a debug build can point at a laptop:
   ///
@@ -43,20 +49,80 @@ class ApiClient {
   /// so one captured at startup would be stale by the time it is used.
   final String Function() _accessToken;
 
+  final String Function() _refreshToken;
+
+  /// Called with a fresh pair after a successful refresh, so whoever owns
+  /// storage writes them. The client itself keeps nothing.
+  final Future<void> Function(String access, String refresh)? _onTokens;
+
+  /// Called when the refresh token is itself dead. The session is over and
+  /// the app has to say so; this client cannot decide what that looks like.
+  final Future<void> Function()? _onSignedOut;
+
+  /// One refresh at a time. Six screens loading at once all meet the same
+  /// expired token, and six parallel refreshes would rotate the refresh
+  /// token six times -- five of them landing on a token already replaced.
+  Future<bool>? _refreshing;
+
+  Future<Map<String, dynamic>> get(String path) => _send('GET', path, null);
+
   Future<Map<String, dynamic>> post(
     String path, {
     Map<String, dynamic> body = const {},
   }) => _send('POST', path, body);
+
+  Future<Map<String, dynamic>> put(
+    String path, {
+    Map<String, dynamic> body = const {},
+  }) => _send('PUT', path, body);
+
+  Future<Map<String, dynamic>> patch(
+    String path, {
+    Map<String, dynamic> body = const {},
+  }) => _send('PATCH', path, body);
 
   Future<Map<String, dynamic>> delete(
     String path, {
     Map<String, dynamic> body = const {},
   }) => _send('DELETE', path, body);
 
+  /// A list endpoint, however the server chose to answer.
+  ///
+  /// DRF sends a bare array from an unpaginated view and
+  /// `{"results": [...], "count": n}` from a paginated one. Both are normal,
+  /// and no caller should have to know which it is dealing with.
+  Future<List<Map<String, dynamic>>> getList(String path) async {
+    final body = await get(path);
+    final rows = body['results'] ?? body['data'] ?? body['items'];
+    if (rows is! List) return const [];
+    return rows.whereType<Map<String, dynamic>>().toList();
+  }
+
   Future<Map<String, dynamic>> _send(
     String method,
     String path,
-    Map<String, dynamic> body,
+    Map<String, dynamic>? body, {
+    bool allowRetry = true,
+  }) async {
+    final response = await _raw(method, path, body);
+
+    // An expired access token is the ordinary case, not a failure: they last
+    // thirty minutes. Refresh once, quietly, and send the request again. If
+    // the refresh also fails the session really is over and the exception
+    // from _decode stands.
+    if (response.statusCode == 401 && allowRetry && _refreshToken().isNotEmpty) {
+      if (await _refresh()) {
+        return _send(method, path, body, allowRetry: false);
+      }
+    }
+
+    return _decode(response);
+  }
+
+  Future<http.Response> _raw(
+    String method,
+    String path,
+    Map<String, dynamic>? body,
   ) async {
     final uri = Uri.parse('$_baseUrl$path');
     final token = _accessToken();
@@ -65,13 +131,12 @@ class ApiClient {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         if (token.isNotEmpty) 'Authorization': 'Bearer $token',
-      })
-      ..body = jsonEncode(body);
+      });
+    if (body != null) request.body = jsonEncode(body);
 
-    http.Response response;
     try {
       final streamed = await _client.send(request).timeout(_timeout);
-      response = await http.Response.fromStream(streamed);
+      return await http.Response.fromStream(streamed);
     } on SocketException {
       throw const NetworkException();
     } on http.ClientException {
@@ -79,8 +144,47 @@ class ApiClient {
     } on async.TimeoutException {
       throw const TimeoutException();
     }
+  }
 
-    return _decode(response);
+  /// Exchange the refresh token for a new pair. True if the session lives.
+  ///
+  /// Shared: callers that arrive while one is in flight wait on the same
+  /// future rather than starting their own.
+  Future<bool> _refresh() {
+    return _refreshing ??= _doRefresh().whenComplete(() => _refreshing = null);
+  }
+
+  Future<bool> _doRefresh() async {
+    final refresh = _refreshToken();
+    if (refresh.isEmpty) return false;
+
+    http.Response response;
+    try {
+      response = await _raw('POST', '/auth/token/refresh/', {'refresh': refresh});
+    } on AppException {
+      // Offline. Not a dead session -- say nothing and let the original
+      // request fail with its own network error.
+      return false;
+    }
+
+    if (response.statusCode != 200) {
+      Log.d('Refresh refused (${response.statusCode}); signing out.');
+      await _onSignedOut?.call();
+      return false;
+    }
+
+    try {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final access = '${body['access'] ?? ''}';
+      if (access.isEmpty) return false;
+      // ROTATE_REFRESH_TOKENS is on server-side, so a new refresh usually
+      // comes back too; keep the old one when it does not.
+      final rotated = '${body['refresh'] ?? ''}';
+      await _onTokens?.call(access, rotated.isEmpty ? refresh : rotated);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   Map<String, dynamic> _decode(http.Response response) {

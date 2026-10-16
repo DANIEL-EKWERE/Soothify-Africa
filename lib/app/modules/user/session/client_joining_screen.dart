@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../widgets/custom_elevated_button.dart';
+import '../../../widgets/custom_ghost_button.dart';
 import '../../practitioner/call/widgets/joining_pulse.dart';
 import 'controller/client_joining_controller.dart';
 import '../../../widgets/soothify_word.dart';
@@ -125,19 +125,10 @@ class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 24.v),
-              child: CustomElevatedButton(
+              // The same outlined Cancel the practitioner's twin carries.
+              child: CustomGhostButton(
                 text: 'Cancel',
-                // Outlined, unlike the practitioner's filled Cancel.
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: appTheme.surface,
-                  foregroundColor: appTheme.actionFill,
-                  elevation: 0,
-                  side: BorderSide(color: appTheme.actionFill),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.h),
-                  ),
-                ),
-                labelStyle: CustomTextStyles.studioSecondaryAction,
+                textStyle: CustomTextStyles.studioSecondaryAction,
                 onPressed: controller.cancel,
               ),
             ),
@@ -156,8 +147,10 @@ class _SessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ClientJoiningController>();
     return Container(
-      height: 92.v,
-      padding: EdgeInsets.symmetric(horizontal: 16.h),
+      // A floor, not a fixed height: "10:00 AM - 11:00 AM" wraps to two
+      // lines beside the calendar, and 92 cut the date off.
+      constraints: BoxConstraints(minHeight: 92.v),
+      padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 14.v),
       decoration: BoxDecoration(
         color: appTheme.policyPanel,
         borderRadius: BorderRadius.circular(12.h),
@@ -187,11 +180,27 @@ class _SessionCard extends StatelessWidget {
           ),
           SizedBox(width: 13.h),
           Expanded(
-            child: _Field(
-              // The frame reads "Seesion Time".
-              label: 'Session Time',
-              value: controller.time,
-              note: controller.date,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 2.v),
+                  child: CustomImageView(
+                    imagePath: ImageConstant.icCalendarSmall,
+                    height: 19.h,
+                    width: 19.h,
+                  ),
+                ),
+                SizedBox(width: 8.h),
+                Expanded(
+                  child: _Field(
+                    // The frame reads "Seesion Time".
+                    label: 'Session Time',
+                    value: controller.time,
+                    note: controller.date,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -322,7 +331,8 @@ class _Control extends StatelessWidget {
             decoration: BoxDecoration(
               color: appTheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: appTheme.cardRim),
+              // Light grey: a 4% ring on a 36 circle disappears.
+              border: Border.all(color: appTheme.fieldRim),
             ),
             child: Icon(icon, size: 18.h, color: appTheme.textPrimary),
           ),

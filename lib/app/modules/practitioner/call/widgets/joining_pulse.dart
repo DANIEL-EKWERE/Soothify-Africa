@@ -118,10 +118,12 @@ class _JoiningPulseState extends State<JoiningPulse>
               color: appTheme.soothifyBlue,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.videocam_outlined,
-              size: 40.h,
-              color: appTheme.onPrimary,
+            // The designer's own camera, not the Material stand-in: it is a
+            // wider mark with the lens as a separate wedge.
+            child: CustomImageView(
+              imagePath: ImageConstant.icJoiningCamera,
+              width: 43.h,
+              height: 29.h,
             ),
           ),
         ],

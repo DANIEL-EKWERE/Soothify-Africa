@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/expert_earnings.dart';
 import 'package:soothifyafrica/app/data/models/expert_session.dart';
 import 'package:soothifyafrica/app/data/models/expert_tab.dart';
@@ -17,6 +15,8 @@ import 'package:soothifyafrica/app/modules/practitioner/shell/controller/expert_
 import 'package:soothifyafrica/app/modules/practitioner/shell/expert_shell_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/widgets/expert_money.dart';
 import 'package:soothifyafrica/app/modules/practitioner/widgets/expert_session_card.dart';
+
+import 'package:soothifyafrica/app/core/app_export.dart';
 
 import 'helpers.dart';
 
@@ -88,6 +88,29 @@ void main() {
           matchesGoldenFile('goldens/expert_earnings_$name.png'));
     });
   }
+
+  testWidgets('the quick-action tiles show their whole body', (tester) async {
+    await mount(tester);
+    // Both tiles' text wraps; the taller one sets the height. A fixed 151
+    // used to cut the third line of "Keep track of your sessions and client
+    // progress." in half.
+    // The tiles sit below the fold; dragUntilVisible would stop at once,
+    // since the list has already built them.
+    await tester.drag(find.byType(ListView).first, Offset(0, -420.v));
+    await tester.pumpAndSettle();
+    final tile = tester.getRect(find.ancestor(
+      of: find.text('Keep track of your sessions and client progress.'),
+      matching: find.byType(Container),
+    ).first);
+    final body = tester.getRect(
+      find.text('Keep track of your sessions and client progress.'),
+    );
+    expect(body.bottom, lessThanOrEqualTo(tile.bottom),
+        reason: 'the card must not cut through its own words');
+
+    await expectLater(find.byType(ExpertShellScreen),
+        matchesGoldenFile('goldens/expert_quick_actions.png'));
+  });
 
   testWidgets('the dashboard previews three sessions, Schedule lists all',
       (tester) async {

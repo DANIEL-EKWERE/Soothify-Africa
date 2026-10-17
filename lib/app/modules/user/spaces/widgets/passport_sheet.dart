@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../data/repositories/spaces_repository.dart';
 import '../../../../widgets/custom_elevated_button.dart';
 import '../../../../widgets/filled_text_field.dart';
 import '../../../../widgets/gradient_text.dart';
@@ -54,6 +55,7 @@ class _PassportSheetState extends State<PassportSheet> {
   final TextEditingController _email = TextEditingController();
 
   bool _invalid = false;
+  bool _sending = false;
 
   @override
   void initState() {
@@ -75,12 +77,29 @@ class _PassportSheetState extends State<PassportSheet> {
       setState(() => _invalid = true);
       return;
     }
+
+    // Kept on the phone either way, so the field comes back filled in and a
+    // reserved place is not lost if the request fails.
     await PrefUtils().setPassportWaitlistEmail(address);
+
+    setState(() => _sending = true);
+    String? message;
+    try {
+      final fresh = await Get.find<SpacesRepository>()
+          .joinPassportWaitlist(address, source: 'spaces');
+      message = fresh
+          ? 'You\u2019re on the list. We\u2019ll write to $address when passes open.'
+          // Asking twice is not a mistake, and should not read like one.
+          : 'You\u2019re already on the list. We\u2019ll write to $address.';
+    } on AppException catch (error) {
+      message = error.message;
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+
     if (!mounted) return;
     Get.back();
-    // Says what actually happened. Nothing is sent anywhere — there is no
-    // waitlist endpoint — so it does not promise that anyone has been told.
-    AppFeedback.info('Saved. We\u2019ll use $address when passes open.');
+    AppFeedback.info(message);
   }
 
   @override
@@ -165,8 +184,10 @@ class _PassportSheetState extends State<PassportSheet> {
             ],
             SizedBox(height: 20.v),
             CustomElevatedButton(
-              text: PassportSheet.action,
-              onPressed: _reserve,
+              // Says what it is doing, and cannot be pressed twice: a second
+              // tap would ask the waitlist to add the same address again.
+              text: _sending ? 'Reserving\u2026' : PassportSheet.action,
+              onPressed: _sending ? null : _reserve,
             ),
           ],
         ),

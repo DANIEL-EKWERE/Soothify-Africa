@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -147,8 +149,10 @@ void main() {
       final slot = dashboard.slots.first;
       expect(slot.enabled, isTrue);
 
-      dashboard.toggleSlot(slot);
-      await tester.pumpAndSettle();
+      // Closing it removes the hour at the server, so the switch moves
+      // first and the call follows.
+      unawaited(dashboard.toggleSlot(slot));
+      await settleLoads(tester);
 
       expect(dashboard.slots.first.enabled, isFalse);
       expect(find.byType(Switch), findsWidgets);

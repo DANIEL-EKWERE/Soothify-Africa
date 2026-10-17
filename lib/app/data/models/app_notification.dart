@@ -127,6 +127,70 @@ class AppNotification {
     if (d.inDays == 1) return 'Yesterday';
     return '${d.inDays} days ago';
   }
+
+  /// Keys are snake_case to match what DRF serves. `kind` and the strings in
+  /// `filters` are the server's own enum values, so an unknown one -- a kind
+  /// added server-side before the app ships -- falls back to a plain line
+  /// rather than crashing the feed.
+  /// The same row, read.
+  ///
+  /// Marking one read is a server call; the screen should not wait for it to
+  /// come back before the dot goes away, so the list is rebuilt with this.
+  AppNotification markedRead() => AppNotification(
+        id: id,
+        kind: kind,
+        at: at,
+        actor: actor,
+        text: text,
+        title: title,
+        body: body,
+        emphasis: emphasis,
+        avatarAsset: avatarAsset,
+        iconAsset: iconAsset,
+        actionLabel: actionLabel,
+        unread: false,
+        filters: filters,
+      );
+
+  factory AppNotification.fromJson(Map<String, dynamic> json) {
+    final kindName = json['kind'] as String? ?? '';
+    final filterNames = (json['filters'] as List?)?.map((f) => '$f').toSet() ??
+        const <String>{};
+
+    return AppNotification(
+      id: '${json['id']}',
+      kind: NotificationKind.values.firstWhere(
+        (k) => k.name == kindName,
+        orElse: () => NotificationKind.plain,
+      ),
+      actor: json['actor'] as String? ?? '',
+      text: json['text'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      body: json['body'] as String? ?? '',
+      emphasis: json['emphasis'] as String? ?? '',
+      actionLabel: json['action_label'] as String? ?? '',
+      unread: json['unread'] as bool? ?? false,
+      at: DateTime.tryParse('${json['created_at']}')?.toLocal() ??
+          DateTime.now(),
+      filters: {
+        NotificationFilter.all,
+        for (final name in filterNames)
+          if (_filterFor(name) != null) _filterFor(name)!,
+      },
+    );
+  }
+
+  /// The server writes "whats_new"; the enum spells it `whatsNew`.
+  static NotificationFilter? _filterFor(String name) {
+    switch (name) {
+      case 'sessions':
+        return NotificationFilter.sessions;
+      case 'whats_new':
+        return NotificationFilter.whatsNew;
+      default:
+        return null;
+    }
+  }
 }
 
 /// Splits [AppNotification.body] into runs, so the emphasised part can be

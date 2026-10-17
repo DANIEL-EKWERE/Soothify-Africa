@@ -94,7 +94,7 @@ class ExpertBankDetailsScreen extends GetView<PayoutController> {
           shrinkWrap: true,
           padding: EdgeInsets.symmetric(vertical: 16.v),
           children: [
-            for (final bank in PayoutController.banks)
+            for (final bank in controller.banks)
               ListTile(
                 title: Text(bank, style: CustomTextStyles.expertRowLabel),
                 onTap: () => Navigator.of(context).pop(bank),

@@ -19,10 +19,15 @@ abstract class BaseController extends GetxController {
   ///
   /// Returns null on failure so callers can branch without catching. Set
   /// [showFeedback] to false when a screen renders the error inline instead.
+  ///
+  /// [onError] runs before the feedback, for the screens that do something
+  /// with the failure beyond showing it -- a form marking the fields the
+  /// server refused, for instance.
   Future<T?> guard<T>(
     Future<T> Function() action, {
     bool showFeedback = true,
     bool setLoading = true,
+    void Function(AppException error)? onError,
   }) async {
     if (setLoading) isLoading.value = true;
     error.value = null;
@@ -31,12 +36,14 @@ abstract class BaseController extends GetxController {
     } on AppException catch (e, s) {
       Log.e('guarded call failed', error: e, stackTrace: s);
       error.value = e;
+      onError?.call(e);
       if (showFeedback) AppFeedback.error(e);
       return null;
     } catch (e, s) {
       Log.e('unexpected failure', error: e, stackTrace: s);
       final wrapped = const UnknownException();
       error.value = wrapped;
+      onError?.call(wrapped);
       if (showFeedback) AppFeedback.error(wrapped);
       return null;
     } finally {

@@ -9,6 +9,7 @@ import 'package:soothifyafrica/app/modules/user/expert_application/controller/ex
 import 'package:soothifyafrica/app/modules/user/expert_application/expert_application_screen.dart';
 import 'package:soothifyafrica/app/modules/user/expert_application/expert_intro_screen.dart';
 import 'package:soothifyafrica/app/widgets/expert_form_fields.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_expert_application_repository.dart';
 
 import 'helpers.dart';
 
@@ -37,10 +38,13 @@ void main() {
   }) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(
-      ExpertApplicationController(pickDocument: () async => nextPick),
-    );
+    final c = Get.put(ExpertApplicationController(
+      MockExpertApplicationRepository(),
+      pickDocument: () async => nextPick,
+    ));
     await pumpScreen(tester, screen, brightness: brightness);
+    // It asks the server whether one of theirs is still being read.
+    await settleLoads(tester);
     return c;
   }
 
@@ -100,7 +104,8 @@ void main() {
       for (var i = 0; i < ExpertApplicationStep.values.length; i++) {
         answer(c);
         c.next();
-        await tester.pumpAndSettle();
+        // The last one sends it, which is a round trip now.
+        await settleLoads(tester);
       }
 
       await expectLater(find.byType(ExpertApplicationScreen),
@@ -286,8 +291,10 @@ void main() {
     for (var i = 0; i < ExpertApplicationStep.values.length; i++) {
       answer(c);
       c.next();
-      await tester.pumpAndSettle();
+      await settleLoads(tester);
     }
+    // Shown only once the server has it -- the acknowledgement used to be
+    // shown regardless, which was honest when nothing received it.
     expect(c.submitted.value, isTrue);
     expect(find.text('Application Submitted!'), findsOneWidget);
     expect(find.textContaining('within 24 to 48 hours'), findsOneWidget);

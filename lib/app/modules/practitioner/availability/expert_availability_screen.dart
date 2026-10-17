@@ -67,11 +67,17 @@ class ExpertAvailabilityScreen extends GetView<ExpertDashboardController> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
+              // Each switch and each edited window reaches the server as it
+              // is made -- an hour closed is an hour clients stop being
+              // offered, and holding that until a Save would mean somebody
+              // booking an hour the practitioner had already closed. So
+              // this confirms and leaves.
               child: CustomElevatedButton(
-                text: 'Save Availability',
-                onPressed: () => AppFeedback.info(
-                  'Saving availability is not built yet.',
-                ),
+                text: 'Done',
+                onPressed: () {
+                  AppFeedback.info('Your hours are saved.');
+                  Get.back();
+                },
               ),
             ),
           ],

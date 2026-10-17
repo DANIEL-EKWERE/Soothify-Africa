@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
+import '../../../../data/models/signed_in_user.dart';
 import '../../../../data/models/user_role.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/kyc_repository.dart';
@@ -84,24 +85,14 @@ class SignupController extends BaseController {
       return;
     }
 
-    final ok = await guard(() async {
-      await _session.setRole(UserRole.user);
-      return true;
-    });
-    if (ok != true) return;
+    final user = await guard(() => _auth.register(
+          fullName: fullname.value,
+          email: email.value,
+          password: password.value,
+        ));
+    if (user == null) return;
 
-    // Taking an account supersedes a skipped onboarding. Clearing the flag
-    // matters beyond this navigation: without it, quitting part-way through
-    // the questionnaire would leave `resolveStartRoute` still treating it as
-    // skipped, and the next launch would walk straight past the KYC that
-    // registering had just asked for.
-    await PrefUtils().setOnboardingSkipped(false);
-
-    // Guests reach sign-up from Profile having already answered the
-    // questionnaire during onboarding, so sending everyone to KYC would make
-    // them repeat it. Signing in has always checked; signing up now does too.
-    final complete = await _kyc.isComplete();
-    Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
+    await _establish(user);
   }
 
   void goToSignIn() => Get.offAllNamed(AppRoutes.signin);
@@ -116,18 +107,36 @@ class SignupController extends BaseController {
 
   Future<void> continueWithApple() => _social(_auth.signInWithApple);
 
-  Future<void> _social(Future<UserRole?> Function() signIn) async {
+  Future<void> _social(Future<SignedInUser?> Function() signIn) async {
     if (isLoading.value) return;
 
-    final role = await guard(signIn);
-    if (role == null) return;
+    final user = await guard(signIn);
+    if (user == null) return;
 
-    await _session.setRole(role);
-    // Taking an account supersedes a skipped onboarding — same reason as
-    // submit() above.
+    await _establish(user);
+  }
+
+  /// What follows a new account, however it was opened.
+  ///
+  /// Taking an account supersedes a skipped onboarding. Clearing that flag
+  /// matters beyond this navigation: without it, quitting part-way through
+  /// the questionnaire would leave `resolveStartRoute` still treating it as
+  /// skipped, and the next launch would walk straight past the KYC that
+  /// registering had just asked for.
+  Future<void> _establish(SignedInUser user) async {
+    await _session.setRole(user.role);
     await PrefUtils().setOnboardingSkipped(false);
 
-    final complete = await _kyc.isComplete();
+    if (user.role == UserRole.practitioner) {
+      Get.offAllNamed(AppRoutes.practitionerDashboard);
+      return;
+    }
+
+    // Guests reach sign-up from Profile having already answered the
+    // questionnaire during onboarding, so sending everyone to KYC would make
+    // them repeat it. The server says which, and the local repository is
+    // asked only when it did not.
+    final complete = user.kycComplete || await _kyc.isComplete();
     Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }
 }

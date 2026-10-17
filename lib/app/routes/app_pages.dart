@@ -66,6 +66,13 @@ import '../modules/auth/language/language_screen.dart';
 import '../modules/auth/personalize/binding/personalize_binding.dart';
 import '../modules/auth/personalize/personalize_screen.dart';
 import '../modules/auth/intro/intro_screen.dart';
+import '../data/repositories/content_repository.dart';
+import '../data/repositories/expert_repository.dart';
+import '../data/repositories/notification_repository.dart';
+import '../modules/user/search/controller/search_controller.dart';
+import '../modules/user/search/search_screen.dart';
+import '../modules/auth/forgot_password/binding/forgot_password_binding.dart';
+import '../modules/auth/forgot_password/forgot_password_screen.dart';
 import '../modules/auth/signin/binding/signin_binding.dart';
 import '../modules/auth/signin/signin_screen.dart';
 import '../modules/auth/signup/binding/signup_binding.dart';
@@ -161,6 +168,21 @@ class AppPages {
       name: AppRoutes.signin,
       page: () => const SigninScreen(),
       binding: SigninBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.librarySearch,
+      page: () => const LibrarySearchScreen(),
+      binding: BindingsBuilder.put(
+        () => LibrarySearchController(
+          Get.find<ContentRepository>(),
+          initialQuery: Get.arguments is String ? Get.arguments as String : null,
+        ),
+      ),
+    ),
+    GetPage(
+      name: AppRoutes.forgotPassword,
+      page: () => const ForgotPasswordScreen(),
+      binding: ForgotPasswordBinding(),
     ),
     GetPage(
       name: AppRoutes.roleSelect,
@@ -341,7 +363,9 @@ class AppPages {
       page: () => const SessionNotesScreen(),
       bindings: [
         ExpertShellBinding(),
-        BindingsBuilder.put(SessionNotesController.new),
+        BindingsBuilder.put(
+          () => SessionNotesController(Get.find<ExpertRepository>()),
+        ),
       ],
     ),
     GetPage(
@@ -397,7 +421,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.notificationSettings,
       page: () => const NotificationSettingsScreen(),
-      binding: BindingsBuilder.put(NotificationSettingsController.new),
+      binding: BindingsBuilder.put(
+        () => NotificationSettingsController(
+          Get.find<NotificationRepository>(),
+        ),
+      ),
     ),
     GetPage(
       name: AppRoutes.policy,

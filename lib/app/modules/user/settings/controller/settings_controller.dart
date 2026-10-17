@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../core/base_controller.dart';
+import '../../../../core/utils/image_picking.dart';
 import '../../../../data/models/settings_entry.dart';
+import '../../../../data/models/user_profile.dart';
 import '../../../../data/models/user_role.dart';
+import '../../../../data/repositories/auth_repository.dart';
+import '../../../../data/repositories/profile_repository.dart';
 import '../../../auth/language/controller/language_controller.dart';
 import '../policy_screen.dart';
 import '../../../../data/services/session_service.dart';
@@ -10,11 +15,17 @@ import '../../../../data/services/theme_service.dart';
 import '../../../../widgets/confirm_dialog.dart';
 
 /// Backs Settings — Figma "Profile/setting" (135:26963).
-class SettingsController extends GetxController {
-  SettingsController(this._theme, this._session);
+class SettingsController extends BaseController {
+  SettingsController(this._theme, this._session, this._profiles, this._auth);
 
   final ThemeService _theme;
   final SessionService _session;
+  final ProfileRepository _profiles;
+  final AuthRepository _auth;
+
+  /// The account as the server has it. Null until it has been read, and for
+  /// a guest, who has none.
+  final Rxn<UserProfile> profile = Rxn<UserProfile>();
 
   bool get isPractitioner => _session.isPractitioner;
 
@@ -23,15 +34,41 @@ class SettingsController extends GetxController {
       ? SettingsEntry.forExpert
       : SettingsEntry.forClient;
 
-  /// The design's own placeholder name. Nothing persists a display name yet —
-  /// sign-up captures one but never stores it — so this is honest placeholder
-  /// copy rather than a value read from an empty store.
-  String get displayName => 'Dera';
+  /// The account's own name, with the frame's placeholder behind it for a
+  /// guest and for the moment before the profile has been read.
+  String get displayName {
+    final name = profile.value?.fullName ?? '';
+    // "Guest" rather than a placeholder name: somebody browsing without an
+    // account has no name here, and inventing one was what this screen used
+    // to do.
+    return name.isEmpty ? 'Guest' : name.split(RegExp(r'\s+')).first;
+  }
 
   String get version => 'Version 1.0';
 
-  /// The name "User Profile" prints under the avatar — the frame's own.
-  String get fullName => 'Dera Ochukwu';
+  /// The name that prints under the avatar.
+  String get fullName {
+    final name = profile.value?.fullName ?? '';
+    return name.isEmpty ? 'User Profile' : name;
+  }
+
+  /// The portrait on the account, or empty for the asset the screen falls
+  /// back to.
+  String get avatarUrl => profile.value?.avatarUrl ?? '';
+
+  @override
+  void onInit() {
+    super.onInit();
+    _readProfile();
+  }
+
+  Future<void> _readProfile() async {
+    if (_session.isGuest) return;
+    final me = await guard(() => _profiles.me(), showFeedback: false);
+    if (me == null) return;
+    profile.value = me;
+    if (name.text.isEmpty) name.text = me.fullName;
+  }
 
   /// What the Update Account field shows when it is empty — the design puts
   /// the name already on the account there as a hint, not as a value.
@@ -46,17 +83,51 @@ class SettingsController extends GetxController {
     super.onClose();
   }
 
-  /// "Update". Nothing persists a profile yet, so this returns rather than
-  /// claiming to have saved — the same bargain [saveProfile] makes.
-  void updateAccount() => Get.back();
+  /// "Update" on Update Account: saves the name.
+  Future<void> updateAccount() async {
+    final typed = name.text.trim();
+    if (typed.isEmpty || typed == profile.value?.fullName) {
+      Get.back();
+      return;
+    }
 
-  /// Nothing persists a profile yet, so Save Changes returns rather than
-  /// claiming to have saved.
-  void saveProfile() => Get.back();
+    final saved = await guard(() => _profiles.update(fullName: typed));
+    if (saved == null) return;
 
-  /// The photo-source sheet on `259:37567`. No picker is wired up.
-  void pickPhoto(String source) =>
-      AppFeedback.info('$source is not connected yet.');
+    profile.value = saved;
+    Get.back();
+    AppFeedback.info('Saved.');
+  }
+
+  /// Save Changes on the profile screen. The same one field, from the other
+  /// frame that offers it.
+  Future<void> saveProfile() => updateAccount();
+
+  /// The photo-source sheet on `259:37567`.
+  ///
+  /// Both sources end in the same place: a file on the device, uploaded and
+  /// stored privately, read back as a signed link.
+  Future<void> pickPhoto(String source) async {
+    final picked = await _pickImage(
+      source.toLowerCase().contains('camera')
+          ? ImageSource.camera
+          : ImageSource.gallery,
+    );
+    if (picked == null) return;
+
+    final saved = await guard(() => _profiles.uploadAvatar(picked));
+    if (saved == null) return;
+
+    profile.value = saved;
+    AppFeedback.info('Your photo is updated.');
+  }
+
+  /// Replaceable, so a test does not need a camera.
+  Future<String?> Function(ImageSource source) _pickImage = pickImageFromDevice;
+
+  // ignore: use_setters_to_change_properties
+  void usePicker(Future<String?> Function(ImageSource source) picker) =>
+      _pickImage = picker;
 
   bool isDark(BuildContext context) => _theme.isDark(context);
 
@@ -127,22 +198,96 @@ class SettingsController extends GetxController {
       );
       if (!go) return;
     }
+    // The refresh token goes back so the server can retire it; this device
+    // forgets its tokens either way, because an unreachable server must not
+    // be able to keep somebody signed in.
+    await _auth.signOut();
     await _session.signOut();
     await Get.offAllNamed(AppRoutes.shell);
   }
 
-  /// TEMPORARY — see [_ExpertModeDoor] in the screen.
+  /// Debug builds only — see [_ExpertModeDoor] in the screen.
   ///
-  /// Saves the practitioner role and opens that side of the app, which is
-  /// exactly what `/role` does; the difference is that this one is reachable.
-  /// Remove both once an approved application grants the role.
+  /// Saves the practitioner role and opens that side of the app. An
+  /// approved application is what grants the role for real; this exists so
+  /// those screens can be walked without one.
   Future<void> enterExpertMode() async {
     await _session.setRole(UserRole.practitioner);
     await Get.offAllNamed(AppRoutes.practitionerDashboard);
   }
 
-  /// Nothing deletes an account yet, and this is the one action in Settings
-  /// that cannot be taken back, so it says so rather than appearing to work.
-  void confirmDeleteAccount() =>
-      AppFeedback.info('Account deletion is not connected yet.');
+  /// What the delete screen's red button does.
+  ///
+  /// The server asks for proof it is them -- their password, or for an
+  /// account opened with Google or Apple, their address -- so this asks for
+  /// it here rather than deleting on a tap. This is the one action in the
+  /// app that cannot be taken back, and a phone left unlocked on a table
+  /// should not be enough to do it.
+  Future<void> confirmDeleteAccount() async {
+    final context = Get.context;
+    if (context == null) return;
+
+    final proof = await _askForProof(context);
+    if (proof == null || proof.isEmpty) return;
+
+    final done = await guard(() async {
+      await _auth.deleteAccount(proof);
+      return true;
+    });
+    if (done != true) return;
+
+    await _session.signOut();
+    await Get.offAllNamed(AppRoutes.shell);
+    AppFeedback.info(
+      'Your account is closed and your journal, check-ins and profile are '
+      'erased.',
+    );
+  }
+
+  /// The password, or the address for an account with no password.
+  Future<String?> _askForProof(BuildContext context) {
+    final field = TextEditingController();
+    // Google and Apple accounts have no password, so the server asks for
+    // the address instead. It says which when the profile is read.
+    final social = !(profile.value?.hasPassword ?? true);
+
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete your account?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              social
+                  ? 'Type your email address to confirm. This cannot be '
+                      'undone.'
+                  : 'Enter your password to confirm. This cannot be undone.',
+            ),
+            SizedBox(height: 12.v),
+            TextField(
+              controller: field,
+              obscureText: !social,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: social ? 'you@example.com' : 'Your password',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back<String>(result: null),
+            child: const Text('Keep my account'),
+          ),
+          TextButton(
+            onPressed: () => Get.back<String>(result: field.text.trim()),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
 }

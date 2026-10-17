@@ -33,14 +33,22 @@ class ApiClient {
   ///
   ///   flutter run --dart-define=SOOTHIFY_API_BASE_URL=http://10.0.2.2:8000/api/v1
   ///
-  /// The default is the AWS subdomain the backend's own settings name for
-  /// the mobile API; the cPanel site serves the same paths off the apex.
+  /// The default is the live backend. It is the apex, not an `api.`
+  /// subdomain: the API runs beside the website on cPanel and answers
+  /// `/api/v1/` there. The subdomain is reserved for the day the API moves
+  /// to AWS — until that name resolves, building against it means every
+  /// request in the app fails at DNS.
   static const defaultBaseUrl = String.fromEnvironment(
     'SOOTHIFY_API_BASE_URL',
-    defaultValue: 'https://api.soothifyafrica.com.ng/api/v1',
+    defaultValue: 'https://soothifyafrica.com.ng/api/v1',
   );
 
   static const _timeout = Duration(seconds: 20);
+
+  /// Uploads get longer: a certificate photographed on a phone is a few
+  /// megabytes, and twenty seconds of a Nigerian mobile connection is not
+  /// enough to be sure it failed.
+  static const _uploadTimeout = Duration(minutes: 2);
 
   final http.Client _client;
   final String _baseUrl;
@@ -96,6 +104,87 @@ class ApiClient {
     final rows = body['results'] ?? body['data'] ?? body['items'];
     if (rows is! List) return const [];
     return rows.whereType<Map<String, dynamic>>().toList();
+  }
+
+  /// A multipart POST: text fields, and files read from disk.
+  ///
+  /// Separate from [post] because a file cannot travel as JSON, and because
+  /// multipart is the only shape Django's upload handling accepts. Lists go
+  /// in [listFields] and are sent comma-joined, which is what the server
+  /// splits them from -- there is no nesting in a multipart form.
+  ///
+  /// Retries once on an expired token like every other call, which means the
+  /// files are read again rather than held in memory between attempts.
+  Future<Map<String, dynamic>> upload(
+    String path, {
+    Map<String, String> fields = const {},
+    Map<String, List<String>> listFields = const {},
+    Map<String, String> files = const {},
+    String method = 'POST',
+    bool allowRetry = true,
+  }) async {
+    final response = await _rawUpload(method, path, fields, listFields, files);
+
+    if (response.statusCode == 401 && allowRetry && _refreshToken().isNotEmpty) {
+      if (await _refresh()) {
+        return upload(
+          path,
+          fields: fields,
+          listFields: listFields,
+          files: files,
+          method: method,
+          allowRetry: false,
+        );
+      }
+    }
+    return _decode(response);
+  }
+
+  Future<http.Response> _rawUpload(
+    String method,
+    String path,
+    Map<String, String> fields,
+    Map<String, List<String>> listFields,
+    Map<String, String> files,
+  ) async {
+    final uri = Uri.parse('$_baseUrl$path');
+    final token = _accessToken();
+    final request = http.MultipartRequest(method, uri)
+      ..headers.addAll({
+        'Accept': 'application/json',
+        if (token.isNotEmpty) 'Authorization': 'Bearer $token',
+      })
+      ..fields.addAll(fields);
+
+    // Joined with commas, and the server splits them.
+    //
+    // A repeated key would be the usual way to carry a list, but this
+    // package models fields as a Map and can only repeat one by adding a
+    // *file* part -- which Django files under request.FILES, where
+    // `getlist` on the form data will never find it. That mistake reads as
+    // "this field is required" from a form that plainly sent it.
+    for (final entry in listFields.entries) {
+      if (entry.value.isEmpty) continue;
+      request.fields[entry.key] = entry.value.join(',');
+    }
+
+    for (final entry in files.entries) {
+      if (entry.value.isEmpty) continue;
+      request.files.add(
+        await http.MultipartFile.fromPath(entry.key, entry.value),
+      );
+    }
+
+    try {
+      final streamed = await _client.send(request).timeout(_uploadTimeout);
+      return await http.Response.fromStream(streamed);
+    } on SocketException {
+      throw const NetworkException();
+    } on http.ClientException {
+      throw const NetworkException();
+    } on async.TimeoutException {
+      throw const TimeoutException();
+    }
   }
 
   Future<Map<String, dynamic>> _send(

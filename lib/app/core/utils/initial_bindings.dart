@@ -1,11 +1,31 @@
+import 'dart:io' show Platform;
+
 import 'package:get/get.dart';
 
 import '../network/api_client.dart';
 import 'pref_utils.dart';
 
 import '../../data/repositories/api_auth_repository.dart';
+import '../../data/repositories/api_billing_repository.dart';
+import '../../data/repositories/api_booking_repository.dart';
+import '../../data/repositories/api_content_repository.dart';
+import '../../data/repositories/api_corporate_repository.dart';
+import '../../data/repositories/api_journal_repository.dart';
+import '../../data/repositories/api_mood_repository.dart';
+import '../../data/repositories/api_expert_application_repository.dart';
+import '../../data/repositories/api_kyc_repository.dart';
+import '../../data/repositories/api_notification_repository.dart';
+import '../../data/repositories/api_profile_repository.dart';
+import '../../data/repositories/api_spaces_repository.dart';
+import '../../data/repositories/api_subscription_repository.dart';
+import '../../data/repositories/billing_repository.dart';
+import '../../data/repositories/booking_repository.dart';
+import '../../data/repositories/corporate_repository.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/content_repository.dart';
+import '../../data/repositories/expert_application_repository.dart';
+import '../../data/repositories/local_auth_repository.dart';
+import '../../data/repositories/mock_expert_application_repository.dart';
 import '../../data/repositories/journal_repository.dart';
 import '../../data/repositories/local_journal_repository.dart';
 import '../../data/repositories/local_kyc_repository.dart';
@@ -18,7 +38,14 @@ import '../../data/repositories/local_mood_repository.dart';
 import '../../data/repositories/local_profile_repository.dart';
 import '../../data/repositories/community_repository.dart';
 import '../../data/repositories/mock_community_repository.dart';
+import '../../data/repositories/mock_billing_repository.dart';
+import '../../data/repositories/mock_booking_repository.dart';
+import '../../data/repositories/mock_corporate_repository.dart';
+import '../../data/repositories/mock_spaces_repository.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
+import '../../data/repositories/spaces_repository.dart';
+import '../../data/repositories/syncing_journal_repository.dart';
+import '../../data/repositories/syncing_mood_repository.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/repositories/subscription_repository.dart';
 
@@ -30,6 +57,27 @@ import '../../data/repositories/subscription_repository.dart';
 /// [MoodRepository] is bound to the local implementation while there is no
 /// backend. When the Django API exists, only this line changes.
 class InitialBindings extends Bindings {
+  /// Whether the screens read from the Django API or from the mocks.
+  ///
+  /// On by default now that the backend exists. Turn it off for a build that
+  /// has to run without a server:
+  ///
+  ///   flutter run --dart-define=SOOTHIFY_USE_API=false
+  static const _useApiBuild = bool.fromEnvironment(
+    'SOOTHIFY_USE_API',
+    defaultValue: true,
+  );
+
+  /// Never in a test, whatever the build says.
+  ///
+  /// A widget test that reaches this binding would otherwise make real HTTP
+  /// calls: slow, flaky, and dependent on a server being up to run the test
+  /// suite. A test that wants the API path builds the repository itself with
+  /// a MockClient, which is what test/api_repositories_test.dart does.
+  static bool get useApi => _useApiBuild && !_inTest;
+
+  static final bool _inTest = Platform.environment.containsKey('FLUTTER_TEST');
+
   @override
   void dependencies() {
     // main() registers this before runApp, because PushService needs it
@@ -44,37 +92,106 @@ class InitialBindings extends Bindings {
     // Google and Apple sign-in, behind the same interface the auth
     // controllers take, so a test can hand them a stub instead.
     Get.lazyPut<AuthRepository>(
-      () => ApiAuthRepository(Get.find<ApiClient>()),
+      () => useApi
+          ? ApiAuthRepository(Get.find<ApiClient>())
+          : LocalAuthRepository(),
       fenix: true,
     );
 
-    Get.lazyPut<MoodRepository>(() => LocalMoodRepository(), fenix: true);
-    // Backs the Home screen's Recommended list and Popular Articles. Still
-    // the mock while there is no backend — swapping in the Django-backed
-    // implementation is this one line.
-    Get.lazyPut<ContentRepository>(() => MockContentRepository(), fenix: true);
+    final api = Get.find<ApiClient>();
+
+    // Mood and journal are the device's first and the server's second.
+    //
+    // What someone records about their own state must survive being
+    // offline, so the local store answers every read and takes every write,
+    // and the server is told afterwards -- and told again later when the
+    // first attempt could not reach it. Reading the server over the top
+    // would be the regression: a device offline for a week holds the truth
+    // about that week.
+    Get.lazyPut<MoodRepository>(
+      () => useApi
+          ? SyncingMoodRepository(LocalMoodRepository(), ApiMoodRepository(api))
+          : LocalMoodRepository(),
+      fenix: true,
+    );
     Get.lazyPut<JournalRepository>(
-      () => LocalJournalRepository(),
+      () => useApi
+          ? SyncingJournalRepository(
+              LocalJournalRepository(),
+              ApiJournalRepository(api),
+            )
+          : LocalJournalRepository(),
       fenix: true,
     );
-    Get.lazyPut<KycRepository>(
-      () => LocalKycRepository(),
+
+    if (!useApi) {
+      // No backend reachable: the app runs end to end on mocks, which is
+      // what makes it demonstrable on a plane and testable without a server.
+      Get.lazyPut<ContentRepository>(() => MockContentRepository(), fenix: true);
+      Get.lazyPut<KycRepository>(() => LocalKycRepository(), fenix: true);
+      Get.lazyPut<ProfileRepository>(() => LocalProfileRepository(), fenix: true);
+      Get.lazyPut<SubscriptionRepository>(
+        () => MockSubscriptionRepository(),
+        fenix: true,
+      );
+      Get.lazyPut<NotificationRepository>(
+        () => MockNotificationRepository(),
+        fenix: true,
+      );
+      Get.lazyPut<BookingRepository>(() => MockBookingRepository(), fenix: true);
+      Get.lazyPut<BillingRepository>(() => MockBillingRepository(), fenix: true);
+      Get.lazyPut<SpacesRepository>(() => MockSpacesRepository(), fenix: true);
+      Get.lazyPut<CorporateRepository>(
+        () => MockCorporateRepository(),
+        fenix: true,
+      );
+    } else {
+      Get.lazyPut<ContentRepository>(
+        () => ApiContentRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<KycRepository>(() => ApiKycRepository(api), fenix: true);
+      Get.lazyPut<ProfileRepository>(
+        () => ApiProfileRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<SubscriptionRepository>(
+        () => ApiSubscriptionRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<NotificationRepository>(
+        () => ApiNotificationRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<BookingRepository>(
+        () => ApiBookingRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<BillingRepository>(
+        () => ApiBillingRepository(api),
+        fenix: true,
+      );
+      Get.lazyPut<SpacesRepository>(() => ApiSpacesRepository(api), fenix: true);
+      Get.lazyPut<CorporateRepository>(
+        () => ApiCorporateRepository(api),
+        fenix: true,
+      );
+    }
+
+    // Applying to practise here. Bound app-wide rather than per route
+    // because the intro reads "is yours still being looked at?" before the
+    // form is opened.
+    Get.lazyPut<ExpertApplicationRepository>(
+      () => useApi
+          ? ApiExpertApplicationRepository(api)
+          : MockExpertApplicationRepository(),
       fenix: true,
     );
-    Get.lazyPut<ProfileRepository>(
-      () => LocalProfileRepository(),
-      fenix: true,
-    );
+
+    // The forum is on hold server-side (FEATURES['community'] in the Django
+    // settings), so it stays on the mock until those endpoints are mounted.
     Get.lazyPut<CommunityRepository>(
       () => MockCommunityRepository(),
-      fenix: true,
-    );
-    Get.lazyPut<SubscriptionRepository>(
-      () => MockSubscriptionRepository(),
-      fenix: true,
-    );
-    Get.lazyPut<NotificationRepository>(
-      () => MockNotificationRepository(),
       fenix: true,
     );
   }

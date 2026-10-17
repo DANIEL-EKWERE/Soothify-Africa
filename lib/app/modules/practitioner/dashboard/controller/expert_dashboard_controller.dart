@@ -1,6 +1,7 @@
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/bank_destination.dart';
+import '../../../../data/models/bank_option.dart';
 import '../../../../data/models/expert_earnings.dart';
 import '../../../../data/models/expert_session.dart';
 import '../../../../data/models/expert_tab.dart';
@@ -62,14 +63,6 @@ class ExpertDashboardController extends BaseController {
   ///
   /// Local only: nothing persists payout accounts yet, and writing them to
   /// preferences would put an account number on the device in clear.
-  void saveDestination(BankDestination destination, {int? at}) {
-    if (at != null && at >= 0 && at < destinations.length) {
-      destinations[at] = destination;
-    } else {
-      destinations.add(destination);
-    }
-  }
-
   void seeAllSessions() =>
       Get.find<ExpertShellController>().show(ExpertTab.schedule);
 
@@ -78,12 +71,124 @@ class ExpertDashboardController extends BaseController {
 
   void openAvailability() => Get.toNamed(AppRoutes.expertAvailability);
 
-  /// Opens or closes a slot to booking. Local only — nothing persists
-  /// availability yet — but the switch has to move when it is pressed.
-  void toggleSlot(AvailabilitySlot slot) {
+  /// Opens or closes an hour to booking.
+  ///
+  /// Closing it removes it at the server: an hour nobody can book is an
+  /// hour that is not there, and the client's calendar reads the same list.
+  /// The switch moves first so the screen answers the press, and moves back
+  /// if the server refuses — an hour somebody has already booked cannot be
+  /// taken away from them.
+  Future<void> toggleSlot(AvailabilitySlot slot) async {
     final i = slots.indexWhere((s) => s.id == slot.id);
     if (i < 0) return;
-    slots[i] = slot.copyWith(enabled: !slot.enabled);
+
+    final closing = slot.enabled;
+    slots[i] = slot.copyWith(enabled: !closing);
+
+    final done = await guard(
+      () async {
+        if (closing) {
+          await _repository.removeAvailability(slot.id);
+        } else {
+          final reopened = await _repository.addAvailability(
+            day: slot.day,
+            from: slot.from,
+            to: slot.to,
+          );
+          // The reopened hour is a new row with a new id; keeping the old
+          // one would make the next close fail.
+          final at = slots.indexWhere((s) => s.id == slot.id);
+          if (at >= 0) slots[at] = reopened;
+        }
+        return true;
+      },
+      onError: (_) {
+        final at = slots.indexWhere((s) => s.id == slot.id);
+        if (at >= 0) slots[at] = slot;
+      },
+    );
+    if (done != true) return;
+  }
+
+  /// Replaces one bookable hour with the hours a repeat covers.
+  ///
+  /// Closing comes first and is allowed to fail: the server refuses to close
+  /// an hour somebody has booked, and that refusal has to stop the rest —
+  /// otherwise the old hour stays, the new ones appear, and the
+  /// practitioner is bookable twice over.
+  Future<bool> rewriteSlot({
+    required AvailabilitySlot closing,
+    required List<DateTime> days,
+    required int from,
+    required int to,
+  }) async {
+    final done = await guard(() async {
+      await _repository.removeAvailability(closing.id);
+      final opened = <AvailabilitySlot>[];
+      for (final day in days) {
+        opened.add(await _repository.addAvailability(
+          day: day,
+          from: from,
+          to: to,
+        ));
+      }
+      return opened;
+    });
+    if (done == null) return false;
+
+    slots
+      ..removeWhere((slot) => slot.id == closing.id)
+      ..addAll(done)
+      ..sort((a, b) {
+        final byDay = a.day.compareTo(b.day);
+        return byDay != 0 ? byDay : a.from.compareTo(b.from);
+      });
+    return true;
+  }
+
+  /// The banks a payout account can be at, from the provider.
+  Future<List<BankOption>> banks() async {
+    final found = await guard(
+      () => _repository.banks(),
+      // The form falls back to an empty picker and says nothing; a snackbar
+      // over a form somebody is filling in is noise.
+      showFeedback: false,
+    );
+    return found ?? const [];
+  }
+
+  /// Asks to be paid, and says only what is true: the request is in.
+  Future<bool> requestPayout(int naira) async {
+    final done = await guard(() async {
+      await _repository.requestPayout(naira);
+      return true;
+    });
+    if (done != true) return false;
+
+    // The balance moves when the money is actually sent, which is a person's
+    // decision, so the figures are read again rather than adjusted here.
+    final fresh = await guard(() => _repository.earnings(), showFeedback: false);
+    if (fresh != null) earnings.value = fresh;
+    return true;
+  }
+
+  /// Adds an account payouts can land in, through the provider -- which is
+  /// also what confirms the name on it.
+  Future<bool> addDestination({
+    required String bankName,
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    final added = await guard(() => _repository.addPayoutDestination(
+          bankName: bankName,
+          bankCode: bankCode,
+          accountNumber: accountNumber,
+        ));
+    if (added == null) return false;
+
+    // Newest first, and the default: that is what the server just made it.
+    destinations.insert(0, added);
+    return true;
   }
 
   /// The Quick Action, and the Notes tab's rows. Notes are written per

@@ -86,9 +86,20 @@ class TrialOfferScreen extends GetView<TrialOfferController> {
                   SizedBox(height: 8.v),
                   Obx(() => _DueToday(
                         due: controller.dueToday,
-                        renews: '${controller.firstChargeDate.substring(0, 3)} '
-                            '9, 2026 · ${controller.firstCharge} / yr',
+                        renews: '${controller.firstChargeShort} · '
+                            '${controller.firstCharge} / yr',
                       )),
+                  // The card check, in the one place somebody reads before
+                  // they decide. Empty, and taking no room, when no card is
+                  // asked for.
+                  Obx(() {
+                    final note = controller.cardCheckNote;
+                    if (note.isEmpty) return const SizedBox.shrink();
+                    return Padding(
+                      padding: EdgeInsets.only(top: 8.v),
+                      child: Text(note, style: CustomTextStyles.trialRenews),
+                    );
+                  }),
                   SizedBox(height: 22.v),
                   for (final benefit in benefits) ...[
                     _Benefit(label: benefit),

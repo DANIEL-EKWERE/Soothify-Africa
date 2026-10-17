@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../core/base_controller.dart';
+import '../../../../data/repositories/corporate_repository.dart';
 
 /// One field on the Corporate form — Figma `259:36101`.
 ///
@@ -28,7 +30,11 @@ enum CorporateField {
 
 /// Backs the Corporate form and its success card — Figma `259:36101` and
 /// `259:36093`, reached from "Speak with Corporate Team" on Plans.
-class CorporateController extends GetxController {
+class CorporateController extends BaseController {
+  CorporateController(this._enquiries);
+
+  final CorporateRepository _enquiries;
+
   final Map<CorporateField, TextEditingController> fields = {
     for (final f in CorporateField.values) f: TextEditingController(),
   };
@@ -51,7 +57,9 @@ class CorporateController extends GetxController {
     super.onClose();
   }
 
-  void submit() {
+  Future<void> submit() async {
+    if (isLoading.value) return;
+
     final empty = CorporateField.values
         .where((f) => f.required && valueOf(f).isEmpty)
         .toSet();
@@ -64,10 +72,46 @@ class CorporateController extends GetxController {
       );
       return;
     }
-    // Nothing receives this yet. The success card is the design's own next
-    // screen, so it is shown; saying the enquiry was sent would be a lie.
+
+    final sent = await guard(() async {
+      await _enquiries.send(
+        company: valueOf(CorporateField.company),
+        contactName: valueOf(CorporateField.contact),
+        email: valueOf(CorporateField.email),
+        phone: valueOf(CorporateField.phone),
+        employees: valueOf(CorporateField.employees),
+        services: valueOf(CorporateField.services),
+        notes: valueOf(CorporateField.notes),
+      );
+      return true;
+    }, onError: (error) {
+      // A field the server rejected -- a malformed email, most likely.
+      // Marked rather than announced, so the form can point at it.
+      if (error is ValidationException) {
+        missing
+          ..clear()
+          ..addAll(
+            CorporateField.values.where(
+              (f) => error.fieldErrors.containsKey(_fieldName(f)),
+            ),
+          );
+      }
+    });
+    if (sent != true) return;
+
     Get.toNamed(AppRoutes.corporateSuccess);
   }
+
+  /// What the server calls each field, for marking the ones it refused.
+  String _fieldName(CorporateField field) => switch (field) {
+        CorporateField.company => 'company',
+        CorporateField.contact => 'contact_name',
+        CorporateField.email => 'email',
+        CorporateField.phone => 'phone',
+        CorporateField.employees => 'employees',
+        CorporateField.services => 'services',
+        CorporateField.notes => 'notes',
+      };
 
   /// "Continue" on the success card returns to the app rather than back into
   /// the form the user has just submitted.

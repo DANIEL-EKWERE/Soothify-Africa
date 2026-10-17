@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -207,26 +209,30 @@ void main() {
       ],
     );
     c.destinations.clear();
+    // The picker's banks come from the provider now, with the codes its
+    // account lookup needs -- a bank with no code cannot be saved.
+    await settleLoads(tester);
+    expect(c.banks, contains('Kuda Bank'));
 
     c.chooseBank('Kuda Bank');
     c.accountNumber.text = '2200110011';
-    c.accountName.text = 'Baraqhat Ibrahim';
     expect(c.canSaveBank, isTrue);
-    c.saveBankDetails();
+    // Not awaited: the save's own delay only elapses while the tester
+    // pumps, so awaiting it here would deadlock the test.
+    unawaited(c.saveBankDetails());
+    await settleLoads(tester);
+
     expect(c.destinations, hasLength(1));
     expect(c.destinations.first.bank, 'Kuda Bank');
     expect(c.destinations.first.masked, 'Bank ****0011');
 
-    await tester.pumpAndSettle();
-
-    // The pencil fills the form with what is on file; saving overwrites that
-    // account rather than adding a second copy of it.
+    // The pencil fills in the bank and the name, but asks for the number
+    // again: only its last four digits are kept here -- the rest went to
+    // the provider -- and saving four digits is a payout going nowhere.
     c.editDestination(0);
-    expect(c.accountName.text, 'Baraqhat Ibrahim');
-    c.accountName.text = 'B. Ibrahim';
-    c.saveBankDetails();
-    expect(c.destinations, hasLength(1));
-    expect(c.destinations.first.accountName, 'B. Ibrahim');
+    expect(c.bank.value, 'Kuda Bank');
+    expect(c.accountNumber.text, isEmpty);
+    expect(c.canSaveBank, isFalse);
 
     // And "+ Add New Payout Method" starts from an empty form.
     c.addDestination();

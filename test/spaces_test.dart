@@ -5,10 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/wellness_space.dart';
+import 'package:soothifyafrica/app/data/repositories/spaces_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_spaces_repository.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/controller/spaces_controller.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/spaces_screen.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/studio_profile_screen.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/widgets/passport_sheet.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
 
 import 'helpers.dart';
 
@@ -32,8 +35,35 @@ void main() {
   }) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(SpacesController());
-    await pumpScreen(tester, const SpacesScreen(), brightness: brightness);
+    // The Passport sheet reaches for the repository itself, as the binding
+    // gives it in the app.
+    Get.put<SpacesRepository>(MockSpacesRepository());
+    final c = Get.put(SpacesController(Get.find<SpacesRepository>()));
+    await pumpScreen(
+      tester,
+      const SpacesScreen(),
+      brightness: brightness,
+      pages: [
+        GetPage(
+          name: AppRoutes.studioProfile,
+          page: () => const StudioProfileScreen(),
+        ),
+      ],
+    );
+    await settleLoads(tester);
+    return c;
+  }
+
+  /// The profile takes its studio from the route, so it is reached the way a
+  /// tap on a card reaches it rather than pumped on its own -- bare, it
+  /// quite rightly says the studio is no longer listed.
+  Future<SpacesController> mountStudio(
+    WidgetTester tester, {
+    Brightness brightness = Brightness.light,
+  }) async {
+    final c = await mount(tester, brightness: brightness);
+    Get.toNamed(AppRoutes.studioProfile, arguments: c.spaces.first);
+    await tester.pumpAndSettle();
     return c;
   }
 
@@ -67,7 +97,7 @@ void main() {
     testWidgets('spaces map with a pin open, $shade', (tester) async {
       final c = await mount(tester, brightness: brightness);
       c.showMap();
-      c.selectPin(WellnessSpace.sample.first);
+      c.selectPin(c.spaces.first);
       await tester.pumpAndSettle();
       await precacheAll(tester, find.byType(SpacesScreen), _art);
 
@@ -76,11 +106,7 @@ void main() {
     });
 
     testWidgets('studio profile, $shade', (tester) async {
-      useDesignFrame(tester);
-      await loadAppFonts();
-      Get.put(SpacesController());
-      await pumpScreen(tester, const StudioProfileScreen(),
-          brightness: brightness);
+      await mountStudio(tester, brightness: brightness);
       await precacheAll(tester, find.byType(StudioProfileScreen), _art);
 
       await expectLater(find.byType(StudioProfileScreen),
@@ -104,27 +130,28 @@ void main() {
     expect(c.spaces, hasLength(WellnessSpace.sample.length));
 
     c.choose(SpaceCategory.pilates);
-    await tester.pumpAndSettle();
-    expect(c.spaces.every((s) => s.category == SpaceCategory.pilates), isTrue);
+    await settleLoads(tester);
+    expect(c.spaces.every((s) => s.category == SpaceCategory.pilates.name),
+        isTrue);
     expect(c.spaces, isNotEmpty);
 
     c.choose(SpaceCategory.all);
-    await tester.pumpAndSettle();
+    await settleLoads(tester);
     expect(c.spaces, hasLength(WellnessSpace.sample.length));
   });
 
   testWidgets('search matches a name, an area or a tag', (tester) async {
     final c = await mount(tester);
     c.search.text = 'lekki';
-    await tester.pumpAndSettle();
+    await settleLoads(tester);
     expect(c.spaces.single.area, 'Lekki Phase 1');
 
     c.search.text = 'reformer';
-    await tester.pumpAndSettle();
+    await settleLoads(tester);
     expect(c.spaces.single.name, 'Sage & She');
 
     c.search.text = 'nowhere at all';
-    await tester.pumpAndSettle();
+    await settleLoads(tester);
     expect(c.spaces, isEmpty);
     // An empty list says so rather than showing a blank screen.
     expect(find.textContaining('No spaces match'), findsOneWidget);
@@ -137,7 +164,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Tap a pin to preview a space'), findsOneWidget);
 
-    c.selectPin(WellnessSpace.sample.first);
+    c.selectPin(c.spaces.first);
     await tester.pumpAndSettle();
     expect(find.text('Tap a pin to preview a space'), findsNothing);
     expect(find.text('Get Directions'), findsOneWidget);
@@ -151,22 +178,18 @@ void main() {
   testWidgets('a filter that excludes the open pin closes it', (tester) async {
     final c = await mount(tester);
     c.showMap();
-    c.selectPin(WellnessSpace.sample.first); // a Pilates studio
+    c.selectPin(c.spaces.first); // a Pilates studio
     await tester.pumpAndSettle();
 
     c.choose(SpaceCategory.spa);
-    await tester.pumpAndSettle();
+    await settleLoads(tester);
     expect(c.selected.value, isNull);
   });
 
   testWidgets('the Passport teaser is a link, and says it is not open yet',
       (tester) async {
-    useDesignFrame(tester);
-    await loadAppFonts();
     await PrefUtils().init();
-    Get.put(SpacesController());
-    Get.testMode = true;
-    await pumpScreen(tester, const StudioProfileScreen());
+    await mountStudio(tester);
 
     // It is the last thing in the sheet, so it starts below the fold.
     final teaser = find.textContaining('Love this studio?');
@@ -205,6 +228,7 @@ void main() {
     // The sheet reads a previously-left address on mount, so preferences
     // have to be up — `main.dart` awaits this before the first frame.
     await PrefUtils().init();
+    Get.put<SpacesRepository>(MockSpacesRepository());
     await pumpScreen(tester, const PassportSheet());
 
     // Supplied by the designer rather than read from the file — the sheet is
@@ -224,6 +248,7 @@ void main() {
     useDesignFrame(tester);
     await loadAppFonts();
     await PrefUtils().init();
+    Get.put<SpacesRepository>(MockSpacesRepository());
     await pumpScreen(tester, const PassportSheet());
 
     expect(find.text('Email address'), findsOneWidget);

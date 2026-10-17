@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/bank_destination.dart';
+import '../../../../data/models/bank_option.dart';
 import '../../../../data/models/expert_earnings.dart';
 import '../../../../data/models/payout_method.dart';
 import '../../dashboard/controller/expert_dashboard_controller.dart';
@@ -29,17 +30,17 @@ class PayoutController extends GetxController {
   /// a TextEditingController is not observable.
   final RxInt _bankEdits = 0.obs;
 
-  /// The banks the picker offers. Short and fixed, so the destination cannot
-  /// be mistyped.
-  static const banks = [
-    'Access Bank',
-    'Guaranty Trust Bank',
-    'First Bank of Nigeria',
-    'United Bank for Africa',
-    'Zenith Bank',
-    'Kuda Bank',
-    'Opay',
-  ];
+  /// The banks the picker offers, from the provider.
+  ///
+  /// Read rather than written into the app: a list of Nigerian banks goes
+  /// out of date, and each one's code is what the account lookup needs — a
+  /// name alone cannot be resolved, so a typed bank cannot be paid.
+  final RxList<BankOption> bankOptions = <BankOption>[].obs;
+
+  List<String> get banks => bankOptions.map((b) => b.name).toList();
+
+  String get _chosenBankCode =>
+      bankOptions.firstWhereOrNull((b) => b.name == bank.value)?.code ?? '';
 
   /// The frame opens with Bank Transfer outlined in blue — the only selected
   /// state it draws.
@@ -65,6 +66,12 @@ class PayoutController extends GetxController {
     // dashboard's load has returned, and reading the balance then gives 0.
     _seed();
     ever(_dashboard.earnings, (_) => _seed());
+    _loadBanks();
+  }
+
+  Future<void> _loadBanks() async {
+    final found = await _dashboard.banks();
+    if (found.isNotEmpty) bankOptions.assignAll(found);
   }
 
   void _seed() {
@@ -93,8 +100,10 @@ class PayoutController extends GetxController {
   bool get canSaveBank {
     _bankEdits.value;
     return bank.value.isNotEmpty &&
+        // Ten digits is a Nigerian account number; a bank with no code
+        // cannot be resolved, so it cannot be saved either.
         accountNumber.text.trim().length >= 10 &&
-        accountName.text.trim().isNotEmpty;
+        _chosenBankCode.isNotEmpty;
   }
 
   /// Which account a withdrawal is heading to — the index of the outlined
@@ -113,16 +122,26 @@ class PayoutController extends GetxController {
   String get savedDestination =>
       hasDestination ? destinations.first.masked : 'Not set';
 
-  /// Which account the form is editing, or null when it is adding one.
+  /// Which account the form is replacing, or null when it is adding one.
+  ///
+  /// Replacing is adding, at the provider: there is no way to edit an
+  /// account there, and a new default demotes the old one. This is kept so
+  /// the form knows which trip it is on and can clear itself afterwards.
+  // ignore: unused_field  -- read by editDestination/addDestination
   int? _editing;
 
-  /// The edit pencil beside an account. Fills the form with what is on file,
-  /// so saving replaces that account rather than adding a second copy of it.
+  /// The edit pencil beside an account.
+  ///
+  /// The number is asked for again, not prefilled: only its last four digits
+  /// are kept here — the rest went to the provider and was never stored —
+  /// and saving four digits as an account number is how a payout goes
+  /// nowhere. The bank and the name are filled, so only the digits are
+  /// retyped.
   void editDestination(int index) {
     final existing = destinations[index];
     _editing = index;
     bank.value = existing.bank;
-    accountNumber.text = existing.accountNumber;
+    accountNumber.clear();
     accountName.text = existing.accountName;
     touchBank();
     Get.toNamed(AppRoutes.expertBankDetails);
@@ -139,24 +158,32 @@ class PayoutController extends GetxController {
     Get.toNamed(AppRoutes.expertBankDetails);
   }
 
-  /// Saved locally for now — there is no payouts API — then the frame's
-  /// confirmation.
-  void saveBankDetails() {
-    if (!canSaveBank) return;
-    _dashboard.saveDestination(
-      BankDestination(
-        bank: bank.value,
-        accountNumber: accountNumber.text.trim(),
-        accountName: accountName.text.trim(),
-      ),
-      at: _editing,
+  /// Sends the account to the provider, which confirms the name on it and
+  /// makes a destination of it. Only then is the confirmation shown.
+  ///
+  /// The number itself is not kept here or on our server: it goes once, and
+  /// what comes back is the last four digits.
+  Future<void> saveBankDetails() async {
+    if (!canSaveBank || saving.value) return;
+    saving.value = true;
+    final added = await _dashboard.addDestination(
+      bankName: bank.value,
+      bankCode: _chosenBankCode,
+      accountNumber: accountNumber.text.trim(),
     );
+    saving.value = false;
+    if (!added) return;
+
     _editing = null;
+    accountNumber.clear();
     Get.toNamed(
       AppRoutes.expertPayoutOutcome,
       arguments: PayoutOutcome.methodUpdated,
     );
   }
+
+  /// Whether a request is in flight, so neither button can be pressed twice.
+  final RxBool saving = false.obs;
 
   /// Where Withdraw on the Earnings card goes.
   ///
@@ -188,11 +215,9 @@ class PayoutController extends GetxController {
 
   void openHistory() => Get.toNamed(AppRoutes.expertPayouts);
 
-  /// No payment provider is wired on this side either. The frame's own
-  /// footnote says Paystack processes these; until it does, saying so beats
-  /// claiming money moved.
   /// Bank Transfer has a form behind it; the other two have no frame of
-  /// their own yet, so they still say so rather than pretending.
+  /// their own and nothing at the provider, so they still say so rather than
+  /// pretending.
   void proceed() {
     if (method.value == PayoutMethod.bankTransfer) {
       addDestination();
@@ -204,8 +229,17 @@ class PayoutController extends GetxController {
   }
 
   /// The Withdraw button on the amount screen.
-  void withdraw() {
-    if (!canProceed || !hasDestination) return;
+  ///
+  /// The request is recorded; the money is sent by a person afterwards. The
+  /// outcome screen says a withdrawal is on its way, which is what has
+  /// actually happened — and nothing claims it has landed.
+  Future<void> withdraw() async {
+    if (!canProceed || !hasDestination || saving.value) return;
+    saving.value = true;
+    final asked = await _dashboard.requestPayout(requested);
+    saving.value = false;
+    if (!asked) return;
+
     Get.toNamed(
       AppRoutes.expertPayoutOutcome,
       arguments: PayoutOutcome.withdrawalSent,

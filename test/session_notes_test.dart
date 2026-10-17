@@ -47,7 +47,7 @@ void main() {
     Get.put<ExpertRepository>(MockExpertRepository(now: now));
     Get.put(ExpertDashboardController(Get.find<ExpertRepository>(), now: now));
 
-    final c = Get.put(SessionNotesController.forSession(session));
+    final c = Get.put(SessionNotesController.forSession(session, MockExpertRepository()));
     await pumpScreen(tester, const SessionNotesScreen(),
         brightness: brightness);
     await tester.pump(const Duration(milliseconds: 600));

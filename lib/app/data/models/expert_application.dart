@@ -1,13 +1,24 @@
 /// What an applicant says they practise — Figma "Become an expert Form"
 /// (`259:59145`), the first question.
 enum ExpertField {
-  therapist('Licensed Therapist'),
-  yoga('Certified Yoga Instructor'),
-  pilates('Certified Pilates Instructor');
+  therapist('Licensed Therapist', 'therapy'),
+  yoga('Certified Yoga Instructor', 'yoga'),
+  pilates('Certified Pilates Instructor', 'pilates');
 
-  const ExpertField(this.label);
+  const ExpertField(this.label, this.key);
 
   final String label;
+
+  /// What the server calls it. The label is the frame's wording and is not
+  /// safe to send: "Certified Yoga Instructor" is not a discipline.
+  final String key;
+
+  static ExpertField? fromKey(String key) {
+    for (final field in values) {
+      if (field.key == key) return field;
+    }
+    return null;
+  }
 }
 
 /// The languages a session can be run in — `259:59179`.
@@ -15,12 +26,20 @@ enum ExpertField {
 /// The same two the app itself offers, which is why the intro promises
 /// "English or Pidgin".
 enum ExpertLanguage {
-  english('English'),
-  pidgin('Pidgin English');
+  english('English', 'english'),
+  pidgin('Pidgin English', 'pidgin');
 
-  const ExpertLanguage(this.label);
+  const ExpertLanguage(this.label, this.key);
 
   final String label;
+  final String key;
+
+  static ExpertLanguage? fromKey(String key) {
+    for (final language in values) {
+      if (language.key == key) return language;
+    }
+    return null;
+  }
 }
 
 /// A document the application asks to be uploaded — `259:59198`.
@@ -83,3 +102,52 @@ class AttachedDocument {
 /// also holds a second, misaligned pair of segments at y=69, one of them off
 /// the frame entirely; that is a leftover layer, not a fourth step.)
 enum ExpertApplicationStep { profile, languages, credentials }
+
+
+/// Where a sent application stands — what `GET /experts/applications/`
+/// answers with.
+///
+/// The acknowledgement screen used to be the end of the story because
+/// nothing received an application. Now that something does, the applicant
+/// can be told whether it is still being read.
+class ExpertApplicationStatus {
+  const ExpertApplicationStatus({
+    required this.id,
+    required this.status,
+    required this.statusLabel,
+    required this.sentAt,
+    this.fields = const {},
+  });
+
+  final String id;
+
+  /// 'submitted', 'reviewing', 'approved' or 'rejected'.
+  final String status;
+
+  /// The same, in the words the server chose, so one wording is used
+  /// everywhere rather than each client inventing its own.
+  final String statusLabel;
+
+  final DateTime sentAt;
+  final Set<ExpertField> fields;
+
+  bool get isApproved => status == 'approved';
+  bool get isRejected => status == 'rejected';
+
+  /// Still being read. Neither of the two outcomes has arrived.
+  bool get isPending => !isApproved && !isRejected;
+
+  factory ExpertApplicationStatus.fromJson(Map<String, dynamic> json) =>
+      ExpertApplicationStatus(
+        id: '${json['id']}',
+        status: json['status'] as String? ?? 'submitted',
+        statusLabel: json['status_display'] as String? ?? 'Submitted',
+        sentAt: DateTime.tryParse('${json['created_at']}')?.toLocal() ??
+            DateTime.now(),
+        fields: {
+          for (final key in (json['disciplines'] as List? ?? const []))
+            if (ExpertField.fromKey('$key') != null)
+              ExpertField.fromKey('$key')!,
+        },
+      );
+}

@@ -89,4 +89,13 @@ class _FailingContentRepository implements ContentRepository {
   Future<MediaItem?> getById(String id) async => null;
   @override
   Future<List<MediaItem>> search(String query) async => const [];
+  @override
+  Future<void> recordPlay(
+    String id, {
+    int secondsListened = 0,
+    bool completed = false,
+  }) async =>
+      throw Exception('offline');
+  @override
+  Future<double> rate(String id, int stars) async => throw Exception('offline');
 }

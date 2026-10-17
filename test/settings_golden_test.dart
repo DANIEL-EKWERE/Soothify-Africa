@@ -9,6 +9,11 @@ import 'package:soothifyafrica/app/data/services/session_service.dart';
 import 'package:soothifyafrica/app/data/services/theme_service.dart';
 import 'package:soothifyafrica/app/modules/user/settings/binding/settings_binding.dart';
 import 'package:soothifyafrica/app/modules/user/settings/settings_screen.dart';
+import 'package:soothifyafrica/app/data/models/profile_stats.dart';
+import 'package:soothifyafrica/app/data/models/user_profile.dart';
+import 'package:soothifyafrica/app/data/repositories/auth_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/profile_repository.dart';
+import 'package:soothifyafrica/app/data/models/user_role.dart';
 
 import 'helpers.dart';
 
@@ -26,7 +31,15 @@ void main() {
   /// which left it unregistered by the time the screen built.
   Future<void> boot() async {
     Get.put<ThemeService>(await ThemeService().init());
-    Get.put<SessionService>(await SessionService().init());
+    final session = await SessionService().init();
+    // Signed in: Settings reads the account, and a guest has none to read.
+    await session.setRole(UserRole.user);
+    Get.put<SessionService>(session);
+    // The screen reads the account now. Seeded with the frame's own name,
+    // which is what these goldens were recorded against -- the app itself
+    // takes it from the server.
+    Get.put<ProfileRepository>(_NamedProfile('Dera Ochukwu'));
+    Get.put<AuthRepository>(StubAuthRepository());
     SettingsBinding().dependencies();
   }
 
@@ -40,6 +53,8 @@ void main() {
       await boot();
 
       await pumpScreen(tester, const SettingsScreen(), brightness: brightness);
+      // The account is read when the screen opens.
+      await settleLoads(tester);
 
       await expectLater(find.byType(SettingsScreen),
           matchesGoldenFile('goldens/settings_$name.png'));
@@ -61,4 +76,30 @@ void main() {
     }
     expect(find.text('Version 1.0'), findsOneWidget);
   });
+}
+
+/// A profile with a name on it, and nothing else to say.
+class _NamedProfile implements ProfileRepository {
+  _NamedProfile(this.name);
+
+  final String name;
+
+  @override
+  Future<ProfileStats> getStats() async => ProfileStats.empty;
+
+  @override
+  Future<UserProfile> me() async => UserProfile(id: '1', fullName: name);
+
+  @override
+  Future<UserProfile> update({
+    String? fullName,
+    String? language,
+    String? moodFigure,
+    String? communityHandle,
+  }) async =>
+      UserProfile(id: '1', fullName: fullName ?? name);
+
+  @override
+  Future<UserProfile> uploadAvatar(String filePath) async =>
+      UserProfile(id: '1', fullName: name, avatarUrl: filePath);
 }

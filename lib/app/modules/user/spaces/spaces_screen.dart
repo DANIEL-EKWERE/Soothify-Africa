@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/filter_pill.dart';
+import '../../../data/models/space_listing.dart';
+// SpaceCategory, which names the filter chips, still lives here.
 import '../../../data/models/wellness_space.dart';
 import 'controller/spaces_controller.dart';
 import 'widgets/space_card.dart';
@@ -296,8 +298,8 @@ class _Map extends StatelessWidget {
                   children: [
                     for (final space in controller.spaces)
                       Positioned(
-                        left: constraints.maxWidth * space.pin.x,
-                        top: constraints.maxHeight * space.pin.y,
+                        left: constraints.maxWidth * controller.pinFor(space).x,
+                        top: constraints.maxHeight * controller.pinFor(space).y,
                         child: _Pin(
                           open: controller.selected.value == space,
                           onTap: () => controller.selectPin(space),
@@ -362,7 +364,7 @@ class _Pin extends StatelessWidget {
 class _PinCard extends StatelessWidget {
   const _PinCard({required this.space});
 
-  final WellnessSpace space;
+  final SpaceListing space;
 
   @override
   Widget build(BuildContext context) {
@@ -378,7 +380,7 @@ class _PinCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CustomImageView(
-              imagePath: space.photo,
+              imagePath: space.photoUrl,
               height: 90.h,
               width: 90.h,
               fit: BoxFit.cover,

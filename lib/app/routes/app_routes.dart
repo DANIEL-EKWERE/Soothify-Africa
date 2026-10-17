@@ -17,6 +17,10 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String signin = '/signin';
 
+  /// Resetting a forgotten password. Takes the address already typed
+  /// on Log in, as a String, so nobody enters it twice.
+  static const String forgotPassword = '/signin/forgot';
+
   /// Practitioner entry point. Kept registered but out of the default flow:
   /// the designs cover only the client-side sign-in, so [login] establishes a
   /// user session and this stands in until practitioner auth is designed.
@@ -98,6 +102,11 @@ class AppRoutes {
   /// A shelf's "See All" grid. Takes the shelf name as its argument, so one
   /// route serves every shelf in the app.
   static const String shelf = '/shelf';
+
+  /// Searching the library. Opened from the search field on the two
+  /// libraries, Videos and a shelf's See All; takes the term already
+  /// typed, as a String, when there is one.
+  static const String librarySearch = '/search';
 
   /// A media item's detail — player plus written material. Takes
   /// `{'item': MediaItem, 'source': String}` so the header can name the shelf

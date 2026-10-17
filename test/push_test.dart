@@ -17,6 +17,7 @@ import 'package:soothifyafrica/app/data/services/push_service.dart';
 import 'package:soothifyafrica/app/modules/user/daily/controller/daily_controller.dart';
 import 'package:soothifyafrica/app/modules/user/settings/controller/notification_settings_controller.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_notification_repository.dart';
 
 /// Stands in for [PushService], which cannot be built in a test: its
 /// constructor reaches for `FirebaseMessaging.instance`.
@@ -202,7 +203,7 @@ void main() {
 
     test('switching one off with no push service does not throw', () async {
       await PrefUtils().init();
-      final controller = NotificationSettingsController()..onInit();
+      final controller = NotificationSettingsController(MockNotificationRepository())..onInit();
       await controller.toggle(NotificationPreference.balance, false);
       expect(controller.isOn(NotificationPreference.balance), isFalse);
     });

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../core/base_controller.dart';
 import '../../../../core/utils/document_picker.dart';
 import '../../../../data/models/expert_application.dart';
+import '../../../../data/repositories/expert_application_repository.dart';
 
 /// Runs the "Become an Expert" application — Figma `259:59132` (the intro),
 /// `259:59145`, `259:59179`, `259:59198` (the three form steps) and
@@ -12,13 +14,26 @@ import '../../../../data/models/expert_application.dart';
 /// a progress bar and run strictly in order, so a back press should step back
 /// through the form rather than unwind a route stack the applicant never
 /// chose to build. Same reasoning as [BookingController].
-class ExpertApplicationController extends GetxController {
+class ExpertApplicationController extends BaseController {
   /// [pickDocument] is injectable so a test can supply a file without a
   /// platform channel; the app uses the system picker.
-  ExpertApplicationController({DocumentPicker? pickDocument})
-      : _pickDocument = pickDocument ?? pickDocumentFromDevice;
+  ExpertApplicationController(
+    this._applications, {
+    DocumentPicker? pickDocument,
+  }) : _pickDocument = pickDocument ?? pickDocumentFromDevice;
 
+  final ExpertApplicationRepository _applications;
   final DocumentPicker _pickDocument;
+
+  /// What the server says about applications already sent. Read on open, so
+  /// somebody who applied last week is told it is being looked at rather
+  /// than invited to apply again.
+  final Rxn<ExpertApplicationStatus> existing = Rxn<ExpertApplicationStatus>();
+
+  bool get hasPendingApplication {
+    final sent = existing.value;
+    return sent != null && sent.isPending;
+  }
 
   final Rx<ExpertApplicationStep> step = ExpertApplicationStep.profile.obs;
 
@@ -57,6 +72,17 @@ class ExpertApplicationController extends GetxController {
     for (final c in [name, experience, about, portfolio, licenceNumber]) {
       c.addListener(_touched);
     }
+    _readWhatWasSent();
+  }
+
+  Future<void> _readWhatWasSent() async {
+    final sent = await guard(
+      () => _applications.mine(),
+      // The intro reads perfectly well without this; it just says less.
+      showFeedback: false,
+    );
+    if (sent == null || sent.isEmpty) return;
+    existing.value = sent.first;
   }
 
   final RxInt _revision = 0.obs;
@@ -137,16 +163,41 @@ class ExpertApplicationController extends GetxController {
   /// "Start Application" on the intro.
   void start() => Get.toNamed(AppRoutes.expertApplicationForm);
 
-  void next() {
-    if (!canAdvance) return;
+  Future<void> next() async {
+    if (!canAdvance || isLoading.value) return;
     final i = step.value.index;
     if (i < ExpertApplicationStep.values.length - 1) {
       step.value = ExpertApplicationStep.values[i + 1];
       return;
     }
-    // Nothing receives an application yet. The acknowledgement is shown
-    // because the design draws it, and it promises only a review — it does
-    // not claim the application was transmitted.
+    await submit();
+  }
+
+  /// Sends it, with both documents.
+  ///
+  /// The acknowledgement is shown only once the server has it. It used to be
+  /// shown regardless, which was honest when nothing received an application
+  /// and would be a lie now.
+  Future<void> submit() async {
+    final certification = attached[ExpertDocument.certification];
+    final identity = attached[ExpertDocument.identity];
+    if (certification == null || identity == null) return;
+
+    final sent = await guard(() => _applications.submit(
+          fullName: name.text,
+          fields: fields.toSet(),
+          languages: languages.toSet(),
+          experienceYears: int.tryParse(experience.text.trim()) ?? 0,
+          about: about.text,
+          portfolioUrl: portfolio.text,
+          licenceNumber: licenceNumber.text,
+          insuranceProvider: insurance.text,
+          certificationPath: certification.path,
+          identityPath: identity.path,
+        ));
+    if (sent == null) return;
+
+    existing.value = sent;
     submitted.value = true;
   }
 

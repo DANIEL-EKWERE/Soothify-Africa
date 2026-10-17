@@ -109,21 +109,31 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                   Text('Pick a time', style: CustomTextStyles.coachSection),
                   SizedBox(height: 12.v),
                   // Full-width rows, one per line, as the design draws them.
-                  Obx(
-                    () => Column(
+                  Obx(() {
+                    final slots = controller.slots;
+                    // The hours are the expert's own, so a day can have
+                    // none left -- saying so beats an empty gap.
+                    if (slots.isEmpty) {
+                      return Text(
+                        controller.isLoading.value
+                            ? 'Finding free times\u2026'
+                            : 'No times left on this day. Try another.',
+                        style: CustomTextStyles.coachBlurb,
+                      );
+                    }
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final slot in BookingCalendarController.slots) ...[
+                        for (final slot in slots) ...[
                           _Slot(
                             label: slot,
                             chosen: controller.slot.value == slot,
                           ),
-                          if (slot != BookingCalendarController.slots.last)
-                            SizedBox(height: 10.v),
+                          if (slot != slots.last) SizedBox(height: 10.v),
                         ],
                       ],
-                    ),
-                  ),
+                    );
+                  }),
                 ],
               ),
             ),

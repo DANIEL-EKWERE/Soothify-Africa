@@ -31,6 +31,36 @@ class NotificationsController extends BaseController {
 
   int get unreadCount => all.where((n) => n.unread).length;
 
+  /// Marks the whole feed read. The rows change here first so the dot goes
+  /// when it is pressed, and the server is told after.
+  Future<void> markAllRead() async {
+    if (all.every((row) => !row.unread)) return;
+    all.assignAll(all.map((row) => row.markedRead()).toList());
+    await guard(
+      () async {
+        await _repository.markRead();
+        return true;
+      },
+      // A dot that comes back on the next load is the worst this can do;
+      // a snackbar over the feed for it would be out of proportion.
+      showFeedback: false,
+    );
+  }
+
+  /// Marks one read, on the way to wherever it leads.
+  Future<void> _markRead(AppNotification notification) async {
+    if (!notification.unread) return;
+    final at = all.indexWhere((row) => row.id == notification.id);
+    if (at >= 0) all[at] = notification.markedRead();
+    await guard(
+      () async {
+        await _repository.markRead(id: notification.id);
+        return true;
+      },
+      showFeedback: false,
+    );
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -54,6 +84,7 @@ class NotificationsController extends BaseController {
   /// runs come from the notification's own copy: the discipline it bolds, and
   /// the hour at the end of its line.
   void openSession(AppNotification notification) {
+    _markRead(notification);
     Get.toNamed(
       AppRoutes.clientJoining,
       arguments: SessionInvite(
@@ -76,6 +107,7 @@ class NotificationsController extends BaseController {
   }
 
   void openAction(AppNotification notification) {
+    _markRead(notification);
     if (notification.kind == NotificationKind.breathe) {
       Get.toNamed(AppRoutes.breathe);
       return;

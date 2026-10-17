@@ -29,4 +29,19 @@ abstract class ContentRepository {
   Future<MediaItem?> getById(String id);
 
   Future<List<MediaItem>> search(String query);
+
+  /// Records that this item was listened to, and for how long.
+  ///
+  /// What the Profile tab's "meditation minutes" is counted from, and what
+  /// fills the Recent shelf, so it is sent when a play ends rather than when
+  /// one starts — a card opened and closed is not a session.
+  Future<void> recordPlay(
+    String id, {
+    int secondsListened = 0,
+    bool completed = false,
+  });
+
+  /// One to five stars. Returns the item's new average, which is what the
+  /// screen shows afterwards.
+  Future<double> rate(String id, int stars);
 }

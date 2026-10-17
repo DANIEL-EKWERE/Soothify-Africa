@@ -465,4 +465,24 @@ class MockContentRepository implements ContentRepository {
             i.practitionerName.toLowerCase().contains(q))
         .toList();
   }
+
+  /// What was listened to this run, so the Recent shelf has something true
+  /// to show even without a server.
+  final Map<String, int> _played = <String, int>{};
+
+  @override
+  Future<void> recordPlay(
+    String id, {
+    int secondsListened = 0,
+    bool completed = false,
+  }) async {
+    _played[id] = (_played[id] ?? 0) + secondsListened;
+  }
+
+  @override
+  Future<double> rate(String id, int stars) async {
+    // Nothing aggregates ratings here, so the star just pressed is the only
+    // honest answer to give back.
+    return stars.toDouble();
+  }
 }

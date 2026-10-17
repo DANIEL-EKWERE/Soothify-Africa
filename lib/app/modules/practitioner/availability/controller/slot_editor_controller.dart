@@ -75,24 +75,56 @@ class SlotEditorController extends GetxController {
 
   void showMonth(DateTime value) => month.value = value;
 
-  /// Writes the window back and leaves.
+  /// Writes the window back, and opens it to clients.
   ///
-  /// Only the in-memory store is behind this, so nothing is claimed about
-  /// clients being able to book it.
+  /// The whole repeat is written, not just the day that was picked: the
+  /// frame's weekday circles are what the practitioner chose, and saving one
+  /// day of a seven-day repeat would quietly discard the other six.
+  ///
+  /// The hour is closed and reopened rather than edited, because an hour is
+  /// a row the client's calendar reads — and a booked one cannot be moved
+  /// out from under the person who booked it, which is why the close is what
+  /// fails first.
   Future<void> save() async {
+    if (saving.value) return;
     final s = slot;
     if (s == null) {
       Get.back();
       return;
     }
-    _dashboard.slots.assignAll([
-      for (final existing in _dashboard.slots)
-        if (existing.id == s.id)
-          AvailabilitySlot(id: s.id, day: day.value, from: from, to: to)
-        else
-          existing,
-    ]);
+
+    saving.value = true;
+    final done = await _dashboard.rewriteSlot(
+      closing: s,
+      days: _daysOfTheRepeat(),
+      from: from,
+      to: to,
+    );
+    saving.value = false;
+    if (!done) return;
+
     Get.back();
-    AppFeedback.info('Saving availability is not built yet.');
+    AppFeedback.info(
+      repeatOn.length > 1
+          ? 'Saved. Those hours are open to clients.'
+          : 'Saved. That hour is open to clients.',
+    );
+  }
+
+  /// Whether a save is in flight, so the button cannot be pressed twice.
+  final RxBool saving = false.obs;
+
+  /// Every date the chosen repeat covers, within the week the picked day
+  /// belongs to. A repeat is a weekly pattern in the frame, and a week is
+  /// as far ahead as it can be read to mean without inventing a horizon.
+  List<DateTime> _daysOfTheRepeat() {
+    final picked = day.value;
+    final monday = DateTime(picked.year, picked.month, picked.day)
+        .subtract(Duration(days: picked.weekday - 1));
+    final days = [
+      for (final weekday in repeatOn.toList()..sort())
+        monday.add(Duration(days: weekday - 1)),
+    ];
+    return days.isEmpty ? [picked] : days;
   }
 }

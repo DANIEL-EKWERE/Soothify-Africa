@@ -30,7 +30,6 @@ class JournalComposeController extends BaseController {
   final JournalEntry? existing;
 
   final bodyController = TextEditingController();
-  final messageController = TextEditingController();
 
   /// Fixed at construction so the header does not shift while writing — and
   /// injectable, because the header renders this date and time, which would
@@ -54,7 +53,6 @@ class JournalComposeController extends BaseController {
   @override
   void onClose() {
     bodyController.dispose();
-    messageController.dispose();
     super.onClose();
   }
 
@@ -80,6 +78,4 @@ class JournalComposeController extends BaseController {
     if (saved == null) return;
     Get.back();
   }
-
-  void send() => AppFeedback.info('Sending is not built yet.');
 }

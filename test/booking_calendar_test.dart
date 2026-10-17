@@ -5,8 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
-import 'package:soothifyafrica/app/data/models/booked_slot.dart';
+import 'package:soothifyafrica/app/data/models/booked_session.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_booking_repository.dart';
 import 'package:soothifyafrica/app/modules/user/booking_calendar/booking_calendar_screen.dart';
 import 'package:soothifyafrica/app/modules/user/booking_calendar/booking_confirmed_screen.dart';
 import 'package:soothifyafrica/app/modules/user/booking_calendar/controller/booking_calendar_controller.dart';
@@ -32,10 +34,14 @@ void main() {
     testWidgets('booking calendar, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+      Get.put(BookingCalendarController(
+      MockBookingRepository(),
+      now: () => DateTime(2026, 10, 5),
+    ));
 
       await pumpScreen(tester, const BookingCalendarScreen(),
           brightness: brightness);
+    await settleLoads(tester);
       await expectLater(find.byType(BookingCalendarScreen),
           matchesGoldenFile('goldens/booking_calendar_$name.png'));
     });
@@ -47,7 +53,10 @@ void main() {
     disableMotion(tester);
     await loadAppFonts();
     Get.testMode = true;
-    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+    final c = Get.put(BookingCalendarController(
+      MockBookingRepository(),
+      now: () => DateTime(2026, 10, 5),
+    ));
 
     await tester.pumpWidget(
       Sizer(
@@ -72,19 +81,24 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await settleLoads(tester);
 
     c.pickDay(DateTime(2026, 10, 14));
     await tester.tap(find.text('11:00am'));
     await tester.pumpAndSettle();
     c.confirm();
-    await tester.pumpAndSettle();
+    // Booking holds the hour on the server before the screen moves on.
+    await settleLoads(tester);
 
-    // The day is chosen before the price now, and travels with it.
+    // The day is chosen before the price now, and travels with it -- as the
+    // session the server is holding, rather than only a time: paying has to
+    // know which booking it is paying for.
     expect(Get.currentRoute, AppRoutes.bookingPayment);
-    final booked = Get.arguments as BookedSlot;
-    expect(booked.slot, '11:00am');
-    expect(booked.summary, 'Wednesday, 14 October at 11:00am');
-    expect(booked.offering, SessionOffering.therapy);
+    final session = Get.arguments as BookedSession;
+    expect(session.startsAt, DateTime(2026, 10, 14, 11));
+    expect(session.discipline, 'therapy');
+    expect(session.awaitingPayment, isTrue,
+        reason: 'the hour is held, not confirmed, until it is paid for');
   });
 
   testWidgets('the receipt leads to the confirmation, not back to a calendar',
@@ -93,7 +107,10 @@ void main() {
     disableMotion(tester);
     await loadAppFonts();
     Get.testMode = true;
-    Get.put(BookingPaymentController(SessionOffering.therapy));
+    Get.put(BookingPaymentController(
+      SessionOffering.therapy,
+      MockBillingRepository(),
+    ));
 
     await tester.pumpWidget(
       Sizer(
@@ -136,9 +153,13 @@ void main() {
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+    final c = Get.put(BookingCalendarController(
+      MockBookingRepository(),
+      now: () => DateTime(2026, 10, 5),
+    ));
 
     await pumpScreen(tester, const BookingCalendarScreen());
+    await settleLoads(tester);
     expect(c.canConfirm, isFalse);
 
     c.pickDay(DateTime(2026, 10, 14));
@@ -189,7 +210,10 @@ void main() {
 
   test('the month steps either way', () {
     Get.testMode = true;
-    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+    final c = Get.put(BookingCalendarController(
+      MockBookingRepository(),
+      now: () => DateTime(2026, 10, 5),
+    ));
     expect(c.monthLabel, 'October 2026');
     c.nextMonth();
     expect(c.monthLabel, 'November 2026');
@@ -202,9 +226,13 @@ void main() {
   testWidgets('a chosen time is outlined in blue, not filled', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(BookingCalendarController(now: () => DateTime(2026, 10, 5)));
+    final c = Get.put(BookingCalendarController(
+      MockBookingRepository(),
+      now: () => DateTime(2026, 10, 5),
+    ));
 
     await pumpScreen(tester, const BookingCalendarScreen());
+    await settleLoads(tester);
 
     Border borderOf(String slot) {
       final box = tester.widget<Container>(

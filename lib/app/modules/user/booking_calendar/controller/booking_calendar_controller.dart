@@ -1,7 +1,9 @@
 import 'package:intl/intl.dart';
 
 import '../../../../core/app_export.dart';
-import '../../../../data/models/booked_slot.dart';
+import '../../../../core/base_controller.dart';
+import '../../../../data/models/booked_session.dart';
+import '../../../../data/repositories/booking_repository.dart';
 import '../../../../data/models/session_offering.dart';
 
 /// Picking the day the paid-for session actually happens — Figma
@@ -15,9 +17,11 @@ import '../../../../data/models/session_offering.dart';
 /// The frame itself could not be read — all three Figma budgets were spent —
 /// so the layout here follows the sheet this replaces (`ScheduleSheet`) at
 /// full-screen size. Worth re-measuring against `280:26019`.
-class BookingCalendarController extends GetxController {
-  BookingCalendarController({DateTime Function()? now})
+class BookingCalendarController extends BaseController {
+  BookingCalendarController(this._bookings, {DateTime Function()? now})
       : _now = now ?? DateTime.now;
+
+  final BookingRepository _bookings;
 
   final DateTime Function() _now;
 
@@ -29,16 +33,22 @@ class BookingCalendarController extends GetxController {
 
   final Rxn<DateTime> selected = Rxn<DateTime>();
 
-  /// The slots the session can start at. The frame was unreadable, so these
-  /// are a plain working day rather than anything measured.
-  static const List<String> slots = [
-    '9:00am',
-    '11:00am',
-    '1:00pm',
-    '3:00pm',
-    '5:00pm',
-    '7:00pm',
-  ];
+  /// The hours offered for the chosen day.
+  ///
+  /// Read from the expert's own availability rather than a fixed list: an
+  /// hour somebody else has already booked must not be offered, and only
+  /// the server knows which those are.
+  final RxList<FreeSlot> available = <FreeSlot>[].obs;
+
+  /// Every free hour the expert has, across the days the calendar shows.
+  final RxList<FreeSlot> _allSlots = <FreeSlot>[].obs;
+
+  /// Which hours the chosen day leaves, as the buttons print them.
+  List<String> get slots =>
+      available.map((slot) => slot.label).toList(growable: false);
+
+  /// Who the client was matched with, if matching ran before this screen.
+  final Rxn<MatchedExpert> expert = Rxn<MatchedExpert>();
 
   final RxnString slot = RxnString();
 
@@ -52,7 +62,70 @@ class BookingCalendarController extends GetxController {
     return '${DateFormat('EEEE, d MMMM').format(day)} at ${slot.value}';
   }
 
-  void pickDay(DateTime day) => selected.value = day;
+  @override
+  void onInit() {
+    super.onInit();
+    _loadAvailability();
+  }
+
+  /// Ask who is free, then for what hours. Both in one go, because the
+  /// calendar cannot offer anything until it knows.
+  Future<void> _loadAvailability() async {
+    await guard(() async {
+      final matched = await _bookings.match(discipline: _discipline);
+      expert.value = matched;
+      if (matched == null) {
+        _allSlots.clear();
+        available.clear();
+        return;
+      }
+
+      final from = _now();
+      _allSlots.value = await _bookings.freeSlots(
+        matched.id,
+        from: from,
+        to: from.add(const Duration(days: 60)),
+      );
+      // Open on the first day with hours left, so the screen arrives with
+      // something to choose rather than an empty strip under the grid. The
+      // month follows, or the chosen day would be off-screen.
+      if (selected.value == null && _allSlots.isNotEmpty) {
+        final first = _allSlots.first.day;
+        selected.value = first;
+        month.value = DateTime(first.year, first.month);
+      }
+      _narrowToSelectedDay();
+    });
+  }
+
+  /// The app's sections do not map one-to-one onto what an expert is booked
+  /// for: Pilates & Core and Stretch & Restore are both movement, and the
+  /// server knows yoga and pilates by name.
+  String get _discipline => switch (offering) {
+        SessionOffering.therapy => 'therapy',
+        SessionOffering.balance => 'yoga',
+        SessionOffering.meditation => 'pilates',
+      };
+
+  bool hasSlotsOn(DateTime day) => _allSlots.any((s) => _sameDay(s.day, day));
+
+  void pickDay(DateTime day) {
+    selected.value = day;
+    // A day's hours are its own; keeping a time chosen on another day would
+    // book something nobody picked.
+    slot.value = null;
+    _narrowToSelectedDay();
+  }
+
+  void _narrowToSelectedDay() {
+    final day = selected.value;
+    available.value = day == null
+        ? const []
+        : _allSlots.where((s) => _sameDay(s.day, day)).toList();
+  }
+
+  bool _sameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 
   void pickSlot(String value) => slot.value = value;
 
@@ -62,19 +135,33 @@ class BookingCalendarController extends GetxController {
   void nextMonth() =>
       month.value = DateTime(month.value.year, month.value.month + 1);
 
-  /// On to the payment screen, with the chosen time attached.
+  /// Hold the hour, then go and pay for it.
+  ///
+  /// The booking is made here rather than after payment: the server holds
+  /// the slot for twenty minutes so nobody else takes it while the card is
+  /// being typed, and releases it if the payment never comes.
   ///
   /// `offNamed`, so the receipt's Continue cannot step back onto a calendar
   /// offering to book the session a second time.
-  void confirm() {
-    if (!canConfirm) return;
-    Get.offNamed(
-      AppRoutes.bookingPayment,
-      arguments: BookedSlot(
-        offering: offering,
-        day: selected.value!,
-        slot: slot.value!,
-      ),
-    );
+  Future<void> confirm() async {
+    if (!canConfirm || isLoading.value) return;
+
+    final chosen = available.firstWhereOrNull((s) => s.label == slot.value);
+    if (chosen == null) return;
+
+    final session = await guard(() => _bookings.book(
+          discipline: _discipline,
+          day: selected.value!,
+          startMinute: chosen.startMinute,
+          expertId: expert.value?.id,
+        ));
+    // guard has already said what went wrong -- the hour taken a moment ago
+    // by somebody else, most often.
+    if (session == null) {
+      await _loadAvailability();
+      return;
+    }
+
+    Get.offNamed(AppRoutes.bookingPayment, arguments: session);
   }
 }

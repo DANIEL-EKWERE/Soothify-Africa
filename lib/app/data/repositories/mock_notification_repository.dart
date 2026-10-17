@@ -157,4 +157,41 @@ class MockNotificationRepository implements NotificationRepository {
       ),
     ];
   }
+
+  /// Read rows, for the length of the run.
+  final Set<String> _read = <String>{};
+
+  @override
+  Future<int> unreadCount() async {
+    final rows = await feed();
+    return rows.where((row) => row.unread && !_read.contains(row.id)).length;
+  }
+
+  @override
+  Future<void> markRead({String? id}) async {
+    if (id != null) {
+      _read.add(id);
+      return;
+    }
+    final rows = await feed();
+    _read.addAll(rows.map((row) => row.id));
+  }
+
+  @override
+  Future<Map<String, bool>> preferences() async {
+    // All off, which is what the server starts everyone at: an unasked-for
+    // reminder about a therapy appointment is a privacy problem.
+    return const {
+      'notify_balance': false,
+      'notify_meditation': false,
+      'notify_mood': false,
+      'notify_offers': false,
+    };
+  }
+
+  @override
+  Future<void> savePreference(String key, bool value) async {
+    // Nothing to save to. The switch is kept on the device by the caller,
+    // which is where a locally-scheduled reminder lives anyway.
+  }
 }

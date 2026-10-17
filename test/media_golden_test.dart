@@ -7,6 +7,7 @@ import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/media_item.dart';
 import 'package:soothifyafrica/app/modules/user/media/controller/media_controller.dart';
 import 'package:soothifyafrica/app/modules/user/media/media_screen.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
 
 import 'helpers.dart';
 
@@ -40,7 +41,11 @@ void main() {
   );
 
   MediaController boot() =>
-      Get.put(MediaController(item, source: 'Top Picks for you'));
+      Get.put(MediaController(
+        item,
+        MockContentRepository(),
+        source: 'Top Picks for you',
+      ));
 
   for (final (shade, brightness) in [
     ('light', Brightness.light),
@@ -63,8 +68,9 @@ void main() {
     expect(find.textContaining('Discover the profound power'), findsOneWidget);
     expect(find.text('Adeshola Wande'), findsOneWidget);
     expect(find.text('Add Note'), findsOneWidget);
-    // The frame opens at 2:34 of 15:00.
-    expect(c.elapsedLabel, '2:34 / 15:00');
+    // The frame draws 2:34 of 15:00, but it plays now: nothing has been
+    // heard yet, so it opens where the audio does.
+    expect(c.elapsedLabel, '0:00 / 15:00');
 
     await expectLater(find.byType(MediaScreen),
         matchesGoldenFile('goldens/media_detail_$shade.png'));
@@ -72,7 +78,7 @@ void main() {
   }
 
   test('seeking is clamped to the item', () {
-    final c = MediaController(item, source: 'x');
+    final c = MediaController(item, MockContentRepository(), source: 'x');
     c.seekBy(const Duration(minutes: -30));
     expect(c.position.value, Duration.zero);
     c.seekBy(const Duration(minutes: 30));
@@ -87,6 +93,6 @@ void main() {
       type: MediaType.audio,
       durationSeconds: 60,
     );
-    expect(MediaController(unrated, source: 'x').ratingLabel, '—/5');
+    expect(MediaController(unrated, MockContentRepository(), source: 'x').ratingLabel, '—/5');
   });
 }

@@ -59,10 +59,37 @@ class ExpertIntroScreen extends GetView<ExpertApplicationController> {
                 ),
               ),
               SizedBox(height: 48.v),
-              CustomElevatedButton(
-                text: 'Start Application',
-                onPressed: controller.start,
-              ),
+              // Somebody who has already applied is told where it stands
+              // rather than invited to apply again -- a second application
+              // is one more thing for a reviewer to read and no faster an
+              // answer for them.
+              Obx(() {
+                final sent = controller.existing.value;
+                if (sent != null && sent.isPending) {
+                  return Column(
+                    children: [
+                      Text(
+                        'Your application is with us — ${sent.statusLabel}.',
+                        textAlign: TextAlign.center,
+                        style: CustomTextStyles.expertIntroBody,
+                      ),
+                      SizedBox(height: 8.v),
+                      Text(
+                        'We read every one ourselves, usually within 24 to '
+                        '48 hours, and write to you either way.',
+                        textAlign: TextAlign.center,
+                        style: CustomTextStyles.expertIntroBody,
+                      ),
+                    ],
+                  );
+                }
+                return CustomElevatedButton(
+                  text: sent != null && sent.isRejected
+                      ? 'Apply again'
+                      : 'Start Application',
+                  onPressed: controller.start,
+                );
+              }),
               SizedBox(height: 16.v),
               CustomGhostButton(
                 text: 'Back',

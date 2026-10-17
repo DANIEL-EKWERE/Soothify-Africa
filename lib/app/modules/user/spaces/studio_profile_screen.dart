@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../data/models/wellness_space.dart';
+import '../../../core/utils/checkout_launcher.dart';
+import '../../../data/models/space_listing.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import 'widgets/passport_sheet.dart';
 import 'widgets/space_card.dart';
@@ -18,16 +19,22 @@ class StudioProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final space = Get.arguments is WellnessSpace
-        ? Get.arguments as WellnessSpace
-        : WellnessSpace.sample.first;
+    final space = Get.arguments as SpaceListing?;
+    if (space == null) {
+      // Reached without a studio -- a deep link, or a stale route. Say so
+      // rather than drawing somebody else's studio.
+      return Scaffold(
+        backgroundColor: appTheme.background,
+        body: const Center(child: Text('That studio is no longer listed.')),
+      );
+    }
 
     return Scaffold(
       backgroundColor: appTheme.background,
       body: Stack(
         children: [
           CustomImageView(
-            imagePath: space.photo,
+            imagePath: space.photoUrl,
             height: 318.v,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -86,7 +93,7 @@ class _Counter extends StatelessWidget {
 class _Sheet extends StatelessWidget {
   const _Sheet({required this.space});
 
-  final WellnessSpace space;
+  final SpaceListing space;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +132,7 @@ class _Sheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomImageView(
-                      imagePath: space.photo,
+                      imagePath: space.photoUrl,
                       height: 73.h,
                       width: 73.h,
                       fit: BoxFit.cover,
@@ -140,8 +147,12 @@ class _Sheet extends StatelessWidget {
                           SizedBox(height: 8.v),
                           // The frame separates these with an asterisk.
                           Text(
-                            '${space.area} • '
-                            '${space.distanceKm.toStringAsFixed(0)}km',
+                            // The distance is only known when the phone
+                            // shared where it is.
+                            space.distanceKm == null
+                                ? space.area
+                                : '${space.area} • '
+                                    '${space.distanceKm!.toStringAsFixed(0)}km',
                             style: CustomTextStyles.studioLocation,
                           ),
                           SizedBox(height: 8.v),
@@ -167,7 +178,7 @@ class _Sheet extends StatelessWidget {
                       for (var i = 0; i < 3; i++) ...[
                         Expanded(
                           child: CustomImageView(
-                            imagePath: space.photo,
+                            imagePath: space.photoUrl,
                             height: 95.v,
                             fit: BoxFit.cover,
                             radius: BorderRadius.circular(8.h),
@@ -181,9 +192,15 @@ class _Sheet extends StatelessWidget {
                 SizedBox(height: 24.5.v),
                 CustomElevatedButton(
                   text: 'Connect on Instagram',
-                  onPressed: () => AppFeedback.info(
-                    'Opening @${space.instagram} is not wired up yet.',
-                  ),
+                  onPressed: () async {
+                    final opened =
+                        await ExternalLink.instagram(space.instagram);
+                    if (!opened) {
+                      AppFeedback.error(
+                        'Could not open @${space.instagram}.',
+                      );
+                    }
+                  },
                 ),
                 SizedBox(height: 8.v),
                 CustomElevatedButton(
@@ -198,9 +215,14 @@ class _Sheet extends StatelessWidget {
                     ),
                   ),
                   labelStyle: CustomTextStyles.studioSecondaryAction,
-                  onPressed: () => AppFeedback.info(
-                    'Calling ${space.phone} is not wired up yet.',
-                  ),
+                  onPressed: () async {
+                    // Opens the dialler with the number in it; pressing
+                    // call is the person's own decision.
+                    final opened = await ExternalLink.call(space.phone);
+                    if (!opened) {
+                      AppFeedback.error('No number on file for this studio.');
+                    }
+                  },
                 ),
                 SizedBox(height: 24.5.v),
                 const _PassportTeaser(),

@@ -1,0 +1,7 @@
+# The suite runs offline. `test/live_api_test.dart` is the one file that wants
+# a Django server, so it is skipped by default and asked for by name:
+#
+#   flutter test test/live_api_test.dart --run-skipped
+tags:
+  live:
+    skip: "needs a local API; run with --run-skipped"

@@ -7,7 +7,11 @@ import 'controller/journal_compose_controller.dart';
 /// Writing a journal entry — Figma `135:2105`.
 ///
 /// A date/time bar with a Done action, a prompt in a pale card, a way to swap
-/// the prompt, the entry itself, and a message field pinned to the bottom.
+/// the prompt, and the entry itself.
+///
+/// The frame draws a message pill at the foot of the screen; it is not here.
+/// The body of the screen is already a text field, so a second one below it
+/// gave two places to type and no answer to which of them the entry was.
 ///
 /// The frame's copy is outlined to vectors rather than live text, so the
 /// strings here were read from a render of it; positions and colours come from
@@ -53,7 +57,6 @@ class JournalComposeScreen extends GetView<JournalComposeController> {
                 ),
               ),
             ),
-            // const _MessageField(),
           ],
         ),
       ),
@@ -136,62 +139,6 @@ class _ChangePrompt extends StatelessWidget {
           SizedBox(width: 8.h),
           Text('Change prompt', style: CustomTextStyles.journalChangePrompt),
         ],
-      ),
-    );
-  }
-}
-
-/// The pill at the foot of the screen. Sits above the keyboard rather than
-/// under it, which the static frame cannot show but the screen needs.
-class _MessageField extends StatelessWidget {
-  const _MessageField();
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<JournalComposeController>();
-    return Padding(
-      padding: EdgeInsets.fromLTRB(24.h, 8.h, 24.h, 16.h),
-      child: Container(
-        height: 40.h,
-        padding: EdgeInsets.symmetric(horizontal: 11.h),
-        decoration: BoxDecoration(
-          color: appTheme.surface,
-          borderRadius: BorderRadius.circular(20.h),
-          border: Border.all(color: appTheme.navInactive),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: controller.messageController,
-                style: CustomTextStyles.journalChangePrompt
-                    .copyWith(fontSize: 12.fSize),
-                cursorColor: appTheme.soothifyBlue,
-                decoration: InputDecoration(
-                  isDense: true,
-                  filled: false,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  hintText: 'Type in your message',
-                  hintStyle: CustomTextStyles.journalChangePrompt.copyWith(
-                    fontSize: 12.fSize,
-                    color: appTheme.navInactive,
-                  ),
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: controller.send,
-              child: CustomImageView(
-                imagePath: ImageConstant.icSend,
-                height: 20.h,
-                width: 20.h,
-                color: appTheme.textSecondary,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

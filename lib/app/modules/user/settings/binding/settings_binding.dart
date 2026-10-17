@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../../../../data/repositories/auth_repository.dart';
+import '../../../../data/repositories/profile_repository.dart';
 import '../../../../data/services/session_service.dart';
 import '../../../../data/services/theme_service.dart';
 import '../controller/settings_controller.dart';
@@ -10,6 +12,8 @@ class SettingsBinding extends Bindings {
     Get.lazyPut(() => SettingsController(
           Get.find<ThemeService>(),
           Get.find<SessionService>(),
+          Get.find<ProfileRepository>(),
+          Get.find<AuthRepository>(),
         ));
   }
 }

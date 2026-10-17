@@ -177,7 +177,9 @@ class _Name extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(controller.fullName, style: CustomTextStyles.profileName),
+        Obx(
+          () => Text(controller.fullName, style: CustomTextStyles.profileName),
+        ),
         SizedBox(width: 6.h),
         // The pencil edits the name, which is a screen of its own — the "+"
         // on the avatar above handles the portrait.

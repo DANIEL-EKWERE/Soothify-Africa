@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_corporate_repository.dart';
 import 'package:soothifyafrica/app/modules/user/corporate/controller/corporate_controller.dart';
 import 'package:soothifyafrica/app/modules/user/corporate/corporate_form_screen.dart';
 import 'package:soothifyafrica/app/modules/user/corporate/corporate_success_screen.dart';
@@ -26,7 +27,7 @@ void main() {
     testWidgets('corporate form, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(CorporateController());
+      Get.put(CorporateController(MockCorporateRepository()));
 
       await pumpScreen(tester, const CorporateFormScreen(),
           brightness: brightness);
@@ -37,7 +38,7 @@ void main() {
     testWidgets('corporate success, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(CorporateController());
+      Get.put(CorporateController(MockCorporateRepository()));
 
       await pumpScreen(tester, const CorporateSuccessScreen(),
           brightness: brightness);
@@ -50,7 +51,7 @@ void main() {
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    Get.put(CorporateController());
+    Get.put(CorporateController(MockCorporateRepository()));
 
     await pumpScreen(tester, const CorporateFormScreen());
 
@@ -68,7 +69,7 @@ void main() {
 
   test('an empty form names what is missing instead of submitting', () {
     Get.testMode = true;
-    final c = Get.put(CorporateController());
+    final c = Get.put(CorporateController(MockCorporateRepository()));
 
     c.submit();
     expect(c.missing, CorporateField.values.where((f) => f.required).toSet());

@@ -80,13 +80,19 @@ class CareGuaranteeScreen extends GetView<BookingPaymentController> {
               SizedBox(height: 32.v),
               _Summary(price: price),
               const Spacer(),
-              CustomElevatedButton(
-                text: 'Pay with Paystack',
-                // Carrying whatever brought us here, so the confirmation at
-                // the end of the chain can still name the day and time.
-                onPressed: () => Get.toNamed(
-                  AppRoutes.paymentSuccess,
-                  arguments: Get.arguments,
+              // This is where money is actually asked for. The button waits
+              // on the server rather than walking on, because only the
+              // provider's webhook can say the session is paid for.
+              Obx(
+                () => CustomElevatedButton(
+                  text: controller.paying.value
+                      ? 'Waiting for payment\u2026'
+                      : controller.isLoading.value
+                          ? 'Opening checkout\u2026'
+                          : 'Pay with card',
+                  onPressed: controller.paying.value || controller.isLoading.value
+                      ? null
+                      : controller.pay,
                 ),
               ),
               SizedBox(height: 93.v),

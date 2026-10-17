@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
-import '../../../../data/models/wellness_space.dart';
+import '../../../../data/models/space_listing.dart';
 
 /// A grey pill under a studio's name — "Reformer Pilates", "Mat Pilates".
 /// 22 tall, 16 radius, `#EEF1F5` under `#717C87` type.
@@ -62,7 +62,7 @@ class SpaceDirections extends StatelessWidget {
 class SpaceCard extends StatelessWidget {
   const SpaceCard({super.key, required this.space, this.onTap});
 
-  final WellnessSpace space;
+  final SpaceListing space;
   final VoidCallback? onTap;
 
   @override
@@ -80,7 +80,7 @@ class SpaceCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             CustomImageView(
-              imagePath: space.photo,
+              imagePath: space.photoUrl,
               height: 130.v,
               width: double.infinity,
               fit: BoxFit.cover,

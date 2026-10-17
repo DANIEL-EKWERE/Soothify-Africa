@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
@@ -29,7 +30,11 @@ class SettingsScreen extends GetView<SettingsController> {
               SizedBox(height: 8.v),
             ],
             SizedBox(height: 16.v),
-            if (!controller.isPractitioner) const _ExpertModeDoor(),
+            // Debug builds only. An approved application is what makes
+            // somebody a practitioner now, and a button in Settings that
+            // grants it would be a way for any member to take bookings.
+            if (kDebugMode && !controller.isPractitioner)
+              const _ExpertModeDoor(),
             SizedBox(height: 16.v),
             Center(
               child: GradientText(
@@ -82,9 +87,13 @@ class _Header extends StatelessWidget {
 /// is `/role`, and nothing navigates to it — so the whole expert app was
 /// unreachable from a running build.
 ///
-/// This row stands in until something real grants the role, most likely an
-/// approved "Become an Expert" application. **Delete it then.** It is drawn
-/// deliberately unlike the designed rows so it is not mistaken for one.
+/// A way into the expert side without being approved, for walking those
+/// screens while building them.
+///
+/// Debug builds only, since an approved application now grants the role for
+/// real: in a shipped build this would let any member start taking
+/// bookings. Drawn deliberately unlike the designed rows so it is never
+/// mistaken for one.
 ///
 /// The way back is the expert's own Profile tab, which offers the role
 /// chooser again.
@@ -124,7 +133,14 @@ class _AccountRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(controller.displayName, style: CustomTextStyles.screenQuestion),
+          // Obx: the account is read when the screen opens, so the name
+          // lands a moment after the first frame.
+          Obx(
+            () => Text(
+              controller.displayName,
+              style: CustomTextStyles.screenQuestion,
+            ),
+          ),
           // The badge said the avatar was editable while nothing happened on
           // tap. It opens the screen that actually changes it.
           GestureDetector(

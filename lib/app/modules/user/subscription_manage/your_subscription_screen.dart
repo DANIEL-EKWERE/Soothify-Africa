@@ -85,9 +85,14 @@ class _InactiveCard extends StatelessWidget {
           style: CustomTextStyles.subscriptionBody,
         ),
         SizedBox(height: 32.v),
-        CustomElevatedButton(
-          text: 'Start 7-Day Free Trial',
-          onPressed: controller.startTrial,
+        // One free week per account: after that the same button sells a
+        // period, and offering the week again would be a promise we would
+        // have to break at checkout.
+        Obx(
+          () => CustomElevatedButton(
+            text: controller.startLabel,
+            onPressed: controller.startTrial,
+          ),
         ),
         SizedBox(height: 40.v),
         Center(

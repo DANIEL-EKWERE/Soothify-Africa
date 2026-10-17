@@ -13,6 +13,7 @@ import 'package:soothifyafrica/app/modules/user/profile/controller/profile_tab_c
 import 'package:soothifyafrica/app/modules/user/profile/profile_tab.dart';
 
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
+import 'package:soothifyafrica/app/data/models/user_profile.dart';
 
 import 'helpers.dart';
 
@@ -28,6 +29,22 @@ class _FakeSession extends SessionService {
 class _FakeProfileRepository implements ProfileRepository {
   @override
   Future<ProfileStats> getStats() async => ProfileStats.empty;
+
+  @override
+  Future<UserProfile> me() async => const UserProfile(id: '1');
+
+  @override
+  Future<UserProfile> update({
+    String? fullName,
+    String? language,
+    String? moodFigure,
+    String? communityHandle,
+  }) async =>
+      UserProfile(id: '1', fullName: fullName ?? '');
+
+  @override
+  Future<UserProfile> uploadAvatar(String filePath) async =>
+      UserProfile(id: '1', avatarUrl: filePath);
 }
 
 /// PNGs only: precacheImage decodes raster data and rejects an SVG. Without

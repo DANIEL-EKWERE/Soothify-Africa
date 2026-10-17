@@ -28,6 +28,10 @@ import 'package:soothifyafrica/app/modules/user/settings/user_profile_screen.dar
 
 import 'helpers.dart';
 import 'package:soothifyafrica/app/modules/user/settings/update_account_screen.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_notification_repository.dart';
+import 'package:soothifyafrica/app/data/models/profile_stats.dart';
+import 'package:soothifyafrica/app/data/models/user_profile.dart';
+import 'package:soothifyafrica/app/data/repositories/profile_repository.dart';
 
 /// Regenerate with:
 ///   flutter test --update-goldens test/settings_pages_test.dart
@@ -41,9 +45,17 @@ void main() {
   Future<void> putSettings() async {
     await PrefUtils().init();
     Get.put(ThemeService());
-    Get.put(SessionService());
-    Get.put(SettingsController(Get.find<ThemeService>(),
-        Get.find<SessionService>()));
+    final session = SessionService();
+    // Signed in, with the frame's own name on the account: these screens
+    // read it now rather than printing a placeholder.
+    await session.setRole(UserRole.user);
+    Get.put(session);
+    Get.put(SettingsController(
+      Get.find<ThemeService>(),
+      Get.find<SessionService>(),
+      _NamedProfile('Dera Ochukwu'),
+      StubAuthRepository(),
+    ));
   }
 
   for (final (name, brightness) in [
@@ -54,7 +66,7 @@ void main() {
       useDesignFrame(tester);
       await loadAppFonts();
       await putSettings();
-      Get.put(NotificationSettingsController());
+      Get.put(NotificationSettingsController(MockNotificationRepository()));
 
       for (final (label, screen) in <(String, Widget)>[
         ('account_settings', const AccountSettingsScreen()),
@@ -309,7 +321,7 @@ void main() {
     useDesignFrame(tester);
     await loadAppFonts();
     await PrefUtils().init();
-    final controller = Get.put(NotificationSettingsController());
+    final controller = Get.put(NotificationSettingsController(MockNotificationRepository()));
 
     await pumpScreen(tester, const NotificationSettingsScreen());
     await tester.pumpAndSettle();
@@ -328,7 +340,7 @@ void main() {
     );
 
     // A fresh controller reads the stored value back.
-    final reopened = NotificationSettingsController()..onInit();
+    final reopened = NotificationSettingsController(MockNotificationRepository())..onInit();
     expect(reopened.isOn(NotificationPreference.balance), isTrue);
   });
 
@@ -431,4 +443,30 @@ void main() {
     expect(find.text('Name'), findsOneWidget);
     expect(find.text('Update'), findsOneWidget);
   });
+}
+
+/// A profile with a name on it, and nothing else to say.
+class _NamedProfile implements ProfileRepository {
+  _NamedProfile(this.name);
+
+  final String name;
+
+  @override
+  Future<ProfileStats> getStats() async => ProfileStats.empty;
+
+  @override
+  Future<UserProfile> me() async => UserProfile(id: '1', fullName: name);
+
+  @override
+  Future<UserProfile> update({
+    String? fullName,
+    String? language,
+    String? moodFigure,
+    String? communityHandle,
+  }) async =>
+      UserProfile(id: '1', fullName: fullName ?? name);
+
+  @override
+  Future<UserProfile> uploadAvatar(String filePath) async =>
+      UserProfile(id: '1', fullName: name, avatarUrl: filePath);
 }

@@ -4,6 +4,11 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/core/utils/checkout_launcher.dart';
+import 'package:soothifyafrica/app/data/models/booked_session.dart';
+import 'package:soothifyafrica/app/data/models/checkout.dart';
+import 'package:soothifyafrica/app/data/repositories/billing_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/data/models/booked_slot.dart';
 import 'package:soothifyafrica/app/modules/user/payment/booking_payment_screen.dart';
@@ -33,7 +38,7 @@ void main() {
   }) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final c = Get.put(BookingPaymentController(offering));
+    final c = Get.put(BookingPaymentController(offering, MockBillingRepository()));
     await pumpScreen(tester, screen, brightness: brightness);
     return c;
   }
@@ -137,6 +142,7 @@ void main() {
     await loadAppFonts();
     Get.put(BookingPaymentController(
       SessionOffering.therapy,
+      MockBillingRepository(),
       booked: BookedSlot(
         offering: SessionOffering.therapy,
         day: DateTime(2026, 10, 14),
@@ -164,6 +170,7 @@ void main() {
       Get.testMode = true;
       Get.put(BookingPaymentController(
         SessionOffering.meditation,
+        MockBillingRepository(),
         booked: BookedSlot(
           offering: SessionOffering.meditation,
           day: DateTime(2026, 10, 14),
@@ -205,16 +212,133 @@ void main() {
       // The screen was built and never reached — paying used to skip it.
       expect(Get.currentRoute, AppRoutes.confirmBooking);
       expect(find.text('Confirm booking'), findsOneWidget);
-      expect(find.text('Pay with Paystack'), findsOneWidget);
+      expect(find.text('Pay with card'), findsOneWidget);
       // Priced from the offering that was booked, not the therapy default.
       expect(find.text('₦10,000'), findsNWidgets(2));
 
       await expectLater(find.byType(CareGuaranteeScreen),
           matchesGoldenFile('goldens/confirm_booking.png'));
 
-      await tester.tap(find.text('Pay with Paystack'));
+      // Paying used to walk straight on to the receipt. It asks the server
+      // for a checkout now, and this older entry point reached the screen
+      // without booking a time -- so it says so rather than charging for a
+      // session that does not exist.
+      await tester.tap(find.text('Pay with card'));
       await tester.pumpAndSettle();
-      expect(Get.currentRoute, AppRoutes.paymentSuccess);
+      expect(Get.currentRoute, AppRoutes.confirmBooking);
+      // That answer comes as a snackbar; let it go rather than leaving its
+      // timer running past the end of the test.
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('the receipt waits for the server, not for the browser',
+        (tester) async {
+      useDesignFrame(tester);
+      disableMotion(tester);
+      await loadAppFonts();
+      Get.testMode = true;
+
+      final opened = <String>[];
+      CheckoutLauncher.opener = (url) async {
+        opened.add(url);
+        return true;
+      };
+      addTearDown(() => CheckoutLauncher.opener = _realOpener);
+
+      // Not paid on the first ask: the webhook has not landed yet.
+      final billing = _StubBilling(const ['pending', 'paid']);
+      Get.put(BookingPaymentController(
+        SessionOffering.therapy,
+        billing,
+        session: BookedSession(
+          id: '11',
+          discipline: 'therapy',
+          expertName: 'Jacob Samuel',
+          startsAt: DateTime(2026, 10, 14, 11),
+          endsAt: DateTime(2026, 10, 14, 12),
+          status: 'pending',
+          priceNaira: 25000,
+        ),
+      ));
+
+      await pumpScreen(
+        tester,
+        const CareGuaranteeScreen(),
+        pages: [
+          GetPage(
+            name: AppRoutes.paymentSuccess,
+            page: () => const Scaffold(body: Text('receipt')),
+          ),
+        ],
+      );
+
+      await tester.tap(find.text('Pay with card'));
+      await tester.pump();
+      // The checkout opens in the browser, outside the app.
+      expect(opened.single, 'https://pay.bachs.io/c/1');
+
+      // While it is out there, the button says what is happening and cannot
+      // be pressed into starting a second payment.
+      await tester.pump();
+      expect(find.text('Waiting for payment\u2026'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 5));   // asked: pending
+      await tester.pump(const Duration(seconds: 5));   // asked: paid
+      await tester.pumpAndSettle();
+
+      expect(billing.polls, 2, reason: 'it stops asking once it is paid');
+      expect(find.text('receipt'), findsOneWidget);
     });
   });
+}
+
+/// The opener the app uses, kept so a test can put it back.
+final _realOpener = CheckoutLauncher.opener;
+
+/// A billing server that answers a fixed sequence of payment states.
+class _StubBilling implements BillingRepository {
+  _StubBilling(this._statuses);
+
+  final List<String> _statuses;
+  int polls = 0;
+
+  @override
+  Future<Checkout> paySession(String sessionId, {String promoCode = ''}) async =>
+      const Checkout(
+        reference: 'ref_1',
+        checkoutUrl: 'https://pay.bachs.io/c/1',
+        amountNaira: 25000,
+      );
+
+  @override
+  Future<String> paymentStatus(String reference) async {
+    final answer = _statuses[polls.clamp(0, _statuses.length - 1)];
+    polls++;
+    return answer;
+  }
+
+  @override
+  Future<MembershipStatus> membership() async => MembershipStatus.none;
+
+  @override
+  Future<Checkout> startMembership({
+    required String planKey,
+    String cadence = 'annual',
+    bool trial = true,
+    String promoCode = '',
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MembershipStatus> cancelMembership() => throw UnimplementedError();
+
+  @override
+  Future<Checkout> replaceCard() => throw UnimplementedError();
+
+  @override
+  Future<List<BillingInvoice>> invoices() async => const [];
+
+  @override
+  Future<Map<String, dynamic>?> checkPromo(String code) async => null;
 }

@@ -1,5 +1,6 @@
 import '../../core/utils/image_constant.dart';
 import '../models/bank_destination.dart';
+import '../models/bank_option.dart';
 import '../models/expert_earnings.dart';
 import '../models/expert_session.dart';
 import 'expert_repository.dart';
@@ -97,4 +98,84 @@ class MockExpertRepository implements ExpertRepository {
     await Future<void>.delayed(_latency);
     _slots = List.of(slots);
   }
+
+  @override
+  Future<BankDestination> addPayoutDestination({
+    required String bankName,
+    required String bankCode,
+    required String accountNumber,
+  }) async {
+    // Through the getter, because the seeded list is a const one and the
+    // field starts null.
+    final current = await payoutDestinations();
+    // The name is the one that was typed -- with a server it is the bank's
+    // own answer, which is the point of asking them.
+    final added = BankDestination(
+      bank: bankName,
+      accountNumber: accountNumber,
+      accountName: 'Account holder',
+    );
+    _destinations = [...current, added];
+    return added;
+  }
+
+  @override
+  Future<List<BankOption>> banks() async {
+    await Future<void>.delayed(_latency);
+    // The handful the frame's picker drew. With a server this is Bachs'
+    // own list, codes included.
+    return const [
+      BankOption(code: '044', name: 'Access Bank'),
+      BankOption(code: '058', name: 'Guaranty Trust Bank'),
+      BankOption(code: '011', name: 'First Bank of Nigeria'),
+      BankOption(code: '033', name: 'United Bank for Africa'),
+      BankOption(code: '057', name: 'Zenith Bank'),
+      BankOption(code: '50211', name: 'Kuda Bank'),
+      BankOption(code: '999992', name: 'Opay'),
+    ];
+  }
+
+  @override
+  Future<void> requestPayout(int naira) async {
+    await Future<void>.delayed(_latency);
+    // Nothing is owed and nothing is sent. Saying otherwise would be the
+    // one lie a payout screen must never tell.
+  }
+
+  @override
+  Future<AvailabilitySlot> addAvailability({
+    required DateTime day,
+    required int from,
+    required int to,
+  }) async {
+    final current = await availability();
+    final slot = AvailabilitySlot(
+      id: 'mock-${DateTime.now().microsecondsSinceEpoch}',
+      day: day,
+      from: from,
+      to: to,
+    );
+    _slots = [...current, slot];
+    return slot;
+  }
+
+  @override
+  Future<void> removeAvailability(String id) async {
+    final current = await availability();
+    _slots = current.where((slot) => slot.id != id).toList();
+  }
+
+  @override
+  Future<String> sessionNote(String sessionId) async {
+    await Future<void>.delayed(_latency);
+    return _notes[sessionId] ?? '';
+  }
+
+  @override
+  Future<void> saveSessionNote(String sessionId, String body) async {
+    await Future<void>.delayed(_latency);
+    _notes[sessionId] = body;
+  }
+
+  final Map<String, String> _notes = <String, String>{};
 }

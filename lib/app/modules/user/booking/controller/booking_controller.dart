@@ -172,13 +172,16 @@ class BookingController extends GetxController {
   /// kept so those stages stay reachable.
   void startSession() => stage.value = BookingStage.method;
 
-  /// "Schedule for later" — the calendar sheet picks a date instead.
+  /// "Schedule for later" — the sheet picks a day, and the calendar takes
+  /// it from there.
+  ///
+  /// It used to say a session was set, which it never was: booking happens
+  /// on the calendar screen, which holds the hour at the server and leads
+  /// to payment. This hands the chosen day to it rather than inventing a
+  /// booking nobody made.
   void schedule(DateTime date) {
     scheduledFor.value = date;
-    AppFeedback.info(
-      'Session set for ${date.day}/${date.month}/${date.year}. '
-      'Confirmation is not built yet.',
-    );
+    Get.toNamed(AppRoutes.bookingCalendar, arguments: offering);
   }
 
   void chooseMode(CallMode value) {

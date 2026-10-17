@@ -49,5 +49,7 @@ class ShelfController extends BaseController {
     await load();
   }
 
-  void openSearch() => AppFeedback.info('Search is not built yet.');
+  /// The library is searched on the server -- titles, practitioners and
+  /// tags across everything, which filtering one loaded shelf could not do.
+  void openSearch() => Get.toNamed(AppRoutes.librarySearch);
 }

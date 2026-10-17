@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:soothifyafrica/app/data/models/signed_in_user.dart';
 import 'package:soothifyafrica/app/data/models/user_role.dart';
 import 'package:soothifyafrica/app/data/repositories/auth_repository.dart';
 import 'package:flutter/services.dart';
@@ -14,34 +15,128 @@ import 'package:soothifyafrica/app/widgets/soothify_word.dart';
 
 /// Stands in for [AuthRepository] in tests.
 ///
-/// The real one drives Google's and Apple's SDKs, which cannot run in a test
-/// — so what is exercised here is what the controllers do with each answer:
-/// a role, a cancellation (null), or a failure.
+/// The real one drives Google's and Apple's SDKs and the Django API, neither
+/// of which can run in a test — so what is exercised here is what the
+/// controllers do with each answer: a session, a cancellation (null), or a
+/// failure.
 class StubAuthRepository implements AuthRepository {
-  StubAuthRepository({this.role = UserRole.user, this.error});
+  StubAuthRepository({
+    this.role = UserRole.user,
+    this.error,
+    this.kycComplete = false,
+    this.emailIsAvailable = true,
+  });
 
-  /// What a successful sign-in returns. Null stands for the user dismissing
-  /// the provider's own sheet.
+  /// The role a successful sign-in returns. Null stands for the user
+  /// dismissing the provider's own sheet.
   final UserRole? role;
+
+  /// Whether the session says the questionnaire is done, which is what the
+  /// controllers route on.
+  final bool kycComplete;
+
+  final bool emailIsAvailable;
 
   /// Thrown instead, when a test wants the failure path.
   final Object? error;
 
   int googleCalls = 0;
   int appleCalls = 0;
+  int registerCalls = 0;
+  int signInCalls = 0;
+  int signOutCalls = 0;
+  int resetRequests = 0;
+
+  /// What was last sent, so a test can check the form reached the server.
+  String? lastEmail;
+  String? lastPassword;
+  String? lastFullName;
+  String? lastCode;
+
+  SignedInUser? get _user => role == null
+      ? null
+      : SignedInUser(role: role!, kycComplete: kycComplete);
 
   @override
-  Future<UserRole?> signInWithGoogle() async {
+  Future<SignedInUser?> signInWithGoogle() async {
     googleCalls++;
     if (error != null) throw error!;
-    return role;
+    return _user;
   }
 
   @override
-  Future<UserRole?> signInWithApple() async {
+  Future<SignedInUser?> signInWithApple() async {
     appleCalls++;
     if (error != null) throw error!;
-    return role;
+    return _user;
+  }
+
+  @override
+  Future<SignedInUser> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    registerCalls++;
+    lastFullName = fullName;
+    lastEmail = email;
+    lastPassword = password;
+    if (error != null) throw error!;
+    return _user ?? const SignedInUser(role: UserRole.user);
+  }
+
+  @override
+  Future<SignedInUser> signIn({
+    required String email,
+    required String password,
+  }) async {
+    signInCalls++;
+    lastEmail = email;
+    lastPassword = password;
+    if (error != null) throw error!;
+    return _user ?? const SignedInUser(role: UserRole.user);
+  }
+
+  @override
+  Future<void> signOut() async {
+    signOutCalls++;
+    if (error != null) throw error!;
+  }
+
+  int deleteCalls = 0;
+
+  @override
+  Future<void> deleteAccount(String confirm) async {
+    deleteCalls++;
+    lastPassword = confirm;
+    if (error != null) throw error!;
+  }
+
+  @override
+  Future<bool> emailAvailable(String email) async {
+    lastEmail = email;
+    if (error != null) throw error!;
+    return emailIsAvailable;
+  }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    resetRequests++;
+    lastEmail = email;
+    if (error != null) throw error!;
+  }
+
+  @override
+  Future<SignedInUser> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String password,
+  }) async {
+    lastEmail = email;
+    lastCode = code;
+    lastPassword = password;
+    if (error != null) throw error!;
+    return _user ?? const SignedInUser(role: UserRole.user);
   }
 }
 
@@ -164,6 +259,17 @@ Future<void> pumpScreen(
       ),
     ),
   );
+  await tester.pumpAndSettle();
+}
+
+/// Lets a repository's latency elapse.
+///
+/// [pumpScreen] settles animations, but `pumpAndSettle` only advances the
+/// clock while a frame is scheduled, and a pending `Future.delayed` schedules
+/// none. A screen that loads its content from a repository therefore stays
+/// empty until the clock is moved on by hand -- which is what this does.
+Future<void> settleLoads(WidgetTester tester) async {
+  await tester.pump(const Duration(seconds: 1));
   await tester.pumpAndSettle();
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
+import '../../../../data/models/signed_in_user.dart';
 import '../../../../data/models/user_role.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/kyc_repository.dart';
@@ -39,9 +40,13 @@ class SigninController extends BaseController {
 
   void toggleObscure() => obscurePassword.toggle();
 
-  /// No backend yet: this validates and establishes a local session. The
-  /// design's error state is what a rejected credential will populate once
-  /// the Django call replaces this body.
+  /// Signs in against the server.
+  ///
+  /// The two obvious mistakes are caught here so the form can answer
+  /// without a round trip; everything else is the server's to judge, and
+  /// its wording is what the field shows. A wrong password is deliberately
+  /// not distinguished from an unknown address: saying which would tell a
+  /// stranger who has an account here.
   Future<void> submit() async {
     if (isLoading.value) return;
     errorText.value = null;
@@ -50,33 +55,31 @@ class SigninController extends BaseController {
       errorText.value = 'Enter a valid email address.';
       return;
     }
-    if (password.value.length < 6) {
-      errorText.value =
-          'You entered an incorrect password. Please try again';
+    if (password.value.isEmpty) {
+      errorText.value = 'Enter your password.';
       return;
     }
 
-    final ok = await guard(() async {
-      await _session.setRole(UserRole.user);
-      return true;
-    });
-    if (ok != true) return;
+    final user = await guard(
+      () => _auth.signIn(email: email.value, password: password.value),
+      // Shown under the field, as the design draws it, rather than over the
+      // screen in a snackbar.
+      showFeedback: false,
+      onError: (error) => errorText.value = error.message,
+    );
+    if (user == null) return;
 
-    // Taking an account supersedes a skipped onboarding. Clearing the flag
-    // matters beyond this navigation: without it, quitting part-way through
-    // the questionnaire would leave `resolveStartRoute` still treating it as
-    // skipped, and the next launch would walk straight past the KYC that
-    // registering had just asked for.
-    await PrefUtils().setOnboardingSkipped(false);
-
-    final complete = await _kyc.isComplete();
-    Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
+    await _establish(user);
   }
 
   void goToSignUp() => Get.offAllNamed(AppRoutes.signup);
 
-  void forgotPassword() =>
-      AppFeedback.info('Password recovery arrives with the backend.');
+  /// Carries whatever they have typed into the reset screen, so they do not
+  /// type their address twice.
+  void forgotPassword() => Get.toNamed(
+        AppRoutes.forgotPassword,
+        arguments: email.value.trim(),
+      );
 
   /// The two social buttons the frames draw.
   ///
@@ -88,19 +91,36 @@ class SigninController extends BaseController {
 
   Future<void> continueWithApple() => _social(_auth.signInWithApple);
 
-  Future<void> _social(Future<UserRole?> Function() signIn) async {
+  Future<void> _social(Future<SignedInUser?> Function() signIn) async {
     if (isLoading.value) return;
     errorText.value = null;
 
-    final role = await guard(signIn);
-    if (role == null) return;
+    final user = await guard(signIn);
+    if (user == null) return;
 
-    await _session.setRole(role);
-    // Taking an account supersedes a skipped onboarding — same reason as
-    // submit() above.
+    await _establish(user);
+  }
+
+  /// What follows a successful sign-in, however it was done.
+  ///
+  /// Taking an account supersedes a skipped onboarding. Clearing that flag
+  /// matters beyond this navigation: without it, quitting part-way through
+  /// the questionnaire would leave `resolveStartRoute` still treating it as
+  /// skipped, and the next launch would walk straight past the KYC that
+  /// signing in had just asked for.
+  Future<void> _establish(SignedInUser user) async {
+    await _session.setRole(user.role);
     await PrefUtils().setOnboardingSkipped(false);
 
-    final complete = await _kyc.isComplete();
+    // The server's answer, not a second call: it told us with the session
+    // whether the questionnaire is done. The local repository is still
+    // asked when the server said nothing, which is the offline build.
+    final complete = user.kycComplete || await _kyc.isComplete();
+
+    if (user.role == UserRole.practitioner) {
+      Get.offAllNamed(AppRoutes.practitionerDashboard);
+      return;
+    }
     Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }
 }

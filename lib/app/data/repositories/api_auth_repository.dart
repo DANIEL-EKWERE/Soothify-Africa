@@ -9,10 +9,10 @@ import '../../core/errors/app_exception.dart';
 import '../../core/network/api_client.dart';
 import '../../core/utils/logger.dart';
 import '../../core/utils/pref_utils.dart';
-import '../models/user_role.dart';
+import '../models/signed_in_user.dart';
 import 'auth_repository.dart';
 
-/// Google and Apple sign-in against the Django API.
+/// Accounts, against the Django API.
 ///
 /// The phone runs the provider's flow, the provider returns a signed identity
 /// token, and the server verifies it before issuing our own session. The app
@@ -29,7 +29,7 @@ class ApiAuthRepository implements AuthRepository {
   static const _applePath = '/auth/apple/';
 
   @override
-  Future<UserRole?> signInWithGoogle() async {
+  Future<SignedInUser?> signInWithGoogle() async {
     final GoogleSignInAccount? account;
     try {
       // Signs the previous account out first. Without it the SDK silently
@@ -62,7 +62,7 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<UserRole?> signInWithApple() async {
+  Future<SignedInUser?> signInWithApple() async {
     if (!kIsWeb && !Platform.isIOS && !Platform.isMacOS) {
       // Apple's flow is available on Android through a web redirect, but it
       // needs a Services ID and a return URL that do not exist yet. Saying
@@ -104,8 +104,83 @@ class ApiAuthRepository implements AuthRepository {
     });
   }
 
-  /// Exchanges a verified provider token for our own session.
-  Future<UserRole> _establish(String path, Map<String, dynamic> body) async {
+  @override
+  Future<SignedInUser> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) =>
+      _establish('/auth/register/', {
+        'full_name': fullName.trim(),
+        'email': email.trim(),
+        'password': password,
+      });
+
+  @override
+  Future<SignedInUser> signIn({
+    required String email,
+    required String password,
+  }) =>
+      _establish('/auth/login/', {
+        'email': email.trim(),
+        'password': password,
+      });
+
+  @override
+  Future<void> signOut() async {
+    final refresh = PrefUtils().refreshToken;
+    try {
+      if (refresh.isNotEmpty) {
+        await _api.post('/auth/logout/', body: {'refresh': refresh});
+      }
+    } on AppException catch (error) {
+      // The session ends on this device either way. A server that cannot be
+      // reached must not be able to keep somebody signed in.
+      Log.e('sign-out could not reach the server', error: error);
+    } finally {
+      await PrefUtils().setTokens(access: '', refresh: '');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount(String confirm) async {
+    await _api.post('/auth/me/delete/', body: {'confirm': confirm});
+    // The session is over whatever else happens next.
+    await PrefUtils().setTokens(access: '', refresh: '');
+  }
+
+  @override
+  Future<bool> emailAvailable(String email) async {
+    final address = email.trim();
+    if (address.isEmpty) return false;
+    final body = await _api.get(
+      '/auth/email-available/?email=${Uri.encodeQueryComponent(address)}',
+    );
+    // Absent means the server did not say; treating that as "taken" would
+    // block a sign-up over a bad answer, so the form carries on and the
+    // register call has the final word.
+    return body['available'] as bool? ?? true;
+  }
+
+  @override
+  Future<void> requestPasswordReset(String email) async {
+    await _api.post('/auth/password/reset/', body: {'email': email.trim()});
+  }
+
+  @override
+  Future<SignedInUser> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String password,
+  }) =>
+      _establish('/auth/password/reset/confirm/', {
+        'email': email.trim(),
+        'code': code.trim(),
+        'password': password,
+      });
+
+  /// Exchanges credentials, or a verified provider token, for our session.
+  Future<SignedInUser> _establish(String path, Map<String, dynamic> body) async {
     final response = await _api.post(path, body: body);
 
     final tokens = response['tokens'];
@@ -118,7 +193,8 @@ class ApiAuthRepository implements AuthRepository {
     );
 
     final profile = response['profile'];
-    final role = profile is Map ? profile['role'] as String? : null;
-    return UserRole.fromKey(role) ?? UserRole.user;
+    return SignedInUser.fromProfile(
+      profile is Map ? Map<String, dynamic>.from(profile) : null,
+    );
   }
 }

@@ -73,6 +73,13 @@ class ProfileTabController extends BaseController {
 
   void select(ProfileSection value) => section.value = value;
 
-  void openSessionNote() =>
-      AppFeedback.info('Session notes are not built yet.');
+  /// The card on Profile that looks like it opens a session note.
+  ///
+  /// It does not, and will not: the note a practitioner writes is clinical,
+  /// and the server never serves it to the client it is about. Said plainly
+  /// rather than left as "not built yet", which promises it one day.
+  void openSessionNote() => AppFeedback.info(
+        'Your practitioner’s notes are private to them. Ask them in your '
+        'next session if you would like to talk one through.',
+      );
 }

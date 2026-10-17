@@ -6,6 +6,7 @@ import '../../../../data/models/signed_in_user.dart';
 import '../../../../data/models/user_role.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/kyc_repository.dart';
+import '../../../../data/repositories/syncing_kyc_repository.dart';
 import '../../../../data/services/session_service.dart';
 
 class SigninController extends BaseController {
@@ -111,6 +112,13 @@ class SigninController extends BaseController {
   Future<void> _establish(SignedInUser user) async {
     await _session.setRole(user.role);
     await PrefUtils().setOnboardingSkipped(false);
+
+    // The questionnaire was answered before this account existed, so the
+    // account is told about it now. Before the upload, because the line
+    // below asks whether it is complete and the server's copy should agree
+    // with the device's by then.
+    final kyc = _kyc;
+    if (kyc is SyncingKycRepository) await kyc.uploadToAccount();
 
     // The server's answer, not a second call: it told us with the session
     // whether the questionnaire is done. The local repository is still

@@ -45,6 +45,7 @@ import '../../data/repositories/mock_spaces_repository.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/spaces_repository.dart';
 import '../../data/repositories/syncing_journal_repository.dart';
+import '../../data/repositories/syncing_kyc_repository.dart';
 import '../../data/repositories/syncing_mood_repository.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/repositories/subscription_repository.dart';
@@ -123,12 +124,25 @@ class InitialBindings extends Bindings {
           : LocalJournalRepository(),
       fenix: true,
     );
+    // The questionnaire is answered before there is an account to put it
+    // on, so the device holds it and the account is told afterwards. Going
+    // straight to the API here was what made the age step announce that the
+    // session had expired to somebody who had never signed in.
+    Get.lazyPut<KycRepository>(
+      () => useApi
+          ? SyncingKycRepository(
+              LocalKycRepository(),
+              ApiKycRepository(api),
+              signedIn: () => PrefUtils().accessToken.isNotEmpty,
+            )
+          : LocalKycRepository(),
+      fenix: true,
+    );
 
     if (!useApi) {
       // No backend reachable: the app runs end to end on mocks, which is
       // what makes it demonstrable on a plane and testable without a server.
       Get.lazyPut<ContentRepository>(() => MockContentRepository(), fenix: true);
-      Get.lazyPut<KycRepository>(() => LocalKycRepository(), fenix: true);
       Get.lazyPut<ProfileRepository>(() => LocalProfileRepository(), fenix: true);
       Get.lazyPut<SubscriptionRepository>(
         () => MockSubscriptionRepository(),
@@ -147,10 +161,11 @@ class InitialBindings extends Bindings {
       );
     } else {
       Get.lazyPut<ContentRepository>(
-        () => ApiContentRepository(api),
+        // Handed the questionnaire so recommendations can be shaped by it,
+        // signed in or not.
+        () => ApiContentRepository(api, kyc: Get.find<KycRepository>()),
         fenix: true,
       );
-      Get.lazyPut<KycRepository>(() => ApiKycRepository(api), fenix: true);
       Get.lazyPut<ProfileRepository>(
         () => ApiProfileRepository(api),
         fenix: true,

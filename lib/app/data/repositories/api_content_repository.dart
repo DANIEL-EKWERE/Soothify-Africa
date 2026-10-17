@@ -1,6 +1,8 @@
 import '../../core/network/api_client.dart';
+import '../../core/utils/logger.dart';
 import '../models/media_item.dart';
 import 'content_repository.dart';
+import 'kyc_repository.dart';
 
 /// The library, from `/api/v1/content/`.
 ///
@@ -9,9 +11,14 @@ import 'content_repository.dart';
 /// list with a different query, and a shelf's row and its "See All" page are
 /// the same shelf with `full=true`.
 class ApiContentRepository implements ContentRepository {
-  ApiContentRepository(this._api);
+  ApiContentRepository(this._api, {KycRepository? kyc}) : _kyc = kyc;
 
   final ApiClient _api;
+
+  /// Where the onboarding answers live, which is the device. Optional so a
+  /// test can build this without one; without it, recommendations are the
+  /// staff-picked list, which is what the server falls back to anyway.
+  final KycRepository? _kyc;
 
   @override
   Future<List<Category>> getCategories() async {
@@ -25,9 +32,48 @@ class ApiContentRepository implements ContentRepository {
   @override
   Future<List<MediaItem>> getRecent() => _items('/content/recent/');
 
+  /// Recommendations, shaped by the onboarding questionnaire.
+  ///
+  /// The answers travel with the request rather than being looked up by
+  /// account, because the questionnaire is answered before anybody has one
+  /// — a guest on the home screen has to get the same personalisation a
+  /// signed-in person does.
+  ///
+  /// A POST, and not because anything is created: concerns like
+  /// "sleep_disorder" in a query string end up in access logs, proxy caches
+  /// and the CDN cache key.
   @override
-  Future<List<MediaItem>> getRecommendations() =>
-      _items('/content/recommendations/');
+  Future<List<MediaItem>> getRecommendations() async {
+    final body = await _api.post(
+      '/content/recommendations/',
+      body: await _questionnaire(),
+    );
+    final rows = body['results'] ?? body['data'] ?? body['items'];
+    if (rows is! List) return const [];
+    return rows.whereType<Map<String, dynamic>>().map(MediaItem.fromJson).toList();
+  }
+
+  /// The two answers that say anything about what to show, if we have them.
+  ///
+  /// An empty body is a perfectly good request: the server reads the
+  /// account's own answers when signed in, and falls back to the staff list
+  /// when there is nothing to go on either way.
+  Future<Map<String, dynamic>> _questionnaire() async {
+    final kyc = _kyc;
+    if (kyc == null) return const {};
+    try {
+      final answers = await kyc.savedAnswers();
+      return {
+        for (final key in const ['concerns', 'goals'])
+          if (answers[key]?.isNotEmpty ?? false) key: answers[key]!.toList(),
+      };
+    } catch (error) {
+      // Corrupt or missing local answers must not cost somebody their home
+      // screen; without them the server picks for everyone.
+      Log.e('could not read the questionnaire for recommendations', error: error);
+      return const {};
+    }
+  }
 
   @override
   Future<List<MediaItem>> getShelf(String query) =>

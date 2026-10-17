@@ -6,6 +6,7 @@ import '../../../../data/models/signed_in_user.dart';
 import '../../../../data/models/user_role.dart';
 import '../../../../data/repositories/auth_repository.dart';
 import '../../../../data/repositories/kyc_repository.dart';
+import '../../../../data/repositories/syncing_kyc_repository.dart';
 import '../../../../data/services/session_service.dart';
 
 /// The password rules the design surfaces as chips beneath the field.
@@ -131,6 +132,13 @@ class SignupController extends BaseController {
       Get.offAllNamed(AppRoutes.practitionerDashboard);
       return;
     }
+
+    // The questionnaire was answered before this account existed, so the
+    // account is told about it now. Before the upload, because the line
+    // below asks whether it is complete and the server's copy should agree
+    // with the device's by then.
+    final kyc = _kyc;
+    if (kyc is SyncingKycRepository) await kyc.uploadToAccount();
 
     // Guests reach sign-up from Profile having already answered the
     // questionnaire during onboarding, so sending everyone to KYC would make

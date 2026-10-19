@@ -47,7 +47,7 @@ class ExpertContentCard extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.h),
                   child: CustomImageView(
-                    imagePath: content.coverAsset,
+                    imagePath: content.cover,
                     height: coverHeight.v,
                     width: double.infinity,
                     fit: BoxFit.cover,

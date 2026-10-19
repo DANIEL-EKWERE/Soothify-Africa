@@ -11,12 +11,25 @@ import '../../../../data/models/media_item.dart';
 import '../../../../data/models/subscription_plan.dart';
 import '../../../../data/repositories/content_repository.dart';
 import '../../../../data/repositories/subscription_repository.dart';
+import '../../../../data/services/session_service.dart';
 import '../../../../data/models/plan_tier.dart';
 import '../../spaces/widgets/passport_sheet.dart';
 
 /// Backs the Discovery tab — Figma "Discovery" (135:3363).
 class DiscoveryTabController extends BaseController {
-  DiscoveryTabController(this._content, this._subscriptions);
+  DiscoveryTabController(
+    this._content,
+    this._subscriptions, {
+    SessionService? session,
+  }) : _session = session;
+
+  /// Who is using the app, when there is one to ask.
+  ///
+  /// Optional and injected rather than looked up inside [load]: a Get.find
+  /// for an unregistered service throws, and a throw inside the guard
+  /// leaves the whole tab empty -- plans and popular included -- for what
+  /// is only a question about one row.
+  final SessionService? _session;
 
   final ContentRepository _content;
   final SubscriptionRepository _subscriptions;
@@ -46,8 +59,17 @@ class DiscoveryTabController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
+    // "Recently played" is this person's own history, so it needs a token.
+    // A guest has none, and asking anyway answers 401 -- which the guard
+    // reports as "your session has expired" to somebody who has never
+    // signed in, and takes the rest of the screen down with it.
+    //
+    // No session supplied means nothing to go on, so it asks: that is the
+    // old behaviour, which is what the screen's own tests rely on.
+    final mine = _session?.hasAccount ?? true;
+
     final results = await Future.wait([
-      _content.getRecent(),
+      mine ? _content.getRecent() : Future.value(const <MediaItem>[]),
       _content.getByCategory('discovery-popular'),
     ]);
     bool keep(MediaItem m) => filters.value.matchesDuration(m.durationSeconds);

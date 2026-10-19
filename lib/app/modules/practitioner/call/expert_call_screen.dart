@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/expert_recommendation.dart';
 import '../../../data/models/expert_session.dart';
+import '../recommend/binding/recommend_binding.dart';
 
 /// The expert's live session — Figma "Audio call with instructor" and
 /// "video call with instructor", read from the expert's side.
@@ -36,9 +37,21 @@ class _ExpertCallScreenState extends State<ExpertCallScreen> {
 
   void _recommend(ExpertContentKind kind) {
     setState(() => _menu = _MenuStep.closed);
-    // Nothing sends a recommendation yet; saying so beats a dead control.
-    AppFeedback.info('Recommending ${kind.label.toLowerCase()} is not built '
-        'yet.');
+
+    final session = _session;
+    if (session == null) {
+      // No booking behind this screen means no client to send to. Only
+      // reachable by opening the route directly, which the app never does.
+      AppFeedback.info('Open this from a session to recommend something.');
+      return;
+    }
+
+    // The kind is settled here, so the picker opens on it and lists only
+    // that: searching across all three would undo the choice just made.
+    Get.toNamed(
+      AppRoutes.expertRecommend,
+      arguments: RecommendArguments(session: session, kind: kind),
+    );
   }
 
   @override

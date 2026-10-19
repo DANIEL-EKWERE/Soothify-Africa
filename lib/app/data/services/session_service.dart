@@ -19,6 +19,16 @@ class SessionService extends GetxService {
   bool get isGuest => role.value == null;
   bool get isPractitioner => role.value == UserRole.practitioner;
 
+  /// Whether there is an account on the server to ask about.
+  ///
+  /// Not the same question as [isSignedIn], and the difference matters.
+  /// A role is chosen during onboarding, before anybody has registered, so
+  /// [isSignedIn] is already true on the first run of a brand-new install.
+  /// Anything that calls an endpoint needing a bearer token has to ask this
+  /// instead, or it calls it with no token and the 401 is reported to the
+  /// user as an expired session they never had.
+  bool get hasAccount => PrefUtils().accessToken.isNotEmpty;
+
   Future<SessionService> init() async {
     // Idempotent; guarantees preferences are loaded even if this service
     // is constructed before main() initialises them (as in tests).

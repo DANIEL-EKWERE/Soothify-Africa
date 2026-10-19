@@ -101,10 +101,12 @@ class _Header extends StatelessWidget {
                   ),
                 )
               else
-                GradientText(
-                  'Hi, Dera',
-                  gradient: appTheme.titleGradient,
-                  style: CustomTextStyles.homeGreeting,
+                Obx(
+                  () => GradientText(
+                    Get.find<HomeTabController>().hello,
+                    gradient: appTheme.titleGradient,
+                    style: CustomTextStyles.homeGreeting,
+                  ),
                 ),
               SizedBox(height: 1.h),
               Text(

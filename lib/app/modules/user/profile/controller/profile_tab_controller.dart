@@ -68,6 +68,13 @@ class ProfileTabController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
+        // The three counters are this person's own. A guest has no account
+        // for the server to count anything about, so the tab shows the
+        // empty figures the design already draws rather than an error.
+        if (!_session.hasAccount) {
+          stats.value = ProfileStats.empty;
+          return;
+        }
         stats.value = await _repository.getStats();
       });
 

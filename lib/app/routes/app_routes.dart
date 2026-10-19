@@ -213,6 +213,9 @@ class AppRoutes {
   /// the client, so a session has to be chosen before it opens.
   static const String expertSessionNotes = '/practitioner/notes';
 
+  /// Picking a piece of the library to send a client mid-call.
+  static const String expertRecommend = '/practitioner/recommend';
+
   /// Withdrawing: the amount, then where it goes.
   static const String expertWithdraw = '/practitioner/withdraw';
   static const String expertPayoutMethod = '/practitioner/payout-method';

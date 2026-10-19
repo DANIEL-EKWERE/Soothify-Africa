@@ -9,6 +9,8 @@ import '../modules/practitioner/availability/expert_slot_editor_screen.dart';
 import '../modules/practitioner/dashboard/controller/expert_dashboard_controller.dart';
 import '../modules/practitioner/notes/controller/session_notes_controller.dart';
 import '../modules/practitioner/notes/session_notes_screen.dart';
+import '../modules/practitioner/recommend/binding/recommend_binding.dart';
+import '../modules/practitioner/recommend/recommend_screen.dart';
 import '../modules/practitioner/payouts/binding/payout_binding.dart';
 import '../modules/practitioner/payouts/expert_payout_method_screen.dart';
 import '../modules/practitioner/payouts/expert_payouts_screen.dart';
@@ -367,6 +369,11 @@ class AppPages {
           () => SessionNotesController(Get.find<ExpertRepository>()),
         ),
       ],
+    ),
+    GetPage(
+      name: AppRoutes.expertRecommend,
+      page: () => const RecommendScreen(),
+      binding: RecommendBinding(),
     ),
     GetPage(
       name: AppRoutes.expertApplication,

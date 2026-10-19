@@ -157,6 +157,19 @@ class ApiExpertRepository implements ExpertRepository {
     await _api.put('/sessions/$sessionId/note/', body: {'body': body});
   }
 
+  @override
+  Future<void> recommend({
+    required String sessionId,
+    required String itemId,
+    String note = '',
+  }) async {
+    await _api.post('/experts/me/recommendations/', body: {
+      'session': int.tryParse(sessionId),
+      'item': int.tryParse(itemId),
+      if (note.trim().isNotEmpty) 'note': note.trim(),
+    });
+  }
+
   // ------------------------------------------------------------- reading
 
   ExpertSession _session(Map<String, dynamic> json) => ExpertSession(

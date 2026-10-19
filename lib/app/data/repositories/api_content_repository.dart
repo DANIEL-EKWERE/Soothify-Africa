@@ -102,6 +102,15 @@ class ApiContentRepository implements ContentRepository {
     return _items('/content/items/?q=${Uri.encodeQueryComponent(term)}');
   }
 
+  @override
+  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''}) {
+    final term = query.trim();
+    return _items(
+      '/content/items/?type=${kind.name}'
+      '${term.isEmpty ? '' : '&q=${Uri.encodeQueryComponent(term)}'}',
+    );
+  }
+
   Future<List<MediaItem>> _items(String path) async {
     final rows = await _api.getList(path);
     return rows.map(MediaItem.fromJson).toList();

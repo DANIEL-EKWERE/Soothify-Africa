@@ -4,7 +4,9 @@ import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/expert_recommendation.dart';
 import '../../../../data/models/expert_session.dart';
+import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/expert_repository.dart';
+import '../../recommend/binding/recommend_binding.dart';
 
 /// How the session went — Figma "Session notes | After session"
 /// (`259:59854`), the three chips under "How did the session go".
@@ -39,13 +41,35 @@ class SessionNotesController extends BaseController {
 
   final Rxn<SessionOutcome> outcome = Rxn<SessionOutcome>();
 
-  /// The piece of content attached to this note — the frame draws it under
-  /// "Recommendation", between the box and Save.
+  /// The piece of the library going to the client with this note — the
+  /// frame draws it under "Recommendation", between the box and Save.
   ///
-  /// The call screen's "Recommend Contents" menu is what picks it; nothing
-  /// stores that choice yet, so this opens on the frame's own video.
-  final Rxn<ExpertContent> content =
-      Rxn<ExpertContent>(ExpertRecommendation.sample().first.content);
+  /// Nothing until one is picked. It used to open on the frame's own
+  /// sample video, which meant every note offered the same recommendation
+  /// whether or not the practitioner chose anything.
+  final Rxn<MediaItem> picked = Rxn<MediaItem>();
+
+  /// The card the frame draws, from whatever is picked.
+  ExpertContent? get content {
+    final item = picked.value;
+    if (item == null) return null;
+    final minutes = (item.durationSeconds / 60).round();
+    return ExpertContent(
+      id: item.id,
+      kind: switch (item.type) {
+        MediaType.video => ExpertContentKind.video,
+        MediaType.article => ExpertContentKind.article,
+        MediaType.audio => ExpertContentKind.audio,
+      },
+      title: item.title,
+      meta: [
+        if (minutes > 0) '$minutes min',
+        if (item.tag.isNotEmpty) item.tag,
+      ].join(' '),
+      coverUrl: item.coverUrl,
+      coverAsset: item.coverAsset,
+    );
+  }
   final summary = TextEditingController();
   final recommendation = TextEditingController();
 
@@ -89,11 +113,23 @@ class SessionNotesController extends BaseController {
 
   void choose(SessionOutcome value) => outcome.value = value;
 
-  /// Nothing plays content from this side yet — the client's journal is
-  /// where it opens.
-  void openContent() => AppFeedback.info(
-        'Opening the recommended content is not built yet.',
-      );
+  /// Choose what to send the client, or change it.
+  ///
+  /// The same picker the call screen opens, in its pick-only mode: this
+  /// screen is written after the session, so nothing is sent until Save.
+  Future<void> pick(ExpertContentKind kind) async {
+    final chosen = await Get.toNamed(
+      AppRoutes.expertRecommend,
+      arguments: RecommendArguments(
+        session: session!,
+        kind: kind,
+        pickOnly: true,
+      ),
+    );
+    if (chosen is MediaItem) picked.value = chosen;
+  }
+
+  void clearPick() => picked.value = null;
 
   /// Saves the note against the session.
   ///
@@ -116,19 +152,41 @@ class SessionNotesController extends BaseController {
       return;
     }
 
+    final item = picked.value;
     final saved = await guard(() async {
       await _experts.saveSessionNote(id, _body());
+      // The note is the practitioner's own record and never leaves; the
+      // recommendation is the one thing from this screen the client sees,
+      // so it is sent as its own row rather than buried in the note.
+      if (item != null) {
+        await _experts.recommend(
+          sessionId: id,
+          itemId: item.id,
+          note: recommendation.text,
+        );
+      }
       return true;
     });
     if (saved != true) return;
 
-    AppFeedback.info('Saved. Only you can read this.');
+    AppFeedback.info(
+      item == null
+          ? 'Saved. Only you can read this.'
+          : 'Saved. Only you can read the note; '
+              '${session?.clientName ?? 'your client'} gets the recommendation.',
+    );
     Get.back();
   }
 
   static const _outcomeMarker = '\n\nHow it went: ';
   static const _recommendationMarker = '\n\nRecommendation: ';
 
+  /// What is kept against the session, for the practitioner alone.
+  ///
+  /// The recommendation text is still written here as well as sent. It is
+  /// part of what happened in the session, and a note that omits what was
+  /// suggested is an incomplete record -- while the client's copy can be
+  /// read back by neither of them from here.
   String _body() {
     final parts = StringBuffer(summary.text.trim());
     final how = outcome.value;

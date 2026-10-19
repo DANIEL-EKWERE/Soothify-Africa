@@ -42,11 +42,16 @@ class ApiAuthRepository implements AuthRepository {
       // registered against this package in the Firebase console. It is the
       // single most common cause and worth naming rather than hiding behind
       // "something went wrong".
+      // The code is carried into the message on purpose. Without it every
+      // misconfiguration reads the same, and the three usual causes --
+      // an unregistered SHA-1, a missing server client id, no network --
+      // need three different fixes.
       throw e.code == '10'
           ? const UnknownException(
-              'Google sign-in is not set up for this build yet.',
+              'Google sign-in is not set up for this build yet: the signing '
+              'certificate is not registered in the Firebase console.',
             )
-          : const UnknownException('Google sign-in did not complete.');
+          : UnknownException('Google sign-in did not complete (${e.code}).');
     }
 
     // The user dismissed the account sheet.

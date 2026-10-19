@@ -58,4 +58,15 @@ abstract class ExpertRepository {
   Future<String> sessionNote(String sessionId);
 
   Future<void> saveSessionNote(String sessionId, String body);
+
+  /// Point a client at a piece of the library.
+  ///
+  /// Addressed by session: the server reads the client off the booking, so
+  /// the app never handles an account id and "have I seen this person" is
+  /// answered by the booking itself.
+  Future<void> recommend({
+    required String sessionId,
+    required String itemId,
+    String note = '',
+  });
 }

@@ -466,6 +466,18 @@ class MockContentRepository implements ContentRepository {
         .toList();
   }
 
+  @override
+  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''}) async {
+    await Future<void>.delayed(_latency);
+    final q = query.trim().toLowerCase();
+    return _items
+        .where((i) => i.type == kind)
+        // An empty query lists the kind, unlike search, which lists
+        // nothing: the picker opens on a browse, not on a blank page.
+        .where((i) => q.isEmpty || i.title.toLowerCase().contains(q))
+        .toList();
+  }
+
   /// What was listened to this run, so the Recent shelf has something true
   /// to show even without a server.
   final Map<String, int> _played = <String, int>{};

@@ -30,6 +30,13 @@ abstract class ContentRepository {
 
   Future<List<MediaItem>> search(String query);
 
+  /// Everything of one kind — video, article or audio.
+  ///
+  /// What the practitioner's recommendation picker lists: the frames split
+  /// the library by kind before anything else, because "recommend a video"
+  /// is the decision already made by the time the picker opens.
+  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''});
+
   /// Records that this item was listened to, and for how long.
   ///
   /// What the Profile tab's "meditation minutes" is counted from, and what

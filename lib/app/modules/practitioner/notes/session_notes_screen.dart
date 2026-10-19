@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/custom_elevated_button.dart';
+import '../../../data/models/expert_recommendation.dart';
 import '../../../widgets/expert_content_card.dart';
 import '../../../widgets/expert_form_fields.dart';
 import '../widgets/expert_session_card.dart';
@@ -100,16 +101,23 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                   ),
                   SizedBox(height: 21.v),
                   Obx(() {
-                    final content = controller.content.value;
-                    if (content == null) return const SizedBox.shrink();
+                    final content = controller.content;
+                    // Nothing picked: the frame's slot becomes the three
+                    // ways to fill it, which is also how the call screen
+                    // offers them.
+                    if (content == null) {
+                      return _PickContent(onPick: controller.pick);
+                    }
                     return ExpertContentCard(
                       content: content,
-                      onOpen: controller.openContent,
+                      // Tapping it changes it rather than playing it: the
+                      // client's journal is where it opens.
+                      onOpen: () => controller.pick(content.kind),
                       // The notes frame leaves the cover clean and crops it
                       // shallower than the journal's.
                       showPlayOverlay: false,
                       coverHeight: 116,
-                      actionLabel: 'Watch Video',
+                      actionLabel: content.kind.action,
                     );
                   }),
                   SizedBox(height: 27.v),
@@ -181,6 +189,70 @@ class _OutcomeChips extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+
+/// The empty Recommendation slot: the three kinds, as the call screen's
+/// own menu offers them.
+class _PickContent extends StatelessWidget {
+  const _PickContent({required this.onPick});
+
+  final void Function(ExpertContentKind) onPick;
+
+  IconData _glyph(ExpertContentKind kind) => switch (kind) {
+        ExpertContentKind.video => Icons.videocam_outlined,
+        ExpertContentKind.audio => Icons.graphic_eq,
+        ExpertContentKind.article => Icons.article_outlined,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Send them something to work with',
+            style: CustomTextStyles.expertCardMeta),
+        SizedBox(height: 10.v),
+        Row(
+          children: [
+            // Video, Audio, Article -- the call screen's order, which is
+            // not the enum's.
+            for (final kind in const [
+              ExpertContentKind.video,
+              ExpertContentKind.audio,
+              ExpertContentKind.article,
+            ]) ...[
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => onPick(kind),
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 14.v),
+                    decoration: BoxDecoration(
+                      color: appTheme.surface,
+                      borderRadius: BorderRadius.circular(8.h),
+                      border: Border.all(color: appTheme.cardRim),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_glyph(kind),
+                            size: 20.h, color: appTheme.textPrimary),
+                        SizedBox(height: 6.v),
+                        Text(kind.label,
+                            style: CustomTextStyles.expertCardMeta),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (kind != ExpertContentKind.article) SizedBox(width: 10.h),
+            ],
+          ],
+        ),
+      ],
     );
   }
 }

@@ -4,4 +4,14 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Plain http to a Django dev server on the laptop. Android has blocked
+         cleartext by default since API 28, so without this every call to
+         http://10.0.2.2:8000 or http://192.168.x.x:8000 fails before it
+         leaves the phone — and the app reports it as a network error, which
+         sends you looking at the server.
+
+         Debug only: this file is not merged into a release build, so the
+         shipped app still refuses cleartext. -->
+    <application android:usesCleartextTraffic="true" />
 </manifest>

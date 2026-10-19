@@ -18,7 +18,10 @@ class ShellBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => ShellController());
-    Get.lazyPut(() => HomeTabController(Get.find<ContentRepository>()));
+    Get.lazyPut(() => HomeTabController(
+          Get.find<ContentRepository>(),
+          profiles: Get.find<ProfileRepository>(),
+        ));
     // The Home tab links straight into the mood checker, so its controller
     // must be resolvable from here too.
     Get.lazyPut(() => MoodCheckerController(
@@ -34,6 +37,7 @@ class ShellBinding extends Bindings {
     Get.lazyPut(() => DiscoveryTabController(
           Get.find<ContentRepository>(),
           Get.find<SubscriptionRepository>(),
+          session: Get.find<SessionService>(),
         ));
   }
 }

@@ -45,6 +45,9 @@ import '../../data/repositories/mock_spaces_repository.dart';
 import '../../data/repositories/mock_subscription_repository.dart';
 import '../../data/repositories/spaces_repository.dart';
 import '../../data/repositories/syncing_journal_repository.dart';
+import '../../data/repositories/api_recommendation_repository.dart';
+import '../../data/repositories/mock_recommendation_repository.dart';
+import '../../data/repositories/recommendation_repository.dart';
 import '../../data/repositories/syncing_kyc_repository.dart';
 import '../../data/repositories/syncing_mood_repository.dart';
 import '../../data/repositories/profile_repository.dart';
@@ -113,6 +116,12 @@ class InitialBindings extends Bindings {
       () => useApi
           ? SyncingMoodRepository(LocalMoodRepository(), ApiMoodRepository(api))
           : LocalMoodRepository(),
+      fenix: true,
+    );
+    Get.lazyPut<RecommendationRepository>(
+      () => useApi
+          ? ApiRecommendationRepository(api)
+          : MockRecommendationRepository(),
       fenix: true,
     );
     Get.lazyPut<JournalRepository>(

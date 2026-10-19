@@ -7,14 +7,25 @@ import '../../../../data/models/library_section.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
+import '../../../../data/repositories/profile_repository.dart';
+import '../../../../data/services/session_service.dart';
 
 /// Backs the Home tab.
 ///
 /// Sections come from the design: a Mood Checker entry, three fixed Explore
 /// destinations, a "Recommended for you" list and a "Popular Content" row.
 class HomeTabController extends BaseController {
-  HomeTabController(this._repository, {DateTime Function()? now})
-    : _now = now ?? DateTime.now;
+  HomeTabController(
+    this._repository, {
+    ProfileRepository? profiles,
+    DateTime Function()? now,
+  })  : _profiles = profiles,
+        _now = now ?? DateTime.now;
+
+  /// Who is signed in, for the header. Optional: a test that only cares
+  /// about the two content rows builds this without one, and the header
+  /// then shows the time of day, which is what a guest sees anyway.
+  final ProfileRepository? _profiles;
 
   /// Injectable so the greeting does not make a golden stale by the hour.
   final DateTime Function() _now;
@@ -27,6 +38,19 @@ class HomeTabController extends BaseController {
     return 'Good evening';
   }
 
+  /// The signed-in person's first name, once it has arrived.
+  final RxString firstName = ''.obs;
+
+  /// What the header says to somebody signed in.
+  ///
+  /// The frame draws "Hi, Dera" -- a name from the design, which shipped as
+  /// a literal and greeted every user as Dera. Until the real one arrives
+  /// this falls back to the time of day rather than to a placeholder: being
+  /// told good morning is no worse than usual, being called by a stranger's
+  /// name is.
+  String get hello =>
+      firstName.value.isEmpty ? greeting : 'Hi, ${firstName.value}';
+
   final ContentRepository _repository;
 
   final RxList<MediaItem> recommended = <MediaItem>[].obs;
@@ -35,9 +59,39 @@ class HomeTabController extends BaseController {
   /// Static, not loaded — these are navigation targets.
   List<ExploreDestination> get explore => ExploreDestination.values;
 
+  /// The part of a name a greeting uses. "Chidera Obi" -> "Chidera".
+  static String _firstWord(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '';
+    return trimmed.split(RegExp(r'\s+')).first;
+  }
+
+  Future<void> _loadName() async {
+    final profiles = _profiles;
+    if (profiles == null) return;
+    // /auth/me/ needs a token. A guest sees the time of day, which is what
+    // the frame draws for them anyway, so the request is not made at all.
+    //
+    // Asked only when there is a session to ask. Get.find throws on an
+    // unregistered service, and that throw is outside the try below -- it
+    // took the whole greeting down in any test that builds this controller
+    // on its own.
+    if (Get.isRegistered<SessionService>() &&
+        !Get.find<SessionService>().hasAccount) {
+      return;
+    }
+    try {
+      firstName.value = _firstWord((await profiles.me()).fullName);
+    } catch (_) {
+      // A header is not worth an error message. Without the name it shows
+      // the time of day, which is a perfectly good greeting.
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
+    _loadName();
     load();
   }
 

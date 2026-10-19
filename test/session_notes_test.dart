@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:soothifyafrica/app/data/models/expert_recommendation.dart';
 import 'package:soothifyafrica/app/data/models/expert_session.dart';
+import 'package:soothifyafrica/app/data/models/media_item.dart';
 import 'package:soothifyafrica/app/data/repositories/expert_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_expert_repository.dart';
 import 'package:soothifyafrica/app/modules/practitioner/dashboard/controller/expert_dashboard_controller.dart';
@@ -82,17 +84,23 @@ void main() {
     expect(find.text('Recommendation'), findsOneWidget);
   });
 
-  testWidgets('the recommended content rides under the note', (tester) async {
+  testWidgets('the recommendation slot starts empty, offering the three kinds',
+      (tester) async {
     final c = await mount(tester);
-    expect(c.content.value, isNotNull);
+
+    // It used to open on the frame's own sample video, so every note
+    // offered the same recommendation whether one was chosen or not.
+    expect(c.content, isNull);
+
     // The form's own fields are scrollables too, so the list is named.
     await tester.dragUntilVisible(
-      find.text('Watch Video'),
+      find.text('Send them something to work with'),
       find.byType(ListView),
       Offset(0, -200.v),
     );
-    expect(find.text('Guided Breathing for calm'), findsOneWidget);
-    expect(find.text('5 min Mindfulness & Stress Relief'), findsOneWidget);
+    expect(find.text('Video'), findsOneWidget);
+    expect(find.text('Audio'), findsOneWidget);
+    expect(find.text('Article'), findsOneWidget);
 
     await tester.dragUntilVisible(
       find.text('Save'),
@@ -100,6 +108,29 @@ void main() {
       Offset(0, -200.v),
     );
     expect(find.text('Save'), findsOneWidget);
+  });
+
+  testWidgets('a picked piece fills the slot and names its own action',
+      (tester) async {
+    final c = await mount(tester);
+
+    c.picked.value = const MediaItem(
+      id: '12',
+      title: 'Guided Breathing for calm',
+      tag: 'Mindfulness & Stress Relief',
+      type: MediaType.video,
+      durationSeconds: 300,
+    );
+    await tester.pump();
+
+    expect(c.content!.kind, ExpertContentKind.video);
+    await tester.dragUntilVisible(
+      find.text('Watch video'),
+      find.byType(ListView),
+      Offset(0, -200.v),
+    );
+    expect(find.text('Guided Breathing for calm'), findsOneWidget);
+    expect(find.text('5 min Mindfulness & Stress Relief'), findsOneWidget);
   });
 
   testWidgets('an outcome is chosen, not assumed', (tester) async {

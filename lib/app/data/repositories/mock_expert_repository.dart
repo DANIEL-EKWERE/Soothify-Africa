@@ -177,5 +177,17 @@ class MockExpertRepository implements ExpertRepository {
     _notes[sessionId] = body;
   }
 
+  /// Remembered, so a test can assert what was recommended.
+  final List<({String session, String item, String note})> recommended = [];
+
+  @override
+  Future<void> recommend({
+    required String sessionId,
+    required String itemId,
+    String note = '',
+  }) async {
+    recommended.add((session: sessionId, item: itemId, note: note));
+  }
+
   final Map<String, String> _notes = <String, String>{};
 }

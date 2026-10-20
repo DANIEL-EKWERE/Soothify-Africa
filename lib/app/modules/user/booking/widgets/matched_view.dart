@@ -38,7 +38,11 @@ class MatchedView extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           children: [
             CustomImageView(
-              imagePath: ImageConstant.imgCoachPhoto,
+              // Their own portrait where the server has one; the frame's
+              // photo is the fallback, not the default.
+              imagePath: coach.avatarUrl.isNotEmpty
+                  ? coach.avatarUrl
+                  : ImageConstant.imgCoachPhoto,
               height: 258.v,
               width: double.infinity,
               fit: BoxFit.cover,

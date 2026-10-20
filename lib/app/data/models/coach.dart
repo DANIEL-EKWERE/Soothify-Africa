@@ -1,5 +1,11 @@
+import 'booked_session.dart';
+
 /// The wellness coach a booking is matched with — Figma "Matched with
 /// instructor" (135:20932).
+///
+/// A view model: the screen's own shape, assembled from whatever the match
+/// returned. [MatchedExpert] is the wire shape; this is what the frame
+/// prints, which is not the same list of fields.
 class Coach {
   const Coach({
     required this.name,
@@ -10,6 +16,7 @@ class Coach {
     required this.outside,
     required this.expertise,
     required this.videoTitles,
+    this.avatarUrl = '',
   });
 
   final String name;
@@ -30,6 +37,40 @@ class Coach {
 
   final List<String> expertise;
   final List<String> videoTitles;
+
+  /// Their portrait, where the server has one. Empty falls back to the
+  /// frame's own photo.
+  final String avatarUrl;
+
+  /// The matched expert, as the screen reads them.
+  ///
+  /// `feelings` is the one part that is not about the expert at all: the
+  /// chips answer "Because you feel..." and come from what the client said
+  /// in the questionnaire, which is why they are passed in rather than
+  /// read off the match.
+  factory Coach.fromMatch(MatchedExpert match, {List<String> feelings = const []}) {
+    return Coach(
+      name: match.name,
+      // The server earns this from the discipline, the hour, the language
+      // and the rating; the frame prints "98% Match".
+      matchPercent: match.matchPercent,
+      blurb: match.bio.isNotEmpty ? match.bio : match.headline,
+      feelings: feelings,
+      quote: match.quote,
+      // "Outside of Soothify" is what they are into, which is what the
+      // profile's interests are.
+      outside: match.interests,
+      expertise: match.disciplines.map(_titled).toList(),
+      // The trending row has no content behind it yet -- these are titles
+      // in the frame, not items in the library.
+      videoTitles: const [],
+      avatarUrl: match.avatarUrl,
+    );
+  }
+
+  /// 'therapy' -> 'Therapy'. The server stores the app's own keys.
+  static String _titled(String key) =>
+      key.isEmpty ? key : key[0].toUpperCase() + key.substring(1);
 
   /// The design mixes two names — the header says "Baraqhat Ibrahim" while
   /// "Find Melody Briggs" and one variant's trending row say "Melody Briggs".

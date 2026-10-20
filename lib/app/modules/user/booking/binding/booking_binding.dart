@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 
 import '../../../../data/models/session_offering.dart';
+import '../../../../data/repositories/booking_repository.dart';
+import '../../../../data/repositories/kyc_repository.dart';
 import '../controller/booking_controller.dart';
 
 /// Takes the offering the receipt hands over, so the matching interstitial
@@ -16,10 +18,14 @@ class BookingBinding extends Bindings {
             offering: args.offering,
             startAt: args.stage,
             startMode: args.mode,
+            bookings: Get.find<BookingRepository>(),
+            kyc: Get.find<KycRepository>(),
           );
         }
         return BookingController(
           offering: args is SessionOffering ? args : null,
+          bookings: Get.find<BookingRepository>(),
+          kyc: Get.find<KycRepository>(),
         );
       });
 }

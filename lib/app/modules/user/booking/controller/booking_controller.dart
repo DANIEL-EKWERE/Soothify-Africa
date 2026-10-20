@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../data/models/booked_session.dart';
 import '../../../../data/models/coach.dart';
 import '../../../../data/models/session_offering.dart';
+import '../../../../data/repositories/booking_repository.dart';
+import '../../../../data/repositories/kyc_repository.dart';
 
 /// How the session is taken. The design offers exactly these two.
 enum CallMode {
@@ -51,8 +54,21 @@ class BookingController extends GetxController {
     this.offering,
     this.startAt,
     CallMode? startMode,
+    BookingRepository? bookings,
+    KycRepository? kyc,
   })  : _matchDuration = matchDuration ?? const Duration(seconds: 3),
-        _startMode = startMode;
+        _startMode = startMode,
+        _bookings = bookings,
+        _kyc = kyc;
+
+  /// Who to match with. Optional: without it the screen shows the frame's
+  /// own coach, which is what the goldens are drawn against and what the
+  /// build with no backend has always shown.
+  final BookingRepository? _bookings;
+
+  /// The questionnaire, for the "Because you feel..." chips. Those are the
+  /// client's own answers, not anything about the expert.
+  final KycRepository? _kyc;
 
   /// How the call opens when the route is entered at [BookingStage.call].
   /// The picker is not in that path, so without this every joined session
@@ -91,8 +107,25 @@ class BookingController extends GetxController {
   final RxBool celebrating = false.obs;
   final TextEditingController feedback = TextEditingController();
 
-  /// The matched coach. The backend will supply this once matching is real.
-  Coach get coach => Coach.sample;
+  /// Who the server matched, once it has answered.
+  final Rxn<MatchedExpert> matched = Rxn<MatchedExpert>();
+
+  /// The chips under "Because you feel...", from the questionnaire.
+  final RxList<String> feelings = <String>[].obs;
+
+  /// Nobody practises this at all. Different from "still looking": the
+  /// screen has to say so rather than show a coach who does not exist.
+  final RxBool nobodyAvailable = false.obs;
+
+  /// The matched coach, as the screen reads them.
+  ///
+  /// Falls back to the frame's own sample when there is no repository to
+  /// ask -- the no-backend build, and the goldens.
+  Coach get coach {
+    final match = matched.value;
+    if (match == null) return Coach.sample;
+    return Coach.fromMatch(match, feelings: feelings);
+  }
 
   String get coachName => coach.name;
 
@@ -132,6 +165,11 @@ class BookingController extends GetxController {
   /// The frame draws the progress bar part-filled (128 of 281), so it is an
   /// indeterminate wait shown as progress rather than a real measurement.
   void _runMatching() {
+    // Asked while the bar is running, so the wait the frame draws is the
+    // wait for the answer rather than three seconds of theatre followed by
+    // a second one.
+    unawaited(_findSomebody());
+
     const tick = Duration(milliseconds: 100);
     var elapsed = Duration.zero;
     _timer = Timer.periodic(tick, (t) {
@@ -146,6 +184,53 @@ class BookingController extends GetxController {
       }
     });
   }
+
+  /// Who the server has, and what the client said they are carrying.
+  ///
+  /// Both are best effort. A matching screen that errors instead of showing
+  /// somebody is worse than one showing the frame's own coach, and the
+  /// chips are decoration on a page whose point is the match.
+  Future<void> _findSomebody() async {
+    final bookings = _bookings;
+    if (bookings == null) return;
+
+    unawaited(_readTheQuestionnaire());
+    try {
+      final found = await bookings.match(
+        discipline: offering?.id ?? SessionOffering.therapy.id,
+      );
+      matched.value = found;
+      nobodyAvailable.value = found == null;
+    } catch (error) {
+      Log.e('matching could not reach the server', error: error);
+    }
+  }
+
+  Future<void> _readTheQuestionnaire() async {
+    final kyc = _kyc;
+    if (kyc == null) return;
+    try {
+      final answers = await kyc.savedAnswers();
+      feelings.assignAll(
+        (answers['concerns'] ?? const <String>{}).map(_feelingLabel),
+      );
+    } catch (_) {
+      // Chips are not worth a message. Without them the block is simply
+      // not drawn.
+    }
+  }
+
+  /// The questionnaire stores "sleep_disorder"; the chip reads "Restless
+  /// sleep". Shortened from the carousel's own wording, which is a sentence
+  /// rather than a chip.
+  static String _feelingLabel(String value) => switch (value) {
+        'stress' => 'Stressed',
+        'anxiety' => 'Anxious',
+        'sleep_disorder' => 'Restless',
+        'depression' => 'Drained',
+        'exploring' => 'Curious',
+        _ => value,
+      };
 
   /// The burst has finished; the screen is now the plain matched frame.
   void celebrationShown() => celebrating.value = false;

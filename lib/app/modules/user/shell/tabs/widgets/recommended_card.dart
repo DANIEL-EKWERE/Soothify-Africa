@@ -89,7 +89,7 @@ class _Cover extends StatelessWidget {
             width: 92.h,
             height: 92.h,
             radius: 6.h,
-            assetPath: item.coverAsset,
+            assetPath: item.cover,
           ),
           Positioned(
             top: 6.h,

@@ -126,7 +126,7 @@ class _GridCard extends StatelessWidget {
                   child: Hero(
                     tag: 'cover-${item.id}',
                     child: CustomImageView(
-                      imagePath: item.coverAsset,
+                      imagePath: item.cover,
                       fit: BoxFit.cover,
                       radius: BorderRadius.circular(8.h),
                     ),

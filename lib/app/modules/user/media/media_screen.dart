@@ -95,7 +95,7 @@ class _Player extends StatelessWidget {
             child: Hero(
               tag: 'cover-${controller.item.id}',
               child: CustomImageView(
-                imagePath: controller.item.coverAsset,
+                imagePath: controller.item.cover,
                 fit: BoxFit.cover,
                 radius: BorderRadius.circular(8.h),
               ),

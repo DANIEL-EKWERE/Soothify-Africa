@@ -34,9 +34,16 @@ class MediaItem {
   final String coverUrl;
 
   /// Bundled cover art, exported from Figma. Distinct from [coverUrl], which
-  /// is the remote one the API will serve — this is what ships in the app and
-  /// is what the mock uses while there is no backend.
+  /// is the remote one the API serves — this is what ships in the app and is
+  /// what the mock uses while there is no backend.
   final String coverAsset;
+
+  /// What to draw, whichever of the two there is.
+  ///
+  /// Every screen used to read [coverAsset] directly, which is empty on
+  /// anything that came from the API — so a piece of content uploaded in
+  /// the dashboard had no cover anywhere in the app.
+  String get cover => coverUrl.isNotEmpty ? coverUrl : coverAsset;
 
   /// Streamed source. Expected to be a short-lived signed URL once the
   /// Django backend is in place, so it must not be persisted long-term.

@@ -394,7 +394,7 @@ class _PopularCard extends StatelessWidget {
               width: 159.h,
               height: 166.h,
               radius: 8.h,
-              assetPath: item.coverAsset,
+              assetPath: item.cover,
             ),
             Positioned(
               top: 8.h,

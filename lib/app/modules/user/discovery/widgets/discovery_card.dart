@@ -44,7 +44,7 @@ class DiscoveryCard extends StatelessWidget {
                 width: width.h,
                 height: 166.v,
                 radius: 8.h,
-                assetPath: item.coverAsset,
+                assetPath: item.cover,
               ),
             ),
             Positioned(

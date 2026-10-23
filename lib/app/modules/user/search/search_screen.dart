@@ -146,7 +146,7 @@ class _ResultCard extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.h),
               child: CustomImageView(
-                imagePath: item.coverAsset,
+                imagePath: item.cover,
                 width: double.infinity,
                 fit: BoxFit.cover,
               ),

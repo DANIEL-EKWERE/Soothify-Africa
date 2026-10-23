@@ -109,11 +109,11 @@ void main() {
 
     test('it asks for the discipline that was booked', () async {
       final bookings = _Bookings(_expert);
-      final c = BookingController(
+      BookingController(
         offering: SessionOffering.balance,
         matchDuration: const Duration(milliseconds: 10),
         bookings: bookings,
-      )..onInit();
+      ).onInit();
       await Future<void>.delayed(const Duration(milliseconds: 60));
 
       expect(bookings.askedFor, SessionOffering.balance.id);

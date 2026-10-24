@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../data/models/article.dart';
 import 'controller/article_controller.dart';
 
 /// The article reader — Figma "Pilates & Core Articles" (`259:58647`) and
@@ -13,14 +12,13 @@ import 'controller/article_controller.dart';
 /// on its first line, the body 535 at a 19 pitch, and the call to action 692.
 ///
 /// The frames' own cover is a stock poster mock-up ("POSTER A4 / Plastic
-/// Surgery"); each article draws its section's photograph instead. See
-/// [Article.coverAsset].
+/// Surgery"), so the article's own cover is drawn -- whatever was uploaded
+/// with it.
 class ArticleScreen extends GetView<ArticleController> {
   const ArticleScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final article = controller.article;
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(
@@ -35,18 +33,18 @@ class ArticleScreen extends GetView<ArticleController> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12.h),
                     child: CustomImageView(
-                      imagePath: article.coverAsset,
+                      imagePath: controller.cover,
                       height: 318.v,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
                   ),
                   SizedBox(height: 24.5.v),
-                  _TitleRow(article: article),
+                  const _TitleRow(),
                   SizedBox(height: 22.5.v),
-                  Text(article.body, style: CustomTextStyles.articleBody),
+                  Text(controller.body, style: CustomTextStyles.articleBody),
                   SizedBox(height: 33.v),
-                  _CallToAction(article: article),
+                  const _CallToAction(),
                 ],
               ),
             ),
@@ -95,9 +93,7 @@ class _Header extends StatelessWidget {
 /// title has to flow around it — hence the leading inline space rather than a
 /// Row, which would reserve the rating's width on every line.
 class _TitleRow extends StatelessWidget {
-  const _TitleRow({required this.article});
-
-  final Article article;
+  const _TitleRow();
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +101,8 @@ class _TitleRow extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(right: 84.h),
-          child: Text(article.title, style: CustomTextStyles.articleTitle),
+          child: Text(Get.find<ArticleController>().title,
+              style: CustomTextStyles.articleTitle),
         ),
         Positioned(
           right: 0,
@@ -121,7 +118,7 @@ class _TitleRow extends StatelessWidget {
               ),
               SizedBox(width: 6.h),
               Text(
-                '${article.rating}/5',
+                '${Get.find<ArticleController>().rating}/5',
                 style: CustomTextStyles.articleRating,
               ),
             ],
@@ -137,9 +134,7 @@ class _TitleRow extends StatelessWidget {
 /// Stateful only because a [TapGestureRecognizer] has to be disposed — one
 /// built inline in `build` leaks a recognizer on every rebuild.
 class _CallToAction extends StatefulWidget {
-  const _CallToAction({required this.article});
-
-  final Article article;
+  const _CallToAction();
 
   @override
   State<_CallToAction> createState() => _CallToActionState();
@@ -152,7 +147,7 @@ class _CallToActionState extends State<_CallToAction> {
   void initState() {
     super.initState();
     final controller = Get.find<ArticleController>();
-    for (final run in widget.article.callToAction) {
+    for (final run in controller.callToAction) {
       if (run.link == null) continue;
       _recognizers.add(
         TapGestureRecognizer()..onTap = () => controller.follow(run.link!),
@@ -174,7 +169,7 @@ class _CallToActionState extends State<_CallToAction> {
     return Text.rich(
       TextSpan(
         children: [
-          for (final run in widget.article.callToAction)
+          for (final run in Get.find<ArticleController>().callToAction)
             if (run.isLink)
               TextSpan(
                 text: run.text,

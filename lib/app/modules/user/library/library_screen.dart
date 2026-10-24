@@ -7,7 +7,6 @@ import '../../../data/models/media_item.dart';
 import '../../../widgets/skeleton.dart';
 import '../discovery/widgets/discovery_card.dart';
 import 'controller/library_controller.dart';
-import '../../../data/models/article.dart';
 
 /// Meditation and Balance — Figma 135:11744 and 135:20551.
 ///
@@ -313,7 +312,16 @@ class _Articles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final articles = Article.values.toList();
+    return Obx(() {
+      final articles = Get.find<LibraryController>().articles;
+      // Nothing written for this section yet: the heading would announce
+      // an empty row.
+      if (articles.isEmpty) return const SizedBox.shrink();
+      return _list(articles.toList());
+    });
+  }
+
+  Widget _list(List<MediaItem> articles) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -334,7 +342,7 @@ class _Articles extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8.h),
                         child: CustomImageView(
-                          imagePath: article.coverAsset,
+                          imagePath: article.cover,
                           height: 136.v,
                           width: double.infinity,
                           fit: BoxFit.cover,

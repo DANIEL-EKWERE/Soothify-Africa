@@ -55,15 +55,21 @@ class ExpertAvailabilityScreen extends GetView<ExpertDashboardController> {
             ),
             SizedBox(height: 37.v),
             Expanded(
-              child: Obx(
-                () => ListView.separated(
+              child: Obx(() {
+                // Nobody has set any hours yet. The frame draws five rows
+                // and no way to add one -- the chevron that opens the
+                // picker lives inside a row -- so an expert who had set
+                // none was looking at a blank screen with nothing to tap.
+                if (controller.slots.isEmpty) return const _NoHoursYet();
+
+                return ListView.separated(
                   padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 16.v),
                   itemCount: controller.slots.length,
                   separatorBuilder: (_, _) => SizedBox(height: 24.v),
                   itemBuilder: (context, i) =>
                       _SlotRow(slot: controller.slots[i]),
-                ),
-              ),
+                );
+              }),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
@@ -72,12 +78,25 @@ class ExpertAvailabilityScreen extends GetView<ExpertDashboardController> {
               // offered, and holding that until a Save would mean somebody
               // booking an hour the practitioner had already closed. So
               // this confirms and leaves.
-              child: CustomElevatedButton(
-                text: 'Done',
-                onPressed: () {
-                  AppFeedback.info('Your hours are saved.');
-                  Get.back();
-                },
+              child: Obx(
+                () => CustomElevatedButton(
+                  // "Save Availability" in both frames.
+                  //
+                  // With no hours set it opens the picker instead: there
+                  // is nothing to confirm, and a Save that only closes the
+                  // screen is a button that lies about what it did.
+                  text: controller.slots.isEmpty
+                      ? 'Add your hours'
+                      : 'Save Availability',
+                  onPressed: () {
+                    if (controller.slots.isEmpty) {
+                      Get.toNamed(AppRoutes.expertSlotEditor);
+                      return;
+                    }
+                    AppFeedback.info('Your hours are saved.');
+                    Get.back();
+                  },
+                ),
               ),
             ),
           ],
@@ -145,6 +164,42 @@ class _SlotRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// What the screen says before any hours have been set.
+///
+/// The frames draw five rows and assume they are there. Without this the
+/// list was simply blank, and the only way into the picker was a chevron
+/// on a row that did not exist.
+class _NoHoursYet extends StatelessWidget {
+  const _NoHoursYet();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.schedule, size: 32.h, color: appTheme.navInactive),
+            SizedBox(height: 16.v),
+            Text('No hours set yet',
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.expertSlotDay),
+            SizedBox(height: 8.v),
+            Text(
+              'Add the times you are free and clients can start booking '
+              'them. You can close any of them again later.',
+              textAlign: TextAlign.center,
+              style: CustomTextStyles.expertBlurb,
+            ),
+          ],
+        ),
       ),
     );
   }

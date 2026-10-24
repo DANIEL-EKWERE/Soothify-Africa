@@ -468,10 +468,15 @@ class _Shelf extends StatelessWidget {
           // Scrolls past the frame edge — the design shows a third card
           // clipped at x=390, so the shelf is meant to run off-screen.
           child: Obx(() {
+            // Read into a local first, and before the test that could skip
+            // it: `items.isEmpty && isLoading.value` short-circuits on a
+            // filled shelf, so the Obx registers no observable at all and
+            // GetX throws "improper use of a GetX". `items` is a plain list
+            // handed to this widget — there is nothing else here to watch.
+            final busy = Get.find<DiscoveryTabController>().isLoading.value;
             // Still loading: hold the shelf's shape rather than leaving the
             // heading over blank space, which reads as a failed load.
-            final loading = items.isEmpty &&
-                Get.find<DiscoveryTabController>().isLoading.value;
+            final loading = items.isEmpty && busy;
             final rail = ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,

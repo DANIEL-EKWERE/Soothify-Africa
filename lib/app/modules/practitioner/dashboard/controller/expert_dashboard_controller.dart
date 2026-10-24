@@ -116,6 +116,39 @@ class ExpertDashboardController extends BaseController {
   /// an hour somebody has booked, and that refusal has to stop the rest —
   /// otherwise the old hour stays, the new ones appear, and the
   /// practitioner is bookable twice over.
+  /// Opens hours that did not exist before.
+  ///
+  /// The same write as [rewriteSlot] without the close: a practitioner
+  /// with no hours yet has nothing to replace, and until this existed the
+  /// editor could only ever edit, so Update Availability was a screen with
+  /// no way out of being empty.
+  Future<bool> addSlots({
+    required List<DateTime> days,
+    required int from,
+    required int to,
+  }) async {
+    final opened = await guard(() async {
+      final made = <AvailabilitySlot>[];
+      for (final day in days) {
+        made.add(await _repository.addAvailability(
+          day: day,
+          from: from,
+          to: to,
+        ));
+      }
+      return made;
+    });
+    if (opened == null) return false;
+
+    slots
+      ..addAll(opened)
+      ..sort((a, b) {
+        final byDay = a.day.compareTo(b.day);
+        return byDay != 0 ? byDay : a.from.compareTo(b.from);
+      });
+    return true;
+  }
+
   Future<bool> rewriteSlot({
     required AvailabilitySlot closing,
     required List<DateTime> days,

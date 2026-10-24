@@ -34,20 +34,35 @@ class LibraryController extends BaseController {
     load();
   }
 
+  /// The closing Articles row. Kept apart from [shelves] because the block
+  /// has no heading of its own and draws two-up rather than as a row.
+  final RxList<MediaItem> articles = <MediaItem>[].obs;
+
   Future<void> load() => guard(() async {
     // Each shelf is fetched by its own query: the frames give Voice Overs
     // and Sound Effects different cards, so one shared list put the wrong
     // art under the wrong heading.
     final queries = section.shelves.toList();
-    final results = await Future.wait(
-      queries.map((s) => _repository.getShelf(s.query)),
-    );
+    final articles = section.blocks.whereType<LibraryArticles>().firstOrNull;
+
+    final results = await Future.wait([
+      ...queries.map((s) => _repository.getShelf(s.query)),
+      // Articles are ordinary content on a shelf of their own now, so they
+      // are fetched like everything else rather than read off an enum.
+      if (articles != null) _repository.getShelf(articles.query),
+    ]);
+
     shelves.assignAll({
       for (var i = 0; i < queries.length; i++)
         queries[i].title: results[i]
             .where((m) => filters.value.matchesDuration(m.durationSeconds))
             .toList(),
     });
+    if (articles != null) {
+      // Not filtered by length: an article has none, so the duration
+      // filter would empty the row whenever one was set.
+      this.articles.assignAll(results.last);
+    }
   });
 
   /// The heading is what the page is called; the shelf's own query is what

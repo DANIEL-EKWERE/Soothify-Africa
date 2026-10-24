@@ -87,19 +87,23 @@ class SlotEditorController extends GetxController {
   /// fails first.
   Future<void> save() async {
     if (saving.value) return;
-    final s = slot;
-    if (s == null) {
-      Get.back();
-      return;
-    }
-
     saving.value = true;
-    final done = await _dashboard.rewriteSlot(
-      closing: s,
-      days: _daysOfTheRepeat(),
-      from: from,
-      to: to,
-    );
+    final s = slot;
+    // Opened with nothing to edit: these are hours that do not exist yet,
+    // which is how a practitioner sets their first ones. It used to leave
+    // without writing anything, so the screen could only ever edit.
+    final done = s == null
+        ? await _dashboard.addSlots(
+            days: _daysOfTheRepeat(),
+            from: from,
+            to: to,
+          )
+        : await _dashboard.rewriteSlot(
+            closing: s,
+            days: _daysOfTheRepeat(),
+            from: from,
+            to: to,
+          );
     saving.value = false;
     if (!done) return;
 

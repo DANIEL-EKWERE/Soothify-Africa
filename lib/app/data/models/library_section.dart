@@ -46,7 +46,12 @@ class LibraryFeature extends LibraryBlock {
 /// The Articles shelf both redrawn frames close on — two pieces, side by
 /// side, cover above a two-line title.
 class LibraryArticles extends LibraryBlock {
-  const LibraryArticles();
+  const LibraryArticles(this.query);
+
+  /// The shelf the articles come from -- `pilates-articles` or
+  /// `balance-articles`. They used to be a hardcoded enum of two, with no
+  /// way to add a third without shipping a release.
+  final String query;
 }
 
 class LibraryPromo extends LibraryBlock {
@@ -81,7 +86,7 @@ enum LibrarySection {
     // card's title pill, not a heading.
     LibraryShelf('Movement', 'pilates-movement'),
     LibraryShelf('Audio & Mindset', 'pilates-audio'),
-    LibraryArticles(),
+    LibraryArticles('pilates-articles'),
     LibraryPromo(
       title: 'Pilates & Core sessions',
       body: 'Speak with a Pilates training coach',
@@ -92,7 +97,7 @@ enum LibrarySection {
   balance('balance', 'Stretch & Restore', [
     LibraryShelf('Movement', 'balance-movement'),
     LibraryShelf('Rest & Sleep', 'balance-rest'),
-    LibraryArticles(),
+    LibraryArticles('balance-articles'),
     LibraryPromo(
       title: 'Stretch & Restore',
       // The design's own leading space is dropped; it is a typo, not spacing.

@@ -15,7 +15,12 @@ class ProfileTabController extends BaseController {
   final SessionService _session;
 
   /// Browsing without an account — Profile offers sign-up instead of stats.
-  bool get isGuest => _session.isGuest;
+  ///
+  /// Reads the observable rather than the plain getter, so a screen that
+  /// consults it inside an Obx rebuilds when the session ends. Without that
+  /// an expiry left this tab drawing a signed-in user while Home — rebuilt
+  /// by something else — had already dropped to the guest header.
+  bool get isGuest => _session.role.value == null;
 
   /// "Unlock Soothify Pro" on the guest card.
   ///

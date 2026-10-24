@@ -275,7 +275,7 @@ class MockContentRepository implements ContentRepository {
       type: MediaType.video,
       durationSeconds: 2700,
       rating: 4.6,
-      categoryId: 'yoga-flow',
+      categoryId: 'balance-movement',
       practitionerName: 'Jacob Samuel',
     ),
     MediaItem(
@@ -285,7 +285,7 @@ class MockContentRepository implements ContentRepository {
       type: MediaType.video,
       durationSeconds: 2700,
       rating: 4.6,
-      categoryId: 'yoga-flow',
+      categoryId: 'balance-movement',
       practitionerName: 'Jacob Samuel',
     ),
     MediaItem(
@@ -295,7 +295,7 @@ class MockContentRepository implements ContentRepository {
       type: MediaType.video,
       durationSeconds: 2700,
       rating: 4.6,
-      categoryId: 'yoga-flow',
+      categoryId: 'balance-movement',
       practitionerName: 'Jacob Samuel',
     ),
     MediaItem(
@@ -328,7 +328,7 @@ class MockContentRepository implements ContentRepository {
       durationSeconds: 2700,
       rating: 4.6,
       coverAsset: '${ImageConstant.contentDir}/cover_c.png',
-      categoryId: 'sound-effects',
+      categoryId: 'pilates-audio',
       practitionerName: 'Jacob Samuel',
     ),
     MediaItem(
@@ -340,7 +340,7 @@ class MockContentRepository implements ContentRepository {
       durationSeconds: 2700,
       rating: 4.6,
       coverAsset: '${ImageConstant.contentDir}/cover_d.png',
-      categoryId: 'sound-effects',
+      categoryId: 'pilates-audio',
       practitionerName: 'Jacob Samuel',
     ),
     MediaItem(
@@ -369,7 +369,7 @@ class MockContentRepository implements ContentRepository {
   static const Set<String> _shelfCategories = {
     'popular',
     'discovery-popular',
-    'sound-effects',
+    'pilates-audio',
     'recommended',
     'shelf-page',
   };
@@ -389,15 +389,15 @@ class MockContentRepository implements ContentRepository {
   /// Order matters: the frames lay the two content covers out a/b/a, so the
   /// ids are sequenced to reproduce that rather than sorted by id.
   static const Map<String, List<String>> _shelves = {
-    'voice-overs': ['4', '5', '6'],
-    'sound-effects': ['10', '11'],
-    'yoga-flow': ['40', '41', '42'],
-    'sounds': ['43', '44'],
+    'pilates-movement': ['4', '5', '6'],
+    'pilates-audio': ['10', '11'],
+    'balance-movement': ['40', '41', '42'],
+    'balance-rest': ['43', '44'],
     // The Videos screen's two rows (`259:60948`). The frame repeats the same
     // artwork across both, so these reuse existing covers rather than
     // pretending to a catalogue that does not exist.
-    'videos-pilates': ['1', '2', '3'],
-    'videos-yoga': ['7', '8', '9'],
+    'pilates-videos': ['1', '2', '3'],
+    'balance-videos': ['7', '8', '9'],
   };
 
   /// The Recommendation page's own five cards, in the frame's order. Home's
@@ -412,11 +412,25 @@ class MockContentRepository implements ContentRepository {
   }
 
   /// The full page behind a shelf's "See All". The frame shows ten cards in
-  /// a two-column grid, independent of the three or four the shelf previews.
+  /// a two-column grid, more than the three or four the shelf previews.
+  ///
+  /// The shelf's own rows lead, then the page set fills up to ten behind
+  /// them. It used to ignore [shelf] entirely and hand back the same ten
+  /// cards to every "See All" in the app, so tapping through from Yoga Flow
+  /// and from Sound Effects landed on identical pages.
   @override
   Future<List<MediaItem>> getShelfPage(String shelf) async {
     await Future<void>.delayed(_latency);
-    return _items.where((i) => i.categoryId == 'shelf-page').toList();
+    final own = [
+      for (final id in _shelves[shelf] ?? const <String>[])
+        ..._items.where((i) => i.id == id),
+    ];
+    final seen = own.map((i) => i.id).toSet();
+    return [
+      ...own,
+      for (final item in _items)
+        if (item.categoryId == 'shelf-page' && seen.add(item.id)) item,
+    ].take(10).toList();
   }
 
   @override
@@ -464,6 +478,29 @@ class MockContentRepository implements ContentRepository {
             i.title.toLowerCase().contains(q) ||
             i.practitionerName.toLowerCase().contains(q))
         .toList();
+  }
+
+  /// Hearted, in memory. The build with no backend has nowhere to keep
+  /// them, and losing them on restart is better than pretending otherwise.
+  final Set<String> _hearted = <String>{};
+
+  @override
+  Future<List<MediaItem>> getPopular() async {
+    await Future<void>.delayed(_latency);
+    return _items.where((i) => i.categoryId == 'popular').toList();
+  }
+
+  @override
+  Future<List<MediaItem>> getFavourites() async {
+    await Future<void>.delayed(_latency);
+    return _items.where((i) => _hearted.contains(i.id)).toList();
+  }
+
+  @override
+  Future<MediaItem> setFavourite(String id, {required bool on}) async {
+    await Future<void>.delayed(_latency);
+    on ? _hearted.add(id) : _hearted.remove(id);
+    return _items.firstWhere((i) => i.id == id);
   }
 
   @override

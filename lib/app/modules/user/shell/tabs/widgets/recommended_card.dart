@@ -9,9 +9,18 @@ import 'content_pills.dart';
 /// The cover carries three pills stacked over it (category, duration, rating)
 /// and a right-hand rail holding the favourite heart above a premium lock.
 class RecommendedCard extends StatelessWidget {
-  const RecommendedCard({super.key, required this.item, this.onTap});
+  const RecommendedCard({
+    super.key,
+    required this.item,
+    this.onTap,
+    this.onHeart,
+  });
 
   final MediaItem item;
+
+  /// Tapping the heart. Null leaves it drawn but inert, which is what a
+  /// screen with nowhere to send the tap should do.
+  final VoidCallback? onHeart;
   final VoidCallback? onTap;
 
   String get _duration {
@@ -64,7 +73,7 @@ class RecommendedCard extends StatelessWidget {
               ),
             ),
             SizedBox(width: 16.h),
-            const _SideRail(),
+            _SideRail(hearted: item.isFavourite, onHeart: onHeart),
           ],
         ),
       ),
@@ -114,7 +123,12 @@ class _Cover extends StatelessWidget {
 
 /// Heart above, lock below, 45 apart — the design's 29x94 rail.
 class _SideRail extends StatelessWidget {
-  const _SideRail();
+  const _SideRail({required this.hearted, this.onHeart});
+
+  /// Filled or outlined. The server is what knows; this only draws it.
+  final bool hearted;
+
+  final VoidCallback? onHeart;
 
   @override
   Widget build(BuildContext context) {
@@ -126,11 +140,21 @@ class _SideRail extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CustomImageView(
-            imagePath: ImageConstant.icHeart,
-            height: 20.h,
-            width: 20.h,
-            color: appTheme.textPrimary,
+          GestureDetector(
+            onTap: onHeart,
+            // Opaque and padded: 20 of glyph is a small target for a
+            // thumb, and the rail has room around it.
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: EdgeInsets.all(4.h),
+              child: CustomImageView(
+                imagePath:
+                    hearted ? ImageConstant.icHeartFilled : ImageConstant.icHeart,
+                height: 20.h,
+                width: 20.h,
+                color: hearted ? appTheme.heartOn : appTheme.textPrimary,
+              ),
+            ),
           ),
           // The design draws the padlock on every card — it is part of the
           // card component, not a per-item state. If locking should follow

@@ -27,9 +27,14 @@ void main() {
   });
   tearDown(Get.reset);
 
-  void boot(String shelf) {
+  /// Named by its heading, fetched by its key — the two differ, and the
+  /// grid asks the server for the key. Passing only "Sounds" here left the
+  /// controller slugifying the heading into a shelf that does not exist.
+  void boot(String shelf, {String key = 'balance-rest'}) {
     Get.put<ContentRepository>(MockContentRepository());
-    Get.lazyPut(() => ShelfController(Get.find<ContentRepository>(), shelf));
+    Get.lazyPut(
+      () => ShelfController(Get.find<ContentRepository>(), shelf, key: key),
+    );
   }
 
   testWidgets('the grid lists the page behind a shelf', (tester) async {

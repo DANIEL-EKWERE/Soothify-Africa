@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:just_audio/just_audio.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
@@ -13,6 +14,12 @@ import '../../../../data/repositories/content_repository.dart';
 /// It plays now. The frame's 2:34 of 15:00 was a drawing; the bar shows the
 /// player's own position, and what the Profile tab counts as meditation
 /// minutes is what this reports when a listen ends.
+///
+/// Two engines behind one set of controls. just_audio plays the audio
+/// library; a video needs a surface to draw on, and handing a video file to
+/// an audio player is why nothing happened when one was opened. Which engine
+/// is in play is [isVideo], and everything above it — play, seek, the
+/// position, the reporting — reads the same either way.
 class MediaController extends BaseController {
   MediaController(
     this.item,
@@ -40,6 +47,16 @@ class MediaController extends BaseController {
 
   /// Whether the player was ever built, so disposing does not create one.
   bool _playerBuilt = false;
+
+  /// A video's own player. Null for audio, and until the screen opens one.
+  VideoPlayerController? _video;
+
+  /// The surface the screen draws when there is a picture to show.
+  VideoPlayerController? get video =>
+      _video != null && _video!.value.isInitialized ? _video : null;
+
+  /// Whether this item is watched rather than listened to.
+  bool get isVideo => item.type == MediaType.video;
 
   final Rx<Duration> position = Duration.zero.obs;
   final RxBool playing = false.obs;
@@ -78,6 +95,11 @@ class MediaController extends BaseController {
       return;
     }
 
+    if (isVideo) {
+      await _openVideo();
+      return;
+    }
+
     _playerBuilt = true;
     _watching.add(_player.positionStream.listen((at) {
       position.value = at;
@@ -91,13 +113,56 @@ class MediaController extends BaseController {
     }));
 
     final opened = await guard(() async {
-      await _player.setUrl(item.remoteUrl);
+      try {
+        await _player.setUrl(item.remoteUrl);
+      } on PlayerInterruptedException {
+        // Leaving the screen while the first bytes are still arriving
+        // cancels the load, and just_audio reports that as a thrown
+        // exception. Nothing failed — the player is being torn down
+        // because nobody is listening any more — so this must not reach
+        // guard, which would log it and raise an error snackbar over
+        // whatever screen the user moved on to.
+        return false;
+      }
       return true;
     });
     ready.value = opened == true;
   }
 
+  /// Opens the file on a video surface.
+  ///
+  /// VideoPlayerController reports through a listener rather than streams,
+  /// so position, playing and completion all come off the one tick.
+  Future<void> _openVideo() async {
+    final player = _video =
+        VideoPlayerController.networkUrl(Uri.parse(item.remoteUrl));
+    _playerBuilt = true;
+    player.addListener(_onVideoTick);
+
+    final opened = await guard(() async {
+      await player.initialize();
+      return true;
+    });
+    // The screen may have gone while the first bytes were arriving.
+    if (_video != player) return;
+    ready.value = opened == true;
+  }
+
+  void _onVideoTick() {
+    final player = _video;
+    if (player == null || !player.value.isInitialized) return;
+    final at = player.value.position;
+    position.value = at;
+    if (at.inSeconds > _furthest) _furthest = at.inSeconds;
+    playing.value = player.value.isPlaying;
+    if (player.value.isCompleted) _report(completed: true);
+  }
+
   Duration get total {
+    if (isVideo) {
+      final known = _video?.value.duration;
+      return known != null && known > Duration.zero ? known : item.duration;
+    }
     final known = _playerBuilt ? _player.duration : null;
     // The item's own length until the file says otherwise: the screen draws
     // a progress bar before the first byte arrives.
@@ -124,15 +189,19 @@ class MediaController extends BaseController {
       AppFeedback.info('This one is not available to play on your plan yet.');
       return;
     }
-    if (_player.playing) {
-      await _player.pause();
+    if (playing.value) {
+      await (isVideo ? _video?.pause() ?? Future.value() : _player.pause());
       // Reported on pause as well as at the end: somebody who listens for
       // ten minutes and stops has meditated for ten minutes.
       await _report();
       return;
     }
     await guard(() async {
-      await _player.play();
+      if (isVideo) {
+        await _video?.play();
+      } else {
+        await _player.play();
+      }
       return true;
     });
   }
@@ -143,7 +212,12 @@ class MediaController extends BaseController {
         ? Duration.zero
         : (next > total ? total : next);
     position.value = target;
-    if (ready.value) await _player.seek(target);
+    if (!ready.value) return;
+    if (isVideo) {
+      await _video?.seekTo(target);
+    } else {
+      await _player.seek(target);
+    }
   }
 
   /// One to five stars, kept by the server against this person — rating it
@@ -182,7 +256,14 @@ class MediaController extends BaseController {
     for (final subscription in _watching) {
       subscription.cancel();
     }
-    if (_playerBuilt) _player.dispose();
+    final video = _video;
+    _video = null;
+    if (video != null) {
+      video.removeListener(_onVideoTick);
+      video.dispose();
+    } else if (_playerBuilt) {
+      _player.dispose();
+    }
     super.onClose();
   }
 }

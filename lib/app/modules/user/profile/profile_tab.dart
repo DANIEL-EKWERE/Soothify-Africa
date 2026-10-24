@@ -26,7 +26,12 @@ class ProfileTab extends GetView<ProfileTabController> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: controller.load,
-          child: ListView(
+          // Obx around the whole page, because whether there is a user at
+          // all is the thing it branches on: a session that ends while this
+          // tab is built has to take the stats and the portrait with it,
+          // not wait for some other rebuild to notice.
+          child: Obx(
+            () => ListView(
             // The card and "My stats" sit at x=22; the header and the pills at
             // x=24, hence the 2px inset on those two rather than one padding
             // for everything. Top is 36 = the design's 83 less the 47-tall
@@ -57,6 +62,7 @@ class ProfileTab extends GetView<ProfileTabController> {
                     }),
               ],
             ],
+            ),
           ),
         ),
       ),

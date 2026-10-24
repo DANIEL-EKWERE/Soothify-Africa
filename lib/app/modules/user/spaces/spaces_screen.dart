@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../widgets/filter_pill.dart';
 import '../../../data/models/space_listing.dart';
 // SpaceCategory, which names the filter chips, still lives here.
@@ -231,6 +232,20 @@ class _List extends StatelessWidget {
     final controller = Get.find<SpacesController>();
     return Obx(() {
       final spaces = controller.spaces;
+      if (spaces.isEmpty && controller.isLoading.value) {
+        // Cards in the shape of the list. This used to fall straight to
+        // "No spaces match that yet", which told the user their search had
+        // failed while it was still running.
+        return SkeletonShimmer(
+          child: ListView.separated(
+            padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 24.v),
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            separatorBuilder: (_, _) => SizedBox(height: 16.v),
+            itemBuilder: (_, _) => const Skeleton(width: 342, height: 240),
+          ),
+        );
+      }
       if (spaces.isEmpty) {
         return Center(
           child: Padding(

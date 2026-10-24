@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../data/models/expert_earnings.dart';
 import '../dashboard/controller/expert_dashboard_controller.dart';
 import '../widgets/expert_money.dart';
@@ -59,10 +60,27 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
                   ],
                 ),
                 SizedBox(height: 16.v),
-                for (final payout in earnings?.payouts ?? const <Payout>[]) ...[
-                  PayoutCard(payout: payout),
-                  SizedBox(height: 8.v),
-                ],
+                // The cards above degrade to em dashes and zeroes while the
+                // figures arrive, so they keep their shape on their own.
+                // This list has nothing to hold it open.
+                if (earnings == null && controller.isLoading.value)
+                  const SkeletonShimmer(
+                    child: Column(
+                      children: [
+                        Skeleton(width: 343, height: 92),
+                        SizedBox(height: 8),
+                        Skeleton(width: 343, height: 92),
+                        SizedBox(height: 8),
+                        Skeleton(width: 343, height: 92),
+                      ],
+                    ),
+                  )
+                else
+                  for (final payout
+                      in earnings?.payouts ?? const <Payout>[]) ...[
+                    PayoutCard(payout: payout),
+                    SizedBox(height: 8.v),
+                  ],
               ],
             );
           }),

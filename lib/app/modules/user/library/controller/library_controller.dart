@@ -50,8 +50,20 @@ class LibraryController extends BaseController {
     });
   });
 
-  void openShelf(String shelf) =>
-      Get.toNamed(AppRoutes.shelf, arguments: shelf);
+  /// The heading is what the page is called; the shelf's own query is what
+  /// the server is asked for. "Movement" is `pilates-movement` here and
+  /// `balance-movement` in the other section, so the two cannot be derived from
+  /// each other.
+  void openShelf(String shelf) {
+    final match = section.shelves.where((s) => s.title == shelf);
+    Get.toNamed(
+      AppRoutes.shelf,
+      arguments: {
+        'shelf': shelf,
+        if (match.isNotEmpty) 'key': match.first.query,
+      },
+    );
+  }
 
   /// Which questionnaire fronts this section's sessions.
   WellnessTrack get track => switch (section) {

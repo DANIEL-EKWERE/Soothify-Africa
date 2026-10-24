@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../../../../core/utils/media_entry.dart';
 import '../../../../core/base_controller.dart';
+import '../../../../core/utils/feedback_utils.dart';
+import '../../../../core/utils/logger.dart';
 import '../../../../data/models/explore_destination.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../routes/app_routes.dart';
@@ -99,7 +101,7 @@ class HomeTabController extends BaseController {
     await guard(() async {
       final results = await Future.wait([
         _repository.getFeatured(),
-        _repository.getByCategory('popular'),
+        _repository.getPopular(),
       ]);
       recommended.assignAll(results[0]);
       popular.assignAll(results[1]);
@@ -107,6 +109,35 @@ class HomeTabController extends BaseController {
   }
 
   Future<void> reload() => load();
+
+  /// Fill or empty the heart on a card.
+  ///
+  /// Drawn immediately and told to the server after: a heart that waits
+  /// for a round trip before it fills reads as a tap that did not land,
+  /// and people tap it again. If the call fails the card goes back to what
+  /// it was, which is the honest answer.
+  Future<void> toggleHeart(MediaItem item) async {
+    if (!Get.find<SessionService>().hasAccount) {
+      AppFeedback.info('Sign in to keep this.');
+      return;
+    }
+
+    final wanted = !item.isFavourite;
+    _redraw(item.id, wanted);
+    try {
+      await _repository.setFavourite(item.id, on: wanted);
+    } catch (error) {
+      _redraw(item.id, item.isFavourite);
+      Log.e('could not change the heart', error: error);
+    }
+  }
+
+  void _redraw(String id, bool hearted) {
+    for (final list in [recommended, popular]) {
+      final i = list.indexWhere((m) => m.id == id);
+      if (i >= 0) list[i] = list[i].copyWith(isFavourite: hearted);
+    }
+  }
 
   /// All three Explore tiles now have a screen. Meditation and Balance share
   /// one, distinguished by the argument.

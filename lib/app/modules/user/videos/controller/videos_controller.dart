@@ -30,8 +30,8 @@ class VideosController extends BaseController {
   /// second spelling — and leaves "Yoga" as the practice, which the section
   /// rename did not cover.
   static const List<VideoShelf> catalogue = [
-    VideoShelf('Pilates', 'videos-pilates'),
-    VideoShelf('Yoga', 'videos-yoga'),
+    VideoShelf('Pilates & Core', 'pilates-videos'),
+    VideoShelf('Stretch & Restore', 'balance-videos'),
   ];
 
   final RxMap<String, List<MediaItem>> shelves =
@@ -60,10 +60,19 @@ class VideosController extends BaseController {
   /// "Pilates video content" (`259:61062`) is the See All grid — the same
   /// two-column page every other shelf opens, with the search row the frame
   /// puts above it.
-  void openShelf(String shelf) => Get.toNamed(
-        AppRoutes.shelf,
-        arguments: {'shelf': shelf, 'search': true},
-      );
+  void openShelf(String shelf) {
+    // The row's heading is not its key: 'Pilates & Core' is
+    // `pilates-videos` on the server.
+    final match = catalogue.where((s) => s.title == shelf);
+    Get.toNamed(
+      AppRoutes.shelf,
+      arguments: {
+        'shelf': shelf,
+        if (match.isNotEmpty) 'key': match.first.query,
+        'search': true,
+      },
+    );
+  }
 
   void open(MediaItem item, {required String source}) =>
       openMedia(item, source: source);

@@ -72,8 +72,9 @@ class ArtworkPlaceholder extends StatelessWidget {
   final double height;
   final double radius;
 
-  /// The exported cover, when the item has one. Null or missing falls back to
-  /// the flat block, so a item without art still lays out at the right size.
+  /// The item's cover. A bundled asset or, for anything that came from the
+  /// API, an http URL — both are handled. Null or missing falls back to the
+  /// flat block, so an item without art still lays out at the right size.
   final String? assetPath;
 
   @override
@@ -89,9 +90,14 @@ class ArtworkPlaceholder extends StatelessWidget {
     final path = assetPath;
     if (path == null || path.isEmpty) return flat;
 
-    // The block stays underneath rather than being replaced: an asset that is
+    // The block stays underneath rather than being replaced: art that is
     // still decoding, missing, or unloaded (as in a widget test) then leaves
     // the card looking as it did before instead of blank.
+    //
+    // CustomImageView, not Image.asset: a cover that came from the API is an
+    // http URL, and Image.asset fails every one of them. Every card built on
+    // this widget — Discovery, the home rails, Recommended — was showing the
+    // grey block for everything the server served.
     return Container(
       width: width,
       height: height,
@@ -100,12 +106,11 @@ class ArtworkPlaceholder extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.asset(
-        path,
+      child: CustomImageView(
+        imagePath: path,
         width: width,
         height: height,
         fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       ),
     );
   }

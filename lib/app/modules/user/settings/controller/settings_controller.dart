@@ -145,6 +145,8 @@ class SettingsController extends BaseController {
         await Get.toNamed(AppRoutes.manageSubscription);
       case SettingsEntry.account:
         await Get.toNamed(AppRoutes.accountSettings);
+      case SettingsEntry.favourites:
+        await Get.toNamed(AppRoutes.favourites);
       case SettingsEntry.notifications:
         await Get.toNamed(AppRoutes.notificationSettings);
       case SettingsEntry.privacyPolicy:

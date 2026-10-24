@@ -42,6 +42,19 @@ class SessionService extends GetxService {
     await PrefUtils().setUserRole(value.key);
   }
 
+  /// The server refused the session and the refresh token with it.
+  ///
+  /// Local only, unlike [signOut]: the credentials are already dead, so
+  /// unregistering the push token would 401 in turn — and that call goes
+  /// through the very client reporting the expiry, which would call back
+  /// in here. The token is left registered; the next sign-in re-registers
+  /// it against whoever signs in.
+  Future<void> expire() async {
+    if (role.value == null) return;
+    role.value = null;
+    await PrefUtils().clearSession();
+  }
+
   /// Signing out returns to guest browsing rather than to the sign-up wall —
   /// the same state a user who never registered is in.
   Future<void> signOut() async {

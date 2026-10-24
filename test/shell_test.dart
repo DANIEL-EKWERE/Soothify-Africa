@@ -87,6 +87,13 @@ class _FailingContentRepository implements ContentRepository {
   Future<List<MediaItem>> getShelfPage(String shelf) async =>
       throw Exception('offline');
   @override
+  Future<List<MediaItem>> getPopular() async => throw Exception('offline');
+  @override
+  Future<List<MediaItem>> getFavourites() async => throw Exception('offline');
+  @override
+  Future<MediaItem> setFavourite(String id, {required bool on}) async =>
+      throw Exception('offline');
+  @override
   Future<List<MediaItem>> getByCategory(String categoryId) async => const [];
   @override
   Future<MediaItem?> getById(String id) async => null;

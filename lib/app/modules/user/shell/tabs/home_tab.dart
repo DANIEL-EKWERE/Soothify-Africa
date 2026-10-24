@@ -6,6 +6,7 @@ import '../../../../data/models/media_item.dart';
 import '../../../../data/services/session_service.dart';
 import '../../../../data/services/theme_service.dart';
 import '../../../../widgets/gradient_text.dart';
+import '../../../../widgets/skeleton.dart';
 import 'home_tab_controller.dart';
 import 'widgets/content_pills.dart';
 import 'widgets/recommended_card.dart';
@@ -65,7 +66,18 @@ class _Header extends StatelessWidget {
     // Two frames: signed in (135:518) leads with the avatar and greets by
     // name; unsigned (135:705) has neither and greets by time of day. The
     // right-hand cluster is the same in both.
-    final guest = Get.find<SessionService>().isGuest;
+    //
+    // The observable, read inside the Obx below: a session ending has to
+    // take the portrait and the name with it here and now. Read plainly,
+    // this header kept a signed-in greeting until something else rebuilt
+    // it, while Profile had already dropped to its guest state.
+    return Obx(() {
+      final guest = Get.find<SessionService>().role.value == null;
+      return _header(context, guest);
+    });
+  }
+
+  Widget _header(BuildContext context, bool guest) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -317,12 +329,26 @@ class _RecommendedSection extends StatelessWidget {
       children: [
         Text('Recommended for you', style: CustomTextStyles.sectionTitle),
         SizedBox(height: 16.h),
-        Obx(
-          () => Column(
+        Obx(() {
+          // Still loading: hold the rail's shape rather than leaving the
+          // heading over blank space, which reads as a failed load.
+          if (controller.recommended.isEmpty && controller.isLoading.value) {
+            return const SkeletonShimmer(
+              child: Column(
+                children: [
+                  Skeleton(width: 342, height: 122),
+                  SizedBox(height: 8),
+                  Skeleton(width: 342, height: 122),
+                ],
+              ),
+            );
+          }
+          return Column(
             children: [
               for (final item in controller.recommended) ...[
                 RecommendedCard(
                   item: item,
+                  onHeart: () => controller.toggleHeart(item),
                   // A card opens the item; the section heading's "See All"
                   // is what opens the full list.
                   onTap: () =>
@@ -331,8 +357,8 @@ class _RecommendedSection extends StatelessWidget {
                 if (item != controller.recommended.last) SizedBox(height: 8.h),
               ],
             ],
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
@@ -360,14 +386,20 @@ class _PopularSection extends StatelessWidget {
         SizedBox(height: 16.h),
         SizedBox(
           height: 166.h,
-          child: Obx(
-            () => ListView.separated(
+          child: Obx(() {
+            final loading =
+                controller.popular.isEmpty && controller.isLoading.value;
+            final rail = ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: controller.popular.length,
+              physics: loading ? const NeverScrollableScrollPhysics() : null,
+              itemCount: loading ? 3 : controller.popular.length,
               separatorBuilder: (_, _) => SizedBox(width: 20.h),
-              itemBuilder: (_, i) => _PopularCard(item: controller.popular[i]),
-            ),
-          ),
+              itemBuilder: (_, i) => loading
+                  ? const Skeleton(width: 159, height: 166)
+                  : _PopularCard(item: controller.popular[i]),
+            );
+            return loading ? SkeletonShimmer(child: rail) : rail;
+          }),
         ),
       ],
     );

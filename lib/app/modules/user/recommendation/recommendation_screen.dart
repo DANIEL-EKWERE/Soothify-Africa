@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../shell/tabs/widgets/recommended_card.dart';
 import 'controller/recommendation_controller.dart';
 
@@ -35,7 +36,30 @@ class RecommendationScreen extends GetView<RecommendationController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            // The page it is about to be, rather than a spinner in the
+            // middle of nothing: the heading is already known, and the
+            // cards land in the shape the skeletons held.
+            return ListView(
+              padding: EdgeInsets.fromLTRB(24.h, 32.h, 24.h, 32.h),
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8.h),
+                  child: Text('Recommended for you',
+                      style: CustomTextStyles.sectionTitle),
+                ),
+                const SkeletonShimmer(
+                  child: Column(
+                    children: [
+                      Skeleton(width: 342, height: 122),
+                      SizedBox(height: 8),
+                      Skeleton(width: 342, height: 122),
+                      SizedBox(height: 8),
+                      Skeleton(width: 342, height: 122),
+                    ],
+                  ),
+                ),
+              ],
+            );
           }
           return RefreshIndicator(
             onRefresh: controller.reload,

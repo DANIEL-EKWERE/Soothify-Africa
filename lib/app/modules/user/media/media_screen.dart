@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../../core/app_export.dart';
 import '../../../widgets/gradient_text.dart';
@@ -94,20 +95,48 @@ class _Player extends StatelessWidget {
             // The far end of the grid card's flight.
             child: Hero(
               tag: 'cover-${controller.item.id}',
-              child: CustomImageView(
-                imagePath: controller.item.cover,
-                fit: BoxFit.cover,
-                radius: BorderRadius.circular(8.h),
-              ),
+              child: Obx(() {
+                // The picture once there is one, the cover until then: a
+                // video opened on its cover and stayed there, because the
+                // only player the screen had was an audio one.
+                final video = controller.ready.value ? controller.video : null;
+                if (video == null) {
+                  return CustomImageView(
+                    imagePath: controller.item.cover,
+                    fit: BoxFit.cover,
+                    radius: BorderRadius.circular(8.h),
+                  );
+                }
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(8.h),
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    clipBehavior: Clip.hardEdge,
+                    child: SizedBox(
+                      width: video.value.size.width,
+                      height: video.value.size.height,
+                      child: VideoPlayer(video),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
           // The frame darkens the art by 40% so the controls stay legible
-          // whatever the cover happens to be.
+          // whatever the cover happens to be. A playing video is lightened
+          // to 20%: the same wash over moving pictures is the difference
+          // between watching something and watching it through a veil.
           Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(8.h),
+            child: Obx(
+              () => DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(
+                    alpha: controller.playing.value && controller.isVideo
+                        ? 0.2
+                        : 0.4,
+                  ),
+                  borderRadius: BorderRadius.circular(8.h),
+                ),
               ),
             ),
           ),

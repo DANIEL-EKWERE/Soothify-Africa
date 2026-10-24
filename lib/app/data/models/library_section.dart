@@ -79,8 +79,8 @@ enum LibrarySection {
     // Two shelves, as the frame's two "See All" links say. "Home Reformer
     // Guides" reads like a third, but it sits 43 under Movement — it is a
     // card's title pill, not a heading.
-    LibraryShelf('Movement', 'voice-overs'),
-    LibraryShelf('Audio & Mindset', 'sound-effects'),
+    LibraryShelf('Movement', 'pilates-movement'),
+    LibraryShelf('Audio & Mindset', 'pilates-audio'),
     LibraryArticles(),
     LibraryPromo(
       title: 'Pilates & Core sessions',
@@ -90,8 +90,8 @@ enum LibrarySection {
     ),
   ]),
   balance('balance', 'Stretch & Restore', [
-    LibraryShelf('Movement', 'yoga-flow'),
-    LibraryShelf('Rest & Sleep', 'sounds'),
+    LibraryShelf('Movement', 'balance-movement'),
+    LibraryShelf('Rest & Sleep', 'balance-rest'),
     LibraryArticles(),
     LibraryPromo(
       title: 'Stretch & Restore',

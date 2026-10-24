@@ -5,6 +5,10 @@
 enum SettingsEntry {
   manageSubscription('Manage subscription', 'ic_settings_subscription'),
   account('Account', 'ic_settings_account'),
+  // Everything hearted. Sits under Account rather than near the policies:
+  // it is the person's own content, not a preference. The glyph is the
+  // card's own heart, so the row and the thing it collects match.
+  favourites('Favourites', 'ic_heart'),
   // The expert's list only. Drawn in the brand blue on its frame — the one
   // row there that is an offer rather than a setting.
   careProtection('Care & protection hub', 'ic_security'),
@@ -39,13 +43,13 @@ enum SettingsEntry {
   /// has no Account row and is not offered "Become an Expert", and carries
   /// the protection hub instead.
   static const forClient = [
-    manageSubscription, account, themeToggle, changeLanguage, notifications,
-    becomeExpert, privacyPolicy, terms, about, logout,
+    manageSubscription, account, favourites, themeToggle, changeLanguage,
+    notifications, becomeExpert, privacyPolicy, terms, about, logout,
   ];
 
   static const forExpert = [
-    manageSubscription, careProtection, themeToggle, changeLanguage,
-    notifications, privacyPolicy, terms, about, logout,
+    manageSubscription, careProtection, favourites, themeToggle,
+    changeLanguage, notifications, privacyPolicy, terms, about, logout,
   ];
 
   /// The row the frame singles out in blue.

@@ -11,6 +11,8 @@ import '../modules/practitioner/notes/controller/session_notes_controller.dart';
 import '../modules/practitioner/notes/session_notes_screen.dart';
 import '../modules/practitioner/recommend/binding/recommend_binding.dart';
 import '../modules/practitioner/recommend/recommend_screen.dart';
+import '../modules/user/favourites/controller/favourites_controller.dart';
+import '../modules/user/favourites/favourites_screen.dart';
 import '../modules/practitioner/payouts/binding/payout_binding.dart';
 import '../modules/practitioner/payouts/expert_payout_method_screen.dart';
 import '../modules/practitioner/payouts/expert_payouts_screen.dart';
@@ -369,6 +371,13 @@ class AppPages {
           () => SessionNotesController(Get.find<ExpertRepository>()),
         ),
       ],
+    ),
+    GetPage(
+      name: AppRoutes.favourites,
+      page: () => const FavouritesScreen(),
+      binding: BindingsBuilder.put(
+        () => FavouritesController(Get.find<ContentRepository>()),
+      ),
     ),
     GetPage(
       name: AppRoutes.expertRecommend,

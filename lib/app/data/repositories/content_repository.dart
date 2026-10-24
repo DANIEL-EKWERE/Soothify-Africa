@@ -17,7 +17,21 @@ abstract class ContentRepository {
   /// [getFeatured], which backs Home's preview row.
   Future<List<MediaItem>> getRecommendations();
 
-  /// One named library shelf — "voice-overs", "sound-effects", "yoga-flow",
+  /// Home's "Popular Content" row, and Discovery's.
+  ///
+  /// Ordered by the server from what people are actually playing, with
+  /// anything staff pinned at the front. It used to be a category called
+  /// "popular", which does not exist — so the row was empty on the real
+  /// server and full only against the mock.
+  Future<List<MediaItem>> getPopular();
+
+  /// What this person has hearted, newest first. Needs a token.
+  Future<List<MediaItem>> getFavourites();
+
+  /// Fill or empty the heart. Returns the item as the server now holds it.
+  Future<MediaItem> setFavourite(String id, {required bool on});
+
+  /// One named library shelf — "pilates-movement", "balance-rest",
   /// "sounds". Each frame gives its shelves different cards.
   Future<List<MediaItem>> getShelf(String query);
 

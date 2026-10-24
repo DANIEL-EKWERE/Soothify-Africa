@@ -44,6 +44,7 @@ class PrimaryColors {
     required this.dotInactive,
     required this.exploreTileBorder,
     required this.pillDark,
+    required this.heartOn,
     required this.lockCircle,
     required this.lockGlyph,
     required this.bellBorder,
@@ -183,6 +184,11 @@ class PrimaryColors {
   /// ring around the notification bell.
   final Color exploreTileBorder;
   final Color pillDark;
+  /// A filled heart. Warm rather than the brand blue: it is affection,
+  /// not a selected state, and the blue already means "chosen" everywhere
+  /// else in the app.
+  final Color heartOn;
+
   final Color lockCircle;
 
   /// The padlock inside [lockCircle] — a pale blue-grey, not the body colour.
@@ -587,6 +593,7 @@ class PrimaryColors {
     dotInactive: Color(0xFFEDEDED),
     exploreTileBorder: Color(0x1FEADDFF),
     pillDark: Color(0xFF484747),
+    heartOn: Color(0xFFE5484D),
     lockCircle: Color(0xFFECECEC),
     lockGlyph: Color(0xFFC1C9DB),
     bellBorder: Color(0xFFCBD0D8),
@@ -708,6 +715,7 @@ class PrimaryColors {
     dotInactive: Color(0xFF3C3939),
     exploreTileBorder: Color(0xFF4A4747),
     pillDark: Color(0xFF1E1D1D),
+    heartOn: Color(0xFFFF6369),
     lockCircle: Color(0xFF3C3939),
     lockGlyph: Color(0xFF8A93A6),
     bellBorder: Color(0xFF4A4747),

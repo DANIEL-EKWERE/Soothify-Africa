@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/month_calendar.dart';
 import 'controller/booking_calendar_controller.dart';
@@ -111,13 +112,27 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                   // Full-width rows, one per line, as the design draws them.
                   Obx(() {
                     final slots = controller.slots;
-                    // The hours are the expert's own, so a day can have
-                    // none left -- saying so beats an empty gap.
+                    if (slots.isEmpty && controller.isLoading.value) {
+                      // Rows where the times will be, rather than a line of
+                      // text that the hours then shove down the screen.
+                      return const SkeletonShimmer(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Skeleton(width: 342, height: 44),
+                            SizedBox(height: 8),
+                            Skeleton(width: 342, height: 44),
+                            SizedBox(height: 8),
+                            Skeleton(width: 342, height: 44),
+                          ],
+                        ),
+                      );
+                    }
                     if (slots.isEmpty) {
+                      // The hours are the expert's own, so a day can have
+                      // none left — saying so beats an empty gap.
                       return Text(
-                        controller.isLoading.value
-                            ? 'Finding free times\u2026'
-                            : 'No times left on this day. Try another.',
+                        'No times left on this day. Try another.',
                         style: CustomTextStyles.coachBlurb,
                       );
                     }

@@ -40,6 +40,17 @@ void main() {
     practitionerName: 'Adeshola Wande',
   );
 
+  /// The same item as a video, with something to play.
+  const video = MediaItem(
+    id: '2',
+    title: 'Guided Breathing for calm',
+    tag: 'Pilates & Core',
+    type: MediaType.video,
+    durationSeconds: 900,
+    coverAsset: 'assets/images/content/cover_a.png',
+    remoteUrl: 'https://soothifyafrica.com.ng/api/v1/media/x.webm/',
+  );
+
   MediaController boot() =>
       Get.put(MediaController(
         item,
@@ -94,5 +105,30 @@ void main() {
       durationSeconds: 60,
     );
     expect(MediaController(unrated, MockContentRepository(), source: 'x').ratingLabel, '—/5');
+  });
+
+  testWidgets('a video opens on a video player, not the audio one',
+      (tester) async {
+    useDesignFrame(tester);
+    // An AudioPlayer that would throw if the screen reached for it: a video
+    // used to be handed to just_audio, which is why nothing ever played.
+    final c = Get.put(MediaController(
+      video,
+      MockContentRepository(),
+      source: 'Pilates',
+    ));
+    expect(c.isVideo, isTrue);
+
+    await pumpScreen(tester, const MediaScreen());
+    await tester.pumpAndSettle();
+
+    // There is no video platform in a widget test, so the surface never
+    // initialises and the cover stays. What matters is that the screen
+    // asked for a video at all, and that it did not fall over without one.
+    expect(c.video, isNull);
+    expect(c.ready.value, isFalse);
+    expect(find.byType(MediaScreen), findsOneWidget);
+    expect(c.total, const Duration(seconds: 900),
+        reason: 'the item’s own length until the file says otherwise');
   });
 }

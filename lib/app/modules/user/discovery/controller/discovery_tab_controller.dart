@@ -70,7 +70,7 @@ class DiscoveryTabController extends BaseController {
 
     final results = await Future.wait([
       mine ? _content.getRecent() : Future.value(const <MediaItem>[]),
-      _content.getByCategory('discovery-popular'),
+      _content.getPopular(),
     ]);
     bool keep(MediaItem m) => filters.value.matchesDuration(m.durationSeconds);
     recent.assignAll(results[0].where(keep));
@@ -110,8 +110,14 @@ class DiscoveryTabController extends BaseController {
   }
 
   /// Each shelf's "See All" opens the same grid, named by its heading.
-  void openShelf(String shelf) =>
-      Get.toNamed(AppRoutes.shelf, arguments: shelf);
+  ///
+  /// Neither row is a shelf on the server — there is no `recent` or
+  /// `popular` to ask for — so the key tells the grid to go back to the
+  /// call that filled the row.
+  void openShelf(String shelf) => Get.toNamed(
+        AppRoutes.shelf,
+        arguments: {'shelf': shelf, 'key': shelf.toLowerCase()},
+      );
 
   Future<void> openFilters(BuildContext anchor) async {
     final applied = await openFilterSheets(anchor, filters.value);

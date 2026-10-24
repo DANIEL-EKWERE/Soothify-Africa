@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../widgets/filter_glyph.dart';
 import '../../../data/models/media_item.dart';
 import 'controller/discovery_tab_controller.dart';
@@ -466,14 +467,23 @@ class _Shelf extends StatelessWidget {
           height: 166.v,
           // Scrolls past the frame edge — the design shows a third card
           // clipped at x=390, so the shelf is meant to run off-screen.
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.zero,
-            itemCount: items.length,
-            separatorBuilder: (_, _) => SizedBox(width: 20.h),
-            itemBuilder: (context, i) =>
-                DiscoveryCard(item: items[i], onTap: () => onTap(items[i])),
-          ),
+          child: Obx(() {
+            // Still loading: hold the shelf's shape rather than leaving the
+            // heading over blank space, which reads as a failed load.
+            final loading = items.isEmpty &&
+                Get.find<DiscoveryTabController>().isLoading.value;
+            final rail = ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              physics: loading ? const NeverScrollableScrollPhysics() : null,
+              itemCount: loading ? 3 : items.length,
+              separatorBuilder: (_, _) => SizedBox(width: 20.h),
+              itemBuilder: (context, i) => loading
+                  ? const Skeleton(width: 159, height: 166)
+                  : DiscoveryCard(item: items[i], onTap: () => onTap(items[i])),
+            );
+            return loading ? SkeletonShimmer(child: rail) : rail;
+          }),
         ),
       ],
     );

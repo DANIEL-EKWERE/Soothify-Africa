@@ -211,6 +211,9 @@ class AppRoutes {
 
   /// One session's notes. Takes an [ExpertSession]; the frame is titled after
   /// the client, so a session has to be chosen before it opens.
+  /// Everything the client has hearted, from Settings.
+  static const String favourites = '/favourites';
+
   static const String expertSessionNotes = '/practitioner/notes';
 
   /// Picking a piece of the library to send a client mid-call.

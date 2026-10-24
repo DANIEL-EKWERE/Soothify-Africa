@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:get/get.dart';
 
 import '../network/api_client.dart';
+import '../network/app_api_client.dart';
 import 'pref_utils.dart';
 
 import '../../data/repositories/api_auth_repository.dart';
@@ -88,10 +89,7 @@ class InitialBindings extends Bindings {
     // sooner than this binding runs. Guarded so a test — which reaches this
     // binding without going through main() — still gets one.
     if (!Get.isRegistered<ApiClient>()) {
-      Get.put(
-        ApiClient(accessToken: () => PrefUtils().accessToken),
-        permanent: true,
-      );
+      Get.put(buildApiClient(), permanent: true);
     }
     // Google and Apple sign-in, behind the same interface the auth
     // controllers take, so a test can hand them a stub instead.

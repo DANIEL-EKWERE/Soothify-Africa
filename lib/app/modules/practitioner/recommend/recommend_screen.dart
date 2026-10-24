@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../data/models/media_item.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import 'controller/recommend_controller.dart';
@@ -25,7 +26,23 @@ class RecommendScreen extends GetView<RecommendController> {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value && controller.items.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
+                  // Rows in the shape of the list, not a spinner: the
+                  // search above re-runs this on every keystroke, and a
+                  // spinner in the middle makes each one look like a
+                  // reload of the whole screen.
+                  // One shimmer around the whole list, not one per row:
+                  // five tickers sweeping independently is five times the
+                  // cost and reads as five separate things loading.
+                  return SkeletonShimmer(
+                    child: ListView.separated(
+                      padding: EdgeInsets.fromLTRB(24.h, 8.v, 24.h, 24.v),
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 5,
+                      separatorBuilder: (_, _) => SizedBox(height: 12.v),
+                      itemBuilder: (_, _) =>
+                          const Skeleton(width: 342, height: 78),
+                    ),
+                  );
                 }
                 if (controller.items.isEmpty) {
                   return _Empty(controller: controller);

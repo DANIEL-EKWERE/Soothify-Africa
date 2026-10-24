@@ -19,6 +19,8 @@ class MediaItem {
     this.categoryId = '',
     this.practitionerName = '',
     this.isFree = true,
+    this.isFavourite = false,
+    this.myRating = 0,
   });
 
   final String id;
@@ -62,11 +64,24 @@ class MediaItem {
   final String practitionerName;
   final bool isFree;
 
+  /// Whether this person has the heart filled on it. False for a guest,
+  /// so the card draws an outline rather than nothing.
+  final bool isFavourite;
+
+  /// Their own score out of 5, 0 if they have not given one. Distinct from
+  /// [rating], which is everybody's average: the stars show what you said.
+  final int myRating;
+
   bool get isDownloaded => localPath != null && localPath!.isNotEmpty;
 
   Duration get duration => Duration(seconds: durationSeconds);
 
-  MediaItem copyWith({String? localPath}) => MediaItem(
+  MediaItem copyWith({
+    String? localPath,
+    bool? isFavourite,
+    int? myRating,
+  }) =>
+      MediaItem(
         id: id,
         title: title,
         subtitle: subtitle,
@@ -82,6 +97,8 @@ class MediaItem {
         categoryId: categoryId,
         practitionerName: practitionerName,
         isFree: isFree,
+        isFavourite: isFavourite ?? this.isFavourite,
+        myRating: myRating ?? this.myRating,
       );
 
   /// DRF returns snake_case; keys here match that contract so swapping the
@@ -103,6 +120,8 @@ class MediaItem {
         categoryId: '${json['category'] ?? ''}',
         practitionerName: json['practitioner_name'] as String? ?? '',
         isFree: json['is_free'] as bool? ?? true,
+        isFavourite: json['is_favourite'] as bool? ?? false,
+        myRating: json['my_rating'] as int? ?? 0,
       );
 }
 

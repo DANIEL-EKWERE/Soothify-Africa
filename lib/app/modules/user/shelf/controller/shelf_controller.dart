@@ -10,12 +10,37 @@ import '../../../../data/repositories/content_repository.dart';
 
 /// Backs a shelf's "See All" page — Figma "Balance Content" (135:20135).
 class ShelfController extends BaseController {
-  ShelfController(this._repository, this.shelf, {this.showSearch = false});
+  ShelfController(
+    this._repository,
+    this.shelf, {
+    String key = '',
+    this.showSearch = false,
+  }) : key = key.isEmpty ? _slug(shelf) : key;
 
   final ContentRepository _repository;
 
   /// The shelf's heading, reused as the page title.
   final String shelf;
+
+  /// Which shelf to ask the server for.
+  ///
+  /// Not the heading: the API routes shelves by slug, so "Voice Overs" was
+  /// a 404 and every See All grid came back empty against the live backend.
+  /// The two are not derivable from each other either — "Movement" is
+  /// `pilates-movement` in one library section and `balance-movement` in
+  /// the other — so
+  /// the caller passes the catalogue's own query and the slug of the
+  /// heading is only a fallback for callers that have none.
+  final String key;
+
+  /// Home's two rows are not shelves: nothing on the server answers to
+  /// `recent` or `popular`, and their See All has to go back to the same
+  /// call that filled the row.
+  static const _recent = 'recent';
+  static const _popular = 'popular';
+
+  static String _slug(String heading) =>
+      heading.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-');
 
   /// Whether a search row sits above the grid. Only the Videos screen's See
   /// All draws one; every other "See All" frame goes straight to the cards.
@@ -32,7 +57,11 @@ class ShelfController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
-        final page = await _repository.getShelfPage(shelf);
+        final page = switch (key) {
+          _recent => await _repository.getRecent(),
+          _popular => await _repository.getFeatured(),
+          _ => await _repository.getShelfPage(key),
+        };
         items.assignAll(
           page
               .where((m) => filters.value.matchesDuration(m.durationSeconds))

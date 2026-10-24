@@ -111,6 +111,19 @@ class ApiContentRepository implements ContentRepository {
     );
   }
 
+  @override
+  Future<List<MediaItem>> getPopular() => _items('/content/popular/');
+
+  @override
+  Future<List<MediaItem>> getFavourites() => _items('/content/favourites/');
+
+  @override
+  Future<MediaItem> setFavourite(String id, {required bool on}) async {
+    final path = '/content/items/$id/favourite/';
+    final body = on ? await _api.post(path) : await _api.delete(path);
+    return MediaItem.fromJson(body);
+  }
+
   Future<List<MediaItem>> _items(String path) async {
     final rows = await _api.getList(path);
     return rows.map(MediaItem.fromJson).toList();

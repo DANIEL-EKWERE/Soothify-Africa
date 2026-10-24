@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'app/core/app_export.dart';
 import 'app/core/utils/initial_bindings.dart';
 import 'app/core/network/api_client.dart';
+import 'app/core/network/app_api_client.dart';
 import 'app/data/repositories/api_device_token_repository.dart';
 import 'app/data/repositories/device_token_repository.dart';
 import 'app/data/services/language_service.dart';
@@ -34,10 +35,7 @@ Future<void> main() async {
   // so it is a top-level function rather than a method.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseMessaging.onBackgroundMessage(soothifyBackgroundMessage);
-  Get.put(
-    ApiClient(accessToken: () => PrefUtils().accessToken),
-    permanent: true,
-  );
+  Get.put(buildApiClient(), permanent: true);
   // The Django endpoint. It holds the token locally until there is a session
   // to register it against — see ApiDeviceTokenRepository.
   Get.put<DeviceTokenRepository>(

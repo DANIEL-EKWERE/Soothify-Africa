@@ -1,3 +1,4 @@
+import 'media_item.dart';
 import 'session_offering.dart';
 
 /// A session as the server holds it: booked, paid for or finished.
@@ -85,6 +86,9 @@ class MatchedExpert {
     this.rating = 0,
     this.avatarUrl = '',
     this.matchPercent = 0,
+    this.outsideWork = '',
+    this.others = const [],
+    this.videos = const [],
   });
 
   final String id;
@@ -103,6 +107,20 @@ class MatchedExpert {
   /// hour, the language and the rating — not decoration.
   final int matchPercent;
 
+  /// "Outside of Soothify", in their own words — what they wrote on the
+  /// application form. Falls back to [interests] where an older profile has
+  /// only those.
+  final String outsideWork;
+
+  /// The rest of the ranked list, for "Other Instructor Matches". That row
+  /// drew a fixed set of asset images: the same five strangers whoever you
+  /// were matched with, and none of them bookable.
+  final List<ExpertPeer> others;
+
+  /// Their own content, for the "Trending Videos" rail under their name —
+  /// titles in the frame until now, with nothing behind them.
+  final List<MediaItem> videos;
+
   factory MatchedExpert.fromJson(Map<String, dynamic> json) => MatchedExpert(
         id: '${json['id']}',
         name: json['name'] as String? ?? '',
@@ -116,10 +134,49 @@ class MatchedExpert {
         rating: (json['rating'] as num?)?.toDouble() ?? 0,
         avatarUrl: json['avatar_url'] as String? ?? '',
         matchPercent: json['match_percent'] as int? ?? 0,
+        outsideWork: json['outside_work'] as String? ?? '',
+        others: _peers(json['others']),
+        videos: _videos(json['videos']),
       );
 
   static List<String> _strings(Object? value) =>
       value is List ? value.map((v) => '$v').toList() : const [];
+
+  static List<ExpertPeer> _peers(Object? value) => value is List
+      ? value
+          .whereType<Map<String, dynamic>>()
+          .map(ExpertPeer.fromJson)
+          .toList()
+      : const [];
+
+  static List<MediaItem> _videos(Object? value) => value is List
+      ? value
+          .whereType<Map<String, dynamic>>()
+          .map(MediaItem.fromJson)
+          .toList()
+      : const [];
+}
+
+/// One of the other people who also matched — a face and a name.
+class ExpertPeer {
+  const ExpertPeer({
+    required this.id,
+    required this.name,
+    this.avatarUrl = '',
+    this.rating = 0,
+  });
+
+  final String id;
+  final String name;
+  final String avatarUrl;
+  final double rating;
+
+  factory ExpertPeer.fromJson(Map<String, dynamic> json) => ExpertPeer(
+        id: '${json['id']}',
+        name: json['name'] as String? ?? '',
+        avatarUrl: json['avatar_url'] as String? ?? '',
+        rating: (json['rating_average'] as num?)?.toDouble() ?? 0,
+      );
 }
 
 /// One hour an expert is free, as the calendar draws it.

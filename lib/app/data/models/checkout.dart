@@ -13,10 +13,18 @@ class Checkout {
     this.dueTodayNaira = 0,
     this.trialStarted = false,
     this.cardCheckNaira = 0,
+    this.returnUrl = '',
   });
 
   final String reference;
   final String checkoutUrl;
+
+  /// The page the provider redirects to when checkout is over.
+  ///
+  /// The app opens [checkoutUrl] in a web view and watches for this, which
+  /// is how it knows to close itself. Empty on an older server, and then
+  /// the payer closes the view by hand.
+  final String returnUrl;
   final int amountNaira;
   final String checkoutId;
 
@@ -47,6 +55,7 @@ class Checkout {
         dueTodayNaira: json['due_today_naira'] as int? ?? 0,
         trialStarted: json['trial_started'] as bool? ?? false,
         cardCheckNaira: json['card_check_naira'] as int? ?? 0,
+        returnUrl: json['return_url'] as String? ?? '',
       );
 }
 

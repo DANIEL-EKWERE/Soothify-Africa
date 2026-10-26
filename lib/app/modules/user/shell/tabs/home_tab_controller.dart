@@ -9,6 +9,7 @@ import '../../../../data/models/library_section.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
+import '../../../../data/repositories/mood_repository.dart';
 import '../../../../data/repositories/profile_repository.dart';
 import '../../../../data/services/session_service.dart';
 
@@ -20,9 +21,19 @@ class HomeTabController extends BaseController {
   HomeTabController(
     this._repository, {
     ProfileRepository? profiles,
+    MoodRepository? moods,
     DateTime Function()? now,
   })  : _profiles = profiles,
+        _moods = moods,
         _now = now ?? DateTime.now;
+
+  /// The last Mood Checker result, which shapes the Recommended row.
+  ///
+  /// Optional for the same reason as [_profiles]: a test or a golden that
+  /// only cares about the rows builds this without one, and then the row is
+  /// the unshaped list -- which is what somebody who has never checked in
+  /// sees anyway.
+  final MoodRepository? _moods;
 
   /// Who is signed in, for the header. Optional: a test that only cares
   /// about the two content rows builds this without one, and the header
@@ -55,8 +66,17 @@ class HomeTabController extends BaseController {
 
   final ContentRepository _repository;
 
+  /// The row is a preview of the recommendations page, not a list of its
+  /// own: same source, same mood, so the heading "Recommended for you" is
+  /// true. Five at most -- [hasMoreRecommended] says whether to offer the
+  /// way through to the rest.
+  static const previewCount = 5;
+
   final RxList<MediaItem> recommended = <MediaItem>[].obs;
   final RxList<MediaItem> popular = <MediaItem>[].obs;
+
+  /// Whether there is more behind the row than the five it shows.
+  final RxBool hasMoreRecommended = false.obs;
 
   /// Static, not loaded — these are navigation targets.
   List<ExploreDestination> get explore => ExploreDestination.values;
@@ -99,14 +119,41 @@ class HomeTabController extends BaseController {
 
   Future<void> load() async {
     await guard(() async {
+      final mood = await _lastMood();
       final results = await Future.wait([
-        _repository.getFeatured(),
+        _repository.getRecommendations(mood: mood),
         _repository.getPopular(),
       ]);
-      recommended.assignAll(results[0]);
+      final picks = results[0];
+      recommended.assignAll(picks.take(previewCount).toList());
+      hasMoreRecommended.value = picks.length > previewCount;
       popular.assignAll(results[1]);
     });
   }
+
+  /// The mood of the last check-in, or empty if there has not been one.
+  ///
+  /// Read from the device, which is where a check-in lands first -- so a
+  /// guest who has never signed in still gets a row shaped by how they
+  /// said they felt.
+  Future<String> _lastMood() async {
+    final moods = _moods;
+    if (moods == null) return '';
+    try {
+      final today = await moods.todaysEntry();
+      if (today != null) return today.level.key;
+      final recent = await moods.history(limit: 1);
+      return recent.isEmpty ? '' : recent.first.level.key;
+    } catch (error) {
+      // No mood is a perfectly good answer; it just means the row is not
+      // shaped by one. Never worth costing somebody their home screen.
+      Log.e('could not read the last mood for Home', error: error);
+      return '';
+    }
+  }
+
+  /// "See more" under the row -- the full recommendations page.
+  void seeAllRecommended() => Get.toNamed(AppRoutes.recommendation);
 
   Future<void> reload() => load();
 

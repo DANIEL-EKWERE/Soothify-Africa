@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
+import '../../../../core/utils/media_entry.dart';
+import '../../../../data/models/booked_session.dart' show ExpertPeer;
 import '../../../../widgets/gradient_text.dart';
 import '../controller/booking_controller.dart';
 import '../../../../widgets/soothify_word.dart';
@@ -80,22 +82,33 @@ class MatchedView extends StatelessWidget {
           style: CustomTextStyles.coachSection,
         ),
         SizedBox(height: 8.v),
+        // The other people the server actually ranked. This drew a fixed
+        // set of asset portraits -- the same five strangers whoever you
+        // were paired with -- and falls back to them only when there is no
+        // server to ask, which is the no-backend build and the goldens.
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (final peer in ImageConstant.imgCoachPeers) ...[
-              ClipOval(
-                child: CustomImageView(
-                  imagePath: peer,
-                  height: 46.h,
-                  width: 46.h,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              if (peer != ImageConstant.imgCoachPeers.last)
-                SizedBox(width: 12.h),
-            ],
-          ],
+          children: coach.peers.isEmpty
+              ? [
+                  for (final peer in ImageConstant.imgCoachPeers) ...[
+                    ClipOval(
+                      child: CustomImageView(
+                        imagePath: peer,
+                        height: 46.h,
+                        width: 46.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    if (peer != ImageConstant.imgCoachPeers.last)
+                      SizedBox(width: 12.h),
+                  ],
+                ]
+              : [
+                  for (final peer in coach.peers) ...[
+                    _PeerFace(peer: peer),
+                    if (peer != coach.peers.last) SizedBox(width: 12.h),
+                  ],
+                ],
         ),
         SizedBox(height: 30.v),
         Text('About ${coach.name}', style: CustomTextStyles.matchedLead),
@@ -108,23 +121,45 @@ class MatchedView extends StatelessWidget {
         // Expertise in. The "Find <name>" row of social glyphs it used to
         // carry between the last two is gone from the frame.
         _Detail(heading: 'Expertise in', lines: coach.expertise),
-        SizedBox(height: 26.v),
-        Text(
-          '${coach.name.split(' ').first}’s Trending Videos',
-          style: CustomTextStyles.matchedLead,
-        ),
-        SizedBox(height: 16.v),
-        SizedBox(
-          height: 168.v,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.zero,
-            itemCount: coach.videoTitles.length,
-            separatorBuilder: (_, _) => SizedBox(width: 16.h),
-            itemBuilder: (context, i) =>
-                _VideoCard(title: coach.videoTitles[i]),
+        // Their own library, credited to them by the upload form's
+        // practitioner link. Left out entirely when they have published
+        // nothing: a heading over an empty rail reads as a failed load,
+        // and the frame's three placeholder cards were worse -- they named
+        // content that did not exist.
+        if (coach.videos.isNotEmpty || coach.videoTitles.isNotEmpty) ...[
+          SizedBox(height: 26.v),
+          Text(
+            '${coach.name.split(' ').first}’s Trending Videos',
+            style: CustomTextStyles.matchedLead,
           ),
-        ),
+          SizedBox(height: 16.v),
+          SizedBox(
+            height: 168.v,
+            child: coach.videos.isNotEmpty
+                ? ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.zero,
+                    itemCount: coach.videos.length,
+                    separatorBuilder: (_, _) => SizedBox(width: 16.h),
+                    itemBuilder: (context, i) => _VideoCard(
+                      title: coach.videos[i].title,
+                      coverUrl: coach.videos[i].cover,
+                      onTap: () => openMedia(
+                        coach.videos[i],
+                        source: 'Matched with ${coach.name}',
+                      ),
+                    ),
+                  )
+                : ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.zero,
+                    itemCount: coach.videoTitles.length,
+                    separatorBuilder: (_, _) => SizedBox(width: 16.h),
+                    itemBuilder: (context, i) =>
+                        _VideoCard(title: coach.videoTitles[i]),
+                  ),
+          ),
+        ],
         SizedBox(height: 34.v),
         // One action, not the old "Get started" / "Schedule for later" pair.
         _PrimaryButton(
@@ -208,21 +243,53 @@ class _Detail extends StatelessWidget {
   }
 }
 
-class _VideoCard extends StatelessWidget {
-  const _VideoCard({required this.title});
+/// One of the other people who also matched.
+class _PeerFace extends StatelessWidget {
+  const _PeerFace({required this.peer});
 
-  final String title;
+  final ExpertPeer peer;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return ClipOval(
+      child: CustomImageView(
+        // Their own portrait where they have uploaded one; the frame's
+        // first placeholder where they have not, so the row keeps its
+        // shape rather than showing a gap.
+        imagePath: peer.avatarUrl.isNotEmpty
+            ? peer.avatarUrl
+            : ImageConstant.imgCoachPeers.first,
+        height: 46.h,
+        width: 46.h,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+class _VideoCard extends StatelessWidget {
+  const _VideoCard({required this.title, this.coverUrl = '', this.onTap});
+
+  final String title;
+
+  /// The item's own cover. Empty falls back to the frame's still.
+  final String coverUrl;
+
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
       width: 206.h,
       height: 168.v,
       child: Stack(
         children: [
           Positioned.fill(
             child: CustomImageView(
-              imagePath: ImageConstant.imgCoachVideo,
+              imagePath:
+                  coverUrl.isNotEmpty ? coverUrl : ImageConstant.imgCoachVideo,
               fit: BoxFit.cover,
               radius: BorderRadius.circular(8.h),
             ),
@@ -242,6 +309,7 @@ class _VideoCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

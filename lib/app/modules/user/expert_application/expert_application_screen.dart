@@ -148,6 +148,23 @@ class _ProfileStep extends StatelessWidget {
           controller: controller.portfolio,
           keyboardType: TextInputType.url,
         ),
+        SizedBox(height: 16.v),
+        // Both optional, and both go on their profile once approved: a
+        // client picks a person, and a page with nothing of theirs on it
+        // reads as a directory entry rather than somebody to book.
+        ExpertFormField(
+          label: 'Your signature quote',
+          controller: controller.signatureQuote,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        SizedBox(height: 16.v),
+        ExpertFormField(
+          label: 'Outside Soothify',
+          controller: controller.outsideSoothify,
+          height: 120,
+          maxLines: null,
+          textCapitalization: TextCapitalization.sentences,
+        ),
       ],
     );
   }

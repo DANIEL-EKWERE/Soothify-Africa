@@ -52,6 +52,13 @@ class ExpertApplicationController extends BaseController {
   final about = TextEditingController();
   final portfolio = TextEditingController();
 
+  /// One line they stand by, and what they do when they are not
+  /// practising. Both optional, both carried onto their profile when the
+  /// application is approved -- so a new practitioner's page has their own
+  /// words on it from the first day.
+  final signatureQuote = TextEditingController();
+  final outsideSoothify = TextEditingController();
+
   // Step 2 — what they can run a session in. The question asks which
   // languages they are fluent in, plural, so more than one can be chosen.
   final RxSet<ExpertLanguage> languages = <ExpertLanguage>{}.obs;
@@ -96,6 +103,8 @@ class ExpertApplicationController extends BaseController {
       experience,
       about,
       portfolio,
+      signatureQuote,
+      outsideSoothify,
       licenceNumber,
       insurance,
     ]) {
@@ -190,6 +199,8 @@ class ExpertApplicationController extends BaseController {
           experienceYears: int.tryParse(experience.text.trim()) ?? 0,
           about: about.text,
           portfolioUrl: portfolio.text,
+          signatureQuote: signatureQuote.text,
+          outsideSoothify: outsideSoothify.text,
           licenceNumber: licenceNumber.text,
           insuranceProvider: insurance.text,
           certificationPath: certification.path,

@@ -20,6 +20,8 @@ class MockExpertApplicationRepository implements ExpertApplicationRepository {
     required int experienceYears,
     required String about,
     String portfolioUrl = '',
+    String signatureQuote = '',
+    String outsideSoothify = '',
     String licenceNumber = '',
     String insuranceProvider = '',
     required String certificationPath,

@@ -1,3 +1,5 @@
+import 'app_notification.dart';
+
 /// The expert's notification feed — Figma's expert "Notification" frame.
 ///
 /// A separate model from the client's [AppNotification]: the expert is told
@@ -28,7 +30,34 @@ class ExpertNotification {
     required this.body,
     required this.emphasis,
     this.unread = true,
+    this.id = '',
   });
+
+  /// Built from a feed row the server served.
+  ///
+  /// The expert and the client read the same endpoint -- notifications are
+  /// filed against whoever signs in -- so this is a reshaping, not a second
+  /// feed. Anything that is not a booking is drawn as a reminder rather
+  /// than dropped: this screen has two shapes and an expert missing a row
+  /// entirely is worse than one drawn with the wrong icon.
+  factory ExpertNotification.fromFeed(AppNotification row) =>
+      ExpertNotification(
+        id: row.id,
+        kind: row.kind == NotificationKind.booking
+            ? ExpertNotificationKind.booking
+            : ExpertNotificationKind.reminder,
+        // `body` on the booking rows the server writes; the social shapes
+        // put their words in `text` behind an actor, so fall through both.
+        body: row.body.isNotEmpty
+            ? row.body
+            : [row.actor, row.text].where((s) => s.isNotEmpty).join(' '),
+        emphasis: row.emphasis,
+        unread: row.unread,
+      );
+
+  /// The server's row id, so tapping one can mark it read. Empty on the
+  /// rows this app writes itself.
+  final String id;
 
   final ExpertNotificationKind kind;
 

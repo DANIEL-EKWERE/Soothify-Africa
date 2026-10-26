@@ -80,17 +80,26 @@ class ExpertNotificationsScreen
             ),
             SizedBox(height: 24.v),
             Expanded(
-              child: Obx(
-                () => ListView(
-                  padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
-                  children: [
-                    for (final item in controller.visible) ...[
-                      _Row(item: item),
-                      SizedBox(height: 12.v),
+              child: Obx(() {
+                final rows = controller.visible;
+                if (rows.isEmpty) {
+                  // Said plainly. An empty list on a screen with chips
+                  // above it reads as a screen that failed to load.
+                  return _NothingYet(waiting: !controller.loaded.value);
+                }
+                return RefreshIndicator(
+                  onRefresh: controller.load,
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
+                    children: [
+                      for (final item in rows) ...[
+                        _Row(item: item, onTap: () => controller.open(item)),
+                        SizedBox(height: 12.v),
+                      ],
                     ],
-                  ],
-                ),
-              ),
+                  ),
+                );
+              }),
             ),
           ],
         ),
@@ -99,15 +108,43 @@ class ExpertNotificationsScreen
   }
 }
 
+/// Nothing to show -- either because nothing has happened yet, or because
+/// the first load has not come back.
+class _NothingYet extends StatelessWidget {
+  const _NothingYet({required this.waiting});
+
+  final bool waiting;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.h),
+        child: Text(
+          waiting
+              ? 'Loading your notifications...'
+              : 'Nothing yet. New bookings and session reminders will '
+                  'appear here.',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.emptyStateBody,
+        ),
+      ),
+    );
+  }
+}
+
 class _Row extends StatelessWidget {
-  const _Row({required this.item});
+  const _Row({required this.item, this.onTap});
 
   final ExpertNotification item;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final split = item.body.split(item.emphasis);
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: EdgeInsets.symmetric(horizontal: 14.h, vertical: 14.v),
       decoration: BoxDecoration(
         color: appTheme.surface,
@@ -163,6 +200,7 @@ class _Row extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

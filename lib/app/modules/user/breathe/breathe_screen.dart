@@ -169,6 +169,31 @@ class _BreathCircleState extends State<_BreathCircle>
   }
 }
 
+/// Opens the weekly reminder for this habit.
+///
+/// A quiet link rather than a third button: the decision on this screen is
+/// whether to breathe now, and scheduling is the smaller errand.
+class _RemindMeDaily extends StatelessWidget {
+  const _RemindMeDaily({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: onTap,
+      child: Text(
+        'Remind me daily',
+        style: CustomTextStyles.breatheBody.copyWith(
+          color: appTheme.soothifyBlue,
+          decoration: TextDecoration.underline,
+          decorationColor: appTheme.soothifyBlue,
+        ),
+      ),
+    );
+  }
+}
+
 class _Invitation extends StatelessWidget {
   const _Invitation();
 
@@ -207,6 +232,8 @@ class _Invitation extends StatelessWidget {
             color: appTheme.soothifyBlue,
             onPressed: controller.decline,
           ),
+          SizedBox(height: 4.v),
+          _RemindMeDaily(onTap: controller.scheduleIt),
           SizedBox(height: 28.v),
         ],
       ),
@@ -295,6 +322,11 @@ class _Done extends StatelessWidget {
             color: appTheme.soothifyBlue,
             onPressed: controller.exploreClasses,
           ),
+          SizedBox(height: 4.v),
+          // Offered here too, and deliberately: somebody who has just
+          // finished one and seen their streak is the likeliest person to
+          // want tomorrow's.
+          _RemindMeDaily(onTap: controller.scheduleIt),
           SizedBox(height: 28.v),
         ],
       ),

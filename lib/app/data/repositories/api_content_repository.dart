@@ -43,10 +43,15 @@ class ApiContentRepository implements ContentRepository {
   /// "sleep_disorder" in a query string end up in access logs, proxy caches
   /// and the CDN cache key.
   @override
-  Future<List<MediaItem>> getRecommendations() async {
+  Future<List<MediaItem>> getRecommendations({String mood = ''}) async {
     final body = await _api.post(
       '/content/recommendations/',
-      body: await _questionnaire(),
+      body: {
+        ...await _questionnaire(),
+        // Sent in the body rather than the query: the questionnaire goes
+        // the same way, and a mood in a URL ends up in access logs.
+        if (mood.isNotEmpty) 'mood': mood,
+      },
     );
     final rows = body['results'] ?? body['data'] ?? body['items'];
     if (rows is! List) return const [];

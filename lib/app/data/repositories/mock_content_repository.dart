@@ -403,7 +403,7 @@ class MockContentRepository implements ContentRepository {
   /// The Recommendation page's own five cards, in the frame's order. Home's
   /// row is a different, shorter set — see [getFeatured].
   @override
-  Future<List<MediaItem>> getRecommendations() async {
+  Future<List<MediaItem>> getRecommendations({String mood = ''}) async {
     await Future<void>.delayed(_latency);
     const ids = ['3', '12', '13', '14', '3'];
     return [

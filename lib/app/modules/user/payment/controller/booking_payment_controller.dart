@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/checkout_launcher.dart';
+import '../../checkout/checkout_webview_screen.dart' show CheckoutOutcome;
 import '../../../../data/models/booked_slot.dart';
 import '../../../../data/models/coach.dart';
 import '../../../../data/models/booked_session.dart';
@@ -93,20 +94,35 @@ class BookingPaymentController extends BaseController {
       return;
     }
 
-    final opened = await CheckoutLauncher.open(checkout.checkoutUrl);
-    if (!opened) {
+    // In a web view, so the payer never leaves the app and this screen is
+    // still here to send them on to the receipt. The system browser used to
+    // take them away mid-payment and leave them to find their own way back.
+    final outcome = await CheckoutLauncher.present(
+      checkout,
+      title: 'Pay for your session',
+    );
+    if (outcome == CheckoutOutcome.failed) {
       AppFeedback.error('Could not open the payment page.');
       return;
     }
 
     paying.value = true;
-    final paid = await _waitForPayment(checkout.reference);
+    // Asked for either way. Somebody who closed the view may well have paid
+    // first, and the webhook is what decides -- but a payer who walked away
+    // should not be left watching a spinner for a minute, so that case is
+    // given one quick look rather than the full wait.
+    final paid = outcome == CheckoutOutcome.abandoned
+        ? await _waitForPayment(checkout.reference, attempts: 2)
+        : await _waitForPayment(checkout.reference);
     paying.value = false;
 
     if (!paid) {
       AppFeedback.info(
-        'We have not seen the payment yet. It will confirm here once it '
-        'lands.',
+        outcome == CheckoutOutcome.abandoned
+            ? 'That payment was not completed. Your slot is held for a '
+                'little longer if you want to try again.'
+            : 'We have not seen the payment yet. It will confirm here once '
+                'it lands.',
       );
       return;
     }
@@ -120,8 +136,8 @@ class BookingPaymentController extends BaseController {
   ///
   /// Bounded: a payment that has not landed in a minute has probably been
   /// abandoned, and the session keeps its hold either way.
-  Future<bool> _waitForPayment(String reference) async {
-    for (var attempt = 0; attempt < 12; attempt++) {
+  Future<bool> _waitForPayment(String reference, {int attempts = 12}) async {
+    for (var attempt = 0; attempt < attempts; attempt++) {
       await Future<void>.delayed(const Duration(seconds: 5));
       final status = await guard(
         () => _billing.paymentStatus(reference),

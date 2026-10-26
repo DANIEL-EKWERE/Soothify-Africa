@@ -74,6 +74,10 @@ dependencies:
   # device and a stale token can be told apart from a reinstall.
   device_info_plus: ^11.2.0
   url_launcher: ^6.3.2
+  # Checkout, inside the app. The payer used to be handed to the system
+  # browser, which backgrounded the app mid-payment and left them to find
+  # their own way back -- so the receipt screen was often never reached.
+  webview_flutter: ^4.10.0
   just_audio: ^0.10.6
   video_player: ^2.11.1
 

@@ -15,7 +15,11 @@ abstract class ContentRepository {
 
   /// The full "Recommended for you" page. A different, longer set than
   /// [getFeatured], which backs Home's preview row.
-  Future<List<MediaItem>> getRecommendations();
+  ///
+  /// [mood] is a Mood Checker result -- a `MoodLevel.key`. Given one, the
+  /// server leads with what staff tagged for that mood and pads with
+  /// untagged picks, never with content tagged for a different mood.
+  Future<List<MediaItem>> getRecommendations({String mood});
 
   /// Home's "Popular Content" row, and Discovery's.
   ///

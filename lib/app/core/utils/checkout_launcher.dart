@@ -1,13 +1,23 @@
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/models/checkout.dart';
+import '../../modules/user/checkout/checkout_webview_screen.dart';
+import '../../routes/app_routes.dart';
 import 'logger.dart';
+import 'package:get/get.dart';
 
 /// Opens a provider's checkout page.
 ///
-/// A thin wrapper so a test can replace it, and so nothing else in the app
-/// has to know which plugin does the opening. Externally, not in a web view:
-/// a card form inside the app looks exactly like a phishing screen, and a
-/// bank's 3-D Secure step often refuses to run in one.
+/// In a web view, inside the app. The system browser was the earlier
+/// choice, on the reasoning that a card form inside an app looks like a
+/// phishing screen and that 3-D Secure often refuses to run in one -- both
+/// true, and both outweighed by what actually happened: the app went to the
+/// background mid-payment, the payer was left on a Bachs page with no way
+/// back, and the receipt screen was never reached.
+///
+/// The view is plain chrome with a close button, loads one URL and reads
+/// nothing. If it cannot load the page at all, [present] still falls back
+/// to the browser rather than stranding anybody.
 class CheckoutLauncher {
   const CheckoutLauncher._();
 
@@ -15,6 +25,45 @@ class CheckoutLauncher {
   static Future<bool> Function(String url) opener = _open;
 
   static Future<bool> open(String url) => opener(url);
+
+  /// Replaced in tests, which have no navigator to push a web view onto.
+  static Future<CheckoutOutcome> Function(Checkout checkout, String title)
+      presenter = _present;
+
+  /// Shows checkout and waits for it to close.
+  ///
+  /// The outcome says how it ended, never whether money moved: the payer
+  /// reaching the return page means the provider is finished with them, and
+  /// only the server's webhook says a payment arrived.
+  static Future<CheckoutOutcome> present(
+    Checkout checkout, {
+    String title = 'Payment',
+  }) =>
+      presenter(checkout, title);
+
+  static Future<CheckoutOutcome> _present(
+    Checkout checkout,
+    String title,
+  ) async {
+    final outcome = await Get.toNamed<dynamic>(
+      AppRoutes.checkoutWebView,
+      arguments: <String, dynamic>{
+        'url': checkout.checkoutUrl,
+        'returnUrl': checkout.returnUrl,
+        'title': title,
+      },
+    );
+
+    if (outcome is CheckoutOutcome && outcome != CheckoutOutcome.failed) {
+      return outcome;
+    }
+
+    // The web view could not load it -- an old Android System WebView, or a
+    // provider page that refuses to frame. Better the browser than nothing.
+    Log.e('checkout web view failed; falling back to the browser');
+    final opened = await open(checkout.checkoutUrl);
+    return opened ? CheckoutOutcome.returned : CheckoutOutcome.failed;
+  }
 
   static Future<bool> _open(String url) async {
     final uri = Uri.tryParse(url);

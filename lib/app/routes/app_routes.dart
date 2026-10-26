@@ -168,6 +168,9 @@ class AppRoutes {
   /// "Push Notification" section, `313:25770` onward.
   static const String breathe = '/breathe';
 
+  /// Provider checkout, in a web view rather than the system browser.
+  static const String checkoutWebView = '/checkout/web';
+
   /// The Corporate enquiry — Figma `259:36101`, and its success card
   /// `259:36093`. Reached from "Speak with Corporate Team" on Plans.
   /// The Settings sub-screens — Figma `259:37602` (subscription), `259:37589`

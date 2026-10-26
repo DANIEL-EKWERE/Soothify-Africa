@@ -15,8 +15,7 @@ class MoodRecommendationController extends BaseController {
 
   final ContentRepository _content;
 
-  /// Which of the ten the user landed on. Decides the copy, and will decide
-  /// the picks once the API can filter by mood.
+  /// Which of the ten the user landed on. Decides the copy and the picks.
   final MoodLevel level;
 
   final RxList<MediaItem> items = <MediaItem>[].obs;
@@ -31,10 +30,11 @@ class MoodRecommendationController extends BaseController {
   }
 
   Future<void> load() => guard(() async {
-        // Three cards, as every one of the ten frames draws. The picks are
-        // not mood-filtered yet: the repository has no mood dimension, and
-        // inventing one would fake a personalisation that is not there.
-        final all = await _content.getRecommendations();
+        // Three cards, as every one of the ten frames draws -- now actually
+        // picked for the mood. Staff tag each piece with the moods it
+        // suits; where nothing is tagged yet the server pads with untagged
+        // picks, so this is never an empty screen.
+        final all = await _content.getRecommendations(mood: level.key);
         items.assignAll(all.take(3));
       });
 

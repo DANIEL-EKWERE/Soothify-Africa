@@ -18,6 +18,8 @@ class ApiExpertApplicationRepository implements ExpertApplicationRepository {
     required int experienceYears,
     required String about,
     String portfolioUrl = '',
+    String signatureQuote = '',
+    String outsideSoothify = '',
     String licenceNumber = '',
     String insuranceProvider = '',
     required String certificationPath,
@@ -30,6 +32,10 @@ class ApiExpertApplicationRepository implements ExpertApplicationRepository {
         'experience_years': '$experienceYears',
         'bio': about.trim(),
         if (portfolioUrl.trim().isNotEmpty) 'portfolio_url': portfolioUrl.trim(),
+        if (signatureQuote.trim().isNotEmpty)
+          'signature_quote': signatureQuote.trim(),
+        if (outsideSoothify.trim().isNotEmpty)
+          'outside_soothify': outsideSoothify.trim(),
         if (licenceNumber.trim().isNotEmpty)
           'licence_number': licenceNumber.trim(),
         if (insuranceProvider.trim().isNotEmpty)

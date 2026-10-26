@@ -21,6 +21,8 @@ class ShellBinding extends Bindings {
     Get.lazyPut(() => HomeTabController(
           Get.find<ContentRepository>(),
           profiles: Get.find<ProfileRepository>(),
+          // So the Recommended row is shaped by the last check-in.
+          moods: Get.find<MoodRepository>(),
         ));
     // The Home tab links straight into the mood checker, so its controller
     // must be resolvable from here too.

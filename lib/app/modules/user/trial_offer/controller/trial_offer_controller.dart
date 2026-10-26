@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/checkout_launcher.dart';
+import '../../checkout/checkout_webview_screen.dart' show CheckoutOutcome;
 import '../../../../data/models/membership.dart';
 import '../../../../data/repositories/billing_repository.dart';
 
@@ -167,18 +168,24 @@ class TrialOfferController extends BaseController {
       return;
     }
 
-    final opened = await CheckoutLauncher.open(checkout.checkoutUrl);
-    if (!opened) {
+    // Same web view as the booking flow, for the same reason: the payer
+    // stays in the app, so this screen is still here afterwards.
+    final outcome = await CheckoutLauncher.present(
+      checkout,
+      title: 'Start your free week',
+    );
+    if (outcome == CheckoutOutcome.failed) {
       AppFeedback.error('Could not open the payment page.');
       return;
     }
 
+    // Still the webhook that decides, so this says what is pending rather
+    // than announcing a trial that has not begun.
     AppFeedback.info(
       checkout.cardCheckNaira > 0
-          ? 'Finish in the browser. Your week starts as soon as the card is '
-              'confirmed, and the ₦${checkout.cardCheckNaira} goes back.'
-          : 'Finish in the browser. Your trial starts as soon as the card is '
-              'confirmed.',
+          ? 'Your week starts as soon as the card is confirmed, and the '
+              '₦${checkout.cardCheckNaira} goes back.'
+          : 'Your trial starts as soon as the card is confirmed.',
     );
   }
 }

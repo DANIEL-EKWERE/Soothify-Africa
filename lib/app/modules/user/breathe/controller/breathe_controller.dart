@@ -2,6 +2,7 @@ import 'dart:async';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/app_tab.dart';
+import '../../../../data/models/checkin_kind.dart';
 import '../../../../data/repositories/breathing_repository.dart';
 import '../../../../data/repositories/local_breathing_repository.dart';
 import '../../shell/controller/shell_controller.dart';
@@ -139,6 +140,18 @@ class BreatheController extends GetxController {
     phase.value = BreathePhase.done;
     streak.value = (await _breathing.recordMinute(seconds: total)).streak;
   }
+
+  /// "Remind me daily" — the reminder screen, for this habit.
+  ///
+  /// The minute was reachable only by tapping a notification somebody else
+  /// decided to send. This is where they decide instead: the same weekly
+  /// reminder the other daily habits use, which the app re-arms at launch
+  /// (see PushService.rearmSavedReminders) because Android drops alarms
+  /// when an app is force-stopped.
+  void scheduleIt() => Get.toNamed(
+        AppRoutes.dailyReminder,
+        arguments: CheckinKind.breathing,
+      );
 
   /// "Not right now" — leaves without starting anything.
   void decline() => Get.back();

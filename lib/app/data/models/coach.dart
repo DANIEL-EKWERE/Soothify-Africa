@@ -1,4 +1,5 @@
 import 'booked_session.dart';
+import 'media_item.dart';
 
 /// The wellness coach a booking is matched with — Figma "Matched with
 /// instructor" (135:20932).
@@ -15,7 +16,9 @@ class Coach {
     required this.quote,
     required this.outside,
     required this.expertise,
-    required this.videoTitles,
+    this.videoTitles = const [],
+    this.videos = const [],
+    this.peers = const [],
     this.avatarUrl = '',
   });
 
@@ -36,7 +39,19 @@ class Coach {
   final List<String> outside;
 
   final List<String> expertise;
+
+  /// The frame's own trending titles, with nothing behind them. Kept for
+  /// [sample] and the no-backend build; [videos] is what the server sends.
   final List<String> videoTitles;
+
+  /// Their library, credited to them by the upload form's practitioner
+  /// link. Empty where they have published nothing yet, and then the row is
+  /// left out rather than drawn with placeholders.
+  final List<MediaItem> videos;
+
+  /// The others who also matched, for the row of faces. Empty falls back to
+  /// the frame's asset portraits.
+  final List<ExpertPeer> peers;
 
   /// Their portrait, where the server has one. Empty falls back to the
   /// frame's own photo.
@@ -57,13 +72,18 @@ class Coach {
       blurb: match.bio.isNotEmpty ? match.bio : match.headline,
       feelings: feelings,
       quote: match.quote,
-      // "Outside of Soothify" is what they are into, which is what the
-      // profile's interests are.
-      outside: match.interests,
+      // Their own words from the application form, where there are any.
+      // Older profiles have only the interests list, which is what this
+      // read before the form asked the question.
+      outside: match.outsideWork.isNotEmpty
+          ? [match.outsideWork]
+          : match.interests,
       expertise: match.disciplines.map(_titled).toList(),
-      // The trending row has no content behind it yet -- these are titles
-      // in the frame, not items in the library.
-      videoTitles: const [],
+      // Their actual library, credited to them by the upload form's
+      // practitioner link. The row used to draw the frame's own titles
+      // with nothing behind them.
+      videos: match.videos,
+      peers: match.others,
       avatarUrl: match.avatarUrl,
     );
   }

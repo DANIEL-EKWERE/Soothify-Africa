@@ -59,9 +59,16 @@ class HabitReminder {
 /// Here rather than on the screen's controller because the app re-arms
 /// saved reminders at launch, long before any screen exists — and both
 /// paths must produce the same notification.
-String reminderTitleFor(CheckinKind kind) =>
-    '${kind.title.replaceFirst('Daily ', '')} Check-In';
+String reminderTitleFor(CheckinKind kind) => switch (kind) {
+      // Not a check-in -- it is a minute of breathing, and calling it one
+      // would read as another form to fill in.
+      CheckinKind.breathing => 'Time to breathe',
+      _ => '${kind.title.replaceFirst('Daily ', '')} Check-In',
+    };
 
-String reminderBodyFor(CheckinKind kind) =>
-    'Time for your ${kind.title.replaceFirst('Daily ', '').toLowerCase()} '
-    'check-in.';
+String reminderBodyFor(CheckinKind kind) => switch (kind) {
+      CheckinKind.breathing =>
+        'Sixty seconds to step away from the noise.',
+      _ => 'Time for your '
+          '${kind.title.replaceFirst('Daily ', '').toLowerCase()} check-in.',
+    };

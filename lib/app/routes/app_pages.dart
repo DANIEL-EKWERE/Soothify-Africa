@@ -46,6 +46,7 @@ import '../modules/user/booking_calendar/binding/booking_calendar_binding.dart';
 import '../modules/user/booking_calendar/booking_calendar_screen.dart';
 import '../modules/user/booking_calendar/booking_confirmed_screen.dart';
 import '../modules/user/breathe/binding/breathe_binding.dart';
+import '../modules/user/checkout/checkout_webview_screen.dart';
 import '../modules/user/breathe/breathe_screen.dart';
 import '../modules/user/trial_offer/binding/trial_offer_binding.dart';
 import '../modules/user/trial_offer/trial_offer_screen.dart';
@@ -327,7 +328,9 @@ class AppPages {
     GetPage(
       name: AppRoutes.expertNotifications,
       page: () => const ExpertNotificationsScreen(),
-      binding: BindingsBuilder.put(ExpertNotificationsController.new),
+      binding: BindingsBuilder.put(
+        () => ExpertNotificationsController(Get.find<NotificationRepository>()),
+      ),
     ),
     GetPage(
       name: AppRoutes.expertCall,
@@ -468,6 +471,18 @@ class AppPages {
       name: AppRoutes.subscriptionOffer,
       page: () => const TrialOfferScreen(),
       binding: TrialOfferBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.checkoutWebView,
+      page: () {
+        final args = Get.arguments;
+        final map = args is Map<String, dynamic> ? args : const <String, dynamic>{};
+        return CheckoutWebViewScreen(
+          checkoutUrl: map['url'] as String? ?? '',
+          returnUrl: map['returnUrl'] as String? ?? '',
+          title: map['title'] as String? ?? 'Payment',
+        );
+      },
     ),
     GetPage(
       name: AppRoutes.breathe,

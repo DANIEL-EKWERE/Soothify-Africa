@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../core/utils/checkout_launcher.dart';
+import '../../checkout/checkout_webview_screen.dart' show CheckoutOutcome;
 import '../../../../data/models/checkout.dart';
 import '../../../../data/models/membership.dart';
 import '../../../../data/repositories/billing_repository.dart';
@@ -184,17 +185,20 @@ class SubscriptionManageController extends BaseController {
       return;
     }
 
-    final opened = await CheckoutLauncher.open(checkout.checkoutUrl);
-    if (!opened) {
+    final outcome = await CheckoutLauncher.present(
+      checkout,
+      title: 'Update your card',
+    );
+    if (outcome == CheckoutOutcome.failed) {
       AppFeedback.error('Could not open the payment page.');
       return;
     }
 
     AppFeedback.info(
       checkout.cardCheckNaira > 0
-          ? 'Finish in the browser. We take ₦${checkout.cardCheckNaira} to '
-              'check the new card and send it straight back.'
-          : 'Finish in the browser to change your card.',
+          ? 'We take ₦${checkout.cardCheckNaira} to check the new card and '
+              'send it straight back.'
+          : 'Your card is updated once the change is confirmed.',
     );
   }
 

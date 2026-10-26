@@ -62,6 +62,9 @@ class ProfileTabController extends BaseController {
           CheckinKind.mood => AppRoutes.checkin,
           CheckinKind.journal => AppRoutes.journal,
           CheckinKind.meditation || CheckinKind.balance => AppRoutes.daily,
+          // Straight into the minute. There is no history screen behind it
+          // and no reminder to set up, so the card is the whole way in.
+          CheckinKind.breathing => AppRoutes.breathe,
         },
         arguments: kind,
       );

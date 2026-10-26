@@ -34,6 +34,9 @@ NotificationPreference? preferenceFor(CheckinKind kind) => switch (kind) {
   CheckinKind.balance => NotificationPreference.balance,
   CheckinKind.mood => NotificationPreference.mood,
   CheckinKind.journal => null,
+  // No server-side preference of its own; the breathe push rides on the
+  // daily reminders the user has already consented to.
+  CheckinKind.breathing => null,
 };
 
 /// The channel a push lands on. Declared once and created at startup,

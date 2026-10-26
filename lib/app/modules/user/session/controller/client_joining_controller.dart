@@ -62,6 +62,7 @@ class ClientJoiningController extends GetxController {
         offering: _invite?.offering ?? SessionOffering.therapy,
         stage: BookingStage.call,
         mode: cameraOn.value ? CallMode.video : CallMode.phone,
+        sessionId: _invite?.sessionId ?? '',
       ),
     );
   }

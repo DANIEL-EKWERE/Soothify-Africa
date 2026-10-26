@@ -18,6 +18,7 @@ class BookingBinding extends Bindings {
             offering: args.offering,
             startAt: args.stage,
             startMode: args.mode,
+            sessionId: args.sessionId,
             bookings: Get.find<BookingRepository>(),
             kyc: Get.find<KycRepository>(),
           );

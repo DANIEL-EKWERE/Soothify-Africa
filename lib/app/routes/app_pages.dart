@@ -124,6 +124,7 @@ import '../modules/user/filters/filters_screen.dart';
 import '../../app/data/models/media_filter.dart';
 import '../modules/user/library/binding/library_binding.dart';
 import '../modules/user/media/binding/media_binding.dart';
+import '../modules/user/media/fullscreen_video_screen.dart';
 import '../modules/user/media/media_screen.dart';
 import '../modules/user/shelf/binding/shelf_binding.dart';
 import '../modules/user/shelf/shelf_screen.dart';
@@ -285,6 +286,12 @@ class AppPages {
       name: AppRoutes.media,
       page: () => const MediaScreen(),
       binding: MediaBinding(),
+    ),
+    GetPage(
+      // No binding: it plays the controller the media screen beneath it
+      // owns, which is what keeps it the same playback.
+      name: AppRoutes.mediaFullscreen,
+      page: () => const FullscreenVideoScreen(),
     ),
     // Three routes, one screen: the sheets differ only in their body, and
     // FiltersBinding creates the shared controller on whichever is entered

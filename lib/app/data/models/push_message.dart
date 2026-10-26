@@ -66,6 +66,8 @@ PushDestination destinationFor(Map<String, dynamic> data) {
           // be empty rather than "null".
           time: text('time'),
           date: text('date'),
+          // What the rating at the end of the call is filed against.
+          sessionId: text('session_id'),
         ),
       );
 

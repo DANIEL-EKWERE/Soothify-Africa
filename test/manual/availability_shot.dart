@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
@@ -8,12 +7,15 @@ import 'package:soothifyafrica/app/data/repositories/mock_expert_repository.dart
 import 'package:soothifyafrica/app/modules/practitioner/availability/expert_availability_screen.dart';
 import 'package:soothifyafrica/app/modules/practitioner/dashboard/controller/expert_dashboard_controller.dart';
 
-import 'helpers.dart';
+import '../helpers.dart';
 
-/// Update Availability, with and without hours set.
+/// Update Availability, with and without hours set -- a screenshot, not a
+/// check. Deliberately outside the suite: named `_test.dart` under `test/`
+/// it was collected by `flutter test`, where it never finished and left the
+/// whole run hanging after all 746 others had reported.
 ///
-/// Regenerate with:
-///   flutter test --update-goldens test/availability_shot_test.dart
+/// Run it on its own:
+///   flutter test --update-goldens test/manual/availability_shot.dart
 class _NoSlots extends MockExpertRepository {
   _NoSlots({super.now});
 

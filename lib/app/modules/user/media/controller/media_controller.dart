@@ -7,6 +7,7 @@ import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
+import '../../../../data/services/video_pip_service.dart';
 
 /// Backs the media detail screen — Figma "Meditation" (135:12484, and
 /// 135:12373 for the not-yet-playing preview state).
@@ -134,10 +135,25 @@ class MediaController extends BaseController {
   /// VideoPlayerController reports through a listener rather than streams,
   /// so position, playing and completion all come off the one tick.
   Future<void> _openVideo() async {
-    final player = _video =
+    // The floating window may already be playing this very item: take its
+    // player back rather than opening a second one, so reopening the screen
+    // carries on from where the window had it.
+    final handed = videoPip.release(item.id);
+    if (handed == null) {
+      // A different video is floating: end it rather than leave it playing
+      // unseen behind this screen. The window hides itself here, which
+      // would otherwise make it an invisible second soundtrack.
+      videoPip.close();
+    }
+    final player = _video = handed ??
         VideoPlayerController.networkUrl(Uri.parse(item.remoteUrl));
     _playerBuilt = true;
     player.addListener(_onVideoTick);
+    if (handed != null) {
+      _onVideoTick();
+      ready.value = true;
+      return;
+    }
 
     final opened = await guard(() async {
       await player.initialize();
@@ -206,6 +222,20 @@ class MediaController extends BaseController {
     });
   }
 
+  /// Straight to a point, for the scrub bar. [seekBy] is the ±10 buttons.
+  Future<void> seekTo(Duration target) async {
+    final clamped = target < Duration.zero
+        ? Duration.zero
+        : (target > total ? total : target);
+    position.value = clamped;
+    if (!ready.value) return;
+    if (isVideo) {
+      await _video?.seekTo(clamped);
+    } else {
+      await _player.seek(clamped);
+    }
+  }
+
   Future<void> seekBy(Duration delta) async {
     final next = position.value + delta;
     final target = next < Duration.zero
@@ -220,11 +250,34 @@ class MediaController extends BaseController {
     }
   }
 
+  /// What this person gave it, 0 until they do. Distinct from [rating],
+  /// which is everybody's average and is what the meta line prints.
+  final RxInt myRating = 0.obs;
+
+  /// True while a rating is in flight, so the row cannot be tapped into a
+  /// second request before the first has answered.
+  final RxBool sending = false.obs;
+
   /// One to five stars, kept by the server against this person — rating it
   /// again changes their score rather than adding a second one.
   Future<void> rate(int stars) async {
-    final average = await guard(() => _content.rate(item.id, stars));
-    if (average == null) return;
+    if (sending.value) return;
+    sending.value = true;
+    // Filled straight away: the request is a round trip, and a star that
+    // only lights once the server answers reads as a tap that missed.
+    final was = myRating.value;
+    myRating.value = stars;
+    final average = await guard(
+      () => _content.rate(item.id, stars),
+      setLoading: false,
+    );
+    sending.value = false;
+    if (average == null) {
+      // guard has already said so; put the row back to what the server
+      // still holds rather than leaving a score that did not take.
+      myRating.value = was;
+      return;
+    }
     rating.value = average;
     AppFeedback.info('Thanks — that helps us recommend better.');
   }
@@ -260,7 +313,14 @@ class MediaController extends BaseController {
     _video = null;
     if (video != null) {
       video.removeListener(_onVideoTick);
-      video.dispose();
+      if (video.value.isInitialized && video.value.isPlaying) {
+        // Still playing when the screen went: hand it to the floating
+        // window rather than ending it. Leaving halfway through a video
+        // used to stop it dead.
+        videoPip.adopt(video, item, from: source);
+      } else {
+        video.dispose();
+      }
     } else if (_playerBuilt) {
       _player.dispose();
     }

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 import '../modules/user/ai_hub/controller/ai_hub_controller.dart';
 import '../modules/user/shell/widgets/app_bottom_nav.dart';
+import '../data/services/video_pip_service.dart';
 import 'ai_assist_button.dart';
 import 'ai_mini_player.dart';
+import 'video_pip_window.dart';
 
 /// Holds the AI Therapy Assist button above the whole app.
 ///
@@ -72,6 +74,12 @@ class AiAssistOverlay extends StatelessWidget {
                 builder: (context, constraints) => Obx(
                   () => Stack(
                     children: [
+                      // The video that outlived its screen. Over the
+                      // navigator for the same reason the assist button is:
+                      // it has to survive the pop that created it.
+                      if (videoPip.showing &&
+                          route.value != AppRoutes.media)
+                        VideoPipWindow(bounds: constraints.biggest),
                       if (expanded.value)
                         Positioned(
                           top: 16.v,

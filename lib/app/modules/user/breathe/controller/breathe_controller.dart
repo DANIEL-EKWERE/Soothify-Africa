@@ -2,6 +2,8 @@ import 'dart:async';
 
 import '../../../../core/app_export.dart';
 import '../../../../data/models/app_tab.dart';
+import '../../../../data/repositories/breathing_repository.dart';
+import '../../../../data/repositories/local_breathing_repository.dart';
 import '../../shell/controller/shell_controller.dart';
 
 /// Where the minute has got to — Figma draws each as its own frame.
@@ -45,7 +47,16 @@ enum BreatheCue {
 /// — so the cues below are a 4-2-6 cycle of this app's own, with the one line
 /// the readable frame carries kept verbatim.
 class BreatheController extends GetxController {
-  BreatheController({this.total = 60});
+  BreatheController({this.total = 60, BreathingRepository? breathing})
+      : _breathing = breathing ??
+            (Get.isRegistered<BreathingRepository>()
+                ? Get.find<BreathingRepository>()
+                // A golden or a widget test reaches this screen without the
+                // app's bindings. The device-only store needs no network and
+                // no account, so the clock still runs.
+                : LocalBreathingRepository());
+
+  final BreathingRepository _breathing;
 
   /// The minute the design asks for.
   final int total;
@@ -64,7 +75,15 @@ class BreatheController extends GetxController {
   void onInit() {
     super.onInit();
     remaining.value = total;
-    streak.value = PrefUtils().breatheStreak();
+    _load();
+  }
+
+  /// The streak as it stands. The device answers first, so the number is
+  /// right before any network call finishes; the account can only raise it,
+  /// which is what makes a reinstall keep somebody's forty days.
+  Future<void> _load() async {
+    final state = await _breathing.state();
+    streak.value = state.streak;
   }
 
   @override
@@ -118,7 +137,7 @@ class BreatheController extends GetxController {
     _tick?.cancel();
     remaining.value = 0;
     phase.value = BreathePhase.done;
-    streak.value = await PrefUtils().recordBreatheDay();
+    streak.value = (await _breathing.recordMinute(seconds: total)).streak;
   }
 
   /// "Not right now" — leaves without starting anything.

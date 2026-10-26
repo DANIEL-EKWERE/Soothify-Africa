@@ -113,6 +113,10 @@ class AppRoutes {
   /// the card was tapped on.
   static const String media = '/media';
 
+  /// The same player, landscape and edge to edge. Pushed over [media], so
+  /// it finds the controller that screen already built.
+  static const String mediaFullscreen = '/media/fullscreen';
+
   /// A section's pre-booking questionnaire. Takes a [WellnessTrack] argument;
   /// shown once per track, then skipped.
   static const String wellnessKyc = '/wellness-kyc';

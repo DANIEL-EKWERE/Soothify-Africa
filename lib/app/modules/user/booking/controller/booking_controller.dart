@@ -32,10 +32,15 @@ class BookingEntry {
     required this.offering,
     required this.stage,
     this.mode,
+    this.sessionId = '',
   });
 
   final SessionOffering offering;
   final BookingStage stage;
+
+  /// The session being joined, so the stars at the end of it can be filed
+  /// against it. Empty when the caller has no id — see SessionInvite.
+  final String sessionId;
 
   /// Voice or video, where the caller already knows. The waiting room does:
   /// its camera toggle is the choice, made before the call opens. Null leaves
@@ -54,12 +59,19 @@ class BookingController extends GetxController {
     this.offering,
     this.startAt,
     CallMode? startMode,
+    String sessionId = '',
     BookingRepository? bookings,
     KycRepository? kyc,
   })  : _matchDuration = matchDuration ?? const Duration(seconds: 3),
         _startMode = startMode,
+        _sessionId = sessionId,
         _bookings = bookings,
         _kyc = kyc;
+
+  /// Which session the stars at the end belong to. Empty when the flow was
+  /// entered without one, and then the review is kept on the device rather
+  /// than filed against the wrong session.
+  final String _sessionId;
 
   /// Who to match with. Optional: without it the screen shows the frame's
   /// own coach, which is what the goldens are drawn against and what the
@@ -291,13 +303,48 @@ class BookingController extends GetxController {
 
   bool get canPost => feedback.text.trim().isNotEmpty;
 
+  /// True while the review is in flight, so a second tap cannot send it
+  /// twice.
+  final RxBool posting = false.obs;
+
   /// Posting the review ends on its own success screen rather than dropping
   /// the user back on the dashboard with a toast — the same acknowledgement
   /// the booking chain ends with, so finishing a session reads like finishing
-  /// one. Nothing is sent yet; there is no feedback service.
-  void post() {
-    if (!canPost) return;
-    stage.value = BookingStage.thanks;
+  /// one.
+  ///
+  /// The stars and the words go to the server together: the frame asks for
+  /// the rating first and the review after, but they are one answer about
+  /// one session. They used to go nowhere at all — this screen collected
+  /// both and advanced, while the endpoint and the repository call sat
+  /// written and unused.
+  Future<void> post() async {
+    if (!canPost || posting.value) return;
+
+    final bookings = _bookings;
+    if (_sessionId.isEmpty || bookings == null) {
+      // Nothing to file it against: the in-app feed builds its invites out
+      // of notification copy and carries no session id. Keeping the user
+      // here would punish them for that, so the thanks screen still shows.
+      stage.value = BookingStage.thanks;
+      return;
+    }
+
+    posting.value = true;
+    try {
+      await bookings.rate(
+        _sessionId,
+        rating.value,
+        feedback: feedback.text.trim(),
+      );
+      stage.value = BookingStage.thanks;
+    } on AppException catch (e) {
+      // Said, not swallowed: a review that did not reach the expert is
+      // worth knowing about, and the button stays where it was so it can
+      // be pressed again.
+      AppFeedback.error(e);
+    } finally {
+      posting.value = false;
+    }
   }
 
   /// The success screen's countdown has run out.

@@ -265,6 +265,7 @@ void main() {
       [
         'Manage subscription',
         'Care & protection hub',
+        'Favourites',
         'Light Mode',
         'Change Language',
         'Notifications',
@@ -287,6 +288,7 @@ void main() {
       [
         'Manage subscription',
         'Account',
+        'Favourites',
         'Light Mode',
         'Change Language',
         'Notifications',

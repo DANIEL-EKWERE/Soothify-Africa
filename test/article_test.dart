@@ -98,6 +98,9 @@ void main() {
       description: 'Written this morning by the team.',
       type: MediaType.article,
       durationSeconds: 0,
+      // A cover it can actually load: with none, the reader asks for an
+      // empty path and the image service throws into the test.
+      coverAsset: 'assets/images/explore/meditation.png',
     );
 
     await mount(tester, edited);

@@ -666,21 +666,35 @@ class _FeedbackStageState extends State<_FeedbackStage> {
         SizedBox(height: 24.v),
         Align(
           alignment: Alignment.centerRight,
-          child: InkWell(
-            onTap: controller.post,
-            borderRadius: BorderRadius.circular(8.h),
-            child: Container(
-              width: 89.h,
-              height: 42.v,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: appTheme.surface,
-                borderRadius: BorderRadius.circular(8.h),
-              ),
-              child: GradientText(
-                'Post',
-                gradient: appTheme.navActiveGradient,
-                style: CustomTextStyles.appBarTitle,
+          // The review is a round trip now, so the button has to say it is
+          // doing something — pressing Post and watching nothing happen is
+          // how a review gets written twice.
+          child: Obx(
+            () => InkWell(
+              onTap: controller.posting.value ? null : controller.post,
+              borderRadius: BorderRadius.circular(8.h),
+              child: Container(
+                width: 89.h,
+                height: 42.v,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: appTheme.surface,
+                  borderRadius: BorderRadius.circular(8.h),
+                ),
+                child: controller.posting.value
+                    ? SizedBox(
+                        height: 18.h,
+                        width: 18.h,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.h,
+                          color: appTheme.soothifyBlue,
+                        ),
+                      )
+                    : GradientText(
+                        'Post',
+                        gradient: appTheme.navActiveGradient,
+                        style: CustomTextStyles.appBarTitle,
+                      ),
               ),
             ),
           ),

@@ -9,6 +9,7 @@ import 'pref_utils.dart';
 import '../../data/repositories/api_auth_repository.dart';
 import '../../data/repositories/api_billing_repository.dart';
 import '../../data/repositories/api_booking_repository.dart';
+import '../../data/repositories/api_breathing_repository.dart';
 import '../../data/repositories/api_content_repository.dart';
 import '../../data/repositories/api_corporate_repository.dart';
 import '../../data/repositories/api_journal_repository.dart';
@@ -21,11 +22,13 @@ import '../../data/repositories/api_spaces_repository.dart';
 import '../../data/repositories/api_subscription_repository.dart';
 import '../../data/repositories/billing_repository.dart';
 import '../../data/repositories/booking_repository.dart';
+import '../../data/repositories/breathing_repository.dart';
 import '../../data/repositories/corporate_repository.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/repositories/content_repository.dart';
 import '../../data/repositories/expert_application_repository.dart';
 import '../../data/repositories/local_auth_repository.dart';
+import '../../data/repositories/local_breathing_repository.dart';
 import '../../data/repositories/mock_expert_application_repository.dart';
 import '../../data/repositories/journal_repository.dart';
 import '../../data/repositories/local_journal_repository.dart';
@@ -50,6 +53,7 @@ import '../../data/repositories/api_recommendation_repository.dart';
 import '../../data/repositories/mock_recommendation_repository.dart';
 import '../../data/repositories/recommendation_repository.dart';
 import '../../data/repositories/syncing_kyc_repository.dart';
+import '../../data/repositories/syncing_breathing_repository.dart';
 import '../../data/repositories/syncing_mood_repository.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/repositories/subscription_repository.dart';
@@ -143,6 +147,20 @@ class InitialBindings extends Bindings {
               signedIn: () => PrefUtils().accessToken.isNotEmpty,
             )
           : LocalKycRepository(),
+      fenix: true,
+    );
+
+    // The breathing streak, same shape: the minute is finished whether or
+    // not the network agrees, and the account is what carries the streak to
+    // a new phone. A guest still gets one, on the device alone.
+    Get.lazyPut<BreathingRepository>(
+      () => useApi
+          ? SyncingBreathingRepository(
+              LocalBreathingRepository(),
+              ApiBreathingRepository(api),
+              signedIn: () => PrefUtils().accessToken.isNotEmpty,
+            )
+          : LocalBreathingRepository(),
       fenix: true,
     );
 

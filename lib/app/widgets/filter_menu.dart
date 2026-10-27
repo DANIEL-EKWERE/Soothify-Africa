@@ -10,13 +10,18 @@ typedef FilterMenuItem = (String label, String route);
 /// Balance copy (`259:48832`).
 ///
 /// 178x172 at an 8 radius, hung off the glyph's right edge and overlapping
-/// the bottom of the search row, with four 133x27 pills 8 apart inside 20 of
+/// the bottom of the search row, with 133x27 pills 8 apart inside 20 of
 /// padding. The frames give the glyph no other behaviour, so this is the only
-/// way into the three filter sheets — they no longer link to each other.
+/// way into the filter sheets — they no longer link to each other.
+///
+/// "Approach" was here and is gone: the design never drew its options, so it
+/// opened an empty sheet. "Teacher" has moved out of More filters into its
+/// own entry, because it is now the practitioners the server knows rather
+/// than a list of seven names the app carried.
 const filterMenuItems = <FilterMenuItem>[
   ('Duration', AppRoutes.filterDuration),
+  ('Teacher', AppRoutes.filterTeacher),
   ('Style', AppRoutes.filterStyle),
-  ('Approach', AppRoutes.filterApproach),
   ('More filters', AppRoutes.filterMore),
 ];
 

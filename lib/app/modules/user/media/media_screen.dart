@@ -13,11 +13,56 @@ import 'controller/media_controller.dart';
 /// material: title, rating, description, instructor and notes. 135:12373 is
 /// the same screen before playback starts, which is this screen's paused
 /// state rather than a second layout.
+/// Shown when the route was reached without an item to play.
+class _CouldNotOpen extends StatelessWidget {
+  const _CouldNotOpen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: appTheme.background,
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'That content could not be opened.',
+                  textAlign: TextAlign.center,
+                  style: CustomTextStyles.emptyStateBody,
+                ),
+                SizedBox(height: 16.v),
+                TextButton(
+                  onPressed: Get.back,
+                  child: Text(
+                    'Go back',
+                    style: CustomTextStyles.emptyStateBody.copyWith(
+                      color: appTheme.soothifyBlue,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class MediaScreen extends GetView<MediaController> {
   const MediaScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Nothing to show: the route was opened without an item, which until
+    // now drew a blank grey screen that said nothing about why. Everything
+    // should go through `openMedia`; this is what is left if something
+    // does not.
+    if (!Get.isRegistered<MediaController>()) return const _CouldNotOpen();
+
     final item = controller.item;
     return Scaffold(
       backgroundColor: appTheme.background,

@@ -37,9 +37,15 @@ class FilterChipGrid extends StatelessWidget {
                   child: switch (row * 2 + col) {
                     final i when i < options.length => Obx(
                       () => _Chip(
-                        label: options[i],
-                        selected: controller.isSelected(group, options[i]),
-                        onTap: () => controller.toggle(group, options[i]),
+                        // Read as the label, matched as the value: a chip
+                        // says "Core" and carries "focus-core".
+                        label: options[i].label,
+                        selected: controller.isSelected(
+                          group, options[i].value,
+                        ),
+                        onTap: () => controller.toggle(
+                          group, options[i].value,
+                        ),
                       ),
                     ),
                     _ => SizedBox(height: chipHeight.v),

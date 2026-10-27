@@ -179,7 +179,10 @@ class DiscoveryTabController extends BaseController {
     }
     searchBusy.value = true;
     try {
-      final found = await _content.search(text);
+      final found = await _content.search(
+        text,
+        filters: filters.value.queryParams,
+      );
       // A stale response: the field moved on while this was in flight.
       if (text != query.value.trim()) return;
       results.assignAll(found);

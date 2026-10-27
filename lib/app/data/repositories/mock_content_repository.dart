@@ -1,4 +1,5 @@
 import '../../core/utils/image_constant.dart';
+import '../models/library_section.dart';
 import '../models/media_item.dart';
 import 'content_repository.dart';
 
@@ -418,8 +419,25 @@ class MockContentRepository implements ContentRepository {
   /// them. It used to ignore [shelf] entirely and hand back the same ten
   /// cards to every "See All" in the app, so tapping through from Yoga Flow
   /// and from Sound Effects landed on identical pages.
+  /// No server to ask, so the sheets fall back to the design's own lists.
   @override
-  Future<List<MediaItem>> getShelfPage(String shelf) async {
+  Future<void> loadFilterOptions() async {}
+
+  @override
+  Future<List<MediaItem>> bySection(LibrarySection section) async {
+    await Future<void>.delayed(_latency);
+    // The shelves are what divide the library, here as on the server.
+    final keys = section.shelves.map((s) => s.query).toSet();
+    return [
+      for (final entry in _shelves.entries)
+        if (keys.contains(entry.key))
+          ..._items.where((i) => entry.value.contains(i.id)),
+    ];
+  }
+
+  @override
+  Future<List<MediaItem>> getShelfPage(String shelf,
+      {Map<String, String> filters = const {}}) async {
     await Future<void>.delayed(_latency);
     final own = [
       for (final id in _shelves[shelf] ?? const <String>[])
@@ -434,7 +452,8 @@ class MockContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> getShelf(String query) async {
+  Future<List<MediaItem>> getShelf(String query,
+      {Map<String, String> filters = const {}}) async {
     await Future<void>.delayed(_latency);
     final ids = _shelves[query] ?? const <String>[];
     return [
@@ -469,7 +488,8 @@ class MockContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> search(String query) async {
+  Future<List<MediaItem>> search(String query,
+      {Map<String, String> filters = const {}}) async {
     await Future<void>.delayed(_latency);
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return const [];
@@ -504,7 +524,8 @@ class MockContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''}) async {
+  Future<List<MediaItem>> byKind(MediaType kind,
+      {String query = '', Map<String, String> filters = const {}}) async {
     await Future<void>.delayed(_latency);
     final q = query.trim().toLowerCase();
     return _items

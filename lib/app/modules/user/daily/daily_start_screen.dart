@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../core/utils/media_entry.dart';
 import '../../../data/models/media_item.dart';
-import '../../../data/repositories/content_repository.dart';
 import '../discovery/widgets/discovery_card.dart';
 import 'controller/daily_controller.dart';
 
@@ -38,7 +38,13 @@ class DailyStartScreen extends GetView<DailyController> {
                 style: CustomTextStyles.sectionTitle),
             SizedBox(height: 16.v),
             FutureBuilder<List<MediaItem>>(
-              future: Get.find<ContentRepository>().getRecommendations(),
+              // This service's own content, not the mood-shaped list: these
+              // two flows are Pilates & Core and Stretch & Restore, and
+              // what the admin uploads for each is what belongs here.
+              //
+              // Held on the controller rather than started here: a future
+              // created in build() is started again on every rebuild.
+              future: controller.sessionsToStart,
               builder: (context, snapshot) {
                 final items = (snapshot.data ?? const <MediaItem>[]).take(2);
                 if (items.isEmpty) return SizedBox(height: 166.v);
@@ -50,9 +56,13 @@ class DailyStartScreen extends GetView<DailyController> {
                         child: DiscoveryCard(
                           item: item,
                           width: 159,
-                          onTap: () => Get.toNamed(
-                            AppRoutes.media,
-                            arguments: item,
+                          // Through the shared opener, like every other
+                          // card. Calling the route directly with a bare
+                          // item is what made this one open a blank
+                          // screen: the binding is handed a map.
+                          onTap: () => openMedia(
+                            item,
+                            source: controller.title,
                           ),
                         ),
                       ),

@@ -97,7 +97,9 @@ class AppRoutes {
   static const String filterDuration = '/filters/duration';
   static const String filterMore = '/filters/more';
   static const String filterStyle = '/filters/style';
-  static const String filterApproach = '/filters/approach';
+  /// The practitioners with content, most booked first. Replaces the
+  /// "Approach" sheet, which the design never gave any options.
+  static const String filterTeacher = '/filters/teacher';
 
   /// A shelf's "See All" grid. Takes the shelf name as its argument, so one
   /// route serves every shelf in the app.

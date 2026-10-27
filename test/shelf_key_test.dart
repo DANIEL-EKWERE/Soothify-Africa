@@ -146,9 +146,10 @@ class _RecordingRepository extends MockContentRepository {
   int featuredCalls = 0;
 
   @override
-  Future<List<MediaItem>> getShelfPage(String shelf) {
+  Future<List<MediaItem>> getShelfPage(String shelf,
+      {Map<String, String> filters = const {}}) {
     askedFor.add(shelf);
-    return super.getShelfPage(shelf);
+    return super.getShelfPage(shelf, filters: filters);
   }
 
   @override

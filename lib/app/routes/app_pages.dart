@@ -562,8 +562,8 @@ class AppPages {
       transition: Transition.downToUp,
     ),
     GetPage(
-      name: AppRoutes.filterApproach,
-      page: () => const FiltersScreen(kind: FilterKind.approach),
+      name: AppRoutes.filterTeacher,
+      page: () => const FiltersScreen(kind: FilterKind.teacher),
       binding: FiltersBinding(),
       transition: Transition.downToUp,
     ),

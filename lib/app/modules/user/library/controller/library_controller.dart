@@ -46,10 +46,19 @@ class LibraryController extends BaseController {
     final articles = section.blocks.whereType<LibraryArticles>().firstOrNull;
 
     final results = await Future.wait([
-      ...queries.map((s) => _repository.getShelf(s.query)),
+      ...queries.map(
+        (s) => _repository.getShelf(
+          s.query,
+          filters: filters.value.queryParams,
+        ),
+      ),
       // Articles are ordinary content on a shelf of their own now, so they
       // are fetched like everything else rather than read off an enum.
-      if (articles != null) _repository.getShelf(articles.query),
+      if (articles != null)
+        _repository.getShelf(
+          articles.query,
+          filters: filters.value.queryParams,
+        ),
     ]);
 
     shelves.assignAll({

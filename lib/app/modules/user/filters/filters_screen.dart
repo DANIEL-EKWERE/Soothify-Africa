@@ -30,7 +30,7 @@ class FiltersScreen extends GetView<FiltersController> {
     FilterKind.duration => 'Duration',
     FilterKind.more => 'More Filters',
     FilterKind.style => 'Style',
-    FilterKind.approach => 'Approach',
+    FilterKind.teacher => 'Teacher',
   };
 
   @override
@@ -52,7 +52,7 @@ class FiltersScreen extends GetView<FiltersController> {
                   FilterKind.duration => const _DurationBody(),
                   FilterKind.more => const _MoreBody(),
                   FilterKind.style => const _StyleBody(),
-                  FilterKind.approach => const _ApproachBody(),
+                  FilterKind.teacher => const _TeacherBody(),
                 },
               ),
             ),
@@ -132,27 +132,29 @@ class _DurationBody extends StatelessWidget {
       const FilterChipGrid(group: FilterGroup.duration);
 }
 
-/// The one sheet with no content in the file.
+/// The Teacher sheet — the practitioners the server knows, most booked
+/// first.
 ///
-/// The menu lists Approach beside the other three, so the row has to lead
-/// somewhere; what it leads to says so plainly rather than showing an empty
-/// sheet with a dead Apply and no explanation.
-class _ApproachBody extends StatelessWidget {
-  const _ApproachBody();
+/// This replaces "Approach", which was in the filter menu with no options
+/// drawn anywhere and opened an empty sheet. Teacher itself used to sit in
+/// More Filters offering seven names — Alex Artymiak, Rita, Westernman and
+/// the rest — none of whom practise here, so ticking one narrowed nothing.
+class _TeacherBody extends StatelessWidget {
+  const _TeacherBody();
 
   @override
   Widget build(BuildContext context) {
-    if (FilterGroup.approach.options.isNotEmpty) {
-      return const FilterChipGrid(group: FilterGroup.approach);
+    if (FilterGroup.teacher.options.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: 80.v),
+        child: Text(
+          'No teachers to filter by yet.',
+          textAlign: TextAlign.center,
+          style: CustomTextStyles.filterGroupLabel,
+        ),
+      );
     }
-    return Padding(
-      padding: EdgeInsets.only(top: 80.v),
-      child: Text(
-        'Approach filters are on the way.',
-        textAlign: TextAlign.center,
-        style: CustomTextStyles.filterGroupLabel,
-      ),
-    );
+    return const FilterChipGrid(group: FilterGroup.teacher);
   }
 }
 

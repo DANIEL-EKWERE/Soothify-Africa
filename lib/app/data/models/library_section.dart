@@ -129,4 +129,15 @@ enum LibrarySection {
       };
 
   Iterable<LibraryShelf> get shelves => blocks.whereType<LibraryShelf>();
+
+  /// What the server calls this half of the app.
+  ///
+  /// Not [id]: this one is `meditation` here and `pilates` there, from the
+  /// days before the rename. The shelf keys already agree (`pilates-…`);
+  /// only the section itself does not, so the translation lives here rather
+  /// than at each call site.
+  String get wire => switch (this) {
+        LibrarySection.meditation => 'pilates',
+        LibrarySection.balance => 'balance',
+      };
 }

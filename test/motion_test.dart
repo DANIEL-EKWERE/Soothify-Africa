@@ -30,7 +30,7 @@ void main() {
       expect(overridden[AppRoutes.filterDuration], Transition.downToUp);
       expect(overridden[AppRoutes.filterMore], Transition.downToUp);
       expect(overridden[AppRoutes.filterStyle], Transition.downToUp);
-      expect(overridden[AppRoutes.filterApproach], Transition.downToUp);
+      expect(overridden[AppRoutes.filterTeacher], Transition.downToUp);
       expect(overridden[AppRoutes.moodRecord], Transition.fadeIn);
       // Everything else takes the app-wide one.
       expect(overridden, hasLength(6));

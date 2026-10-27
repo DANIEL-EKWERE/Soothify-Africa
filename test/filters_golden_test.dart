@@ -65,7 +65,7 @@ void main() {
       // The Music group holds a chip also called "Music", so that word is on
       // screen twice — the heading and the chip. That is the frame, not a
       // duplicate render.
-      final twice = group.options.contains(group.label);
+      final twice = group.options.any((o) => o.label == group.label);
       expect(
         find.text(group.label),
         twice ? findsNWidgets(2) : findsOneWidget,
@@ -73,9 +73,11 @@ void main() {
       );
       for (final option in group.options) {
         expect(
-          find.text(option),
-          twice && option == group.label ? findsNWidgets(2) : findsOneWidget,
-          reason: '$option is missing from ${group.label}',
+          find.text(option.label),
+          twice && option.label == group.label
+              ? findsNWidgets(2)
+              : findsOneWidget,
+          reason: '${option.label} is missing from ${group.label}',
         );
       }
     }
@@ -137,7 +139,10 @@ void main() {
   });
 
   test('the design typos do not ship', () {
-    final all = [for (final g in FilterGroup.values) ...g.options];
+    final all = [
+      for (final g in FilterGroup.values)
+        for (final option in g.options) option.label,
+    ];
     expect(all, contains('Strength'));
     expect(all, isNot(contains('Strenght')));
     expect(all, contains('Immune System'));
@@ -147,8 +152,8 @@ void main() {
   });
 
   test('a duration chip is a bucket, not an exact length', () {
-    final selection = FilterSelection()
-      ..toggle(FilterGroup.duration, '10 minutes');
+    // Values, not labels: the chip reads "10 minutes" and carries "10".
+    final selection = FilterSelection()..toggle(FilterGroup.duration, '10');
 
     // 12 minutes is nearer 10 than 15, so it belongs to the 10 bucket.
     expect(selection.matchesDuration(12 * 60), isTrue);
@@ -332,15 +337,16 @@ void main() {
     expect(find.byType(FiltersScreen), findsNothing);
   });
 
-  /// Approach is the fourth row in the menu and the one frame the file never
-  /// drew. It must still land somewhere.
-  testWidgets('Approach opens a sheet that says it is unfinished', (
-    tester,
-  ) async {
-    await mount(tester, FilterKind.approach);
+  /// Approach was the fourth row in the menu and the one frame the file
+  /// never drew, so it opened an empty sheet. It is gone, and Teacher --
+  /// the practitioners the server knows -- has the entry now.
+  testWidgets('Teacher has a sheet of its own', (tester) async {
+    await mount(tester, FilterKind.teacher);
 
-    expect(find.text('Approach'), findsOneWidget);
-    expect(find.textContaining('on the way'), findsOneWidget);
+    expect(find.text('Teacher'), findsOneWidget);
+    // Nothing loaded in a test, so it says so rather than drawing the seven
+    // invented names it used to carry.
+    expect(find.textContaining('No teachers'), findsOneWidget);
     expect(Get.find<FiltersController>().canApply, isFalse);
   });
 

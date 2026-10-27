@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/data/models/app_tab.dart';
+import 'package:soothifyafrica/app/data/models/library_section.dart';
 import 'package:soothifyafrica/app/data/models/media_item.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
@@ -75,16 +76,26 @@ class _FailingContentRepository implements ContentRepository {
   @override
   Future<List<MediaItem>> getRecent() async => throw Exception('offline');
   @override
-  Future<List<MediaItem>> getShelf(String query) async =>
+  Future<void> loadFilterOptions() async {}
+
+  @override
+  Future<List<MediaItem>> bySection(LibrarySection section) async =>
+      throw Exception('offline');
+
+  @override
+  Future<List<MediaItem>> getShelf(String query,
+          {Map<String, String> filters = const {}}) async =>
       throw Exception('offline');
   @override
   Future<List<MediaItem>> getRecommendations({String mood = ''}) async =>
       throw Exception('offline');
   @override
-  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''}) async =>
+  Future<List<MediaItem>> byKind(MediaType kind,
+          {String query = '', Map<String, String> filters = const {}}) async =>
       throw Exception('offline');
   @override
-  Future<List<MediaItem>> getShelfPage(String shelf) async =>
+  Future<List<MediaItem>> getShelfPage(String shelf,
+          {Map<String, String> filters = const {}}) async =>
       throw Exception('offline');
   @override
   Future<List<MediaItem>> getPopular() async => throw Exception('offline');
@@ -98,7 +109,8 @@ class _FailingContentRepository implements ContentRepository {
   @override
   Future<MediaItem?> getById(String id) async => null;
   @override
-  Future<List<MediaItem>> search(String query) async => const [];
+  Future<List<MediaItem>> search(String query,
+          {Map<String, String> filters = const {}}) async => const [];
   @override
   Future<void> recordPlay(
     String id, {

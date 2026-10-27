@@ -60,7 +60,12 @@ class ShelfController extends BaseController {
         final page = switch (key) {
           _recent => await _repository.getRecent(),
           _popular => await _repository.getFeatured(),
-          _ => await _repository.getShelfPage(key),
+          // Sent to the server, so a chip narrows the catalogue rather
+          // than the page already fetched.
+          _ => await _repository.getShelfPage(
+            key,
+            filters: filters.value.queryParams,
+          ),
         };
         items.assignAll(
           page

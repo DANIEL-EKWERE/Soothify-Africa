@@ -114,40 +114,60 @@ class _CalendarView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<CheckinController>();
-    return Obx(() => ListView(
-          padding: EdgeInsets.fromLTRB(24.h, 34.v, 24.h, 32.v),
-          children: [
-            for (final month in controller.months) ...[
-              Container(
-                padding: EdgeInsets.fromLTRB(23.h, 25.v, 23.h, 25.v),
-                decoration: BoxDecoration(
-                  color: appTheme.surface,
-                  borderRadius: BorderRadius.circular(12.h),
-                  border: Border.all(color: appTheme.calendarCardBorder),
-                ),
-                child: MonthCalendar(
-                  month: month,
-                  selected: controller.selected.value,
-                  marked: controller.marked,
-                  onSelected: controller.selectDate,
-                  style: MonthCalendarStyle.circles,
-                  markBuilder: (day) => controller.marked
-                          .any((d) => DateUtils.isSameDay(d, day))
-                      // Cropped to the head: at 20 across, a bust would be
-                      // unreadable, and the face is what carries the mood.
-                      ? Image.asset(
-                          controller.figure.value
-                              .artFor(controller.levelOn(day)),
-                          fit: BoxFit.cover,
-                          alignment: Alignment.topCenter,
-                        )
-                      : null,
-                ),
+    return Obx(() {
+      // Read here, inside the Obx, and passed down as plain values.
+      //
+      // `markBuilder` runs during the calendar's own build, which is a
+      // child build and so outside this closure -- so reads made in there
+      // registered no dependency. The faces therefore did not appear when
+      // the history arrived; they appeared on the first tap, because that
+      // changes `selected`, which this closure does read.
+      final marked = controller.marked.toSet();
+      final figure = controller.figure.value;
+      final levels = Map.of(controller.levels);
+      final selected = controller.selected.value;
+
+      MoodLevel levelOn(DateTime day) {
+        for (final entry in levels.entries) {
+          if (DateUtils.isSameDay(entry.key, day)) return entry.value;
+        }
+        return MoodLevel.neutral;
+      }
+
+      return ListView(
+        padding: EdgeInsets.fromLTRB(24.h, 34.v, 24.h, 32.v),
+        children: [
+          for (final month in controller.months) ...[
+            Container(
+              padding: EdgeInsets.fromLTRB(23.h, 25.v, 23.h, 25.v),
+              decoration: BoxDecoration(
+                color: appTheme.surface,
+                borderRadius: BorderRadius.circular(12.h),
+                border: Border.all(color: appTheme.calendarCardBorder),
               ),
-              SizedBox(height: 32.v),
-            ],
+              child: MonthCalendar(
+                month: month,
+                selected: selected,
+                marked: marked,
+                onSelected: controller.selectDate,
+                style: MonthCalendarStyle.circles,
+                markBuilder: (day) =>
+                    marked.any((d) => DateUtils.isSameDay(d, day))
+                        // Cropped to the head: at 20 across, a bust would
+                        // be unreadable, and the face carries the mood.
+                        ? Image.asset(
+                            figure.artFor(levelOn(day)),
+                            fit: BoxFit.cover,
+                            alignment: Alignment.topCenter,
+                          )
+                        : null,
+              ),
+            ),
+            SizedBox(height: 32.v),
           ],
-        ));
+        ],
+      );
+    });
   }
 }
 

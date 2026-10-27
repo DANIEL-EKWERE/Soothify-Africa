@@ -47,7 +47,12 @@ class VideosController extends BaseController {
 
   Future<void> load() => guard(() async {
         final results = await Future.wait(
-          catalogue.map((s) => _repository.getShelf(s.query)),
+          catalogue.map(
+            (s) => _repository.getShelf(
+              s.query,
+              filters: filters.value.queryParams,
+            ),
+          ),
         );
         shelves.assignAll({
           for (var i = 0; i < catalogue.length; i++)

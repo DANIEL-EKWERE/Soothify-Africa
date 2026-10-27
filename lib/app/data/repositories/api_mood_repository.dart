@@ -22,6 +22,11 @@ class ApiMoodRepository implements MoodRepository {
     final body = await _api.post('/wellbeing/moods/', body: {
       'score': score,
       'note': note,
+      // The phone's own day, not the server's. It runs on UTC and the
+      // people using it do not: half past midnight in Lagos is still
+      // yesterday there, and with one entry per day that overwrote the
+      // check-in they had already made.
+      'recorded_on': _day(DateTime.now()),
     });
     return MoodEntry.fromJson(body);
   }
@@ -36,7 +41,10 @@ class ApiMoodRepository implements MoodRepository {
 
   @override
   Future<MoodEntry?> todaysEntry() async {
-    final body = await _api.get('/wellbeing/moods/today/');
+    // Asked for by the phone's day, for the same reason.
+    final body = await _api.get(
+      '/wellbeing/moods/today/?day=${_day(DateTime.now())}',
+    );
     // The server answers with an empty body when nothing was recorded
     // today, which is a fact rather than a failure.
     if (body.isEmpty || body['id'] == null) return null;

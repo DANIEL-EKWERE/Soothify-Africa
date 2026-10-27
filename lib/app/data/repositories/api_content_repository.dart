@@ -1,5 +1,7 @@
 import '../../core/network/api_client.dart';
 import '../../core/utils/logger.dart';
+import '../models/library_section.dart';
+import '../models/media_filter.dart';
 import '../models/media_item.dart';
 import 'content_repository.dart';
 import 'kyc_repository.dart';
@@ -81,16 +83,22 @@ class ApiContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> getShelf(String query) =>
-      _shelf(query, full: false);
+  Future<List<MediaItem>> getShelf(String query,
+          {Map<String, String> filters = const {}}) =>
+      _shelf(query, full: false, filters: filters);
 
   @override
-  Future<List<MediaItem>> getShelfPage(String shelf) =>
-      _shelf(shelf, full: true);
+  Future<List<MediaItem>> getShelfPage(String shelf,
+          {Map<String, String> filters = const {}}) =>
+      _shelf(shelf, full: true, filters: filters);
 
   @override
   Future<List<MediaItem>> getByCategory(String categoryId) =>
       _items('/content/items/?category=${Uri.encodeQueryComponent(categoryId)}');
+
+  @override
+  Future<List<MediaItem>> bySection(LibrarySection section) =>
+      _items('/content/items/?section=${section.wire}');
 
   @override
   Future<MediaItem?> getById(String id) async {
@@ -99,20 +107,93 @@ class ApiContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> search(String query) {
+  Future<List<MediaItem>> search(String query,
+      {Map<String, String> filters = const {}}) {
     final term = query.trim();
     // An empty search returns nothing rather than the whole library, which
     // is what the screen expects and what the server does with `?q=`.
     if (term.isEmpty) return Future.value(const []);
-    return _items('/content/items/?q=${Uri.encodeQueryComponent(term)}');
+    return _items(
+      '/content/items/?q=${Uri.encodeQueryComponent(term)}'
+      '${_query(filters, leading: '&')}',
+    );
   }
 
   @override
-  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''}) {
+  Future<void> loadFilterOptions() async {
+    final body = await _api.get('/content/filters/');
+
+    final groups = <FilterGroup, List<FilterOption>>{};
+    for (final raw in (body['groups'] as List? ?? const [])) {
+      if (raw is! Map<String, dynamic>) continue;
+      final group = _groupFor(raw['id'] as String? ?? '');
+      if (group == null) continue;
+      groups[group] = [
+        for (final option in (raw['options'] as List? ?? const []))
+          if (option is Map<String, dynamic>)
+            FilterOption(
+              option['slug'] as String? ?? '',
+              option['label'] as String? ?? '',
+              description: option['description'] as String? ?? '',
+            ),
+      ];
+    }
+
+    // The practitioners, which are not tags: a teacher option carries their
+    // id, because that is what content is credited to.
+    final teachers = [
+      for (final row in (body['teachers'] as List? ?? const []))
+        if (row is Map<String, dynamic>)
+          FilterOption(
+            '${row['id']}',
+            row['name'] as String? ?? '',
+          ),
+    ];
+    if (teachers.isNotEmpty) groups[FilterGroup.teacher] = teachers;
+
+    final buckets = [
+      for (final minutes in (body['durations'] as List? ?? const []))
+        if (minutes is num) minutes.toInt(),
+    ];
+    if (buckets.isNotEmpty) {
+      groups[FilterGroup.duration] = [
+        for (final minutes in buckets)
+          FilterOption('$minutes', '$minutes minutes'),
+      ];
+    }
+
+    FilterCatalogue.instance.adopt(groups: groups, durationBuckets: buckets);
+  }
+
+  /// The server's group id to the app's enum. An id the app does not know
+  /// is skipped rather than guessed, so a group added server-side before
+  /// this app ships is simply not offered.
+  static FilterGroup? _groupFor(String id) => switch (id) {
+        'focus' => FilterGroup.focus,
+        'body_part' => FilterGroup.bodyPart,
+        'prop' => FilterGroup.prop,
+        'music' => FilterGroup.music,
+        'style' => FilterGroup.style,
+        _ => null,
+      };
+
+  /// `tags=a,b&teacher=4` — empty for no filters, so a URL stays clean.
+  static String _query(Map<String, String> filters, {String leading = '?'}) {
+    if (filters.isEmpty) return '';
+    final pairs = filters.entries
+        .map((e) => '${e.key}=${Uri.encodeQueryComponent(e.value)}')
+        .join('&');
+    return '$leading$pairs';
+  }
+
+  @override
+  Future<List<MediaItem>> byKind(MediaType kind,
+      {String query = '', Map<String, String> filters = const {}}) {
     final term = query.trim();
     return _items(
       '/content/items/?type=${kind.name}'
-      '${term.isEmpty ? '' : '&q=${Uri.encodeQueryComponent(term)}'}',
+      '${term.isEmpty ? '' : '&q=${Uri.encodeQueryComponent(term)}'}'
+      '${_query(filters, leading: '&')}',
     );
   }
 
@@ -136,9 +217,14 @@ class ApiContentRepository implements ContentRepository {
 
   /// A shelf answers with its own envelope — key, title, items — rather than
   /// a bare list, because the row prints the title the server curates.
-  Future<List<MediaItem>> _shelf(String key, {required bool full}) async {
+  Future<List<MediaItem>> _shelf(String key,
+      {required bool full, Map<String, String> filters = const {}}) async {
+    final query = {
+      if (full) 'full': 'true',
+      ...filters,
+    };
     final body = await _api.get(
-      '/content/shelves/${Uri.encodeComponent(key)}/${full ? '?full=true' : ''}',
+      '/content/shelves/${Uri.encodeComponent(key)}/${_query(query)}',
     );
     final items = body['items'];
     if (items is! List) return const [];

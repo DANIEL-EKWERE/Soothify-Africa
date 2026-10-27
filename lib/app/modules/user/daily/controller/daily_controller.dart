@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../data/models/checkin_kind.dart';
 import '../../../../data/models/habit_reminder.dart';
+import '../../../../data/models/library_section.dart';
+import '../../../../data/models/media_item.dart';
+import '../../../../data/repositories/content_repository.dart';
 import '../../../../data/services/push_service.dart';
 
 /// A daily habit's history and reminder — Figma "Profile/daily meditation"
@@ -37,6 +40,33 @@ class DailyController extends GetxController {
   final RxSet<int> reminderDays = <int>{}.obs;
 
   String get title => kind.title;
+
+  /// Which half of the app this habit belongs to, so the screen can offer
+  /// that service's content. Mood and journal have no section of their own.
+  LibrarySection? get section => switch (kind) {
+        CheckinKind.meditation => LibrarySection.meditation,
+        CheckinKind.balance => LibrarySection.balance,
+        _ => null,
+      };
+
+  /// A couple of sessions to begin with — this service's own.
+  ///
+  /// Started once and kept, because the screen reads it from a
+  /// FutureBuilder: created in `build()` it was re-requested on every
+  /// rebuild.
+  late final Future<List<MediaItem>> sessionsToStart = _readSessions();
+
+  Future<List<MediaItem>> _readSessions() async {
+    final where = section;
+    if (where == null || !Get.isRegistered<ContentRepository>()) return const [];
+    try {
+      return await Get.find<ContentRepository>().bySection(where);
+    } catch (_) {
+      // Two cards missing is not worth a message over a screen whose point
+      // is the reminder.
+      return const [];
+    }
+  }
 
   /// "pilates & core" / "stretch & restore" — the habit without the "Daily".
   String get habit => kind.title.replaceFirst('Daily ', '').toLowerCase();

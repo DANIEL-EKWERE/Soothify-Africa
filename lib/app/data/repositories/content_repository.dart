@@ -1,5 +1,7 @@
 import '../models/media_item.dart';
 
+import '../models/library_section.dart';
+import '../models/media_filter.dart';
 /// The contract every screen codes against.
 ///
 /// Controllers depend on this interface, never on an HTTP client. That is what
@@ -37,23 +39,47 @@ abstract class ContentRepository {
 
   /// One named library shelf — "pilates-movement", "balance-rest",
   /// "sounds". Each frame gives its shelves different cards.
-  Future<List<MediaItem>> getShelf(String query);
+  ///
+  /// [filters] is `FilterSelection.queryParams`. Passed to the server so a
+  /// filter narrows the catalogue rather than the page the app happens to
+  /// be holding — which is what filtering client-side did, where a chip
+  /// could empty a shelf that had matches further down.
+  Future<List<MediaItem>> getShelf(String query,
+      {Map<String, String> filters});
 
   /// The full page behind a shelf's "See All" — a longer, separate list.
-  Future<List<MediaItem>> getShelfPage(String shelf);
+  Future<List<MediaItem>> getShelfPage(String shelf,
+      {Map<String, String> filters});
 
   Future<List<MediaItem>> getByCategory(String categoryId);
 
+  /// Everything in one half of the app — Pilates & Core, or Stretch &
+  /// Restore.
+  ///
+  /// What the "Start Daily …" screens offer. Those flows are per service,
+  /// so they show that service's own content; nothing here is shaped by a
+  /// mood check-in.
+  Future<List<MediaItem>> bySection(LibrarySection section);
+
   Future<MediaItem?> getById(String id);
 
-  Future<List<MediaItem>> search(String query);
+  Future<List<MediaItem>> search(String query,
+      {Map<String, String> filters});
+
+  /// What the filter sheets offer, from `/content/filters/`.
+  ///
+  /// Asked for once and adopted by [FilterCatalogue]. The app used to ship
+  /// these lists, which is how its Teacher sheet came to name seven people
+  /// who do not practise here.
+  Future<void> loadFilterOptions();
 
   /// Everything of one kind — video, article or audio.
   ///
   /// What the practitioner's recommendation picker lists: the frames split
   /// the library by kind before anything else, because "recommend a video"
   /// is the decision already made by the time the picker opens.
-  Future<List<MediaItem>> byKind(MediaType kind, {String query = ''});
+  Future<List<MediaItem>> byKind(MediaType kind,
+      {String query, Map<String, String> filters});
 
   /// Records that this item was listened to, and for how long.
   ///

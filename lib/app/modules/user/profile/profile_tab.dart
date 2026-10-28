@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/media_entry.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/profile_stats.dart';
 import 'controller/profile_tab_controller.dart';
@@ -75,15 +76,232 @@ class _Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ProfileTabController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('My stats', style: CustomTextStyles.statsHeading),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text('My stats', style: CustomTextStyles.statsHeading),
+            const Spacer(),
+            // The range the server actually counted, not the app's guess.
+            Obx(() => Text(
+                  controller.weekLabel,
+                  style: CustomTextStyles.emptyStateBody,
+                )),
+          ],
+        ),
         SizedBox(height: 16.v),
         const _StatsCard(),
+        SizedBox(height: 20.v),
+        const _WeeklyGoalCard(),
+        SizedBox(height: 28.v),
+        const _RecentActivity(),
       ],
     );
   }
+}
+
+/// "Your weekly goal — 120 / 150 min", the bar, and the weekday strip.
+class _WeeklyGoalCard extends StatelessWidget {
+  const _WeeklyGoalCard();
+
+  /// Monday first, as the strip is drawn. The repeated letters are the
+  /// design's own: T for Tuesday and Thursday, S for both weekend days.
+  static const _letters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<ProfileTabController>();
+    return Obx(() {
+      final stats = controller.stats.value;
+      return Container(
+        padding: EdgeInsets.fromLTRB(20.h, 20.v, 20.h, 20.v),
+        decoration: BoxDecoration(
+          color: appTheme.surface,
+          borderRadius: BorderRadius.circular(12.h),
+          border: Border.all(color: appTheme.cardRim),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Text('Your weekly goal', style: CustomTextStyles.statsHeading),
+                const Spacer(),
+                Text(
+                  '${stats.minutesDone} / ${stats.goalMinutes} min',
+                  style: CustomTextStyles.statsHeading
+                      .copyWith(color: appTheme.soothifyBlue),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.v),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4.h),
+              child: LinearProgressIndicator(
+                value: stats.goalProgress,
+                minHeight: 8.v,
+                backgroundColor: appTheme.cardRim,
+                valueColor: AlwaysStoppedAnimation(appTheme.soothifyBlue),
+              ),
+            ),
+            SizedBox(height: 16.v),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (var day = 1; day <= 7; day++)
+                  _DayPip(
+                    letter: _letters[day - 1],
+                    active: stats.activeWeekdays.contains(day),
+                  ),
+              ],
+            ),
+            SizedBox(height: 14.v),
+            Text(
+              stats.minutesRemaining == 0
+                  ? 'You have reached your goal this week.'
+                  : 'Just ${stats.minutesRemaining} more minutes to reach '
+                      'your goal.',
+              style: CustomTextStyles.emptyStateBody,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+/// One day on the strip. Filled when something was done that day.
+class _DayPip extends StatelessWidget {
+  const _DayPip({required this.letter, required this.active});
+
+  final String letter;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36.h,
+      width: 36.h,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: active ? appTheme.soothifyBlue : appTheme.cardRim,
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        letter,
+        style: CustomTextStyles.statLabel.copyWith(
+          fontSize: 14.fSize,
+          color: active ? appTheme.onPrimary : appTheme.soothifyBlue,
+        ),
+      ),
+    );
+  }
+}
+
+/// "Recent activity" — what was played, newest first.
+class _RecentActivity extends StatelessWidget {
+  const _RecentActivity();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<ProfileTabController>();
+    return Obx(() {
+      final rows = controller.stats.value.recent;
+      if (rows.isEmpty) return const SizedBox.shrink();
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Recent activity', style: CustomTextStyles.statsHeading),
+          SizedBox(height: 16.v),
+          Container(
+            decoration: BoxDecoration(
+              color: appTheme.surface,
+              borderRadius: BorderRadius.circular(12.h),
+              border: Border.all(color: appTheme.cardRim),
+            ),
+            child: Column(
+              children: [
+                for (final row in rows) ...[
+                  _RecentRow(row: row),
+                  if (row != rows.last)
+                    Divider(height: 1, color: appTheme.cardRim),
+                ],
+              ],
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
+
+class _RecentRow extends StatelessWidget {
+  const _RecentRow({required this.row});
+
+  final RecentPlay row;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = row.item;
+    return InkWell(
+      onTap: () => openMedia(item, source: 'Recent activity'),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 14.v),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.h),
+              child: CustomImageView(
+                imagePath: item.cover,
+                height: 48.h,
+                width: 48.h,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: 14.h),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: CustomTextStyles.statsHeading
+                        .copyWith(fontSize: 15.fSize),
+                  ),
+                  SizedBox(height: 4.v),
+                  Text(
+                    // "Pilates & Core · 30 min · Today"
+                    [
+                      if (item.tag.isNotEmpty) item.tag,
+                      row.lengthLabel,
+                      row.whenFor(controllerNow),
+                    ].where((s) => s.isNotEmpty).join(' · '),
+                    style: CustomTextStyles.emptyStateBody,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.play_circle_outline,
+              size: 22.h,
+              color: appTheme.soothifyBlue,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Read once per row rather than held: these are relative timestamps and
+  /// a cached "now" would make them drift on a screen left open.
+  DateTime get controllerNow => DateTime.now();
 }
 
 class _Header extends StatelessWidget {
@@ -225,19 +443,43 @@ class _StatsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<ProfileTabController>();
     return Container(
-      height: 265.v,
+      // Taller than the design's 265: the lead line and the active-days
+      // line are inside the card, and 265 clipped them.
+      constraints: BoxConstraints(minHeight: 265.v),
       decoration: BoxDecoration(
         gradient: appTheme.statsCardGradient,
         borderRadius: BorderRadius.circular(16.h),
       ),
-      // 57 top and bottom in the design; the button and the stat row are the
-      // only two children, 25 apart.
-      padding: EdgeInsets.symmetric(vertical: 57.v),
+      // 57 top and bottom in the design; the button and the stat row are
+      // 25 apart, with the active-days line closing the card.
+      padding: EdgeInsets.symmetric(vertical: 32.v, horizontal: 16.h),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Not in an Obx: the line is fixed copy, and GetX treats an Obx
+          // that reads no observable as misuse -- rightly, since it would
+          // never rebuild.
+          Text(
+            controller.cardLead,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.statLabel.copyWith(
+              fontSize: 14.fSize,
+              color: appTheme.onPrimary,
+            ),
+          ),
+          SizedBox(height: 18.v),
           _SessionButton(onTap: controller.openSessionNote),
           SizedBox(height: 25.v),
           Obx(() => _StatRow(stats: controller.stats.value)),
+          SizedBox(height: 18.v),
+          Obx(() => Text(
+                controller.activeDaysLine,
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.statLabel.copyWith(
+                  fontSize: 13.fSize,
+                  color: appTheme.onPrimary,
+                ),
+              )),
         ],
       ),
     );
@@ -291,7 +533,7 @@ class _StatRow extends StatelessWidget {
         _Stat(
           asset: ImageConstant.imgStatMeditation,
           label: 'Pilates & Core minutes',
-          value: stats.meditationMinutes,
+          value: stats.pilatesMinutes,
           width: 95,
         ),
         SizedBox(width: 4.h),

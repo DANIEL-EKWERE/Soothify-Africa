@@ -15,7 +15,14 @@ class ApiProfileRepository implements ProfileRepository {
 
   @override
   Future<ProfileStats> getStats() async {
-    final body = await _api.get('/wellbeing/stats/');
+    // The phone's own day. The server runs on UTC, and a week boundary
+    // read from there puts Monday in the wrong place for anybody east of
+    // Greenwich.
+    final now = DateTime.now();
+    final day = '${now.year.toString().padLeft(4, '0')}-'
+        '${now.month.toString().padLeft(2, '0')}-'
+        '${now.day.toString().padLeft(2, '0')}';
+    final body = await _api.get('/wellbeing/stats/?day=$day');
     return ProfileStats.fromJson(body);
   }
 

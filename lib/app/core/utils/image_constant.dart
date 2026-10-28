@@ -89,7 +89,6 @@ class ImageConstant {
   static const String icWarning = '$_icons/ic_warning.svg';
 
   /// The flat map behind "Spaces Around Me" — the fill on `282:25250`.
-  static const String imgSpacesMap = '$_images/spaces/map.png';
 
   /// Dr. Amara Okafor on the Journal's Expert Recommendation tab —
   /// `259:60781`, cropped the way the frame's `imageTransform` does.

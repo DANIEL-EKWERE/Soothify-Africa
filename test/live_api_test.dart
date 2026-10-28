@@ -161,7 +161,7 @@ void main() {
 
       final stats = await ApiProfileRepository(api).getStats();
 
-      expect(stats.meditationMinutes, 0);
+      expect(stats.pilatesMinutes, 0);
       expect(stats.liveSessions, 0);
     });
 
@@ -394,7 +394,7 @@ void main() {
 
       final stats = await ApiProfileRepository(api).getStats();
 
-      expect(stats.meditationMinutes, 0);
+      expect(stats.pilatesMinutes, 0);
       expect(PrefUtils().accessToken, isNot('not.a.token'));
     });
   });

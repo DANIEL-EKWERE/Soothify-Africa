@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../core/app_export.dart';
+import '../../../core/utils/map_tiles.dart';
 import '../../../widgets/skeleton.dart';
 import '../../../widgets/filter_pill.dart';
 import '../../../data/models/space_listing.dart';
@@ -190,6 +193,46 @@ class _Filters extends StatelessWidget {
   }
 }
 
+/// "Use my location" — what turns the distances on.
+///
+/// A button rather than a prompt on open: a permission request that
+/// appears the moment a screen does is the kind nobody reads. Gone once
+/// the location is known, because then it has nothing left to offer.
+class _UseMyLocation extends StatelessWidget {
+  const _UseMyLocation();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<SpacesController>();
+    return Obx(() {
+      if (controller.locatedMe.value) return const SizedBox.shrink();
+      return Padding(
+        padding: EdgeInsets.only(bottom: 12.v),
+        child: InkWell(
+          onTap: controller.useMyLocation,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.my_location,
+                size: 16.h,
+                color: appTheme.soothifyBlue,
+              ),
+              SizedBox(width: 8.h),
+              Text(
+                'Use my location to see how far away these are',
+                style: CustomTextStyles.emptyStateBody.copyWith(
+                  color: appTheme.soothifyBlue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+}
+
 class _ViewPill extends StatelessWidget {
   const _ViewPill({
     required this.label,
@@ -259,67 +302,94 @@ class _List extends StatelessWidget {
           ),
         );
       }
-      return ListView.separated(
+      return ListView(
         padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 24.v),
-        itemCount: spaces.length,
-        separatorBuilder: (_, _) => SizedBox(height: 16.v),
-        itemBuilder: (context, i) => SpaceCard(
-          space: spaces[i],
-          onTap: () => Get.toNamed(
-            AppRoutes.studioProfile,
-            arguments: spaces[i],
-          ),
-        ),
+        children: [
+          const _UseMyLocation(),
+          for (final space in spaces) ...[
+            SpaceCard(
+              space: space,
+              onTap: () => Get.toNamed(
+                AppRoutes.studioProfile,
+                arguments: space,
+              ),
+            ),
+            if (space != spaces.last) SizedBox(height: 16.v),
+          ],
+        ],
       );
     });
   }
 }
 
-/// The map view.
+/// The map view — OpenStreetMap tiles, with a pin per space.
 ///
-/// **A flat image, not a map view.** `282:25250` ships a 339x534 screenshot
-/// with pins drawn on top, and nothing in the file says which provider the
-/// real thing uses — so this places each studio's pin by the fraction stored
-/// on it rather than by projecting a coordinate. Swapping in a real map means
-/// replacing this widget, not the screen.
+/// This was a flat screenshot with pins placed by spreading the studios
+/// across it, because the design ships a picture and names no provider.
+/// OSM rather than Google: no API key and no billing account, and the
+/// coordinates were already on every space.
+///
+/// A space with no coordinates is not drawn. It stays in the list, where
+/// it can at least be read; there is nowhere to put it here.
 class _Map extends StatelessWidget {
   const _Map();
+
+  /// Lagos is around zoom 12 for a city-wide view of a few studios.
+  static const _zoom = 12.0;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SpacesController>();
     return Padding(
       padding: EdgeInsets.fromLTRB(26.h, 0, 25.h, 24.v),
-      child: Obx(
-        () => Stack(
+      child: Obx(() {
+        final centre = controller.mapCentre;
+        final placed = controller.placed;
+
+        return Stack(
           children: [
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.h),
-                child: CustomImageView(
-                  imagePath: ImageConstant.imgSpacesMap,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
-            ),
-            // One LayoutBuilder for all the pins, inside a Positioned.fill:
-            // a Positioned has to be an immediate child of the Stack, so a
-            // pin that measures itself cannot also position itself.
-            Positioned.fill(
-              child: LayoutBuilder(
-                builder: (context, constraints) => Stack(
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(centre.latitude, centre.longitude),
+                    initialZoom: _zoom,
+                    // Tapping the map itself closes an open card, which is
+                    // what tapping away from a thing should do.
+                    onTap: (_, _) => controller.closePin(),
+                  ),
                   children: [
-                    for (final space in controller.spaces)
-                      Positioned(
-                        left: constraints.maxWidth * controller.pinFor(space).x,
-                        top: constraints.maxHeight * controller.pinFor(space).y,
-                        child: _Pin(
-                          open: controller.selected.value == space,
-                          onTap: () => controller.selectPin(space),
-                        ),
-                      ),
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      // OSM's tile policy asks for an identifying agent and
+                      // refuses anonymous bulk traffic. This is that.
+                      userAgentPackageName: 'ng.com.soothifyafrica.app',
+                      // Their tiles, their credit -- the licence requires
+                      // it, and the attribution widget below is where it
+                      // is shown.
+                      tileProvider: MapTiles.get(),
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        for (final space in placed)
+                          Marker(
+                            point: LatLng(space.latitude!, space.longitude!),
+                            width: 24.h,
+                            height: 24.h,
+                            child: _Pin(
+                              open: controller.selected.value == space,
+                              onTap: () => controller.selectPin(space),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const RichAttributionWidget(
+                      attributions: [
+                        TextSourceAttribution('OpenStreetMap contributors'),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -334,13 +404,17 @@ class _Map extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 16.v),
-                  child: Text('Tap a pin to preview a space',
-                      style: CustomTextStyles.spaceMapHint),
+                  child: Text(
+                    placed.isEmpty
+                        ? 'None of these have a location yet'
+                        : 'Tap a pin to preview a space',
+                    style: CustomTextStyles.spaceArea,
+                  ),
                 ),
               ),
           ],
-        ),
-      ),
+        );
+      }),
     );
   }
 }

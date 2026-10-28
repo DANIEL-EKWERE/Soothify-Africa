@@ -9,6 +9,14 @@
          wellness reminder is neither. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <!--
+      "Spaces Around Me" measures how far each studio is. Coarse is
+      genuinely enough for a list of places across a city, and it is the
+      lesser thing to ask for; fine is declared because some devices will
+      not give coarse without it, and neither is required to use the app.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- Scheduled reminders live in AlarmManager, which a reboot clears;
          the boot receiver below re-registers them. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>

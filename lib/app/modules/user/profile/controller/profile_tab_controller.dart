@@ -40,6 +40,36 @@ class ProfileTabController extends BaseController {
   final Rx<ProfileSection> section = ProfileSection.dashboard.obs;
   final Rx<ProfileStats> stats = ProfileStats.empty.obs;
 
+  /// "This week · 5–11 Oct" — the range the server says it counted, so the
+  /// heading cannot claim a week the numbers are not for.
+  String get weekLabel {
+    final from = stats.value.weekStart;
+    final to = stats.value.weekEnd;
+    if (from == null || to == null) return 'This week';
+
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    // "5–11 Oct" within one month; "28 Sep – 4 Oct" across two.
+    final tail = from.month == to.month
+        ? '${from.day}\u2013${to.day} ${months[to.month - 1]}'
+        : '${from.day} ${months[from.month - 1]} \u2013 '
+            '${to.day} ${months[to.month - 1]}';
+    return 'This week \u00b7 $tail';
+  }
+
+  /// The line above the button, as the design writes it.
+  String get cardLead => 'A little movement, a little more balance.';
+
+  /// "5 active days · Time well spent on you".
+  String get activeDaysLine {
+    final days = stats.value.activeDays;
+    if (days == 0) return 'Nothing yet this week \u00b7 there is still time';
+    final word = days == 1 ? 'active day' : 'active days';
+    return '$days $word \u00b7 Time well spent on you';
+  }
+
   List<ProfileSection> get sections => ProfileSection.values;
 
   /// The month the History calendar is showing. The design prints August 2024.

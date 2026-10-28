@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/base_controller.dart';
+import '../../../../core/utils/feedback_utils.dart';
+import '../../../../core/utils/where_i_am.dart';
 import '../../../../data/models/space_listing.dart';
 import '../../../../data/models/wellness_space.dart';
 import '../../../../data/repositories/spaces_repository.dart';
@@ -34,36 +36,31 @@ class SpacesController extends BaseController {
 
   List<SpaceListing> get all => spaces;
 
-  /// Where a studio's pin sits on the map image, as a fraction of its box.
+  /// Where the phone is, once it has said. Null until then, and null for
+  /// good if the person declines — the list works either way, it just
+  /// cannot say how far away anything is.
+  ({double latitude, double longitude})? _origin;
+
+  /// Whether the distances on the cards are real.
+  final RxBool locatedMe = false.obs;
+
+  /// Asks for the location and reloads with it.
   ///
-  /// The design ships a flat picture rather than a map view, so a pin is
-  /// placed, not projected. Placing it by spreading the listed studios
-  /// across the image at least keeps their relative positions true; a real
-  /// map widget would replace this whole method and the picture with it.
-  ({double x, double y}) pinFor(SpaceListing space) {
-    final located = spaces
-        .where((s) => s.latitude != null && s.longitude != null)
-        .toList();
-    if (space.latitude == null || space.longitude == null || located.length < 2) {
-      // Nothing to spread it against: park it in the middle rather than at
-      // a corner, where it would look like a bug.
-      return (x: 0.45, y: 0.45);
+  /// Called from the "Use my location" button rather than on open: a
+  /// permission prompt that appears the moment a screen does is the kind
+  /// nobody reads.
+  Future<void> useMyLocation() async {
+    final here = await WhereIAm.get();
+    if (here == null) {
+      AppFeedback.info(
+        'We could not get your location, so distances are hidden. The list '
+        'still works.',
+      );
+      return;
     }
-
-    final lats = located.map((s) => s.latitude!).toList()..sort();
-    final lngs = located.map((s) => s.longitude!).toList()..sort();
-    final latSpan = lats.last - lats.first;
-    final lngSpan = lngs.last - lngs.first;
-
-    // Inset, so a pin at the extreme does not hang off the edge.
-    final x = lngSpan == 0
-        ? 0.45
-        : 0.1 + 0.8 * ((space.longitude! - lngs.first) / lngSpan);
-    // North is up: a larger latitude belongs nearer the top.
-    final y = latSpan == 0
-        ? 0.45
-        : 0.1 + 0.8 * ((lats.last - space.latitude!) / latSpan);
-    return (x: x, y: y);
+    _origin = here;
+    locatedMe.value = true;
+    await load();
   }
 
   @override
@@ -73,7 +70,29 @@ class SpacesController extends BaseController {
       query.value = search.text;
       _debounceSearch();
     });
-    load();
+    opening = _openWithWhatWeAlreadyHave();
+  }
+
+  /// The first load, so a test can await it rather than guess at a delay.
+  late final Future<void> opening;
+
+  /// Loads, then uses the location if permission was already given.
+  ///
+  /// The list comes first and never waits on the platform: asking about
+  /// permission is a round trip, and a screen that holds its content back
+  /// for it shows nothing in the meantime. Having been told once, though,
+  /// there is no reason to make somebody press a button for what they
+  /// already allowed -- so it reloads with distances straight after.
+  Future<void> _openWithWhatWeAlreadyHave() async {
+    await load();
+
+    if (!await WhereIAm.alreadyAllowed()) return;
+    final here = await WhereIAm.get();
+    if (here == null) return;
+
+    _origin = here;
+    locatedMe.value = true;
+    await load();
   }
 
   Timer? _typing;
@@ -90,6 +109,10 @@ class SpacesController extends BaseController {
       () => _spaces.spaces(
         category: category.value.name,
         query: query.value,
+        // What turns "2.4 km away" on. The server measures it; until this
+        // was passed it had nothing to measure from.
+        latitude: _origin?.latitude,
+        longitude: _origin?.longitude,
       ),
       // The list renders its own empty state; a snackbar over a search box
       // is noise.
@@ -129,6 +152,37 @@ class SpacesController extends BaseController {
   }
 
   void selectPin(SpaceListing space) => selected.value = space;
+
+  /// Tapping the map away from a pin closes the card it raised.
+  void closePin() => selected.value = null;
+
+  /// Where the map opens: on the person if they have said, otherwise on
+  /// the middle of what is listed, otherwise on Lagos.
+  ///
+  /// The fallback is a city rather than (0, 0), which is in the Atlantic
+  /// and would read as a broken map.
+  ({double latitude, double longitude}) get mapCentre {
+    final here = _origin;
+    if (here != null) return here;
+
+    final placed = spaces
+        .where((s) => s.latitude != null && s.longitude != null)
+        .toList();
+    if (placed.isEmpty) return (latitude: 6.4541, longitude: 3.3947);
+
+    final lat = placed.map((s) => s.latitude!).reduce((a, b) => a + b);
+    final lng = placed.map((s) => s.longitude!).reduce((a, b) => a + b);
+    return (
+      latitude: lat / placed.length,
+      longitude: lng / placed.length,
+    );
+  }
+
+  /// Only the spaces that can be put on a map. One without coordinates is
+  /// still in the list; it simply has nowhere to be drawn.
+  List<SpaceListing> get placed => spaces
+      .where((s) => s.latitude != null && s.longitude != null)
+      .toList();
 
   void clearPin() => selected.value = null;
 }

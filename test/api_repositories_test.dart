@@ -112,7 +112,7 @@ void main() {
 
       expect(refreshed, isTrue);
       expect(served, isTrue);
-      expect(stats.meditationMinutes, 30);
+      expect(stats.pilatesMinutes, 30);
       // The retry carries the new token, not the stale one.
       expect(c.sent.last.headers['Authorization'], 'Bearer jwt-new');
     });

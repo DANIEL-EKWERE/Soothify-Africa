@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<!-- "Spaces Around Me" measures how far each studio is. Asked for
+	     only when that screen is opened, and the list works without it. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Soothify uses your location to show how far away each studio, sanctuary and spa is. The list works without it.</string>
 	<key>CFBundleDisplayName</key>
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundleExecutable</key>

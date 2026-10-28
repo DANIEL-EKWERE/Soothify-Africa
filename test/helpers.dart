@@ -8,6 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
+import 'package:flutter_map/flutter_map.dart';
+
+import 'package:soothifyafrica/app/core/utils/map_tiles.dart';
+import 'package:soothifyafrica/app/core/utils/where_i_am.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/widgets/soothify_word.dart';
@@ -321,3 +325,40 @@ Finder findSoothify(String text) => find.byWidgetPredicate(
           (w is Text && w.data == text),
       description: 'text "$text"',
     );
+
+
+/// A tile provider that serves one flat colour and asks the network for
+/// nothing.
+///
+/// The map would otherwise make a real request per tile: a widget test has
+/// no network, so every one fails and buries the actual result, and a
+/// golden drawn over live tiles would change with whatever OpenStreetMap
+/// served that minute.
+class StubTileProvider extends TileProvider {
+  @override
+  ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
+      MemoryImage(Uint8List.fromList(_onePixel));
+
+  /// A 1x1 opaque PNG, stretched over each tile.
+  static const _onePixel = <int>[
+    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
+    0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+    0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xDE, 0x00, 0x00, 0x00,
+    0x0C, 0x49, 0x44, 0x41, 0x54, 0x08, 0xD7, 0x63, 0xF8, 0xCF, 0xC0, 0x00,
+    0x00, 0x03, 0x01, 0x01, 0x00, 0x18, 0xDD, 0x8D, 0xB0, 0x00, 0x00, 0x00,
+    0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+  ];
+}
+
+/// Points the map at [StubTileProvider] for the rest of the test file, and
+/// answers the location question without a platform to ask.
+///
+/// Both matter on the Spaces screen: the tiles would otherwise be fetched
+/// over a network the test does not have, and the permission check would
+/// hang on a channel nobody is listening to -- which held the list back
+/// and left it empty.
+void useStubTiles() {
+  MapTiles.provider = StubTileProvider.new;
+  WhereIAm.allowedCheck = () async => false;
+  WhereIAm.finder = () async => null;
+}

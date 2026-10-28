@@ -19,11 +19,11 @@ import 'helpers.dart';
 ///   flutter test --update-goldens test/spaces_test.dart
 const _art = [
   'assets/images/spaces/studio.png',
-  'assets/images/spaces/map.png',
 ];
 
 void main() {
   setUp(() {
+    useStubTiles();
     PrefUtils.resetForTesting();
     SharedPreferences.setMockInitialValues({});
   });

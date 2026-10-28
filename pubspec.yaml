@@ -74,6 +74,15 @@ dependencies:
   # device and a stale token can be told apart from a reinstall.
   device_info_plus: ^11.2.0
   url_launcher: ^6.3.2
+  # Where the phone is, for "Spaces Around Me". The server measures the
+  # distance (?lat=&lng=); nothing was telling it where to measure from,
+  # so a screen called "around me" knew nothing about where anybody was.
+  geolocator: ^13.0.2
+  # A real map for "Spaces Around Me", on OpenStreetMap tiles -- no API key
+  # and no billing account, unlike the alternative. The screen used to be a
+  # flat screenshot with pins placed by spreading the studios across it.
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
   # Checkout, inside the app. The payer used to be handed to the system
   # browser, which backgrounded the app mid-payment and left them to find
   # their own way back -- so the receipt screen was often never reached.

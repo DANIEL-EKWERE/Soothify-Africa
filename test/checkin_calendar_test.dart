@@ -29,10 +29,13 @@ import 'helpers.dart';
 /// and the bug cannot happen: it is entirely about what does and does not
 /// repaint when the answer lands *after* the screen is up.
 class _SlowMoodRepository implements MoodRepository {
-  _SlowMoodRepository(this._entries, {this.delay = const Duration(seconds: 1)});
+  _SlowMoodRepository(this._entries);
 
   final List<MoodEntry> _entries;
-  final Duration delay;
+
+  /// Long enough that the screen is up before the answer lands, which is
+  /// the whole point of this stub.
+  static const delay = Duration(seconds: 1);
 
   @override
   Future<List<MoodEntry>> history({int limit = 50}) async {

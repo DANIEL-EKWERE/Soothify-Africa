@@ -25,6 +25,7 @@ class PrefUtils {
   static const _kWellnessKycPrefix = 'wellnessKyc_';
   static const _kDeviceToken = 'deviceToken';
   static const _kReminderPrefix = 'reminder_';
+  static const _kSessionMode = 'sessionMode';
   static const _kAccessToken = 'accessToken';
   static const _kRefreshToken = 'refreshToken';
 
@@ -102,6 +103,16 @@ class PrefUtils {
   /// Defaults to true — data cost matters in our target markets.
   /// How many days running the 60-second breathing minute has been finished
   /// — Figma's "Push Notification" section counts it on the last screen.
+  /// How they last chose to take a session — 'phone' or 'video'.
+  ///
+  /// Remembered so the question opens on their own answer rather than on
+  /// the default every time. The therapy questionnaire asks it too, and
+  /// writes here, so answering it once carries into the booking.
+  String sessionMode() => _store.getString(_kSessionMode) ?? '';
+
+  Future<void> setSessionMode(String wire) =>
+      _store.setString(_kSessionMode, wire);
+
   int breatheStreak() => _store.getInt(_kBreatheStreak) ?? 0;
 
   /// Records today and returns the streak it leaves behind.

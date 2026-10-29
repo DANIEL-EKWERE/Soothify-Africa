@@ -1,5 +1,7 @@
 import '../../../../core/app_export.dart';
+import '../../../../data/models/booked_session.dart';
 import '../../../../data/models/session_invite.dart';
+import '../../../../data/repositories/booking_repository.dart';
 import '../../../../data/models/session_offering.dart';
 import '../../booking/controller/booking_controller.dart';
 
@@ -15,7 +17,11 @@ class ClientJoiningController extends GetxController {
     String? time,
     String? date,
     this.connecting = const Duration(seconds: 4),
-  })  : _invite = Get.arguments is SessionInvite
+    BookingRepository? bookings,
+    DateTime Function()? now,
+  })  : _bookings = bookings,
+        _now = now ?? DateTime.now,
+        _invite = Get.arguments is SessionInvite
             ? Get.arguments as SessionInvite
             : null,
         _expertName = expertName,
@@ -25,6 +31,75 @@ class ClientJoiningController extends GetxController {
 
   /// The session tapped in the feed, when the screen was opened from there.
   final SessionInvite? _invite;
+
+  /// Looked up so the screen knows when the session actually is. Optional
+  /// so a golden can build this without one.
+  final BookingRepository? _bookings;
+
+  /// Injectable, because everything below turns on what time it is.
+  final DateTime Function() _now;
+
+  /// The booked session this screen is about, once it has been found.
+  final Rxn<BookedSession> session = Rxn<BookedSession>();
+
+  /// How early somebody may go in. Early enough to be waiting when the
+  /// coach arrives, not so early that a session booked for Friday can be
+  /// joined on Tuesday.
+  static const openFrom = Duration(minutes: 10);
+
+  @override
+  void onInit() {
+    super.onInit();
+    _findTheSession();
+  }
+
+  Future<void> _findTheSession() async {
+    final id = _invite?.sessionId ?? '';
+    final bookings = _bookings;
+    if (id.isEmpty || bookings == null) return;
+
+    try {
+      final mine = await bookings.mySessions();
+      session.value = mine.firstWhereOrNull((s) => s.id == id);
+    } catch (error) {
+      // Without it the screen still shows; it simply cannot say when.
+      Log.e('could not read the session being joined', error: error);
+    }
+  }
+
+  /// Whether the call may be entered yet.
+  ///
+  /// True when the session is unknown: the feed can open this screen from
+  /// a row that carries no id, and refusing on a guess would lock
+  /// somebody out of a session that is happening.
+  bool get canJoin {
+    final booked = session.value;
+    if (booked == null) return true;
+
+    final now = _now();
+    return !now.isBefore(booked.startsAt.subtract(openFrom)) &&
+        now.isBefore(booked.endsAt);
+  }
+
+  /// Why it cannot be joined, for the line under the button.
+  String get waitLabel {
+    final booked = session.value;
+    if (booked == null || canJoin) return '';
+
+    final now = _now();
+    if (!now.isBefore(booked.endsAt)) return 'This session has ended.';
+
+    final until = booked.startsAt.difference(now);
+    if (until.inDays >= 1) {
+      final days = until.inDays;
+      return 'This session is in $days ${days == 1 ? 'day' : 'days'}.';
+    }
+    if (until.inHours >= 1) {
+      final hours = until.inHours;
+      return 'This session starts in $hours ${hours == 1 ? 'hour' : 'hours'}.';
+    }
+    return 'You can join ten minutes before it starts.';
+  }
 
   final String? _expertName;
   final String? _service;
@@ -56,6 +131,14 @@ class ClientJoiningController extends GetxController {
   /// flow asks: the communication picker the design draws sits on a branch
   /// that booking no longer takes.
   void join() {
+    // Not before its time. Nothing checked, so any session row opened the
+    // waiting room and the call started four seconds later -- whatever
+    // day the session was actually booked for.
+    if (!canJoin) {
+      AppFeedback.info(waitLabel);
+      return;
+    }
+
     Get.offNamed(
       AppRoutes.booking,
       arguments: BookingEntry(

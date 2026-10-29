@@ -1,4 +1,5 @@
 import '../models/booked_session.dart';
+import '../models/call_credentials.dart';
 
 /// Matching, booking and the sessions that come of it.
 ///
@@ -38,5 +39,10 @@ abstract class BookingRepository {
 
   /// Credentials for joining the call. Only issued to the two people on the
   /// booking, and only around the time it runs.
-  Future<Map<String, dynamic>> callToken(String sessionId);
+  /// Credentials for joining this session's call.
+  ///
+  /// Minted per person and only around the time the session runs -- the
+  /// server refuses outside that window, with a line saying when the room
+  /// opens. Throws [AppException] carrying that line.
+  Future<CallCredentials> callToken(String sessionId);
 }

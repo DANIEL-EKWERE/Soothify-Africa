@@ -47,6 +47,10 @@ import '../modules/user/booking_calendar/booking_calendar_screen.dart';
 import '../modules/user/booking_calendar/booking_confirmed_screen.dart';
 import '../modules/user/breathe/binding/breathe_binding.dart';
 import '../modules/user/checkout/checkout_webview_screen.dart';
+import '../data/models/session_mode.dart';
+import '../data/repositories/booking_repository.dart';
+import '../modules/user/call/session_call_screen.dart';
+import '../modules/user/session_mode/session_mode_screen.dart';
 import '../modules/user/breathe/breathe_screen.dart';
 import '../modules/user/trial_offer/binding/trial_offer_binding.dart';
 import '../modules/user/trial_offer/trial_offer_screen.dart';
@@ -471,6 +475,24 @@ class AppPages {
       name: AppRoutes.subscriptionOffer,
       page: () => const TrialOfferScreen(),
       binding: TrialOfferBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.sessionCall,
+      page: () => const SessionCallScreen(),
+      binding: BindingsBuilder.put(
+        () => SessionCallController(
+          Get.find<BookingRepository>(),
+          Get.arguments is String ? Get.arguments as String : '',
+        ),
+      ),
+    ),
+    GetPage(
+      name: AppRoutes.sessionMode,
+      page: () => SessionModeScreen(
+        initial: Get.arguments is SessionMode
+            ? Get.arguments as SessionMode
+            : null,
+      ),
     ),
     GetPage(
       name: AppRoutes.checkoutWebView,

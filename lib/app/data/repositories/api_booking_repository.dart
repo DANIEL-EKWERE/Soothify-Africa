@@ -1,6 +1,7 @@
 import '../../core/errors/app_exception.dart';
 import '../../core/network/api_client.dart';
 import '../models/booked_session.dart';
+import '../models/call_credentials.dart';
 import 'booking_repository.dart';
 
 /// Booking against `/api/v1/experts/` and `/api/v1/sessions/`.
@@ -96,8 +97,10 @@ class ApiBookingRepository implements BookingRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> callToken(String sessionId) =>
-      _api.post('/sessions/$sessionId/call-token/');
+  Future<CallCredentials> callToken(String sessionId) async =>
+      CallCredentials.fromJson(
+        await _api.post('/sessions/$sessionId/call-token/'),
+      );
 
   String _day(DateTime when) {
     final local = when.toLocal();

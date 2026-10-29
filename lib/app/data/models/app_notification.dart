@@ -73,7 +73,18 @@ class AppNotification {
     this.actionLabel = '',
     this.unread = false,
     this.filters = const {NotificationFilter.all},
+    this.target = '',
   });
+
+  /// Where tapping it goes, as the server wrote it — 'session/8',
+  /// 'breathe', 'daily'. Dropped on the way in until now, which is why a
+  /// session row had no idea which session it was about and the waiting
+  /// room was built out of the row's own words.
+  final String target;
+
+  /// The id in a 'session/8' target, or empty.
+  String get sessionId =>
+      target.startsWith('session/') ? target.substring('session/'.length) : '';
 
   final String id;
   final NotificationKind kind;
@@ -150,6 +161,9 @@ class AppNotification {
         actionLabel: actionLabel,
         unread: false,
         filters: filters,
+        // Carried, or a row forgets which session it is about the moment
+        // it is read.
+        target: target,
       );
 
   factory AppNotification.fromJson(Map<String, dynamic> json) {

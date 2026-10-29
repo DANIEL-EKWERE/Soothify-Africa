@@ -4,6 +4,7 @@ import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/booked_session.dart';
 import '../../../../data/repositories/booking_repository.dart';
+import '../../../../data/models/session_mode.dart';
 import '../../../../data/models/session_offering.dart';
 
 /// Picking the day the paid-for session actually happens — Figma
@@ -149,11 +150,22 @@ class BookingCalendarController extends BaseController {
     final chosen = available.firstWhereOrNull((s) => s.label == slot.value);
     if (chosen == null) return;
 
+    // How they want to take it, before the hour is held. The session
+    // carries this, and until now nothing asked: every booking was sent
+    // as a video call whatever the questionnaire had been told.
+    final mode = await Get.toNamed(
+      AppRoutes.sessionMode,
+      arguments: SessionMode.fromWire(PrefUtils().sessionMode()),
+    );
+    if (mode is! SessionMode) return;      // backed out; nothing is booked
+    await PrefUtils().setSessionMode(mode.wire);
+
     final session = await guard(() => _bookings.book(
           discipline: _discipline,
           day: selected.value!,
           startMinute: chosen.startMinute,
           expertId: expert.value?.id,
+          mode: mode.wire,
         ));
     // guard has already said what went wrong -- the hour taken a moment ago
     // by somebody else, most often.

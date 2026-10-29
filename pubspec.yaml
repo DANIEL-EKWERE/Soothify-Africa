@@ -81,6 +81,10 @@ dependencies:
   # A real map for "Spaces Around Me", on OpenStreetMap tiles -- no API key
   # and no billing account, unlike the alternative. The screen used to be a
   # flat screenshot with pins placed by spreading the studios across it.
+  # The session call. The server already mints ZEGOCLOUD tokens and holds
+  # the credentials; the app had no calling SDK at all, so "the call" was
+  # two static screens with buttons that toggled nothing.
+  zego_uikit_prebuilt_call: ^4.16.16
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   # Checkout, inside the app. The payer used to be handed to the system

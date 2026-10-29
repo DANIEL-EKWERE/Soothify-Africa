@@ -1,4 +1,5 @@
 import '../models/booked_session.dart';
+import '../models/call_credentials.dart';
 import '../models/coach.dart';
 import 'booking_repository.dart';
 
@@ -128,7 +129,7 @@ class MockBookingRepository implements BookingRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> callToken(String sessionId) async {
+  Future<CallCredentials> callToken(String sessionId) async {
     await Future<void>.delayed(_latency);
     // No credentials without a server, and saying so is better than handing
     // back something that cannot join a room.

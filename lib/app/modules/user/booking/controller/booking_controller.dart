@@ -284,6 +284,22 @@ class BookingController extends GetxController {
   void chooseMode(CallMode value) {
     mode.value = value;
     stage.value = BookingStage.call;
+    unawaited(openTheCall());
+  }
+
+  /// Opens the real call, and moves to the rating when it ends.
+  ///
+  /// The stage below it stays what it was: the prebuilt call is pushed
+  /// over this screen, so backing out of it lands here rather than on
+  /// nothing. Without a session id there is nothing to join -- the mock
+  /// screens still draw, which is what the no-backend build shows.
+  Future<void> openTheCall() async {
+    if (_sessionId.isEmpty) return;
+
+    await Get.toNamed(AppRoutes.sessionCall, arguments: _sessionId);
+    // However it ended -- hung up, refused, or backed out of -- the next
+    // thing the flow asks is how it went.
+    if (stage.value == BookingStage.call) endCall();
   }
 
   void endCall() => stage.value = BookingStage.rating;

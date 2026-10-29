@@ -88,6 +88,10 @@ class NotificationsController extends BaseController {
     Get.toNamed(
       AppRoutes.clientJoining,
       arguments: SessionInvite(
+        // The server's id, carried on the row's target. Without it the
+        // waiting room could not tell which session it was about, so it
+        // could not tell whether it was time.
+        sessionId: notification.sessionId,
         expertName: Coach.sample.name.split(' ').first,
         service: notification.emphasis.isEmpty
             ? '1-on-1 Therapy'

@@ -148,6 +148,13 @@ class AppRoutes {
   /// follows it. The receipt used to return to [booking], which restarts at
   /// the matching interstitial.
   static const String bookingCalendar = '/schedule/calendar';
+
+  /// "How do you want to have your sessions?" — audio or video. Asked
+  /// between picking the hour and paying for it.
+  static const String sessionMode = '/schedule/calendar/how';
+
+  /// The call itself, on ZEGOCLOUD. Takes the session id.
+  static const String sessionCall = '/session/call';
   static const String bookingConfirmed = '/schedule/calendar/confirmed';
 
   /// Applying to practise on Soothify. The intro, then the form, which runs

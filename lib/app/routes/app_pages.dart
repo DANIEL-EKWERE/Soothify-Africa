@@ -49,7 +49,7 @@ import '../modules/user/breathe/binding/breathe_binding.dart';
 import '../modules/user/checkout/checkout_webview_screen.dart';
 import '../data/models/session_mode.dart';
 import '../data/repositories/booking_repository.dart';
-import '../modules/user/call/session_call_screen.dart';
+import '../modules/user/session/session_call_screen.dart';
 import '../modules/user/session_mode/session_mode_screen.dart';
 import '../modules/user/breathe/breathe_screen.dart';
 import '../modules/user/trial_offer/binding/trial_offer_binding.dart';

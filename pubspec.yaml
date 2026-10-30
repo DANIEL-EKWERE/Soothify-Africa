@@ -44,7 +44,7 @@ dependencies:
   # Picks the certification and ID documents the expert application asks for
   # (`259:59198`, "PDF, JPG, or PNG"). The document picker needs no runtime
   # permission on either platform, unlike an image-library picker.
-  file_picker: ^8.1.7
+  file_picker: ^10.3.8
   # The one HTTP client for the Django API at /api/v1/. Kept to `http`
   # rather than a heavier package: the client here is a thin JSON wrapper,
   # and interceptors would hide where the auth header comes from.
@@ -84,7 +84,7 @@ dependencies:
   # The session call. The server already mints ZEGOCLOUD tokens and holds
   # the credentials; the app had no calling SDK at all, so "the call" was
   # two static screens with buttons that toggled nothing.
-  zego_uikit_prebuilt_call: ^4.16.16
+  zego_uikit_prebuilt_call: ^4.24.5
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   # Checkout, inside the app. The payer used to be handed to the system

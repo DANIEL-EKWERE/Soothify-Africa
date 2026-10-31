@@ -36,11 +36,33 @@ class JoiningSessionScreen extends GetView<JoiningSessionController> {
                   Text('You’re joining a live session with your client.',
                       style: CustomTextStyles.expertBlurb),
                   SizedBox(height: 33.v),
-                  const Center(child: JoiningPulse()),
-                  SizedBox(height: 36.v),
-                  Text('Joining Call',
-                      textAlign: TextAlign.center,
-                      style: CustomTextStyles.joiningHeading),
+                  // The pulse is the room opening. Not pulsing at a
+                  // session that is days away: it read as connecting, and
+                  // then nothing ever happened.
+                  if (controller.canJoin)
+                    const Center(child: JoiningPulse()),
+                  if (controller.canJoin) SizedBox(height: 36.v),
+                  Text(
+                    controller.canJoin ? 'Joining Call' : controller.waitLabel,
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.joiningHeading,
+                  ),
+                  if (controller.canJoin) ...[
+                    SizedBox(height: 20.v),
+                    // The frame draws no Join -- it was taken to mean the
+                    // screen was the joining, so nothing opened the room.
+                    Center(
+                      child: TextButton(
+                        onPressed: controller.join,
+                        child: Text(
+                          'Enter the room',
+                          style: CustomTextStyles.expertBlurb.copyWith(
+                            color: appTheme.soothifyBlue,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                   SizedBox(height: 16.v),
                   Text(
                     // The frame's line here is the payout flow's — "Your

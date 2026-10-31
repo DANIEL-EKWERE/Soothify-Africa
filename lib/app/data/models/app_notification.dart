@@ -184,6 +184,11 @@ class AppNotification {
       emphasis: json['emphasis'] as String? ?? '',
       actionLabel: json['action_label'] as String? ?? '',
       unread: json['unread'] as bool? ?? false,
+      // Without this the field stayed empty, so a session row had no idea
+      // which session it was about -- the waiting room could not tell
+      // whether it was time, and the call fell through to the drawn
+      // stage. The server has sent it all along.
+      target: json['target'] as String? ?? '',
       at: DateTime.tryParse('${json['created_at']}')?.toLocal() ??
           DateTime.now(),
       filters: {

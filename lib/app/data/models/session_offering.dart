@@ -54,3 +54,19 @@ enum SessionOffering {
 
 /// Which of the two prices on the booking screen is chosen.
 enum SessionPlan { single, monthly }
+
+
+/// What the calendar is opened with.
+///
+/// The offering alone was not enough: the calendar matched again on its
+/// own, so it could offer -- and book -- a different practitioner from
+/// the one the matched screen had just named.
+class CalendarArguments {
+  const CalendarArguments({required this.offering, this.expertId = ''});
+
+  final SessionOffering offering;
+
+  /// Who the user was matched with. Empty when the calendar is reached
+  /// without a match, and then it asks for one itself.
+  final String expertId;
+}

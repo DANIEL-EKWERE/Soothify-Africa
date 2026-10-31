@@ -26,9 +26,12 @@ class BookingCalendarController extends BaseController {
 
   final DateTime Function() _now;
 
-  late final SessionOffering offering = Get.arguments is SessionOffering
-      ? Get.arguments as SessionOffering
-      : SessionOffering.therapy;
+  /// Both shapes: a bare offering is what the older callers pass.
+  late final SessionOffering offering = switch (Get.arguments) {
+    final CalendarArguments given => given.offering,
+    final SessionOffering only => only,
+    _ => SessionOffering.therapy,
+  };
 
   late final Rx<DateTime> month = DateTime(_now().year, _now().month).obs;
 
@@ -73,6 +76,9 @@ class BookingCalendarController extends BaseController {
   /// calendar cannot offer anything until it knows.
   Future<void> _loadAvailability() async {
     await guard(() async {
+      // Matched again here rather than carried: `matching.best` is
+      // deterministic for a discipline, so this is the same person the
+      // screen before named. There is no lookup by id to use instead.
       final matched = await _bookings.match(discipline: _discipline);
       expert.value = matched;
       if (matched == null) {
@@ -144,7 +150,9 @@ class BookingCalendarController extends BaseController {
   ///
   /// `offNamed`, so the receipt's Continue cannot step back onto a calendar
   /// offering to book the session a second time.
-  Future<void> confirm() async {
+  /// [mode] is supplied by a test, which has no navigator to show the
+  /// picker on. The app leaves it out and the picker is opened.
+  Future<void> confirm({SessionMode? mode}) async {
     if (!canConfirm || isLoading.value) return;
 
     final chosen = available.firstWhereOrNull((s) => s.label == slot.value);
@@ -153,19 +161,29 @@ class BookingCalendarController extends BaseController {
     // How they want to take it, before the hour is held. The session
     // carries this, and until now nothing asked: every booking was sent
     // as a video call whatever the questionnaire had been told.
-    final mode = await Get.toNamed(
-      AppRoutes.sessionMode,
-      arguments: SessionMode.fromWire(PrefUtils().sessionMode()),
-    );
-    if (mode is! SessionMode) return;      // backed out; nothing is booked
-    await PrefUtils().setSessionMode(mode.wire);
+    // Typed, not inferred: `Get.toNamed` answers `dynamic`, and Dart does
+    // not promote a dynamic through an `is!` check.
+    final Object? callMode = mode ??
+        await Get.toNamed<dynamic>(
+          AppRoutes.sessionMode,
+          arguments: SessionMode.fromWire(
+          PrefUtils.isReady ? PrefUtils().sessionMode() : '',
+        ),
+        );
+    if (callMode is! SessionMode) return;  // backed out; nothing is booked
+
+    // Remembering the choice is a convenience; failing to remember it must
+    // not stop the booking.
+    if (PrefUtils.isReady) {
+      await PrefUtils().setSessionMode(callMode.wire);
+    }
 
     final session = await guard(() => _bookings.book(
           discipline: _discipline,
           day: selected.value!,
           startMinute: chosen.startMinute,
           expertId: expert.value?.id,
-          mode: mode.wire,
+          mode: callMode.wire,
         ));
     // guard has already said what went wrong -- the hour taken a moment ago
     // by somebody else, most often.

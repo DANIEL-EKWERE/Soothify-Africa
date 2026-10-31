@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/app_export.dart';
 import '../../../../core/utils/media_entry.dart';
 import '../../../../data/models/booked_session.dart' show ExpertPeer;
+import '../../../../data/models/coach.dart';
 import '../../../../widgets/gradient_text.dart';
 import '../controller/booking_controller.dart';
 import '../../../../widgets/soothify_word.dart';
@@ -20,7 +21,33 @@ class MatchedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<BookingController>();
-    final coach = controller.coach;
+
+    // Its own Obx: this widget is built by the stage switch above, so a
+    // read made here would register no dependency and the answer landing
+    // would not repaint.
+    return Obx(() {
+      // Nobody practises this, or nobody is free then. The screen used to
+      // fall through to the frame's own coach and announce a match with
+      // "Baraqhat Ibrahim" -- a name out of the design, presented as a
+      // real practitioner somebody could book.
+      if (controller.stillMatching.value) return const _StillLooking();
+      if (controller.nobodyAvailable.value) return const _NobodyFree();
+      if (controller.matchFailed.value) return const _CouldNotMatch();
+
+      return _Matched(coach: controller.coach);
+    });
+  }
+}
+
+/// The matched coach, as the frame draws them.
+class _Matched extends StatelessWidget {
+  const _Matched({required this.coach});
+
+  final Coach coach;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<BookingController>();
     return ListView(
       padding: EdgeInsets.only(bottom: 32.v),
       children: [
@@ -239,6 +266,89 @@ class _Detail extends StatelessWidget {
             child: Text(line, style: CustomTextStyles.coachBlurb),
           ),
       ],
+    );
+  }
+}
+
+/// Still asking.
+class _StillLooking extends StatelessWidget {
+  const _StillLooking();
+
+  @override
+  Widget build(BuildContext context) => const Center(
+        child: CircularProgressIndicator(),
+      );
+}
+
+/// The match could not be asked for -- a timeout, or the server refusing.
+///
+/// Its own state, separate from "nobody is free": one is an answer and
+/// the other is the absence of one, and showing a coach for either was
+/// how the screen came to announce a match with somebody from the design.
+class _CouldNotMatch extends StatelessWidget {
+  const _CouldNotMatch();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<BookingController>();
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'We could not find you a coach just now',
+              textAlign: TextAlign.center,
+              style: CustomTextStyles.matchedLead,
+            ),
+            SizedBox(height: 12.v),
+            Text(
+              'Check your connection and try again.',
+              textAlign: TextAlign.center,
+              style: CustomTextStyles.emptyStateBody,
+            ),
+            SizedBox(height: 28.v),
+            _PrimaryButton(label: 'Try again', onTap: controller.matchAgain),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// When the server has nobody to offer.
+class _NobodyFree extends StatelessWidget {
+  const _NobodyFree();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 40.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'No coach is free for that just now',
+              textAlign: TextAlign.center,
+              style: CustomTextStyles.matchedLead,
+            ),
+            SizedBox(height: 12.v),
+            Text(
+              'Try another time, or come back shortly \u2014 we are adding '
+              'practitioners.',
+              textAlign: TextAlign.center,
+              style: CustomTextStyles.emptyStateBody,
+            ),
+            SizedBox(height: 28.v),
+            _PrimaryButton(
+              label: 'Pick another time',
+              onTap: Get.back,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

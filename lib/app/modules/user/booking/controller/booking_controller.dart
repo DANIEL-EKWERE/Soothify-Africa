@@ -129,15 +129,35 @@ class BookingController extends GetxController {
   /// screen has to say so rather than show a coach who does not exist.
   final RxBool nobodyAvailable = false.obs;
 
+  /// The match could not be asked for at all -- a timeout, or the server
+  /// refusing. Different from [nobodyAvailable], which is a real answer.
+  ///
+  /// It used to be swallowed: the screen then fell through to the frame's
+  /// own coach and announced a match with somebody who does not exist,
+  /// while the calendar behind it asked again, succeeded, and booked a
+  /// real practitioner. The two screens disagreed about who you had been
+  /// matched with.
+  final RxBool matchFailed = false.obs;
+
+  /// Whether the match is still being asked for.
+  final RxBool stillMatching = true.obs;
+
   /// The matched coach, as the screen reads them.
   ///
   /// Falls back to the frame's own sample when there is no repository to
   /// ask -- the no-backend build, and the goldens.
   Coach get coach {
     final match = matched.value;
-    if (match == null) return Coach.sample;
-    return Coach.fromMatch(match, feelings: feelings);
+    if (match != null) return Coach.fromMatch(match, feelings: feelings);
+
+    // The frame's own coach, and only where there is no server to ask --
+    // the no-backend build and the goldens. With a server, showing this
+    // would be presenting a name out of the design as a real person.
+    return Coach.sample;
   }
+
+  /// Whether [coach] is somebody the server actually named.
+  bool get hasRealMatch => matched.value != null;
 
   String get coachName => coach.name;
 
@@ -167,13 +187,24 @@ class BookingController extends GetxController {
     super.onInit();
     // Entering at the call means the session was already matched and paid
     // for; running the interstitial would walk it through matching again.
-    if (stage.value == BookingStage.matching) _runMatching();
+    if (stage.value == BookingStage.matching) {
+      _runMatching();
+    } else {
+      // Entering further along: no match is being asked for, so the
+      // matched screen must not sit on a spinner waiting for one.
+      stillMatching.value = false;
+    }
 
     // ...and entering at the call means opening the real one. This hung
     // off `chooseMode` alone, which is the old method-selection step the
     // flow no longer takes -- so arriving here from the waiting room drew
     // the mock screens instead of joining anything.
-    if (stage.value == BookingStage.call) unawaited(openTheCall());
+    if (stage.value == BookingStage.call) {
+      // After the first frame: onInit runs while the controller is being
+      // put, which is before there is a navigator to push onto.
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => unawaited(openTheCall()));
+    }
   }
 
   @override
@@ -214,9 +245,16 @@ class BookingController extends GetxController {
   /// chips are decoration on a page whose point is the match.
   Future<void> _findSomebody() async {
     final bookings = _bookings;
-    if (bookings == null) return;
+    if (bookings == null) {
+      // No server to ask: the frame's own coach is the answer here, and
+      // leaving this true would spin forever on the no-backend build.
+      stillMatching.value = false;
+      return;
+    }
 
     unawaited(_readTheQuestionnaire());
+    matchFailed.value = false;
+    stillMatching.value = true;
     try {
       final found = await bookings.match(
         discipline: offering?.id ?? SessionOffering.therapy.id,
@@ -224,9 +262,17 @@ class BookingController extends GetxController {
       matched.value = found;
       nobodyAvailable.value = found == null;
     } catch (error) {
+      // Not silently any more. Whatever this screen shows next, it must
+      // not be a coach nobody was matched with.
       Log.e('matching could not reach the server', error: error);
+      matchFailed.value = true;
+    } finally {
+      stillMatching.value = false;
     }
   }
+
+  /// Asks again, for the retry on the failure state.
+  Future<void> matchAgain() => _findSomebody();
 
   Future<void> _readTheQuestionnaire() async {
     final kyc = _kyc;
@@ -267,7 +313,16 @@ class BookingController extends GetxController {
     // The calendar first, then payment: you choose when the session runs and
     // pay for that, rather than paying for an unscheduled one and picking a
     // day off the receipt.
-    await Get.toNamed(AppRoutes.bookingCalendar, arguments: offering);
+    await Get.toNamed(
+      AppRoutes.bookingCalendar,
+      // With the coach they were just shown, so the calendar offers that
+      // person's hours rather than matching again and perhaps landing on
+      // somebody else.
+      arguments: CalendarArguments(
+        offering: offering ?? SessionOffering.therapy,
+        expertId: matched.value?.id ?? '',
+      ),
+    );
   }
 
   /// Opens the communication picker, and from there the call.
@@ -288,7 +343,13 @@ class BookingController extends GetxController {
   /// booking nobody made.
   void schedule(DateTime date) {
     scheduledFor.value = date;
-    Get.toNamed(AppRoutes.bookingCalendar, arguments: offering);
+    Get.toNamed(
+      AppRoutes.bookingCalendar,
+      arguments: CalendarArguments(
+        offering: offering ?? SessionOffering.therapy,
+        expertId: matched.value?.id ?? '',
+      ),
+    );
   }
 
   void chooseMode(CallMode value) {
@@ -304,15 +365,14 @@ class BookingController extends GetxController {
   /// nothing. Without a session id there is nothing to join -- the mock
   /// screens still draw, which is what the no-backend build shows.
   Future<void> openTheCall() async {
+    // Nothing to join: the build with no backend, and the goldens. The
+    // drawn stage stands in for a call there, which is all it can do.
+    if (_sessionId.isEmpty) {
+      Log.e('the call stage was reached with no session to join');
+      return;
+    }
     if (_openedTheCall) return;      // one room, however many rebuilds
     _openedTheCall = true;
-
-    // Opened even with no session id. The call screen says it could not
-    // be identified; the mock screens behind this say nothing at all and
-    // look like a call that is working, which is worse.
-    if (_sessionId.isEmpty) {
-      Log.e('the call was opened with no session to join');
-    }
 
     await Get.toNamed(AppRoutes.sessionCall, arguments: _sessionId);
     // However it ended -- hung up, refused, or backed out of -- the next

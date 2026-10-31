@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
 import 'package:soothifyafrica/app/data/models/booked_session.dart';
+import 'package:soothifyafrica/app/data/models/session_mode.dart';
 import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_booking_repository.dart';
@@ -86,7 +87,9 @@ void main() {
     c.pickDay(DateTime(2026, 10, 14));
     await tester.tap(find.text('11:00am'));
     await tester.pumpAndSettle();
-    c.confirm();
+    // The communication picker sits between the hour and payment now, and
+    // a test has no navigator to show it on.
+    c.confirm(mode: SessionMode.video);
     // Booking holds the hour on the server before the screen moves on.
     await settleLoads(tester);
 

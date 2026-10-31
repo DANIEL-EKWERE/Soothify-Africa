@@ -257,7 +257,8 @@ class BookingController extends GetxController {
     stillMatching.value = true;
     try {
       final found = await bookings.match(
-        discipline: offering?.id ?? SessionOffering.therapy.id,
+        // The server's own name for it, not the app's.
+        discipline: (offering ?? SessionOffering.therapy).wire,
       );
       matched.value = found;
       nobodyAvailable.value = found == null;

@@ -12,6 +12,19 @@ enum SessionOffering {
       monthly: 36000,
       matchingTitle: 'Finding your instructor');
 
+  /// What the server calls this discipline.
+  ///
+  /// Not [id]: the app says `meditation` and `balance`, from before the
+  /// rename, and the server knows `pilates` and `yoga`. They disagreed, so
+  /// asking to be matched for Pilates & Core or Stretch & Restore was a
+  /// request for a discipline nobody practises -- and the answer was
+  /// always "nobody is free".
+  String get wire => switch (this) {
+        SessionOffering.therapy => 'therapy',
+        SessionOffering.meditation => 'pilates',
+        SessionOffering.balance => 'yoga',
+      };
+
   const SessionOffering(
     this.id,
     this.title, {

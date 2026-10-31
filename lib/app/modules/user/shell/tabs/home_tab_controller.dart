@@ -206,9 +206,15 @@ class HomeTabController extends BaseController {
   void open(MediaItem item, {required String source}) =>
       openMedia(item, source: source);
 
-  /// Home's Popular Content row is the one "See All" in the app with nothing
-  /// behind it. It opens the Videos catalogue (`259:60948`), which is the
-  /// full browse page for this kind of card — the frames draw no entry point
-  /// for that screen, so this placement is a decision, not the design's.
-  void seeAllPopular() => Get.toNamed(AppRoutes.videos);
+  /// The rest of the Popular row, in the grid every other "See All" opens.
+  ///
+  /// It used to open the Videos catalogue, which is two fixed video shelves
+  /// — somewhere adjacent, not more of what was tapped, and nothing at all
+  /// for the audio and articles this row can hold. The grid repeats the
+  /// very call that filled the row, which is what Discovery's Popular
+  /// already did.
+  void seeAllPopular() => Get.toNamed(
+        AppRoutes.shelf,
+        arguments: {'shelf': 'Popular Content', 'key': 'popular'},
+      );
 }

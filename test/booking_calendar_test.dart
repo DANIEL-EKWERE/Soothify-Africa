@@ -22,6 +22,7 @@ import 'helpers.dart';
 /// Regenerate with:
 ///   flutter test --update-goldens test/booking_calendar_test.dart
 void main() {
+  _disciplineNames();
   setUp(() {
     PrefUtils.resetForTesting();
     SharedPreferences.setMockInitialValues({});
@@ -266,5 +267,31 @@ void main() {
     expect(fillOf(slot), appTheme.surface);
     // And only the one that was tapped.
     expect(borderOf('9:00am').top.color, appTheme.cardHairline);
+  });
+}
+/// The name the server knows a discipline by.
+///
+/// The app says `meditation` and `balance`, from before the rename; the
+/// server knows `pilates` and `yoga`. The matched screen sent the app's
+/// name, so asking to be matched for Pilates & Core or Stretch & Restore
+/// was a request for a discipline nobody practises — and the answer was
+/// always "nobody is free", while the calendar behind it mapped correctly
+/// and found somebody.
+void _disciplineNames() {
+  test('each offering maps to a discipline the server has', () {
+    expect(SessionOffering.therapy.wire, 'therapy');
+    expect(SessionOffering.meditation.wire, 'pilates');
+    expect(SessionOffering.balance.wire, 'yoga');
+  });
+
+  test('none of them sends the app-side name', () {
+    // These are the values that returned 404 from the live server.
+    for (final offering in SessionOffering.values) {
+      expect(
+        ['meditation', 'balance'].contains(offering.wire),
+        isFalse,
+        reason: '${offering.name} still sends its app-side name',
+      );
+    }
   });
 }

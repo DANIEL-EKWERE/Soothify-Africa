@@ -60,12 +60,15 @@ void main() {
     expect(repository.askedFor, ['sound-effects']);
   });
 
-  test('Home’s two rows repeat their own call, not a shelf', () async {
+  test('the two content rows repeat their own call, not a shelf', () async {
     await openedWith({'shelf': 'Recent', 'key': 'recent'}).load();
-    await openedWith({'shelf': 'Popular', 'key': 'popular'}).load();
+    await openedWith({'shelf': 'Popular Content', 'key': 'popular'}).load();
     expect(repository.askedFor, isEmpty, reason: 'neither is a shelf');
     expect(repository.recentCalls, 1);
-    expect(repository.featuredCalls, 1);
+    // getPopular, which is what fills the rows — not getFeatured, which is
+    // a different list the grid used to open on.
+    expect(repository.popularCalls, 1);
+    expect(repository.featuredCalls, 0);
   });
 
   /// Opening for real: the binding is what reads the route arguments, so
@@ -144,6 +147,7 @@ class _RecordingRepository extends MockContentRepository {
   final List<String> askedFor = [];
   int recentCalls = 0;
   int featuredCalls = 0;
+  int popularCalls = 0;
 
   @override
   Future<List<MediaItem>> getShelfPage(String shelf,
@@ -162,5 +166,11 @@ class _RecordingRepository extends MockContentRepository {
   Future<List<MediaItem>> getFeatured() {
     featuredCalls++;
     return super.getFeatured();
+  }
+
+  @override
+  Future<List<MediaItem>> getPopular() {
+    popularCalls++;
+    return super.getPopular();
   }
 }

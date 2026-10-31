@@ -59,7 +59,12 @@ class ShelfController extends BaseController {
   Future<void> load() => guard(() async {
         final page = switch (key) {
           _recent => await _repository.getRecent(),
-          _popular => await _repository.getFeatured(),
+          // getPopular, not getFeatured: the rows this grid is the rest of
+          // are filled by the former — what people are actually playing,
+          // staff pins first. Featured is a different list, so both
+          // Popular "See All"s were opening on content the row never
+          // showed.
+          _popular => await _repository.getPopular(),
           // Sent to the server, so a chip narrows the catalogue rather
           // than the page already fetched.
           _ => await _repository.getShelfPage(

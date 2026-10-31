@@ -108,11 +108,10 @@ class BookingCalendarController extends BaseController {
   /// The app's sections do not map one-to-one onto what an expert is booked
   /// for: Pilates & Core and Stretch & Restore are both movement, and the
   /// server knows yoga and pilates by name.
-  String get _discipline => switch (offering) {
-        SessionOffering.therapy => 'therapy',
-        SessionOffering.balance => 'yoga',
-        SessionOffering.meditation => 'pilates',
-      };
+  /// On the enum, so this screen and the matched one cannot drift: they
+  /// did, and the matched screen asked for a discipline the server has
+  /// never heard of.
+  String get _discipline => offering.wire;
 
   bool hasSlotsOn(DateTime day) => _allSlots.any((s) => _sameDay(s.day, day));
 

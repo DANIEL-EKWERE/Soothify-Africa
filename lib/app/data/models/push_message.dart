@@ -67,7 +67,11 @@ PushDestination destinationFor(Map<String, dynamic> data) {
           time: text('time'),
           date: text('date'),
           // What the rating at the end of the call is filed against.
-          sessionId: text('session_id'),
+          // Either key: the server sends `session_id` now and `session`
+          // on older builds, and they disagreed for a while.
+          sessionId: text('session_id').isNotEmpty
+              ? text('session_id')
+              : text('session'),
         ),
       );
 

@@ -5,6 +5,8 @@ import 'package:soothifyafrica/app/core/errors/app_exception.dart';
 import 'package:soothifyafrica/app/data/models/booked_session.dart';
 import 'package:soothifyafrica/app/data/models/call_credentials.dart';
 import 'package:soothifyafrica/app/data/repositories/booking_repository.dart';
+import 'package:soothifyafrica/app/modules/user/booking/controller/booking_controller.dart';
+import 'package:soothifyafrica/app/data/models/session_offering.dart';
 import 'package:soothifyafrica/app/modules/user/session/session_call_screen.dart';
 
 /// Joining a session's call.
@@ -123,6 +125,21 @@ void main() {
     });
   });
 
+  group('opening it from the flow', () {
+    test('entering at the call stage opens the real one', () {
+      // What the waiting room does: straight to the call stage, with the
+      // session it is for.
+      final entry = BookingEntry(
+        offering: SessionOffering.therapy,
+        stage: BookingStage.call,
+        sessionId: '8',
+      );
+
+      expect(entry.stage, BookingStage.call);
+      expect(entry.sessionId, '8');
+    });
+  });
+
   group('reading the server\'s answer', () {
     test('it takes the app id however it is typed', () {
       expect(
@@ -146,4 +163,23 @@ void main() {
       expect(creds.recordingNotice, 'This session is recorded.');
     });
   });
+}
+
+/// Opening the call from the flow.
+///
+/// The real call hung off `chooseMode`, the old method-selection step the
+/// booking no longer takes. Arriving at the call stage from the waiting
+/// room therefore opened nothing, and the mock screens drew instead.
+class _CountingBookings implements BookingRepository {
+  int tokensAsked = 0;
+
+  @override
+  Future<CallCredentials> callToken(String sessionId) async {
+    tokensAsked += 1;
+    return good();
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw UnimplementedError('${invocation.memberName} is not used here');
 }

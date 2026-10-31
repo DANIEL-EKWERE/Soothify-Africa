@@ -127,9 +127,30 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                     style: CustomTextStyles.expertCardMeta,
                   ),
                   SizedBox(height: 40.v),
-                  CustomElevatedButton(
-                    text: 'Save',
-                    onPressed: controller.save,
+                  // Whatever stopped it, said here.
+                  //
+                  // A refusal used to speak only through a snackbar, which
+                  // leaves "Save does nothing" as the whole of what a
+                  // practitioner can see when one does not appear.
+                  Obx(() {
+                    final problem = controller.whyNotSaved.value;
+                    if (problem.isEmpty) return const SizedBox.shrink();
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.v),
+                      child: Text(
+                        problem,
+                        style: CustomTextStyles.expertCardMeta
+                            .copyWith(color: appTheme.error),
+                      ),
+                    );
+                  }),
+                  Obx(
+                    () => CustomElevatedButton(
+                      text: controller.isLoading.value ? 'Saving…' : 'Save',
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : controller.save,
+                    ),
                   ),
                 ],
               ),

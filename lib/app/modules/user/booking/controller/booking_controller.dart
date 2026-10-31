@@ -158,12 +158,22 @@ class BookingController extends GetxController {
 
   Timer? _ratingHold;
 
+  /// Guards against pushing the call twice: `onInit` opens it, and a
+  /// rebuild must not open a second.
+  bool _openedTheCall = false;
+
   @override
   void onInit() {
     super.onInit();
     // Entering at the call means the session was already matched and paid
     // for; running the interstitial would walk it through matching again.
     if (stage.value == BookingStage.matching) _runMatching();
+
+    // ...and entering at the call means opening the real one. This hung
+    // off `chooseMode` alone, which is the old method-selection step the
+    // flow no longer takes -- so arriving here from the waiting room drew
+    // the mock screens instead of joining anything.
+    if (stage.value == BookingStage.call) unawaited(openTheCall());
   }
 
   @override
@@ -294,7 +304,15 @@ class BookingController extends GetxController {
   /// nothing. Without a session id there is nothing to join -- the mock
   /// screens still draw, which is what the no-backend build shows.
   Future<void> openTheCall() async {
-    if (_sessionId.isEmpty) return;
+    if (_openedTheCall) return;      // one room, however many rebuilds
+    _openedTheCall = true;
+
+    // Opened even with no session id. The call screen says it could not
+    // be identified; the mock screens behind this say nothing at all and
+    // look like a call that is working, which is worse.
+    if (_sessionId.isEmpty) {
+      Log.e('the call was opened with no session to join');
+    }
 
     await Get.toNamed(AppRoutes.sessionCall, arguments: _sessionId);
     // However it ended -- hung up, refused, or backed out of -- the next

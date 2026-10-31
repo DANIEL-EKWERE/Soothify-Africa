@@ -49,6 +49,10 @@ class SessionNotesController extends BaseController {
   /// whether or not the practitioner chose anything.
   final Rxn<MediaItem> picked = Rxn<MediaItem>();
 
+  /// Why the last Save did not go through, for the line above the button.
+  /// Empty when there is nothing to say.
+  final RxString whyNotSaved = ''.obs;
+
   /// The card the frame draws, from whatever is picked.
   ExpertContent? get content {
     final item = picked.value;
@@ -131,24 +135,27 @@ class SessionNotesController extends BaseController {
 
   void clearPick() => picked.value = null;
 
+  void _refuse(String why) {
+    whyNotSaved.value = why;
+    AppFeedback.error(ValidationException(why));
+  }
+
   /// Saves the note against the session.
   ///
   /// The three parts the frame collects are one body server-side: the note
   /// is a document a clinician writes, not a form with columns, and marking
   /// the sections in the text keeps them readable when they come back.
   Future<void> save() async {
+    whyNotSaved.value = '';
+
     final id = session?.id;
     if (id == null || id.isEmpty) {
-      AppFeedback.error(const ValidationException(
-        'Open a session from your schedule to write its notes.',
-      ));
+      _refuse('Open a session from your schedule to write its notes.');
       return;
     }
     if (isLoading.value) return;
     if (summary.text.trim().isEmpty) {
-      AppFeedback.error(const ValidationException(
-        'Write the session summary before saving.',
-      ));
+      _refuse('Write the session summary before saving.');
       return;
     }
 
@@ -167,7 +174,13 @@ class SessionNotesController extends BaseController {
       }
       return true;
     });
-    if (saved != true) return;
+    if (saved != true) {
+      // `guard` has already shown its own message; this keeps it on the
+      // screen, where a snackbar that did not appear leaves nothing.
+      whyNotSaved.value = error.value?.message ??
+          'That did not save. Please try again.';
+      return;
+    }
 
     AppFeedback.info(
       item == null

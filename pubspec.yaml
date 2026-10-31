@@ -93,6 +93,7 @@ dependencies:
   webview_flutter: ^4.10.0
   just_audio: ^0.10.6
   video_player: ^2.11.1
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -184,4 +185,37 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
 launcher_name:
-  default: "Soothify Africa"
+  default: "Soothify"
+
+
+flutter_launcher_icons:
+  # Both platforms use the HuxNovel wordmark. iOS gets its own copy of the
+  # Android image with the dark rounded corners filled white and no alpha
+  # channel (App Store requirement) — iOS applies its own corner mask.
+  image_path: "assets/images/1024.png"
+  android:
+    generate: true
+    image_path: "assets/images/1024.png"
+  ios: true
+  image_path_ios: "assets/images/1024.png"
+  remove_alpha_ios: true
+  background_color_ios: "#FFFFFF"
+
+flutter_native_splash:
+  # Android = HuxNovel wordmark. iOS (still NoveluX) keeps its existing splash
+  # files, so it is excluded from generation — like flutter_launcher_icons.
+  color: "#000000"
+  color_dark: "#000000"
+  image: "assets/images/play_store_512.png"
+  image_android: "assets/images/splash_android.png"
+  image_dark_android: "assets/images/splash_android.png"
+
+  android_12:
+    image: "assets/images/splash_android.png"
+    image_dark: "assets/images/splash_android.png"
+    icon_background_color: "#000000"
+    icon_background_color_dark: "#000000"
+
+  android: true
+  ios: false
+  web: false    

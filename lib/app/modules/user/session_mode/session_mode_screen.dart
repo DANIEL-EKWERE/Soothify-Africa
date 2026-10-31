@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
-import '../../../widgets/custom_elevated_button.dart';
 import '../../../data/models/session_mode.dart';
 
 /// "How do you want to have your sessions?" — Figma `259:38702`.
@@ -14,18 +13,18 @@ import '../../../data/models/session_mode.dart';
 ///
 /// Answers with the chosen [SessionMode], or null if backed out — the
 /// booking is made by the caller, so leaving here books nothing.
-class SessionModeScreen extends StatefulWidget {
+/// "How would you like to connect with your wellness coach?" — the
+/// Schedule frame: two square cards side by side, a phone and a camcorder.
+///
+/// Choosing is the whole screen; there is no Continue button, because a
+/// card is the answer. Answers with the chosen [SessionMode], or null if
+/// backed out — the booking is made by the caller, so leaving here books
+/// nothing.
+class SessionModeScreen extends StatelessWidget {
   const SessionModeScreen({super.key, this.initial});
 
-  /// What to open on. Their last choice, where there is one.
+  /// What they chose last time, drawn as already selected.
   final SessionMode? initial;
-
-  @override
-  State<SessionModeScreen> createState() => _SessionModeScreenState();
-}
-
-class _SessionModeScreenState extends State<SessionModeScreen> {
-  late SessionMode _chosen = widget.initial ?? SessionMode.fallback;
 
   @override
   Widget build(BuildContext context) {
@@ -49,34 +48,45 @@ class _SessionModeScreenState extends State<SessionModeScreen> {
                       color: appTheme.textPrimary,
                     ),
                   ),
+                  Expanded(
+                    child: Text(
+                      'Schedule',
+                      textAlign: TextAlign.center,
+                      style: CustomTextStyles.appBarTitle
+                          .copyWith(color: appTheme.brandDeep),
+                    ),
+                  ),
+                  // Balances the back arrow so the title sits centred.
+                  SizedBox(width: 18.h),
                 ],
               ),
-              SizedBox(height: 32.v),
+              SizedBox(height: 60.v),
               Text(
-                'How do you want to have your sessions?',
-                style: CustomTextStyles.breatheHeading,
+                'How would you like to\nconnect with your wellness coach?',
+                style: CustomTextStyles.breatheHeading
+                    .copyWith(color: appTheme.brandDeep),
               ),
               SizedBox(height: 12.v),
               Text(
-                'You can change this with your coach once the session '
-                'starts.',
+                'We want to make sure it\u2019s a comfortable and convenient '
+                'experience for you.',
                 style: CustomTextStyles.emptyStateBody,
               ),
-              SizedBox(height: 32.v),
-              for (final mode in SessionMode.values) ...[
-                _ModeTile(
-                  mode: mode,
-                  selected: _chosen == mode,
-                  onTap: () => setState(() => _chosen = mode),
-                ),
-                SizedBox(height: 16.v),
-              ],
-              const Spacer(),
-              CustomElevatedButton(
-                text: 'Continue',
-                onPressed: () => Get.back<SessionMode>(result: _chosen),
+              SizedBox(height: 40.v),
+              Row(
+                children: [
+                  for (final mode in SessionMode.values) ...[
+                    Expanded(
+                      child: _ModeCard(
+                        mode: mode,
+                        selected: initial == mode,
+                        onTap: () => Get.back<SessionMode>(result: mode),
+                      ),
+                    ),
+                    if (mode != SessionMode.values.last) SizedBox(width: 20.h),
+                  ],
+                ],
               ),
-              SizedBox(height: 28.v),
             ],
           ),
         ),
@@ -85,16 +95,20 @@ class _SessionModeScreenState extends State<SessionModeScreen> {
   }
 }
 
-/// One choice — the icon the questionnaire draws over its label.
-class _ModeTile extends StatelessWidget {
-  const _ModeTile({
+/// One square card — the icon over its label, as the frame draws it.
+class _ModeCard extends StatelessWidget {
+  const _ModeCard({
     required this.mode,
     required this.selected,
     required this.onTap,
   });
 
   final SessionMode mode;
+
+  /// Their last choice. The frame outlines both cards the same; this only
+  /// thickens the one they picked before, so returning here shows it.
   final bool selected;
+
   final VoidCallback onTap;
 
   @override
@@ -102,35 +116,36 @@ class _ModeTile extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12.h),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 20.v),
-        decoration: BoxDecoration(
-          color: selected ? appTheme.spaceTag : appTheme.surface,
-          borderRadius: BorderRadius.circular(12.h),
-          border: Border.all(
-            color: selected ? appTheme.soothifyBlue : appTheme.optionBorder,
-            width: selected ? 2 : 1,
+      child: AspectRatio(
+        // Square, as drawn.
+        aspectRatio: 1,
+        child: Container(
+          decoration: BoxDecoration(
+            color: appTheme.surface,
+            borderRadius: BorderRadius.circular(12.h),
+            border: Border.all(
+              color: appTheme.soothifyBlue,
+              width: selected ? 2 : 1,
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            CustomImageView(
-              imagePath: mode.icon,
-              height: 24.h,
-              width: 24.h,
-              color: selected ? appTheme.soothifyBlue : appTheme.textPrimary,
-            ),
-            SizedBox(width: 16.h),
-            Expanded(
-              child: Text(mode.label, style: CustomTextStyles.statsHeading),
-            ),
-            if (selected)
-              Icon(
-                Icons.check_circle,
-                size: 22.h,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomImageView(
+                imagePath: mode.icon,
+                height: 34.h,
+                width: 34.h,
                 color: appTheme.soothifyBlue,
               ),
-          ],
+              SizedBox(height: 14.v),
+              Text(
+                mode.cardLabel,
+                textAlign: TextAlign.center,
+                style: CustomTextStyles.emptyStateBody
+                    .copyWith(color: appTheme.brandDeep),
+              ),
+            ],
+          ),
         ),
       ),
     );

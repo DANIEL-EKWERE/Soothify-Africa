@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 
 import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
@@ -10,7 +11,15 @@ import '../../shell/controller/shell_controller.dart';
 
 /// Backs the Profile tab — Figma "Profile/dashboard" (135:8098).
 class ProfileTabController extends BaseController {
-  ProfileTabController(this._repository, this._session);
+  ProfileTabController(
+    this._repository,
+    this._session, {
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now;
+
+  /// Injectable, because the calendar opens on today and a golden
+  /// recorded against the wall clock goes stale the next day.
+  final DateTime Function() _now;
 
   final SessionService _session;
 
@@ -72,12 +81,51 @@ class ProfileTabController extends BaseController {
 
   List<ProfileSection> get sections => ProfileSection.values;
 
-  /// The month the History calendar is showing. The design prints August 2024.
-  final Rx<DateTime> month = DateTime(2024, 8).obs;
+  /// The month the History calendar is showing.
+  ///
+  /// This month, not the design's August 2024: the frame prints a date
+  /// because a frame has to print something, and shipping it meant the
+  /// calendar opened two years ago with nothing on it.
+  late final Rx<DateTime> month =
+      DateTime(_now().year, _now().month).obs;
 
-  final Rxn<DateTime> selectedDate = Rxn<DateTime>();
+  /// The day whose activity is listed. Today to begin with, so the screen
+  /// opens on something rather than on an unanswered question.
+  late final Rxn<DateTime> selectedDate = Rxn<DateTime>(_today);
+
+  DateTime get _today {
+    final now = _now();
+    return DateTime(now.year, now.month, now.day);
+  }
 
   void selectDate(DateTime date) => selectedDate.value = date;
+
+  /// What was played on the chosen day, newest first.
+  List<RecentPlay> get historyForSelectedDay {
+    final day = selectedDate.value;
+    if (day == null) return stats.value.recent;
+    return stats.value.recent.where((row) {
+      final at = row.playedAt;
+      return at != null && DateUtils.isSameDay(at, day);
+    }).toList();
+  }
+
+  /// The days the calendar marks — the ones with something on them.
+  Set<DateTime> get daysWithActivity => {
+        for (final row in stats.value.recent)
+          if (row.playedAt != null)
+            DateTime(
+              row.playedAt!.year,
+              row.playedAt!.month,
+              row.playedAt!.day,
+            ),
+      };
+
+  /// Whether the chosen day is today, for the empty state's wording.
+  bool get showingToday {
+    final day = selectedDate.value;
+    return day != null && DateUtils.isSameDay(day, _today);
+  }
 
   /// Mood opens a calendar of past check-ins; the two daily habits have their
   /// own screen, with a reminder behind it.

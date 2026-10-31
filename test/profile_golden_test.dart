@@ -66,6 +66,10 @@ const _art = [
   'assets/images/explore/balance.png',
 ];
 
+/// The History calendar opens on today, so every controller here is given
+/// the same fixed day -- otherwise its golden would change with the date.
+DateTime _pinnedNow() => DateTime(2024, 8, 20);
+
 void main() {
   setUp(() {
     PrefUtils.resetForTesting();
@@ -80,7 +84,8 @@ void main() {
     testWidgets('profile dashboard, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false)));
+      Get.put(ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false),
+          now: _pinnedNow));
 
       await pumpScreen(tester, const ProfileTab(), brightness: brightness);
       await precacheAll(tester, find.byType(ProfileTab), _art);
@@ -93,7 +98,8 @@ void main() {
   testWidgets('each pill switches to its own section', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final controller = ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false));
+    final controller = ProfileTabController(_FakeProfileRepository(), _FakeSession(guest: false),
+          now: _pinnedNow);
     Get.put(controller);
 
     await pumpScreen(tester, const ProfileTab());
@@ -148,6 +154,7 @@ void main() {
       Get.put(ProfileTabController(
         _FakeProfileRepository(),
         _FakeSession(guest: true),
+        now: _pinnedNow,
       ));
 
       await pumpScreen(tester, const ProfileTab(), brightness: brightness);
@@ -164,6 +171,7 @@ void main() {
     Get.put(ProfileTabController(
       _FakeProfileRepository(),
       _FakeSession(guest: true),
+      now: _pinnedNow,
     ));
 
     await pumpScreen(tester, const ProfileTab());
@@ -185,6 +193,9 @@ void main() {
     final controller = ProfileTabController(
       _FakeProfileRepository(),
       _FakeSession(guest: false),
+      // Pinned: the calendar opens on today now, so without this the
+      // month -- and the golden -- would change with the date.
+      now: _pinnedNow,
     );
     Get.put(controller);
 
@@ -201,6 +212,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(controller.selectedDate.value, DateTime(2024, 8, 14));
+    // And it opened on today rather than on nothing, which is what the
+    // screen used to do.
+    expect(controller.month.value, DateTime(2024, 8));
     // Orange, not the blue every other calendar in the app selects with.
     final filled = tester
         .widgetList<Container>(find.byType(Container))

@@ -41,14 +41,21 @@ class ProfileHistory extends StatelessWidget {
               child: MonthCalendar(
                 month: controller.month.value,
                 selected: controller.selectedDate.value,
+                // Dotted where something was done, so the month says at a
+                // glance which days are worth tapping.
+                marked: controller.daysWithActivity,
                 onSelected: controller.selectDate,
                 selectedColor: appTheme.daySelected,
               ),
             ),
             SizedBox(height: 28.v),
-            if (controller.stats.value.recent.isEmpty)
+            if (controller.historyForSelectedDay.isEmpty)
               Text(
-                'Your history will show here after your first\nsession.',
+                controller.stats.value.recent.isEmpty
+                    ? 'Your history will show here after your first\nsession.'
+                    : controller.showingToday
+                        ? 'Nothing done yet today.'
+                        : 'Nothing on this day.',
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.emptyStateBody,
               )
@@ -61,9 +68,9 @@ class ProfileHistory extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    for (final row in controller.stats.value.recent) ...[
+                    for (final row in controller.historyForSelectedDay) ...[
                       _HistoryRow(row: row),
-                      if (row != controller.stats.value.recent.last)
+                      if (row != controller.historyForSelectedDay.last)
                         Divider(height: 1, color: appTheme.cardRim),
                     ],
                   ],

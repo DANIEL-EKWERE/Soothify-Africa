@@ -6,15 +6,39 @@ import '../../../../data/models/habit_reminder.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/repositories/content_repository.dart';
+import '../../../../data/repositories/reminder_repository.dart';
 import '../../../../data/services/push_service.dart';
 
 /// A daily habit's history and reminder — Figma "Profile/daily meditation"
 /// (135:8664), "Profile/daily balance" (135:8707) and the reminder frames
 /// (135:8888 onward).
 class DailyController extends GetxController {
-  DailyController(this.kind, {DateTime Function()? now, ReminderScheduler? scheduler})
-      : _now = now ?? DateTime.now,
-        _injectedScheduler = scheduler;
+  DailyController(
+    this.kind, {
+    DateTime Function()? now,
+    ReminderScheduler? scheduler,
+    ReminderRepository? reminders,
+    bool Function()? signedIn,
+  })  : _now = now ?? DateTime.now,
+        _injectedScheduler = scheduler,
+        _injectedReminders = reminders,
+        _signedIn = signedIn ?? _hasAccount;
+
+  /// Where a reminder is kept when there is an account to keep it on.
+  final ReminderRepository? _injectedReminders;
+
+  ReminderRepository? get _reminders =>
+      _injectedReminders ??
+      (Get.isRegistered<ReminderRepository>()
+          ? Get.find<ReminderRepository>()
+          : null);
+
+  /// Whether the server can own this reminder. A guest has no account to
+  /// hang one on, so theirs stays a local alarm.
+  final bool Function() _signedIn;
+
+  static bool _hasAccount() =>
+      PrefUtils.isReady && PrefUtils().accessToken.isNotEmpty;
 
   final CheckinKind kind;
   final DateTime Function() _now;
@@ -146,6 +170,30 @@ class DailyController extends GetxController {
   void openReminder() =>
       Get.toNamed(AppRoutes.dailyReminder, arguments: kind);
 
+  /// Sends the reminder to the server. False means it stays local --
+  /// no account, no repository, or the call did not get through.
+  ///
+  /// A failure is deliberately not surfaced: the local alarm is a working
+  /// fallback, and telling somebody their reminder half-failed when it
+  /// will in fact go off is worse than silence.
+  Future<bool> _keepOnTheAccount(HabitReminder reminder) async {
+    final remote = _reminders;
+    if (remote == null || !_signedIn()) return false;
+
+    try {
+      await remote.save(
+        kind,
+        reminder,
+        // Minutes east of UTC, as this phone reckons it -- Lagos is +60.
+        utcOffsetMinutes: _now().timeZoneOffset.inMinutes,
+      );
+      return true;
+    } catch (error) {
+      Log.e('reminder not kept on the account', error: error);
+      return false;
+    }
+  }
+
   Future<void> setReminder() async {
     if (!canSetReminder) return;
     final scheduler = _scheduler;
@@ -169,15 +217,32 @@ class DailyController extends GetxController {
       ).encode(),
     );
 
-    await scheduler.scheduleWeekly(
-      series: reminderSeries(kind),
-      title: reminderTitleFor(kind),
-      body: reminderBodyFor(kind),
+    final wanted = HabitReminder(
       hour: at.hour,
       minute: at.minute,
       weekdays: reminderDays.toSet(),
-      data: {'habit': kind.name},
     );
+
+    // The server owns it where there is an account: it sends the push and
+    // files the row in the in-app feed from one call, and it cannot be
+    // lost the way a local alarm is when Android force-stops the app.
+    //
+    // Whichever side owns it, only one does -- two would deliver the same
+    // reminder twice.
+    final kept = await _keepOnTheAccount(wanted);
+    if (kept) {
+      await scheduler.cancelSeries(reminderSeries(kind));
+    } else {
+      await scheduler.scheduleWeekly(
+        series: reminderSeries(kind),
+        title: reminderTitleFor(kind),
+        body: reminderBodyFor(kind),
+        hour: at.hour,
+        minute: at.minute,
+        weekdays: reminderDays.toSet(),
+        data: {'habit': kind.name},
+      );
+    }
 
     // Settings carries a switch per habit. Leaving it off while a reminder
     // is scheduled would show the user a switch that contradicts what the

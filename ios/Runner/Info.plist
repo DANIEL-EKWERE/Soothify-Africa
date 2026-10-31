@@ -6,6 +6,12 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<!-- "Spaces Around Me" measures how far each studio is. Asked for
 	     only when that screen is opened, and the list works without it. -->
+	<!-- The session call: ZEGOCLOUD needs both, and asks for them when
+	     somebody joins a call rather than at launch. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Soothify uses your camera for video sessions with your coach.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Soothify uses your microphone so you and your coach can hear each other.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Soothify uses your location to show how far away each studio, sanctuary and spa is. The list works without it.</string>
 	<key>CFBundleDisplayName</key>

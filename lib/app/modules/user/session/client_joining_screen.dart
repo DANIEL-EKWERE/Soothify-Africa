@@ -51,6 +51,24 @@ class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
   @override
   void initState() {
     super.initState();
+    _waitThenJoin();
+  }
+
+  /// Holds while the call opens, then goes through -- but only once the
+  /// session is known, and only if it is time.
+  ///
+  /// The countdown used to run straight into `join`, which raced the
+  /// lookup: four seconds is often quicker than the round trip, and the
+  /// gate allows when it cannot tell which session this is.
+  Future<void> _waitThenJoin() async {
+    await controller.ready;
+    if (!mounted) return;
+
+    if (!controller.canJoin) {
+      // Nothing to count down to. The screen says when to come back.
+      setState(() {});
+      return;
+    }
     _connect = Timer(controller.connecting, controller.join);
   }
 
@@ -97,14 +115,24 @@ class _ClientJoiningScreenState extends State<ClientJoiningScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 10.v, 24.h, 10.v),
                 children: [
-                  Text('You’re joining a live session...',
-                      style: CustomTextStyles.clientJoiningLead),
+                  Text(
+                    controller.canJoin
+                        ? 'You’re joining a live session...'
+                        : 'This session is not open yet',
+                    style: CustomTextStyles.clientJoiningLead,
+                  ),
                   SizedBox(height: 24.v),
-                  const Center(child: JoiningPulse()),
-                  SizedBox(height: 20.v),
-                  Text('Joining Call',
-                      textAlign: TextAlign.center,
-                      style: CustomTextStyles.clientJoiningHeading),
+                  // The pulse is the call opening. Not pulsing at a
+                  // session that is days away: it read as connecting, and
+                  // then the call opened.
+                  if (controller.canJoin)
+                    const Center(child: JoiningPulse()),
+                  if (controller.canJoin) SizedBox(height: 20.v),
+                  Text(
+                    controller.canJoin ? 'Joining Call' : controller.waitLabel,
+                    textAlign: TextAlign.center,
+                    style: CustomTextStyles.clientJoiningHeading,
+                  ),
                   SizedBox(height: 14.v),
                   // The frame states the Care Guarantee here and again in the
                   // panel below. It reads as a promise made on arrival and

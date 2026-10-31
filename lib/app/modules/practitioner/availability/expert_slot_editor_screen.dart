@@ -84,10 +84,10 @@ class _TimeWheels extends StatelessWidget {
           ),
           Obx(
             () => _Wheel(
-              // Quarter hours: the design's own slots start on the hour, and
-              // a 60-stop wheel is unusable at this size.
-              count: 4,
-              step: 15,
+              // Every minute, as the frame draws it -- 00, 01, 02 running
+              // consecutively. It used to step in quarter hours, so a
+              // practitioner could not say they were free at twenty past.
+              count: 60,
               value: controller.minute.value,
               onChanged: controller.setMinute,
             ),
@@ -103,11 +103,9 @@ class _Wheel extends StatefulWidget {
     required this.count,
     required this.value,
     required this.onChanged,
-    this.step = 1,
   });
 
   final int count;
-  final int step;
   final int value;
   final ValueChanged<int> onChanged;
 
@@ -117,7 +115,7 @@ class _Wheel extends StatefulWidget {
 
 class _WheelState extends State<_Wheel> {
   late final FixedExtentScrollController _scroll =
-      FixedExtentScrollController(initialItem: widget.value ~/ widget.step);
+      FixedExtentScrollController(initialItem: widget.value);
 
   @override
   void dispose() {
@@ -134,14 +132,14 @@ class _WheelState extends State<_Wheel> {
         // 68 in the frame: rows at 141, 209 and 277.
         itemExtent: 68.v,
         physics: const FixedExtentScrollPhysics(),
-        onSelectedItemChanged: (i) => widget.onChanged(i * widget.step),
+        onSelectedItemChanged: widget.onChanged,
         childDelegate: ListWheelChildBuilderDelegate(
           childCount: widget.count,
           builder: (context, i) {
-            final focused = i * widget.step == widget.value;
+            final focused = i == widget.value;
             return Center(
               child: Text(
-                (i * widget.step).toString().padLeft(2, '0'),
+                i.toString().padLeft(2, '0'),
                 style: focused
                     ? CustomTextStyles.slotWheelFocused
                     : CustomTextStyles.slotWheel,

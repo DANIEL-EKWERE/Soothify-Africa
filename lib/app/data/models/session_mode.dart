@@ -19,6 +19,12 @@ enum SessionMode {
   /// What the API stores. See Session.MODES server-side.
   final String wire;
 
+  /// What the card says — "Phone call" / "Video call", as the Schedule
+  /// frame draws them. Shorter than [label], which spells out what the
+  /// questionnaire means by it.
+  String get cardLabel =>
+      this == SessionMode.audio ? 'Phone call' : 'Video call';
+
   final String label;
   final String icon;
 

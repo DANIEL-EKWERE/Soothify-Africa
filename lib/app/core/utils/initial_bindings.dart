@@ -18,6 +18,7 @@ import '../../data/repositories/api_expert_application_repository.dart';
 import '../../data/repositories/api_kyc_repository.dart';
 import '../../data/repositories/api_notification_repository.dart';
 import '../../data/repositories/api_profile_repository.dart';
+import '../../data/repositories/api_reminder_repository.dart';
 import '../../data/repositories/api_spaces_repository.dart';
 import '../../data/repositories/api_subscription_repository.dart';
 import '../../data/repositories/billing_repository.dart';
@@ -51,7 +52,9 @@ import '../../data/repositories/spaces_repository.dart';
 import '../../data/repositories/syncing_journal_repository.dart';
 import '../../data/repositories/api_recommendation_repository.dart';
 import '../../data/repositories/mock_recommendation_repository.dart';
+import '../../data/repositories/mock_reminder_repository.dart';
 import '../../data/repositories/recommendation_repository.dart';
+import '../../data/repositories/reminder_repository.dart';
 import '../../data/repositories/syncing_kyc_repository.dart';
 import '../../data/repositories/syncing_breathing_repository.dart';
 import '../../data/repositories/syncing_mood_repository.dart';
@@ -118,6 +121,14 @@ class InitialBindings extends Bindings {
       () => useApi
           ? SyncingMoodRepository(LocalMoodRepository(), ApiMoodRepository(api))
           : LocalMoodRepository(),
+      fenix: true,
+    );
+    // Habit reminders live on the account when there is one: the server
+    // sends the push and files the in-app row from a single call, and it
+    // cannot be lost the way a local alarm is when Android force-stops
+    // the app. A guest keeps a local alarm, which is all they can have.
+    Get.lazyPut<ReminderRepository>(
+      () => useApi ? ApiReminderRepository(api) : MockReminderRepository(),
       fenix: true,
     );
     Get.lazyPut<RecommendationRepository>(

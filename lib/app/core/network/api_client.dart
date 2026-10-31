@@ -22,7 +22,9 @@ class ApiClient {
     String Function()? refreshToken,
     Future<void> Function(String access, String refresh)? onTokens,
     Future<void> Function()? onSignedOut,
-  }) : _client = client ?? http.Client(),
+    Duration? timeout,
+  }) : _timeout = timeout ?? _defaultTimeout,
+       _client = client ?? http.Client(),
        _baseUrl = baseUrl ?? defaultBaseUrl,
        _accessToken = accessToken ?? (() => ''),
        _refreshToken = refreshToken ?? (() => ''),
@@ -43,7 +45,20 @@ class ApiClient {
     defaultValue: 'https://soothifyafrica.com.ng/api/v1',
   );
 
-  static const _timeout = Duration(seconds: 20);
+  static const _defaultTimeout = Duration(seconds: 20);
+
+  /// Injectable so a test need not sit through a real twenty seconds --
+  /// twice, since a timed-out read is tried again.
+  final Duration _timeout;
+
+  /// How long to wait before trying a timed-out read again.
+  ///
+  /// The shared host starts the Python application on the first request
+  /// after it has been idle, and that can outlast the timeout above --
+  /// so the first screen of a cold app failed, and the pull-to-refresh
+  /// that followed worked, because the server was warm by then. One more
+  /// attempt is the difference between those two.
+  static const _retryAfter = Duration(seconds: 2);
 
   /// Uploads get longer: a certificate photographed on a phone is a few
   /// megabytes, and twenty seconds of a Nigerian mobile connection is not
@@ -74,10 +89,17 @@ class ApiClient {
 
   Future<Map<String, dynamic>> get(String path) => _send('GET', path, null);
 
+  /// [reads] marks a POST that only reads.
+  ///
+  /// A few do: the recommendations endpoint takes the questionnaire in
+  /// the body rather than the query string, because "depression" in a URL
+  /// ends up in access logs and caches. Those may be sent again after a
+  /// timeout; a POST that books an hour or takes a payment may not.
   Future<Map<String, dynamic>> post(
     String path, {
     Map<String, dynamic> body = const {},
-  }) => _send('POST', path, body);
+    bool reads = false,
+  }) => _send('POST', path, body, reads: reads);
 
   Future<Map<String, dynamic>> put(
     String path, {
@@ -192,8 +214,9 @@ class ApiClient {
     String path,
     Map<String, dynamic>? body, {
     bool allowRetry = true,
+    bool reads = false,
   }) async {
-    final response = await _raw(method, path, body);
+    final response = await _raw(method, path, body, reads: reads);
 
     // An expired access token is the ordinary case, not a failure: they last
     // thirty minutes. Refresh once, quietly, and send the request again. If
@@ -201,7 +224,7 @@ class ApiClient {
     // from _decode stands.
     if (response.statusCode == 401 && allowRetry && _refreshToken().isNotEmpty) {
       if (await _refresh()) {
-        return _send(method, path, body, allowRetry: false);
+        return _send(method, path, body, allowRetry: false, reads: reads);
       }
     }
 
@@ -211,8 +234,10 @@ class ApiClient {
   Future<http.Response> _raw(
     String method,
     String path,
-    Map<String, dynamic>? body,
-  ) async {
+    Map<String, dynamic>? body, {
+    int attempt = 0,
+    bool reads = false,
+  }) async {
     final uri = Uri.parse('$_baseUrl$path');
     final token = _accessToken();
     final request = http.Request(method, uri)
@@ -227,12 +252,39 @@ class ApiClient {
       final streamed = await _client.send(request).timeout(_timeout);
       return await http.Response.fromStream(streamed);
     } on SocketException {
+      if (_worthRetrying(method, attempt, reads)) {
+        return _retry(method, path, body, reads: reads);
+      }
       throw const NetworkException();
     } on http.ClientException {
+      if (_worthRetrying(method, attempt, reads)) {
+        return _retry(method, path, body, reads: reads);
+      }
       throw const NetworkException();
     } on async.TimeoutException {
+      if (_worthRetrying(method, attempt, reads)) {
+        return _retry(method, path, body, reads: reads);
+      }
       throw const TimeoutException();
     }
+  }
+
+  /// Whether this request may simply be sent again.
+  ///
+  /// Reads only, and once. A POST that books an hour or takes a payment
+  /// must never be repeated on a timeout: the first one may well have
+  /// reached the server, and the reply is what went missing.
+  bool _worthRetrying(String method, int attempt, bool reads) =>
+      attempt == 0 && (method == 'GET' || method == 'HEAD' || reads);
+
+  Future<http.Response> _retry(
+    String method,
+    String path,
+    Map<String, dynamic>? body, {
+    bool reads = false,
+  }) async {
+    await Future<void>.delayed(_retryAfter);
+    return _raw(method, path, body, attempt: 1, reads: reads);
   }
 
   /// Exchange the refresh token for a new pair. True if the session lives.

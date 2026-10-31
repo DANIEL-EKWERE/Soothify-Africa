@@ -15,6 +15,18 @@
       lesser thing to ask for; fine is declared because some devices will
       not give coarse without it, and neither is required to use the app.
     -->
+    <!--
+      The session call. ZEGOCLOUD needs the camera and the microphone, and
+      the two network permissions below: without them the SDK fails at the
+      moment somebody joins, which looks like a broken call rather than a
+      missing permission.
+    -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <!-- Scheduled reminders live in AlarmManager, which a reboot clears;

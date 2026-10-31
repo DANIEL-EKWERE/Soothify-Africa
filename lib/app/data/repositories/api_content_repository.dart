@@ -48,6 +48,10 @@ class ApiContentRepository implements ContentRepository {
   Future<List<MediaItem>> getRecommendations({String mood = ''}) async {
     final body = await _api.post(
       '/content/recommendations/',
+      // A read, despite the verb: the questionnaire travels in the body to
+      // keep it out of access logs. Safe to send again if the first
+      // attempt times out on a cold server.
+      reads: true,
       body: {
         ...await _questionnaire(),
         // Sent in the body rather than the query: the questionnaire goes

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../widgets/skeleton.dart';
 import '../../../data/models/plan_tier.dart';
 import '../spaces/widgets/passport_sheet.dart';
 import '../../../widgets/gradient_text.dart';
@@ -35,19 +36,92 @@ class PlansTab extends GetView<PlansTabController> {
               SizedBox(height: 41.v),
               const _PeriodToggle(),
               SizedBox(height: 24.v),
-              Obx(
-                () => Column(
+              Obx(() {
+                // Cards in the shape of the real ones. This used to be
+                // blank while the tiers were fetched, so the screen read
+                // as a plans page with no plans on it -- and on a cold
+                // server that is the first thing anybody sees.
+                if (controller.tiers.isEmpty && controller.isLoading.value) {
+                  return const _LoadingTiers();
+                }
+                if (controller.tiers.isEmpty) {
+                  return const _NoTiers();
+                }
+                return Column(
                   children: [
                     for (final tier in controller.tiers) ...[
                       _TierCard(tier: tier),
                       SizedBox(height: 17.v),
                     ],
                   ],
-                ),
-              ),
+                );
+              }),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The tiers, before they arrive.
+///
+/// Three cards the size of the real ones, so the page does not jump when
+/// they land. The design draws three.
+class _LoadingTiers extends StatelessWidget {
+  const _LoadingTiers();
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonShimmer(
+      child: Column(
+        children: [
+          for (var card = 0; card < 3; card++) ...[
+            Container(
+              padding: EdgeInsets.fromLTRB(25.h, 34.v, 25.h, 34.v),
+              decoration: BoxDecoration(
+                color: appTheme.surface,
+                borderRadius: BorderRadius.circular(16.h),
+                border: Border.all(color: appTheme.cardRim),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // The name, the line under it, the price, the button --
+                  // in the card's own order.
+                  const Skeleton.text(width: 140, height: 20),
+                  SizedBox(height: 16.v),
+                  const Skeleton.text(width: 240),
+                  SizedBox(height: 8.v),
+                  const Skeleton.text(width: 180),
+                  SizedBox(height: 28.v),
+                  const Skeleton.text(width: 160, height: 18),
+                  SizedBox(height: 24.v),
+                  const Skeleton(width: double.infinity, height: 48),
+                ],
+              ),
+            ),
+            SizedBox(height: 17.v),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Nothing came back. Said plainly rather than left blank, and the pull
+/// to refresh above still works.
+class _NoTiers extends StatelessWidget {
+  const _NoTiers();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 60.v, horizontal: 24.h),
+      child: Text(
+        'We could not load the plans just now. Pull down to try again.',
+        textAlign: TextAlign.center,
+        style: CustomTextStyles.emptyStateBody,
       ),
     );
   }

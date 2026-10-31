@@ -19,11 +19,15 @@ class ClientJoiningController extends GetxController {
     this.connecting = const Duration(seconds: 4),
     BookingRepository? bookings,
     DateTime Function()? now,
+    SessionInvite? invite,
   })  : _bookings = bookings,
         _now = now ?? DateTime.now,
-        _invite = Get.arguments is SessionInvite
-            ? Get.arguments as SessionInvite
-            : null,
+        // Passed directly by a test, which has no way to set
+        // `Get.arguments`; the route supplies it in the app.
+        _invite = invite ??
+            (Get.arguments is SessionInvite
+                ? Get.arguments as SessionInvite
+                : null),
         _expertName = expertName,
         _service = service,
         _time = time,
@@ -50,8 +54,16 @@ class ClientJoiningController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _findTheSession();
+    ready = _findTheSession();
   }
+
+  /// The lookup, so the screen can wait for it before deciding.
+  ///
+  /// Without this the waiting room's countdown raced it: four seconds
+  /// passed, the session was not known yet, and [canJoin] -- which allows
+  /// when it cannot tell -- let the call open whatever day it was booked
+  /// for.
+  late final Future<void> ready;
 
   Future<void> _findTheSession() async {
     final id = _invite?.sessionId ?? '';

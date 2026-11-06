@@ -15,6 +15,8 @@ class BookedSession {
     required this.endsAt,
     required this.status,
     required this.priceNaira,
+    this.currency = 'NGN',
+    this.priceDisplay = '',
     this.mode = 'video',
     this.roomId = '',
     this.rating,
@@ -32,7 +34,22 @@ class BookedSession {
   /// Also 'cancelled' and 'no_show'.
   final String status;
 
+  /// The amount, in whole units of [currency] — 15000 naira, or 45
+  /// dollars. Named for naira because that is the key the server serves
+  /// it under; it is not always naira, so nothing may read it without
+  /// reading [currency] too.
   final int priceNaira;
+
+  /// 'NGN' or 'USD'. Nigeria pays naira, everywhere else dollars, decided
+  /// server-side from where the request came from.
+  final String currency;
+
+  /// "₦15,000" / "$45", written by the server.
+  ///
+  /// Taken rather than formatted: the amount and the currency have to
+  /// agree, and a client that formats them itself is a client that can
+  /// print the wrong symbol.
+  final String priceDisplay;
 
   /// 'phone' or 'video', chosen on the booking screen.
   final String mode;
@@ -65,6 +82,8 @@ class BookedSession {
             DateTime.now(),
         status: json['status'] as String? ?? 'pending',
         priceNaira: json['price_naira'] as int? ?? 0,
+        currency: json['currency'] as String? ?? 'NGN',
+        priceDisplay: json['price_display'] as String? ?? '',
         mode: json['mode'] as String? ?? 'video',
         roomId: json['room_id'] as String? ?? '',
         rating: json['rating'] as int?,

@@ -1,8 +1,13 @@
-/// The two audiences the app serves. Practitioner screens are not designed
-/// yet — the role exists so routing and bindings have a seam to grow into.
+/// The three audiences the app serves: the member, the practitioner who
+/// sees them, and the studio whose floor a Passport member books.
 enum UserRole {
   user('user'),
-  practitioner('practitioner');
+  practitioner('practitioner'),
+
+  /// A studio, in its own portal — Figma `4968:32935` and `4968:32751`.
+  /// Not a member with extra screens: a partner has no library, no journal
+  /// and no plans, and signs in to answer bookings and work the door.
+  partner('partner');
 
   const UserRole(this.key);
 

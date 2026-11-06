@@ -199,6 +199,32 @@ class AppRoutes {
   static const String policy = '/settings/policy';
 
   static const String corporateForm = '/corporate-form';
+  /// The Studio Partner portal — Figma `4968:32935` and `4968:32751`.
+  /// A studio's own home: one screen with the Overview and Active Guest
+  /// List tabs.
+  static const String partnerPortal = '/partner';
+
+  /// "Financials & Settlement Hub" — Figma `416:26282`.
+  static const String partnerLedger = '/partner/ledger';
+
+  /// The master schedule (`416:26376`) and the sheet that adds to it
+  /// (`416:26557`).
+  static const String partnerSchedule = '/partner/schedule';
+  static const String partnerAddSlot = '/partner/schedule/add';
+
+  /// The door — the live roster (`416:26667`) and the receipt a verified
+  /// member ends on (`416:26905`).
+  static const String partnerRoster = '/partner/roster';
+  static const String partnerCheckInDone = '/partner/roster/checked-in';
+
+  /// The camera behind "Scan Passport QR Code".
+  static const String partnerScanner = '/partner/roster/scan';
+
+  /// Soothify Passport — the tier selection the Plans card opens
+  /// (`4958:26661`), and the receipt a paid tier ends on.
+  static const String passportTiers = '/plans/passport';
+  static const String passportSuccess = '/plans/passport/success';
+
   static const String corporateSuccess = '/corporate-success';
 
   /// The notification feed, reached from the bell on Home.

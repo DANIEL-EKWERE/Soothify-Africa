@@ -64,6 +64,17 @@ import '../modules/user/article/binding/article_binding.dart';
 import '../modules/user/payment/binding/booking_payment_binding.dart';
 import '../modules/user/payment/booking_payment_screen.dart';
 import '../modules/user/payment/care_guarantee_screen.dart';
+import '../modules/partner/binding/partner_binding.dart';
+import '../modules/partner/add_slot_screen.dart';
+import '../modules/partner/check_in_done_screen.dart';
+import '../modules/partner/partner_ledger_screen.dart';
+import '../modules/partner/partner_schedule_screen.dart';
+import '../modules/partner/qr_scanner_screen.dart';
+import '../modules/partner/roster_screen.dart';
+import '../modules/partner/partner_portal_screen.dart';
+import '../modules/user/passport/binding/passport_binding.dart';
+import '../modules/user/passport/passport_success_screen.dart';
+import '../modules/user/passport/passport_tiers_screen.dart';
 import '../modules/user/payment/payment_success_screen.dart';
 import '../modules/user/videos/binding/videos_binding.dart';
 import '../modules/user/videos/videos_screen.dart';
@@ -520,6 +531,52 @@ class AppPages {
       name: AppRoutes.article,
       page: () => const ArticleScreen(),
       binding: ArticleBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.partnerPortal,
+      page: () => const PartnerPortalScreen(),
+      binding: PartnerBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.partnerLedger,
+      page: () => const PartnerLedgerScreen(),
+      binding: PartnerBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.partnerSchedule,
+      page: () => const PartnerScheduleScreen(),
+      binding: PartnerBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.partnerAddSlot,
+      page: () => const AddSlotScreen(),
+      binding: PartnerBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.partnerRoster,
+      page: () => const RosterScreen(),
+      binding: PartnerBinding(),
+    ),
+    GetPage(
+      // No binding: the receipt is handed its member and reads the roster
+      // the screen behind it already built.
+      name: AppRoutes.partnerCheckInDone,
+      page: () => const CheckInDoneScreen(),
+    ),
+    GetPage(
+      // No binding either: it owns a camera and hands back a string.
+      name: AppRoutes.partnerScanner,
+      page: () => const QrScannerScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.passportTiers,
+      page: () => const PassportTiersScreen(),
+      binding: PassportBinding(),
+    ),
+    GetPage(
+      // No binding: the receipt is handed its tier and needs nothing else.
+      name: AppRoutes.passportSuccess,
+      page: () => const PassportSuccessScreen(),
     ),
     GetPage(
       name: AppRoutes.videos,

@@ -49,6 +49,22 @@ class BookingPaymentController extends BaseController {
         SessionPlan.monthly => offering.monthly,
       };
 
+  /// What to print on this screen.
+  ///
+  /// The server's own words where a session has been held: it decided the
+  /// currency from where the request came from, and the app's table knows
+  /// nothing about that. Showing the table's naira figure to somebody
+  /// being charged in dollars is the worst of both.
+  String get priceLabel {
+    final held = session;
+    if (held != null && held.priceDisplay.isNotEmpty) {
+      return held.priceDisplay;
+    }
+    // Nothing held yet, or a build with no server: the app's own table,
+    // which is naira and may be out of date by a price change.
+    return money(amount);
+  }
+
   /// The frames print a bare figure — "25,000" — with no currency mark at
   /// all. A price on a payment screen that does not say what it is in is a
   /// hazard, so the naira sign is added here. It is this app's addition, not

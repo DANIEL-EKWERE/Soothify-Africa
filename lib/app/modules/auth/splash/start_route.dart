@@ -29,6 +29,12 @@ Future<String> resolveStartRoute({
     return AppRoutes.practitionerDashboard;
   }
 
+  // A studio has no member app behind it — no library, no questionnaire —
+  // so the portal is where its launch ends, before the KYC check below.
+  if (session.role.value == UserRole.partner) {
+    return AppRoutes.partnerPortal;
+  }
+
   // A null role is a guest, not a locked-out user. Onboarding already runs
   // intro -> personalize -> language -> KYC -> shell without ever asking for
   // an account, so sending guests to sign-up on the *next* launch would lock

@@ -153,6 +153,11 @@ class ForgotPasswordController extends BaseController {
       Get.offAllNamed(AppRoutes.practitionerDashboard);
       return;
     }
+    // A studio has its own portal, and no questionnaire to answer.
+    if (user.role == UserRole.partner) {
+      Get.offAllNamed(AppRoutes.partnerPortal);
+      return;
+    }
     final complete = user.kycComplete || await _kyc.isComplete();
     Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }

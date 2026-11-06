@@ -1069,6 +1069,185 @@ class CustomTextStyles {
   );
 
   /// A plan card's name — Nunito Bold 20.
+  // ---------------------------------------------------------------- //
+  // Studio Partner portal — Figma `4968:32935`, `4968:32751`.          //
+  // Nunito Sans throughout, unlike the member app's Nunito headings.   //
+  // ---------------------------------------------------------------- //
+
+  /// "Luma Pilates Studio" in the header.
+  static TextStyle get partnerStudio => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 21.8 / 16,
+    color: appTheme.partnerName,
+  );
+
+  /// Every small grey line: "Soothify Partner Dashboard", a metric's label,
+  /// a card's time, the summaries under each list.
+  static TextStyle get partnerMeta => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 16.37 / 12,
+    color: appTheme.partnerMuted,
+  );
+
+  /// A metric's figure — "2", "6".
+  static TextStyle get partnerMetric => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32.74 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  /// "₦342,000" on the payout card.
+  static TextStyle get partnerPayout => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 26.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 35.5 / 26,
+    color: appTheme.onPrimary,
+  );
+
+  /// A section heading: "Real-Time Notifications", "Today's Guests".
+  static TextStyle get partnerSection => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 21.8 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// A tab's label in the segmented control.
+  static TextStyle get partnerTab => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 19.1 / 14,
+    color: appTheme.partnerMuted,
+  );
+
+  /// "New Booking Request!"
+  static TextStyle get partnerCardTitle => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 19.1 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// "User: Rita P. | Class: Reformer Flow | Nov 28, 9:00 AM"
+  static TextStyle get partnerCardBody => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 17.7 / 13,
+    color: appTheme.textPrimary,
+  );
+
+  /// A status pill: "Status: Pending Acceptance", "Checked In".
+  static TextStyle get partnerStatus => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 12.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 16.4 / 12,
+  );
+
+  /// A guest's initials in their avatar.
+  static TextStyle get partnerInitials => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 17.7 / 13,
+    color: appTheme.onPrimary,
+  );
+
+  // ---------------------------------------------------------------- //
+  // Soothify Passport tier selection — Figma `4958:26661`.             //
+  // ---------------------------------------------------------------- //
+
+  /// "Tier 1" in its outlined pill at the card's right.
+  static TextStyle get passportLevel => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 17.73 / 13,
+    color: appTheme.textPrimary,
+  );
+
+  /// "₦90,000 / month" — the frame's largest type on the card.
+  static TextStyle get passportPrice => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 24.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 32.74 / 24,
+    color: appTheme.textPrimary,
+  );
+
+  /// Who the tier is for, under the price.
+  static TextStyle get passportFor => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21.82 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// "6 Classes Total".
+  static TextStyle get passportAllowance => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 18.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 24.55 / 18,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Max 2 Reformer sessions included" — bold, unlike the line under it.
+  static TextStyle get passportLimit => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 21.82 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// "(Remaining 4 can be Mat, Yoga, or standard wellness classes)."
+  static TextStyle get passportRemainder => TextStyle(
+    fontFamily: fontNunito,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 21.82 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// "Select Starter Flow" — Nunito Sans, unlike the card's own Nunito.
+  static TextStyle get passportAction => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 800)],
+    height: 21.82 / 16,
+    color: appTheme.onPrimary,
+  );
+
   static TextStyle get tierName => TextStyle(
     fontFamily: fontNunito,
     fontSize: 20.fSize,

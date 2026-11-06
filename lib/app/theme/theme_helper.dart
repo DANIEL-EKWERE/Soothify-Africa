@@ -71,6 +71,23 @@ class PrimaryColors {
     required this.textSubtitle,
     required this.onPrimary,
     required this.onFixedLight,
+    required this.partnerName,
+    required this.partnerMuted,
+    required this.partnerTabTrack,
+    required this.partnerWarnFill,
+    required this.partnerWarnInk,
+    required this.partnerOfflineFill,
+    required this.partnerOfflineInk,
+    required this.partnerAllocation,
+    required this.categoryReformer,
+    required this.categoryMat,
+    required this.categoryYoga,
+    required this.partnerQueuedFill,
+    required this.partnerOkFill,
+    required this.partnerOkInk,
+    required this.passportPage,
+    required this.passportRim,
+    required this.passportAction,
     required this.cardBorder,
     required this.optionBorder,
     required this.segmentBorder,
@@ -248,6 +265,45 @@ class PrimaryColors {
   /// trial offer's gradient card. [textPrimary] flips to near-white in the
   /// dark palette, which left that label white on white.
   final Color onFixedLight;
+
+  /// The Studio Partner portal — Figma `4968:32935` and `4968:32751`.
+  ///
+  /// Its own palette: the studio's name in a deeper blue than the app's
+  /// brand, a grey for every secondary line, the tab track, and the two
+  /// status washes the frames use for pending and arrived.
+  final Color partnerName;
+  final Color partnerMuted;
+  final Color partnerTabTrack;
+  final Color partnerWarnFill;
+  final Color partnerWarnInk;
+  /// The offline banner at the door, and the "entry now, review later"
+  /// panel in the dispute dialog — Figma `416:26667`, `416:26781`.
+  final Color partnerOfflineFill;
+  final Color partnerOfflineInk;
+
+  /// The pale panel behind the Passport spot allocation — Figma
+  /// `416:26557`.
+  final Color partnerAllocation;
+
+  /// The three class categories on the master schedule's legend and its
+  /// blocks — Figma `416:26376`.
+  final Color categoryReformer;
+  final Color categoryMat;
+  final Color categoryYoga;
+
+  /// "Verified & Queued" on the ledger — the brand wash, distinct from the
+  /// green a settled line takes.
+  final Color partnerQueuedFill;
+  final Color partnerOkFill;
+  final Color partnerOkInk;
+
+  /// Soothify Passport tier selection — Figma `4958:26661`. The page is a
+  /// paler blue than the app's usual background, the card rings and
+  /// dividers are a mid grey the frame uses nowhere else, and the action is
+  /// a blue of its own, a shade off the brand ink behind the filled card.
+  final Color passportPage;
+  final Color passportRim;
+  final Color passportAction;
 
   // Lines
   final Color cardBorder;
@@ -620,6 +676,23 @@ class PrimaryColors {
     textSubtitle: Color(0xE6323233),
     onPrimary: Color(0xFFFFFFFF),
     onFixedLight: Color(0xFF263238),
+    partnerName: Color(0xFF1F2EB1),
+    partnerMuted: Color(0xFF59656E),
+    partnerTabTrack: Color(0xFFE9F1FA),
+    partnerWarnFill: Color(0xFFFFF4DF),
+    partnerWarnInk: Color(0xFF946114),
+    partnerOfflineFill: Color(0xFFFFF4D9),
+    partnerOfflineInk: Color(0xFF80540E),
+    partnerAllocation: Color(0xFFF2F6FE),
+    categoryReformer: Color(0xFFEFE8FC),
+    categoryMat: Color(0xFFE8F5EF),
+    categoryYoga: Color(0xFFE3F5F5),
+    partnerQueuedFill: Color(0xFFEAF1FF),
+    partnerOkFill: Color(0xFFEAF6EF),
+    partnerOkInk: Color(0xFF237351),
+    passportPage: Color(0xFFF5FBFF),
+    passportRim: Color(0xFFD7D7D7),
+    passportAction: Color(0xFF2233B5),
     cardBorder: Color(0x0D000000),
     optionBorder: Color(0x0D263238),
     segmentBorder: Color(0x80263238),
@@ -743,6 +816,29 @@ class PrimaryColors {
     textSubtitle: Color(0xE6FEFEFE),
     onPrimary: Color(0xFFFFFFFF),
     onFixedLight: Color(0xFF263238),
+    // The page alone follows the dark palette; the cards are the frame's
+    // own, and a paper-white card on charcoal is the point of them.
+    // The washes hold on charcoal — they are the status colours, and a
+    // pending badge that goes grey in the dark says nothing.
+    partnerName: Color(0xFF8FA8FF),
+    partnerMuted: Color(0xFFA8B3BF),
+    partnerTabTrack: Color(0xFF1E2227),
+    partnerWarnFill: Color(0xFF3A2E17),
+    partnerWarnInk: Color(0xFFE0A94B),
+    // Darkened to the same hues: the legend is how a block is read, so the
+    // three have to stay apart on charcoal too.
+    partnerOfflineFill: Color(0xFF342A12),
+    partnerOfflineInk: Color(0xFFE2B45C),
+    partnerAllocation: Color(0xFF191D26),
+    categoryReformer: Color(0xFF2A2338),
+    categoryMat: Color(0xFF1B2F26),
+    categoryYoga: Color(0xFF16302F),
+    partnerQueuedFill: Color(0xFF17203A),
+    partnerOkFill: Color(0xFF17301F),
+    partnerOkInk: Color(0xFF5BC08E),
+    passportPage: Color(0xFF131415),
+    passportRim: Color(0xFF42484E),
+    passportAction: Color(0xFF2233B5),
     cardBorder: Color(0x14FFFFFF),
     optionBorder: Color(0x14FFFFFF),
     segmentBorder: Color(0x66FFFFFF),

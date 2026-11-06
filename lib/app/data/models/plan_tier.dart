@@ -13,9 +13,14 @@ enum PlanAction {
   /// The Core card's "Start 7-Day Free Trial" — on to the subscription offer.
   trial('Start 7-Day Free Trial'),
 
-  /// The Passport card's "Join the Waitlist" — opens the waitlist sheet the
-  /// Spaces flow already uses, since it is the same waitlist.
-  waitlist('Join the Waitlist'),
+  /// The Passport card's button. It collected an email for a waitlist
+  /// until the designer drew the tiers (`4958:26661`) — it sells now, so it
+  /// opens the tier selection and the chosen tier goes to checkout.
+  ///
+  /// The server still calls this action `waitlist`; renaming it there means
+  /// a migration and a release in step, so the key stays and the label is
+  /// what changed.
+  waitlist('Choose Your Tier'),
 
   /// The Corporate card's "Speak with Corporate Team".
   corporate('Speak with Corporate Team');

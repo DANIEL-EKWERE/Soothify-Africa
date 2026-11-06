@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/app_export.dart';
 import '../../../widgets/skeleton.dart';
 import '../../../data/models/plan_tier.dart';
-import '../spaces/widgets/passport_sheet.dart';
 import '../../../widgets/gradient_text.dart';
 import 'controller/plans_tab_controller.dart';
 import '../../../widgets/soothify_word.dart';
@@ -298,7 +297,8 @@ class _TierCard extends StatelessWidget {
               onDark: onDark,
               onTap: () => switch (tier.action!) {
                 PlanAction.trial => controller.startTrial(),
-                PlanAction.waitlist => PassportSheet.show(context),
+                PlanAction.waitlist =>
+                  Get.toNamed(AppRoutes.passportTiers),
                 PlanAction.corporate => controller.openCorporateForm(),
               },
             ),

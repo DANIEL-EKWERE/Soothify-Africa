@@ -129,6 +129,12 @@ class SigninController extends BaseController {
       Get.offAllNamed(AppRoutes.practitionerDashboard);
       return;
     }
+    // A studio goes to its portal. The questionnaire above is a member's,
+    // and asking a studio how it feels is nonsense.
+    if (user.role == UserRole.partner) {
+      Get.offAllNamed(AppRoutes.partnerPortal);
+      return;
+    }
     Get.offAllNamed(complete ? AppRoutes.shell : AppRoutes.kyc);
   }
 }

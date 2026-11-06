@@ -19,7 +19,6 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
 
   @override
   Widget build(BuildContext context) {
-    final offering = controller.offering;
     return Scaffold(
       backgroundColor: appTheme.background,
       body: SafeArea(
@@ -66,11 +65,15 @@ class BookingPaymentScreen extends GetView<BookingPaymentController> {
                   // it; `SessionPlan.monthly` and the prices behind it are
                   // left in the model, so bringing it back is a matter of
                   // drawing it again.
-                  _SessionCard(
-                    title: 'Single Session',
-                    amount: offering.single,
-                    unit: '/50-minute session',
-                  ),
+                  // The server's price for the session that was held, not
+                  // the app's own table: the currency was decided from
+                  // where the request came from, and printing naira to
+                  // somebody charged in dollars is the worst of both.
+                  Obx(() => _SessionCard(
+                        title: 'Single Session',
+                        price: controller.priceLabel,
+                        unit: '/50-minute session',
+                      )),
                   SizedBox(height: 32.v),
                   const _CancellationPolicy(),
                   // 32 between the panel and the action, as the frame draws
@@ -144,12 +147,13 @@ abstract final class SessionCardIncludes {
 class _SessionCard extends StatelessWidget {
   const _SessionCard({
     required this.title,
-    required this.amount,
+    required this.price,
     required this.unit,
   });
 
   final String title;
-  final int amount;
+  /// Already written out — "₦15,000" or "$45".
+  final String price;
   final String unit;
 
   static List<String> get includes => SessionCardIncludes.lines;
@@ -175,7 +179,7 @@ class _SessionCard extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: BookingPaymentController.money(amount),
+                  text: price,
                   style: CustomTextStyles.planOptionPrice
                       .copyWith(color: white),
                 ),

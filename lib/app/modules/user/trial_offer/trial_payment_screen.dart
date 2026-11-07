@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../../../core/utils/card_input.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/membership.dart';
@@ -380,6 +383,7 @@ class _CardForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<TrialOfferController>();
     return Container(
       margin: EdgeInsets.only(top: 12.v),
       padding: EdgeInsets.all(16.h),
@@ -405,33 +409,74 @@ class _CardForm extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.v),
-          const _CardField(label: 'Cardholder name', hint: 'Name on card'),
-          SizedBox(height: 16.v),
-          const _CardField(
-            label: 'Card number',
-            hint: '1234 1234 1234 1234',
-            keyboard: TextInputType.number,
-          ),
-          SizedBox(height: 16.v),
-          Row(
-            children: [
-              const Expanded(
-                child: _CardField(
-                  label: 'Expiry date',
-                  hint: 'MM / YY',
-                  keyboard: TextInputType.datetime,
+          Obx(() {
+            // Rebuilt per keystroke: the errors are read off the text, and
+            // a TextEditingController is not observable.
+            controller.cardEdits.value;
+            final amex = controller.cardBrand == CardBrand.amex;
+            return Column(
+              children: [
+                _CardField(
+                  label: 'Cardholder name',
+                  hint: 'Name on card',
+                  field: 'name',
+                  controller: controller.cardholder,
+                  error: controller.cardholderError,
+                  keyboard: TextInputType.name,
+                  capitalise: TextCapitalization.words,
+                  // A name is letters and the punctuation a name carries.
+                  formatters: [
+                    FilteringTextInputFormatter.deny(RegExp(r'[0-9]')),
+                    LengthLimitingTextInputFormatter(60),
+                  ],
                 ),
-              ),
-              SizedBox(width: 12.h),
-              const Expanded(
-                child: _CardField(
-                  label: 'Security code',
-                  hint: 'CVC',
+                SizedBox(height: 16.v),
+                _CardField(
+                  label: 'Card number',
+                  hint: amex ? '1234 123456 12345' : '1234 1234 1234 1234',
+                  field: 'number',
+                  controller: controller.cardNumber,
+                  error: controller.cardNumberError,
                   keyboard: TextInputType.number,
+                  formatters: const [CardNumberFormatter()],
                 ),
-              ),
-            ],
-          ),
+                SizedBox(height: 16.v),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _CardField(
+                        label: 'Expiry date',
+                        hint: 'MM / YY',
+                        field: 'expiry',
+                        controller: controller.expiry,
+                        error: controller.expiryError,
+                        keyboard: TextInputType.number,
+                        formatters: const [ExpiryFormatter()],
+                      ),
+                    ),
+                    SizedBox(width: 12.h),
+                    Expanded(
+                      child: _CardField(
+                        label: 'Security code',
+                        hint: amex ? 'CVC (4)' : 'CVC',
+                        field: 'code',
+                        controller: controller.securityCode,
+                        error: controller.securityCodeError,
+                        keyboard: TextInputType.number,
+                        formatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(
+                            controller.cardBrand.codeLength,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
           SizedBox(height: 16.v),
           Row(
             children: [
@@ -456,43 +501,82 @@ class _CardForm extends StatelessWidget {
 }
 
 class _CardField extends StatelessWidget {
-  const _CardField({required this.label, required this.hint, this.keyboard});
+  const _CardField({
+    required this.label,
+    required this.hint,
+    required this.field,
+    required this.controller,
+    required this.error,
+    this.keyboard,
+    this.formatters,
+    this.capitalise = TextCapitalization.none,
+  });
 
   final String label;
   final String hint;
+
+  /// Which field this is, so leaving it can be recorded — an error that
+  /// appears on the first keystroke tells somebody they are wrong before
+  /// they have finished being right.
+  final String field;
+
+  final TextEditingController controller;
+  final String? error;
   final TextInputType? keyboard;
+  final List<TextInputFormatter>? formatters;
+  final TextCapitalization capitalise;
 
   @override
   Widget build(BuildContext context) {
+    final payment = Get.find<TrialOfferController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: CustomTextStyles.paymentFieldLabel),
         SizedBox(height: 8.v),
-        Container(
-          height: 46.v,
-          padding: EdgeInsets.symmetric(horizontal: 12.h),
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-            color: appTheme.surface,
-            borderRadius: BorderRadius.circular(8.h),
-            border: Border.all(color: appTheme.fieldRim),
-          ),
-          child: TextField(
-            keyboardType: keyboard,
-            style: CustomTextStyles.paymentValue,
-            cursorColor: appTheme.soothifyBlue,
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              hintText: hint,
-              hintStyle: CustomTextStyles.paymentHint,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
+        Focus(
+          onFocusChange: (has) {
+            if (!has) payment.blur(field);
+          },
+          child: Container(
+            height: 46.v,
+            padding: EdgeInsets.symmetric(horizontal: 12.h),
+            alignment: Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: appTheme.surface,
+              borderRadius: BorderRadius.circular(8.h),
+              border: Border.all(
+                color: error == null ? appTheme.fieldRim : appTheme.error,
+              ),
+            ),
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboard,
+              textCapitalization: capitalise,
+              inputFormatters: formatters,
+              onChanged: (_) => payment.touchCard(),
+              style: CustomTextStyles.paymentValue,
+              cursorColor: appTheme.soothifyBlue,
+              decoration: InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                hintText: hint,
+                hintStyle: CustomTextStyles.paymentHint,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
             ),
           ),
         ),
+        if (error != null) ...[
+          SizedBox(height: 6.v),
+          Text(
+            error!,
+            style: CustomTextStyles.paymentFinePrint
+                .copyWith(color: appTheme.error),
+          ),
+        ],
       ],
     );
   }

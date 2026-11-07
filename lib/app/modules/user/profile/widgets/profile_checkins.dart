@@ -47,10 +47,17 @@ class _CheckinCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          CustomImageView(
-            imagePath: kind.iconAsset,
-            height: 38.h,
-            width: 38.h,
+          // Clipped round, not just placed: every badge's source is a
+          // square, and the two Explore photos only look circular because
+          // their corners are drawn away. Breathing's is a flat photo, so
+          // it sat on the card as a rectangle among circles.
+          ClipOval(
+            child: CustomImageView(
+              imagePath: kind.iconAsset,
+              height: 38.h,
+              width: 38.h,
+              fit: BoxFit.cover,
+            ),
           ),
           SizedBox(height: 20.v),
           Text(

@@ -10,6 +10,7 @@ import 'package:soothifyafrica/app/data/repositories/mock_subscription_repositor
 import 'package:soothifyafrica/app/modules/user/plans/controller/plans_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/plans/plans_tab.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/widgets/passport_sheet.dart';
+import 'package:soothifyafrica/app/routes/app_routes.dart';
 
 import 'helpers.dart';
 
@@ -70,14 +71,24 @@ void main() {
     expect(find.text('Continue'), findsNothing);
   });
 
-  testWidgets('the Passport card opens the waitlist sheet', (tester) async {
+  testWidgets('the Passport card opens the tier selection', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
     // The sheet reads a previously-left address on mount.
     await PrefUtils().init();
     Get.put(PlansTabController(MockSubscriptionRepository()));
 
-    await pumpScreen(tester, const PlansTab());
+    await pumpScreen(
+      tester,
+      const PlansTab(),
+      // The card leaves for the tiers, so the route has to exist here.
+      pages: [
+        GetPage(
+          name: AppRoutes.passportTiers,
+          page: () => const Scaffold(body: Text('tier selection')),
+        ),
+      ],
+    );
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
@@ -90,8 +101,10 @@ void main() {
     await tester.tap(find.text(PlanAction.waitlist.label));
     await tester.pumpAndSettle();
 
-    // The same waitlist the Spaces flow opens, not a second one.
-    expect(find.text(PassportSheet.heading), findsOneWidget);
+    // It collected an email for a waitlist until the designer drew the
+    // tiers; it sells now, so the card opens the tier selection.
+    expect(find.text('tier selection'), findsOneWidget);
+    expect(find.text(PassportSheet.heading), findsNothing);
   });
 
   testWidgets('switching period reloads the tiers', (tester) async {

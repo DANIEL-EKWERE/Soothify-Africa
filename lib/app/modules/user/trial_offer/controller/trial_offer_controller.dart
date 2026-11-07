@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/app_export.dart';
@@ -5,6 +6,7 @@ import '../../../../core/base_controller.dart';
 import '../../../../core/utils/checkout_launcher.dart';
 import '../../checkout/checkout_webview_screen.dart' show CheckoutOutcome;
 import '../../../../data/models/membership.dart';
+import '../../../../core/utils/card_input.dart' as card;
 import '../../../../data/repositories/billing_repository.dart';
 
 /// How the trial is paid for — Figma `311:25477` (card) and `311:25582`
@@ -39,6 +41,73 @@ class TrialOfferController extends BaseController {
   final Rx<PaymentMethod> method = PaymentMethod.card.obs;
 
   final RxString promo = ''.obs;
+
+  // ---------------------------------------------------------------- //
+  // The card form.                                                     //
+  //                                                                    //
+  // Held here rather than in the widget so what was typed survives a   //
+  // rebuild, and so the errors can be checked without pumping the      //
+  // screen. The fields used to carry no controller at all: anything    //
+  // could be typed, nothing was kept, and nothing complained.          //
+  // ---------------------------------------------------------------- //
+
+  final cardholder = TextEditingController();
+  final cardNumber = TextEditingController();
+  final expiry = TextEditingController();
+  final securityCode = TextEditingController();
+
+  /// Which fields have been left once, so an error shows after somebody
+  /// has had their go at a field rather than while they are still in it.
+  final RxSet<String> touched = <String>{}.obs;
+
+  /// Bumped on every keystroke: a TextEditingController is not observable,
+  /// and the errors below have to be recomputed as the card is typed.
+  final RxInt cardEdits = 0.obs;
+
+  void touchCard() => cardEdits.value++;
+
+  void blur(String field) {
+    touched.add(field);
+    touchCard();
+  }
+
+  String? _shown(String field, String? error) =>
+      touched.contains(field) ? error : null;
+
+  String? get cardholderError =>
+      _shown('name', card.cardholderError(cardholder.text));
+
+  String? get cardNumberError =>
+      _shown('number', card.cardNumberError(cardNumber.text));
+
+  String? get expiryError =>
+      _shown('expiry', card.expiryError(expiry.text, now: _now()));
+
+  String? get securityCodeError => _shown(
+        'code',
+        card.securityCodeError(
+          securityCode.text,
+          cardNumber: cardNumber.text,
+        ),
+      );
+
+  /// Whether the card as typed could be sent. Read without regard to
+  /// [touched]: a field nobody has visited is still empty and still wrong.
+  bool get cardIsComplete {
+    cardEdits.value;
+    return card.cardholderError(cardholder.text) == null &&
+        card.cardNumberError(cardNumber.text) == null &&
+        card.expiryError(expiry.text, now: _now()) == null &&
+        card.securityCodeError(
+              securityCode.text,
+              cardNumber: cardNumber.text,
+            ) ==
+            null;
+  }
+
+  /// What the card says it is, for the mark beside the number.
+  card.CardBrand get cardBrand =>
+      card.CardBrand.of(card.onlyDigits(cardNumber.text));
 
   /// When the first charge falls, counted from today.
   ///
@@ -187,5 +256,14 @@ class TrialOfferController extends BaseController {
               '₦${checkout.cardCheckNaira} goes back.'
           : 'Your trial starts as soon as the card is confirmed.',
     );
+  }
+
+  @override
+  void onClose() {
+    cardholder.dispose();
+    cardNumber.dispose();
+    expiry.dispose();
+    securityCode.dispose();
+    super.onClose();
   }
 }

@@ -327,7 +327,28 @@ class _RecommendedSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Recommended for you', style: CustomTextStyles.sectionTitle),
+        // "See more" sits on the heading's line, at the far end — the
+        // same place every other section in the app puts its way through,
+        // and where the eye already is when it has read the heading. It
+        // used to sit under the last card, where it read as part of the
+        // list rather than as the section's own action.
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Recommended for you', style: CustomTextStyles.sectionTitle),
+            Obx(
+              () => controller.hasMoreRecommended.value
+                  ? InkWell(
+                      onTap: controller.seeAllRecommended,
+                      child: Text('See more',
+                          style: CustomTextStyles.seeAll),
+                    )
+                  // Only when there is more than the five shown: a link to
+                  // the same five is worse than no link.
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
         SizedBox(height: 16.h),
         Obx(() {
           // Still loading: hold the rail's shape rather than leaving the
@@ -349,21 +370,12 @@ class _RecommendedSection extends StatelessWidget {
                 RecommendedCard(
                   item: item,
                   onHeart: () => controller.toggleHeart(item),
-                  // A card opens the item; "See more" below opens the full
-                  // page this row is a preview of.
+                  // A card opens the item; "See more" beside the heading
+                  // opens the full page this row is a preview of.
                   onTap: () =>
                       controller.open(item, source: 'Recommended for you'),
                 ),
                 if (item != controller.recommended.last) SizedBox(height: 8.h),
-              ],
-              // Only when there is more than the five shown -- a button
-              // that leads to the same five is worse than no button.
-              if (controller.hasMoreRecommended.value) ...[
-                SizedBox(height: 12.h),
-                InkWell(
-                  onTap: controller.seeAllRecommended,
-                  child: Text('See more', style: CustomTextStyles.seeAll),
-                ),
               ],
             ],
           );

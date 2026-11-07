@@ -165,7 +165,12 @@ class _PeriodToggle extends StatelessWidget {
     return Obx(() {
       final period = controller.period.value;
       return Container(
-        height: 40.v,
+        // 56, measured off the designer's own render: the navy segment
+        // runs 112px at 2x, flush with the track. It was 40, which is what
+        // the earlier frames drew — too short once the label went to 20
+        // with a 10 saving line under it, so Annual's two lines were
+        // squeezed against the rim.
+        height: 56.v,
         decoration: BoxDecoration(
           color: appTheme.surface,
           borderRadius: BorderRadius.circular(100.h),

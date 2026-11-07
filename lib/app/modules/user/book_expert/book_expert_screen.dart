@@ -94,9 +94,11 @@ class _OfferCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appTheme.surface,
         borderRadius: BorderRadius.circular(16.h),
-        // The hairline is #2233B5 — the same blue as the action fill,
-        // which the palette already carries.
-        border: Border.all(color: appTheme.actionFill),
+        // The app's 4% rim, not the blue one the earlier frame drew. The
+        // redrawn screen leaves the cards plain: a blue ring round every
+        // card made all three read as selected, and the only blue on the
+        // screen should be the action inside them.
+        border: Border.all(color: appTheme.cardRim),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

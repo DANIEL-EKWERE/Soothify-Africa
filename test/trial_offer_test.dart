@@ -239,6 +239,73 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
   });
+
+  group('the card form', () {
+    testWidgets('a number is grouped as it is typed, and capped',
+        (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final c = Get.put(TrialOfferController(MockBillingRepository()));
+      await pumpScreen(tester, const TrialPaymentScreen());
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.widgetWithText(TextField, '1234 1234 1234 1234'),
+        '42424242424242429999',
+      );
+      await tester.pumpAndSettle();
+
+      // Grouped, and nothing past the sixteenth digit was taken.
+      expect(c.cardNumber.text, '4242 4242 4242 4242');
+    });
+
+    testWidgets('the form is only complete once every field is right',
+        (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final c = Get.put(TrialOfferController(
+        MockBillingRepository(),
+        now: () => DateTime(2026, 11),
+      ));
+      await pumpScreen(tester, const TrialPaymentScreen());
+      await tester.pumpAndSettle();
+
+      expect(c.cardIsComplete, isFalse);
+
+      c.cardholder.text = 'Dami Adeyemi';
+      c.cardNumber.text = '4242 4242 4242 4242';
+      c.expiry.text = '12 / 30';
+      c.securityCode.text = '123';
+      c.touchCard();
+      await tester.pumpAndSettle();
+      expect(c.cardIsComplete, isTrue);
+
+      // One digit out and it is not.
+      c.cardNumber.text = '4242 4242 4242 4224';
+      c.touchCard();
+      await tester.pumpAndSettle();
+      expect(c.cardIsComplete, isFalse);
+    });
+
+    testWidgets('an error waits until the field has been left',
+        (tester) async {
+      useDesignFrame(tester);
+      await loadAppFonts();
+      final c = Get.put(TrialOfferController(MockBillingRepository()));
+      await pumpScreen(tester, const TrialPaymentScreen());
+      await tester.pumpAndSettle();
+
+      c.cardNumber.text = '4242';
+      c.touchCard();
+      await tester.pumpAndSettle();
+      // Mid-typing: nothing is said yet.
+      expect(c.cardNumberError, isNull);
+
+      c.blur('number');
+      await tester.pumpAndSettle();
+      expect(c.cardNumberError, 'That number is too short.');
+    });
+  });
 }
 
 /// A server that asks for a card before the free week.

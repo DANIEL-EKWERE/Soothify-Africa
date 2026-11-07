@@ -112,6 +112,19 @@ class SigninController extends BaseController {
   Future<void> _establish(SignedInUser user) async {
     await _session.setRole(user.role);
     await PrefUtils().setOnboardingSkipped(false);
+    await PrefUtils().setEmailUnverified(!user.emailVerified);
+
+    // Signed in, but the address was never confirmed -- somebody who closed
+    // the app before typing the code. Back to the screen that asks for it,
+    // rather than into an app they can use without ever confirming.
+    //
+    // Checked before the KYC upload below: that call needs a session, and
+    // this one has one, but an account in this state should not be filing
+    // anything until the address behind it is real.
+    if (!user.emailVerified) {
+      Get.offAllNamed(AppRoutes.verifyEmail, arguments: user.email);
+      return;
+    }
 
     // The questionnaire was answered before this account existed, so the
     // account is told about it now. Before the upload, because the line

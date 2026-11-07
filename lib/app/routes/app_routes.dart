@@ -21,6 +21,10 @@ class AppRoutes {
   /// on Log in, as a String, so nobody enters it twice.
   static const String forgotPassword = '/signin/forgot';
 
+  /// Confirming the address a password sign-up was made with. Takes that
+  /// address, as a String, so the screen can show where the code went.
+  static const String verifyEmail = '/signup/verify';
+
   /// Practitioner entry point. Kept registered but out of the default flow:
   /// the designs cover only the client-side sign-in, so [login] establishes a
   /// user session and this stands in until practitioner auth is designed.

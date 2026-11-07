@@ -13,6 +13,7 @@ class SignedInUser {
     this.fullName = '',
     this.email = '',
     this.kycComplete = false,
+    this.emailVerified = true,
   });
 
   final UserRole role;
@@ -23,6 +24,17 @@ class SignedInUser {
   /// them to it; true sends them into the app.
   final bool kycComplete;
 
+  /// Whether they have proved they hold [email].
+  ///
+  /// Travels with the sign-in for the same reason as [kycComplete]: the
+  /// screen that follows depends on it.
+  ///
+  /// Defaults to true, not false. A server that does not send the field is
+  /// one from before verification existed, and reading its silence as
+  /// "unverified" would park every user of an older build on a screen
+  /// asking for a code that nothing will send.
+  final bool emailVerified;
+
   factory SignedInUser.fromProfile(Map<String, dynamic>? profile) {
     final row = profile ?? const <String, dynamic>{};
     return SignedInUser(
@@ -30,6 +42,7 @@ class SignedInUser {
       fullName: row['full_name'] as String? ?? '',
       email: row['email'] as String? ?? '',
       kycComplete: row['kyc_complete'] as bool? ?? false,
+      emailVerified: row['email_verified'] as bool? ?? true,
     );
   }
 }

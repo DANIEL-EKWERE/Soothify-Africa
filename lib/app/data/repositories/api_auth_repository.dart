@@ -168,6 +168,18 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<SignedInUser> verifyEmail(String code) =>
+      // Goes through _establish because the server answers with a fresh
+      // session: confirming an address is a good moment to take new tokens,
+      // and the profile that comes back is what the caller routes on.
+      _establish('/auth/email/verify/', {'code': code.trim()});
+
+  @override
+  Future<void> resendVerificationCode() async {
+    await _api.post('/auth/email/verify/resend/');
+  }
+
+  @override
   Future<void> requestPasswordReset(String email) async {
     await _api.post('/auth/password/reset/', body: {'email': email.trim()});
   }

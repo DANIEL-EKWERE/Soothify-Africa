@@ -45,6 +45,20 @@ abstract class AuthRepository {
   /// more than a clearer error message.
   Future<void> requestPasswordReset(String email);
 
+  /// Confirms the address with the six digits from the signup email.
+  ///
+  /// Answers with the account as it now stands, so the caller can route on
+  /// it without asking again. Throws [ValidationException] carrying the
+  /// server's own message when the code is wrong, spent or expired — that
+  /// is the message the screen shows.
+  Future<SignedInUser> verifyEmail(String code);
+
+  /// Asks for another code, for one that never arrived or has run out.
+  ///
+  /// Issuing supersedes whatever was outstanding, so the newest code is
+  /// the only one that works.
+  Future<void> resendVerificationCode();
+
   /// Closes the account and erases what is personal.
   ///
   /// [confirm] is the password, or — for an account opened with Google or

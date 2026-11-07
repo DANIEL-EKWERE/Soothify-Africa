@@ -29,6 +29,10 @@ class LocalAuthRepository implements AuthRepository {
       throw const ValidationException('That email already has an account.');
     }
     _taken.add(address);
+    // `emailVerified` defaults to true, and is left that way on purpose.
+    // This stand-in cannot send a code, so claiming an address needs
+    // confirming would park the no-server build on a screen it can never
+    // leave -- which is the one thing this class exists to avoid.
     return SignedInUser(
       role: UserRole.user,
       fullName: fullName.trim(),
@@ -86,6 +90,23 @@ class LocalAuthRepository implements AuthRepository {
     throw const ValidationException(
       'Password resets need the server. Sign in with your password instead.',
     );
+  }
+
+  @override
+  Future<SignedInUser> verifyEmail(String code) async {
+    await Future<void>.delayed(_latency);
+    // Nothing issued a code, so nothing can check one -- the same position
+    // as a password reset. Refused rather than waved through: a stand-in
+    // that accepts any six digits teaches the wrong thing about the flow.
+    throw const ValidationException(
+      'Confirming an email needs the server.',
+    );
+  }
+
+  @override
+  Future<void> resendVerificationCode() async {
+    await Future<void>.delayed(_latency);
+    throw const UnknownException('Sending a code needs the server.');
   }
 
   @override

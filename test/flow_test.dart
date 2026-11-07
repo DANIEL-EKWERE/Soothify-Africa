@@ -164,11 +164,20 @@ void main() {
     // is never skipped by accident.
     const needsArguments = {AppRoutes.communityThread, AppRoutes.media};
 
+    // Routes whose screen needs a platform implementation a unit test has
+    // no way to provide. The checkout webview asserts on
+    // `WebViewPlatform.instance`, which only a real engine sets -- so this
+    // loop cannot say anything useful about it either way. Listed rather
+    // than left failing, because a failure here stops the loop and hides
+    // every route after it.
+    const needsPlatform = {AppRoutes.checkoutWebView};
+
     for (final page in AppPages.pages) {
       // Parameterised routes need a value to resolve.
       if (page.name.contains(':') ||
           page.name == AppRoutes.splash ||
-          needsArguments.contains(page.name)) {
+          needsArguments.contains(page.name) ||
+          needsPlatform.contains(page.name)) {
         continue;
       }
 

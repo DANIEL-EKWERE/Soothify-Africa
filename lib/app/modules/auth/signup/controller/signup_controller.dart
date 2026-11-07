@@ -127,6 +127,18 @@ class SignupController extends BaseController {
   Future<void> _establish(SignedInUser user) async {
     await _session.setRole(user.role);
     await PrefUtils().setOnboardingSkipped(false);
+    await PrefUtils().setEmailUnverified(!user.emailVerified);
+
+    // Signing up with a password proves nothing about the address, so the
+    // server has just emailed a code. Before the role branches: a studio
+    // and a practitioner own an address the same way a member does.
+    //
+    // Google and Apple arrive here already verified -- the provider checked
+    // the address -- so they pass straight through.
+    if (!user.emailVerified) {
+      Get.offAllNamed(AppRoutes.verifyEmail, arguments: user.email);
+      return;
+    }
 
     if (user.role == UserRole.practitioner) {
       Get.offAllNamed(AppRoutes.practitionerDashboard);

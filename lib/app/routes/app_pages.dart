@@ -93,6 +93,8 @@ import '../modules/user/search/controller/search_controller.dart';
 import '../modules/user/search/search_screen.dart';
 import '../modules/auth/forgot_password/binding/forgot_password_binding.dart';
 import '../modules/auth/forgot_password/forgot_password_screen.dart';
+import '../modules/auth/verify_email/binding/verify_email_binding.dart';
+import '../modules/auth/verify_email/verify_email_screen.dart';
 import '../modules/auth/signin/binding/signin_binding.dart';
 import '../modules/auth/signin/signin_screen.dart';
 import '../modules/auth/signup/binding/signup_binding.dart';
@@ -204,6 +206,11 @@ class AppPages {
       name: AppRoutes.forgotPassword,
       page: () => const ForgotPasswordScreen(),
       binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.verifyEmail,
+      page: () => const VerifyEmailScreen(),
+      binding: VerifyEmailBinding(),
     ),
     GetPage(
       name: AppRoutes.roleSelect,

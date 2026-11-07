@@ -29,6 +29,8 @@ class StubAuthRepository implements AuthRepository {
     this.error,
     this.kycComplete = false,
     this.emailIsAvailable = true,
+    this.emailVerified = true,
+    this.verifyError,
   });
 
   /// The role a successful sign-in returns. Null stands for the user
@@ -41,8 +43,18 @@ class StubAuthRepository implements AuthRepository {
 
   final bool emailIsAvailable;
 
+  /// Whether the session says the address is confirmed. Defaults to true,
+  /// as the model does, so the tests written before verification existed go
+  /// on routing the way they always did.
+  final bool emailVerified;
+
   /// Thrown instead, when a test wants the failure path.
   final Object? error;
+
+  /// Thrown by [verifyEmail] alone, for the wrong-code path. Separate from
+  /// [error], which would also break the register call that gets a test to
+  /// the code screen in the first place.
+  final Object? verifyError;
 
   int googleCalls = 0;
   int appleCalls = 0;
@@ -50,6 +62,8 @@ class StubAuthRepository implements AuthRepository {
   int signInCalls = 0;
   int signOutCalls = 0;
   int resetRequests = 0;
+  int verifyCalls = 0;
+  int resendCalls = 0;
 
   /// What was last sent, so a test can check the form reached the server.
   String? lastEmail;
@@ -59,7 +73,11 @@ class StubAuthRepository implements AuthRepository {
 
   SignedInUser? get _user => role == null
       ? null
-      : SignedInUser(role: role!, kycComplete: kycComplete);
+      : SignedInUser(
+          role: role!,
+          kycComplete: kycComplete,
+          emailVerified: emailVerified,
+        );
 
   @override
   Future<SignedInUser?> signInWithGoogle() async {
@@ -121,6 +139,26 @@ class StubAuthRepository implements AuthRepository {
     lastEmail = email;
     if (error != null) throw error!;
     return emailIsAvailable;
+  }
+
+  @override
+  Future<SignedInUser> verifyEmail(String code) async {
+    verifyCalls++;
+    lastCode = code;
+    if (verifyError != null) throw verifyError!;
+    if (error != null) throw error!;
+    // Confirmed, whatever this stub was told to say before: that is what
+    // succeeding at this call means.
+    return SignedInUser(
+      role: role ?? UserRole.user,
+      kycComplete: kycComplete,
+    );
+  }
+
+  @override
+  Future<void> resendVerificationCode() async {
+    resendCalls++;
+    if (error != null) throw error!;
   }
 
   @override

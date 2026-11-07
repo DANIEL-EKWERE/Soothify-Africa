@@ -10,6 +10,7 @@ import '../../../data/services/session_service.dart';
 /// controller whose screen never references it.
 ///
 ///   first launch     -> intro carousel
+///   email unconfirmed-> the code screen, for an account that has one
 ///   practitioner     -> practitioner dashboard (no designs yet)
 ///   guest            -> same as a signed-in user; the app is usable without
 ///                       an account, and Profile offers sign-up when wanted
@@ -24,6 +25,18 @@ Future<String> resolveStartRoute({
   required KycRepository kyc,
 }) async {
   if (!PrefUtils().introSeen()) return AppRoutes.intro;
+
+  // An account that owes us a confirmation code goes back to the screen
+  // asking for it, whatever its role -- a studio and a practitioner own an
+  // address the same way a member does.
+  //
+  // Guarded by `hasAccount`, not by the role: a role is chosen during
+  // onboarding before anybody registers, and a guest has no address to
+  // confirm. The flag defaults to false, so an install from before
+  // verification existed is unaffected.
+  if (session.hasAccount && PrefUtils().emailUnverified()) {
+    return AppRoutes.verifyEmail;
+  }
 
   if (session.role.value == UserRole.practitioner) {
     return AppRoutes.practitionerDashboard;

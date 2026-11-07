@@ -15,6 +15,7 @@ class PrefUtils {
   static const _kLanguage = 'language';
   static const _kIntroSeen = 'introSeen';
   static const _kOnboardingSkipped = 'onboardingSkipped';
+  static const _kEmailUnverified = 'emailUnverified';
   static const _kOnboarded = 'hasOnboarded';
   static const _kWifiOnlyDownloads = 'wifiOnlyDownloads';
   static const _kPassportWaitlist = 'passportWaitlistEmail';
@@ -95,6 +96,15 @@ class PrefUtils {
   String? getUserRole() => _store.getString(_kUserRole);
   Future<void> setUserRole(String value) async =>
       _store.setString(_kUserRole, value);
+
+  /// Whether the signed-in account still owes us a confirmation code.
+  ///
+  /// Stored as the negative, so the default — an absent key — means
+  /// verified. An install from before this existed, and a guest who has no
+  /// account at all, must not be sent to a screen asking for a code.
+  bool emailUnverified() => _store.getBool(_kEmailUnverified) ?? false;
+  Future<void> setEmailUnverified(bool value) async =>
+      _store.setBool(_kEmailUnverified, value);
 
   bool hasOnboarded() => _store.getBool(_kOnboarded) ?? false;
   Future<void> setOnboarded(bool value) async =>
@@ -214,6 +224,8 @@ class PrefUtils {
 
   Future<void> clearSession() async {
     await _store.remove(_kUserRole);
+    // Whose address was unconfirmed is part of whose session it was.
+    await _store.remove(_kEmailUnverified);
     // Credentials are the session. Leaving them behind would let the next
     // person on the phone act as the last one.
     await _store.remove(_kAccessToken);

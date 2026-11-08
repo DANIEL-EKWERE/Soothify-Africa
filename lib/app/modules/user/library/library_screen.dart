@@ -339,13 +339,25 @@ class _Articles extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.h),
-                        child: CustomImageView(
-                          imagePath: article.cover,
-                          height: 136.v,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+                      // The same shape as every other media card.
+                      //
+                      // An AspectRatio rather than a height, because the
+                      // width here comes from Expanded and is whatever two
+                      // cards and a gap leave of the screen. A fixed
+                      // `136.v` against that was a landscape rectangle on
+                      // a 375 phone and a different rectangle on every
+                      // other size -- and it scaled by height while the
+                      // width scaled by width, so the shape drifted with
+                      // the device as well.
+                      AspectRatio(
+                        aspectRatio: DiscoveryCard.aspect,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.h),
+                          child: CustomImageView(
+                            imagePath: article.cover,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       SizedBox(height: 12.v),

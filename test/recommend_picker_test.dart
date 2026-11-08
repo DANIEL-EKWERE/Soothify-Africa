@@ -57,8 +57,25 @@ void main() {
     expect(video.items.every((i) => i.type == MediaType.video), isTrue);
   });
 
-  test('a kind the library has none of comes back empty, not wrong', () async {
+  test('articles are listed too, and only articles', () async {
     final c = build(ExpertContentKind.article);
+    await c.load();
+
+    expect(c.items, isNotEmpty);
+    expect(c.items.every((i) => i.type == MediaType.article), isTrue);
+  });
+
+  test('a kind the library has none of comes back empty, not wrong', () async {
+    // An empty library, built for this, rather than whichever kind the
+    // fixtures happen to be missing: this used to pick `article` because
+    // the mock had none, and the day the mock gained two the test failed
+    // for a reason that had nothing to do with what it was checking.
+    final c = RecommendController(
+      _EmptyLibrary(),
+      experts,
+      session: session,
+      kind: ExpertContentKind.article,
+    );
     await c.load();
 
     // The screen says "nothing of this kind in the library yet" rather
@@ -133,4 +150,20 @@ void main() {
     // nothing: this screen opens on a browse.
     expect(c.items, isNotEmpty);
   });
+}
+
+
+/// A library with nothing in it.
+///
+/// Only `byKind` is reached by the picker; everything else inherits the
+/// mock's answers, so this stays a one-line change if the picker ever asks
+/// for something more.
+class _EmptyLibrary extends MockContentRepository {
+  @override
+  Future<List<MediaItem>> byKind(
+    MediaType kind, {
+    String query = '',
+    Map<String, String> filters = const {},
+  }) async =>
+      const [];
 }

@@ -22,6 +22,15 @@ class DiscoveryCard extends StatelessWidget {
   final VoidCallback onTap;
   final double width;
 
+  /// The shape of a media card: 159 across by 166 down, as the frames draw
+  /// it -- square to the eye, a shade taller than wide in fact.
+  ///
+  /// Public and named because the Articles shelf has to match it. That shelf
+  /// sizes its covers from the width it is given rather than from a fixed
+  /// number, so without something to match it drifted into a landscape
+  /// rectangle beside cards that were not.
+  static const aspect = 159 / 166;
+
   String get _duration {
     final d = item.duration;
     final minutes = d.inMinutes.toString().padLeft(2, '0');

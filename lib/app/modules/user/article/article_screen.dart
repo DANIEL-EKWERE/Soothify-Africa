@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../data/models/article.dart';
+import '../../../data/models/article_body.dart';
 import 'controller/article_controller.dart';
 
 /// The article reader — Figma "Pilates & Core Articles" (`259:58647`) and
@@ -42,7 +44,7 @@ class ArticleScreen extends GetView<ArticleController> {
                   SizedBox(height: 24.5.v),
                   const _TitleRow(),
                   SizedBox(height: 22.5.v),
-                  Text(controller.body, style: CustomTextStyles.articleBody),
+                  const _Body(),
                   SizedBox(height: 33.v),
                   const _CallToAction(),
                 ],
@@ -129,37 +131,113 @@ class _TitleRow extends StatelessWidget {
   }
 }
 
-/// The closing paragraph, with its two phrases tappable.
+/// The article's own text, with any links the author embedded.
 ///
-/// Stateful only because a [TapGestureRecognizer] has to be disposed — one
-/// built inline in `build` leaks a recognizer on every rebuild.
-class _CallToAction extends StatefulWidget {
+/// An author writes them inline on the dashboard, so a piece about winding
+/// down can send the reader to the sleep story it is describing:
+///
+///     Wind down with [our Deep Rest story](media:42) tonight.
+///
+/// A body with no links renders as a plain [Text] — no recognizers to build
+/// or dispose, which is the ordinary article and should cost nothing.
+class _Body extends StatelessWidget {
+  const _Body();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<ArticleController>();
+    if (!controller.bodyHasLinks) {
+      return Text(controller.body, style: CustomTextStyles.articleBody);
+    }
+    return _LinkedProse(
+      spans: controller.bodySpans,
+      onTap: controller.followTap,
+    );
+  }
+}
+
+/// The closing paragraph, with its two phrases tappable.
+class _CallToAction extends StatelessWidget {
   const _CallToAction();
 
   @override
-  State<_CallToAction> createState() => _CallToActionState();
+  Widget build(BuildContext context) {
+    final controller = Get.find<ArticleController>();
+    return _LinkedProse(
+      // The generated call to action carries [ArticleLink]s rather than
+      // body taps, so it is mapped onto the same shape -- one widget draws
+      // both, and there is one place where a recognizer can leak.
+      spans: [
+        for (final run in controller.callToAction)
+          ArticleSpan(
+            run.text,
+            tap: switch (run.link) {
+              ArticleLink.library => const ArticleTap(ArticleTarget.library),
+              ArticleLink.booking => const ArticleTap(ArticleTarget.booking),
+              null => null,
+            },
+          ),
+      ],
+      onTap: controller.followTap,
+    );
+  }
 }
 
-class _CallToActionState extends State<_CallToAction> {
+/// Prose with tappable phrases in it.
+///
+/// Stateful only because a [TapGestureRecognizer] has to be disposed — one
+/// built inline in `build` leaks a recognizer on every rebuild.
+class _LinkedProse extends StatefulWidget {
+  const _LinkedProse({required this.spans, required this.onTap});
+
+  final List<ArticleSpan> spans;
+  final void Function(ArticleTap) onTap;
+
+  @override
+  State<_LinkedProse> createState() => _LinkedProseState();
+}
+
+class _LinkedProseState extends State<_LinkedProse> {
   final List<TapGestureRecognizer> _recognizers = [];
 
   @override
   void initState() {
     super.initState();
-    final controller = Get.find<ArticleController>();
-    for (final run in controller.callToAction) {
-      if (run.link == null) continue;
+    _build();
+  }
+
+  @override
+  void didUpdateWidget(_LinkedProse old) {
+    super.didUpdateWidget(old);
+    // The spans can change under us -- a different article pushed onto the
+    // same route. Recognizers are rebuilt rather than reused, or a tap
+    // would follow the previous article's link.
+    if (widget.spans.length != old.spans.length) {
+      _dispose();
+      _build();
+    }
+  }
+
+  void _build() {
+    for (final span in widget.spans) {
+      final tap = span.tap;
+      if (tap == null) continue;
       _recognizers.add(
-        TapGestureRecognizer()..onTap = () => controller.follow(run.link!),
+        TapGestureRecognizer()..onTap = () => widget.onTap(tap),
       );
     }
   }
 
+  void _dispose() {
+    for (final recognizer in _recognizers) {
+      recognizer.dispose();
+    }
+    _recognizers.clear();
+  }
+
   @override
   void dispose() {
-    for (final r in _recognizers) {
-      r.dispose();
-    }
+    _dispose();
     super.dispose();
   }
 
@@ -169,15 +247,15 @@ class _CallToActionState extends State<_CallToAction> {
     return Text.rich(
       TextSpan(
         children: [
-          for (final run in Get.find<ArticleController>().callToAction)
-            if (run.isLink)
+          for (final span in widget.spans)
+            if (span.isLink)
               TextSpan(
-                text: run.text,
+                text: span.text,
                 style: CustomTextStyles.articleLink,
                 recognizer: _recognizers[next++],
               )
             else
-              TextSpan(text: run.text, style: CustomTextStyles.articleBody),
+              TextSpan(text: span.text, style: CustomTextStyles.articleBody),
         ],
       ),
     );

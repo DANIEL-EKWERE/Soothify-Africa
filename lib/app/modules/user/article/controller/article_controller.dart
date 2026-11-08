@@ -1,9 +1,12 @@
 import '../../../../core/app_export.dart';
 import '../../../../core/utils/wellness_entry.dart';
+import '../../../../core/utils/checkout_launcher.dart';
 import '../../../../data/models/article.dart';
+import '../../../../data/models/article_body.dart';
 import '../../../../data/models/library_section.dart';
 import '../../../../data/models/media_item.dart';
 import '../../../../data/models/wellness_kyc.dart';
+import '../../../../data/repositories/content_repository.dart';
 
 /// Backs the article reader — Figma "Pilates & Core Articles" (`259:58647`)
 /// and "Stretch Articles" (`259:58687`).
@@ -14,10 +17,27 @@ import '../../../../data/models/wellness_kyc.dart';
 /// values in an enum, with its title, body and closing paragraph written
 /// into the app -- so adding a third meant shipping a release.
 class ArticleController extends GetxController {
-  ArticleController(this.item, {LibrarySection? section})
-      : section = section ?? _sectionOf(item);
+  ArticleController(this.item, {LibrarySection? section, ContentRepository? content})
+      : section = section ?? _sectionOf(item),
+        _content = content;
 
   final MediaItem item;
+
+  /// Looks up what an embedded link points at. Optional: an article with no
+  /// links in it never needs one, and the reader must still open without a
+  /// repository registered.
+  final ContentRepository? _content;
+
+  ContentRepository? get _repository {
+    if (_content != null) return _content;
+    return Get.isRegistered<ContentRepository>()
+        ? Get.find<ContentRepository>()
+        : null;
+  }
+
+  /// True while a tapped link is being looked up, so the reader can say so
+  /// rather than appearing to ignore the tap.
+  final RxBool isFollowing = false.obs;
 
   /// Which half of the app it belongs to. Decides where the closing
   /// paragraph's two links go.
@@ -26,6 +46,18 @@ class ArticleController extends GetxController {
   String get title => item.title;
 
   String get body => item.description;
+
+  /// The body, split into prose and links.
+  ///
+  /// An author writes them inline on the dashboard --
+  /// `[our Deep Rest sleep story](media:42)` -- so an article can send a
+  /// reader straight to the thing it is talking about. See
+  /// [parseArticleBody].
+  List<ArticleSpan> get bodySpans => parseArticleBody(body);
+
+  /// Whether this article has any links in its body at all. The reader uses
+  /// a plain [Text] when it has none, which needs no gesture recognizers.
+  bool get bodyHasLinks => bodySpans.any((span) => span.isLink);
 
   double get rating => item.rating;
 
@@ -57,6 +89,60 @@ class ArticleController extends GetxController {
       const {'sleep', 'calm', 'stories'}.contains(item.categoryId)
           ? LibrarySection.balance
           : LibrarySection.meditation;
+
+  /// Open what an embedded link points at.
+  ///
+  /// Nothing here throws: a link to a piece that has since been unpublished
+  /// is an authoring mistake, and the reader says so plainly rather than
+  /// failing in front of somebody who only tapped a phrase.
+  Future<void> followTap(ArticleTap tap) async {
+    if (isFollowing.value) return;
+
+    switch (tap.target) {
+      case ArticleTarget.external:
+        final opened = await ExternalLink.open(tap.id);
+        if (!opened) AppFeedback.info('That link could not be opened.');
+      case ArticleTarget.library:
+        await Get.toNamed(AppRoutes.library, arguments: section);
+      case ArticleTarget.booking:
+        await follow(ArticleLink.booking);
+      case ArticleTarget.breathe:
+        await Get.toNamed(AppRoutes.breathe);
+      case ArticleTarget.media:
+        await _openMedia(tap.id);
+    }
+  }
+
+  Future<void> _openMedia(String id) async {
+    // Linking a piece to itself would push a second copy of this screen on
+    // top of the one being read. Harmless but baffling, and an easy thing
+    // to do by accident when copying ids.
+    if (id == item.id) return;
+
+    final repository = _repository;
+    if (repository == null) return;
+
+    isFollowing.value = true;
+    try {
+      final found = await repository.getById(id);
+      if (found == null) {
+        AppFeedback.info('That piece is no longer available.');
+        return;
+      }
+      // An article opens the reader; anything else opens the player.
+      await Get.toNamed(
+        found.type == MediaType.article
+            ? AppRoutes.article
+            : AppRoutes.media,
+        arguments: found,
+      );
+    } catch (error, stack) {
+      Log.e('could not follow an article link', error: error, stackTrace: stack);
+      AppFeedback.info('That could not be opened just now.');
+    } finally {
+      isFollowing.value = false;
+    }
+  }
 
   Future<void> follow(ArticleLink link) async {
     switch (link) {

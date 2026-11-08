@@ -138,6 +138,7 @@ flutter:
     - assets/images/onboarding/
     - assets/icons/
     - assets/data/
+    - assets/audio/
 
   # Variable fonts from Google Fonts (OFL). Bundled rather than fetched at
   # runtime so first launch works offline.

@@ -355,6 +355,46 @@ class MockContentRepository implements ContentRepository {
       categoryId: 'discovery-popular',
       practitionerName: 'Jacob Samuel',
     ),
+    // The two written pieces, matching what `seed_content.py` puts on the
+    // server. Without them the Articles shelf rendered as nothing here --
+    // which is not an empty state the app has, and it meant the shelf's
+    // layout was never exercised by a test at all.
+    //
+    // The first carries a link in its body on purpose: an author writes
+    // them inline, and an article with one is the case worth having a
+    // fixture for.
+    MediaItem(
+      id: '60',
+      title: 'Why Your Core is More Than Just Six-Pack Abs',
+      coverAsset: '${ImageConstant.contentDir}/yoga_vinyasa.png',
+      subtitle: 'Pilates & Core',
+      tag: 'Pilates & Core',
+      type: MediaType.article,
+      durationSeconds: 0,
+      rating: 4.8,
+      categoryId: 'pilates-articles',
+      description:
+          'True core strength runs deep, wrapping around your spine like a '
+          'natural corset to protect your lower back and improve posture. '
+          'Start with [the daily focus session](media:1), or '
+          '[take a breathing minute](breathe) before you begin.',
+    ),
+    MediaItem(
+      id: '61',
+      title: 'The Physiology of Deep Rest: Why Doing Nothing is Productive',
+      coverAsset: '${ImageConstant.contentDir}/yoga_restorative.png',
+      subtitle: 'Stretch & Restore',
+      tag: 'Stretch & Restore',
+      type: MediaType.article,
+      durationSeconds: 0,
+      rating: 4.8,
+      categoryId: 'balance-articles',
+      description:
+          'Constant go-mode keeps your nervous system trapped in a chronic '
+          'state of fight-or-flight. True rest triggers your '
+          'parasympathetic nervous system, lowering your heart rate and '
+          'clearing brain fog so you can perform at your best.',
+    ),
   ];
 
   @override
@@ -373,6 +413,10 @@ class MockContentRepository implements ContentRepository {
     'pilates-audio',
     'recommended',
     'shelf-page',
+    // Articles have their own shelf at the foot of each library; they are
+    // not cards in the featured row.
+    'pilates-articles',
+    'balance-articles',
   };
 
   @override
@@ -399,6 +443,9 @@ class MockContentRepository implements ContentRepository {
     // pretending to a catalogue that does not exist.
     'pilates-videos': ['1', '2', '3'],
     'balance-videos': ['7', '8', '9'],
+    // Both libraries close on an Articles shelf -- see LibraryArticles.
+    'pilates-articles': ['60', '61'],
+    'balance-articles': ['61', '60'],
   };
 
   /// The Recommendation page's own five cards, in the frame's order. Home's

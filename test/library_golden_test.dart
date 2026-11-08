@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/library_section.dart';
+import 'package:soothifyafrica/app/modules/user/discovery/widgets/discovery_card.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
 import 'package:soothifyafrica/app/modules/user/library/controller/library_controller.dart';
@@ -100,7 +101,59 @@ void main() {
         expect(find.text(article.title), findsOneWidget,
             reason: '${section.title}: ${article.title}');
       }
+
+      // The covers are the same shape as every other media card.
+      //
+      // They were a landscape rectangle beside cards that were not: a fixed
+      // `136.v` height against a width that comes from Expanded. Checked as
+      // a size rather than left to the goldens, because a golden says only
+      // that a screenshot changed, not which way the shape went.
+      final covers = tester.widgetList<AspectRatio>(
+        find.ancestor(
+          of: find.byType(ClipRRect),
+          matching: find.byType(AspectRatio),
+        ),
+      );
+      expect(covers, isNotEmpty, reason: 'no article cover found');
+      for (final cover in covers) {
+        expect(cover.aspectRatio, DiscoveryCard.aspect);
+      }
+
       Get.reset();
+    }
+  });
+
+  testWidgets('an article cover is the same shape as a media card',
+      (tester) async {
+    // It was a landscape rectangle beside cards that were not: the shelf
+    // set a fixed `136.v` height against a width that comes from Expanded,
+    // so the shape depended on the screen and matched nothing.
+    useDesignFrame(tester);
+    await loadAppFonts();
+    Get.put<ContentRepository>(MockContentRepository());
+    Get.put(
+      LibraryController(Get.find<ContentRepository>(), LibrarySection.balance),
+    );
+
+    await pumpScreen(tester, const LibraryScreen());
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+
+    final covers = tester.widgetList<AspectRatio>(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('Articles'),
+          matching: find.byType(Column),
+        ).last,
+        matching: find.byType(AspectRatio),
+      ),
+    );
+    expect(covers, isNotEmpty, reason: 'no article covers were rendered');
+    for (final cover in covers) {
+      expect(cover.aspectRatio, DiscoveryCard.aspect);
+      // And that shape is square to within a few percent, which is what
+      // "square like the others" means on the frame.
+      expect(cover.aspectRatio, closeTo(1, 0.05));
     }
   });
 

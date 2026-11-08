@@ -11,6 +11,7 @@ import 'app/core/network/api_client.dart';
 import 'app/core/network/app_api_client.dart';
 import 'app/data/repositories/api_device_token_repository.dart';
 import 'app/data/repositories/device_token_repository.dart';
+import 'app/data/services/ambience_service.dart';
 import 'app/data/services/language_service.dart';
 import 'app/data/services/push_service.dart';
 import 'app/data/services/session_service.dart';
@@ -29,6 +30,10 @@ Future<void> main() async {
   await Get.putAsync(() => ThemeService().init(), permanent: true);
   await Get.putAsync(() => LanguageService().init(), permanent: true);
   await Get.putAsync(() => NetworkInfo().init(), permanent: true);
+  // The stream under the splash. Registered before the first frame because
+  // the splash asks for it three seconds in, and nothing about it is async
+  // -- the player is opened lazily, on that first ask.
+  Get.put(AmbienceService(), permanent: true);
 
   // Push. Firebase first, then the background handler — it has to be
   // registered before a message can arrive, and it runs in its own isolate,

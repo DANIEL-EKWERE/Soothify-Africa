@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/repositories/kyc_repository.dart';
+import '../../../data/services/ambience_service.dart';
 import '../../../data/services/push_service.dart';
 import '../../../data/services/session_service.dart';
+import 'splash_timing.dart';
 import 'start_route.dart';
 
 /// Splash — the wordmark, then a breath, then the app.
@@ -17,37 +21,19 @@ import 'start_route.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
-  /// How long the wordmark holds before the breathing prompts begin.
-  static const brandHold = Duration(seconds: 3);
-
-  /// How long the outgoing word takes to reach nothing at all, and the same
-  /// again for the incoming one.
-  ///
-  /// 1.4s each way. 600 read as a UI transition and 1000 was still brisk
-  /// for the one screen whose whole job is to slow you down.
-  static const fadeOutMs = 1400;
-
-  /// The empty beat between the two words — a second of nothing, so one has
-  /// plainly gone before the next arrives.
-  static const gapMs = 1000;
-
-  /// One swap, start to finish: out, the gap, then in.
-  static const fadeMs = fadeOutMs + gapMs + fadeOutMs;
-  static const fade = Duration(milliseconds: fadeMs);
-
-  /// How long a word stands fully lit, once it has finished arriving.
-  static const litMs = 1600;
-
-  /// How long each prompt stays up, measured from the moment it is swapped
-  /// in — the swap itself, then [litMs] of stillness.
-  ///
-  /// Derived rather than written down: this was a literal 3800 alongside a
-  /// comment claiming 1.6s of stillness, which stopped being true the moment
-  /// the fade changed. Now it cannot drift.
-  static const breathHold = Duration(milliseconds: fadeMs + litMs);
-
-  /// The prompts, in order.
-  static const prompts = ['Inhale Deeply', 'Exhale Slowly'];
+  // The durations live in splash_timing.dart and are re-exported here, so
+  // this is still where you look for them. They moved out because the
+  // stream that fades up under the prompts has to be timed against them,
+  // and a service importing this screen — which imports the service — is a
+  // cycle.
+  static const brandHold = SplashTiming.brandHold;
+  static const fadeOutMs = SplashTiming.fadeOutMs;
+  static const gapMs = SplashTiming.gapMs;
+  static const fadeMs = SplashTiming.fadeMs;
+  static const fade = SplashTiming.fade;
+  static const litMs = SplashTiming.litMs;
+  static const breathHold = SplashTiming.breathHold;
+  static const prompts = SplashTiming.prompts;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -71,6 +57,15 @@ class _SplashScreenState extends State<SplashScreen> {
     );
 
     await Future<void>.delayed(SplashScreen.brandHold);
+
+    // The stream comes up as the wordmark leaves, over one word-swap, so it
+    // is at full in the same moment "Inhale Deeply" finishes arriving. Not
+    // awaited: opening a codec can take a moment on a cold start and the
+    // prompts must not wait on it.
+    if (Get.isRegistered<AmbienceService>()) {
+      unawaited(Get.find<AmbienceService>().start());
+    }
+
     for (var i = 0; i < SplashScreen.prompts.length; i++) {
       // Guarded at every step: the widget can be disposed if something else
       // navigates first, and this sequence runs for several seconds.
@@ -81,6 +76,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
     Get.offAllNamed(route);
+
+    // Three more seconds wherever that landed -- the shell, the intro
+    // carousel on a first launch, the questionnaire, a studio's portal --
+    // and then it fades away. Told here rather than from the destination,
+    // because every destination would otherwise have to remember to.
+    if (Get.isRegistered<AmbienceService>()) {
+      Get.find<AmbienceService>().land();
+    }
 
     // A notification the user tapped to launch the app is held until there
     // is something to push onto — which is now, after the splash has handed

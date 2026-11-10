@@ -13,6 +13,7 @@ import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dar
 import 'package:soothifyafrica/app/modules/user/article/article_screen.dart';
 import 'package:soothifyafrica/app/modules/user/article/controller/article_controller.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
+import 'package:soothifyafrica/app/widgets/custom_image_view.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 
 import 'helpers.dart';
@@ -296,6 +297,96 @@ void main() {
       expect(shown, isNot(contains('](')));
       expect(shown, isNot(contains('media:42')));
       expect(shown, startsWith('Wind down with our Deep Rest story'));
+    });
+  });
+
+  group('a picture in the body', () {
+    Future<Size?> sizeOfBodyImage(WidgetTester tester, String body) async {
+      useDesignFrame(tester);
+      Get.put<ContentRepository>(MockContentRepository());
+      Get.put(ArticleController(
+        MediaItem(
+          id: '60',
+          title: 'A piece',
+          type: MediaType.article,
+          durationSeconds: 0,
+          description: body,
+        ),
+        section: LibrarySection.balance,
+      ));
+
+      await pumpScreen(tester, const ArticleScreen());
+      await tester.pump(const Duration(milliseconds: 600));
+
+      for (final element in find.byType(CustomImageView).evaluate()) {
+        final widget = element.widget as CustomImageView;
+        if ((widget.imagePath ?? '').startsWith('http')) {
+          return (element.renderObject as RenderBox).size;
+        }
+      }
+      return null;
+    }
+
+    testWidgets('is drawn at a size somebody can see', (tester) async {
+      // It used to draw at 342 by 0: CustomImageView hands its own height
+      // to the placeholder, and a placeholder of height null in a Column
+      // has unbounded height to fill and fills none of it. The picture was
+      // in the body, parsed correctly, and invisible.
+      final size = await sizeOfBodyImage(
+        tester,
+        'Before.\n\n![A mat](https://example.test/x.png)\n\nAfter.',
+      );
+
+      expect(size, isNotNull, reason: 'no body image was rendered at all');
+      expect(size!.height, greaterThan(100),
+          reason: 'the picture is there but has no height');
+      expect(size.width, greaterThan(300));
+    });
+
+    testWidgets('the space is held while it loads', (tester) async {
+      // Same assertion, made immediately: nothing has had a chance to
+      // load, so this is the placeholder's size. A zero here is the text
+      // below jumping when the picture arrives.
+      useDesignFrame(tester);
+      Get.put<ContentRepository>(MockContentRepository());
+      Get.put(ArticleController(
+        const MediaItem(
+          id: '60',
+          title: 'A piece',
+          type: MediaType.article,
+          durationSeconds: 0,
+          description: '![](https://example.test/x.png)',
+        ),
+        section: LibrarySection.balance,
+      ));
+      await pumpScreen(tester, const ArticleScreen());
+
+      final found = find.byType(CustomImageView).evaluate().where(
+            (e) => ((e.widget as CustomImageView).imagePath ?? '')
+                .startsWith('http'),
+          );
+      expect(found, isNotEmpty);
+      expect((found.first.renderObject as RenderBox).size.height,
+          greaterThan(100));
+    });
+
+    testWidgets('the alt text is shown as a caption', (tester) async {
+      useDesignFrame(tester);
+      Get.put<ContentRepository>(MockContentRepository());
+      Get.put(ArticleController(
+        const MediaItem(
+          id: '60',
+          title: 'A piece',
+          type: MediaType.article,
+          durationSeconds: 0,
+          description: '![A reformer mat](https://example.test/x.png)',
+        ),
+        section: LibrarySection.balance,
+      ));
+      await pumpScreen(tester, const ArticleScreen());
+      await tester.pump(const Duration(milliseconds: 600));
+
+      expect(find.text('A reformer mat'), findsOneWidget);
     });
   });
 

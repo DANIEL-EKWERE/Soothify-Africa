@@ -59,6 +59,91 @@ void main() {
         'content-type': 'application/json',
       });
 
+  group('a 403 is not a 401', () {
+    // They need opposite answers. A 401 means the session is dead and
+    // signing in again fixes it; a 403 means the session is fine and
+    // signing in again changes nothing. Telling a studio whose login was
+    // never joined to a studio that its session expired sent it round a
+    // loop with nothing to fix at the end.
+    test("it carries the server's own reason", () async {
+      final c = clientAnswering(
+        (_) => json({'detail': 'You do not partner with a studio.'}, 403),
+      );
+
+      await expectLater(
+        c.api.get('/partner/overview/'),
+        throwsA(
+          isA<ForbiddenException>().having(
+            (e) => e.message,
+            'message',
+            'You do not partner with a studio.',
+          ),
+        ),
+      );
+    });
+
+    test('it does not claim the session expired', () async {
+      final c = clientAnswering((_) => json({'detail': 'nope'}, 403));
+      try {
+        await c.api.get('/partner/overview/');
+        fail('a 403 should throw');
+      } on AppException catch (error) {
+        expect(error, isNot(isA<UnauthorizedException>()));
+        expect(error.message.toLowerCase(), isNot(contains('expired')));
+        expect(error.message.toLowerCase(), isNot(contains('sign in')));
+      }
+    });
+
+    test('a 403 does not spend the refresh token', () async {
+      // Refreshing cannot help, and burning the round trip on every
+      // forbidden panel is three wasted calls per portal load.
+      var refreshes = 0;
+      final c = clientAnswering(
+        (request) {
+          if (request.url.path.contains('refresh')) {
+            refreshes++;
+            return json({'access': 'new'}, 200);
+          }
+          return json({'detail': 'no'}, 403);
+        },
+        refresh: 'refresh-token',
+      );
+
+      await expectLater(
+        c.api.get('/partner/overview/'), throwsA(isA<ForbiddenException>()),
+      );
+      expect(refreshes, 0);
+    });
+
+    test('a body with no detail still says something usable', () async {
+      final c = clientAnswering((_) => json({}, 403));
+      await expectLater(
+        c.api.get('/partner/overview/'),
+        throwsA(isA<ForbiddenException>().having(
+          (e) => e.message, 'message', isNotEmpty,
+        )),
+      );
+    });
+
+    test('a non-JSON body does not crash the mapping', () async {
+      final c = clientAnswering(
+        (_) => http.Response('<html>Forbidden</html>', 403),
+      );
+      await expectLater(
+        c.api.get('/partner/overview/'),
+        throwsA(isA<ForbiddenException>()),
+      );
+    });
+
+    test('a 401 still says the session expired', () async {
+      final c = clientAnswering((_) => json({'detail': 'expired'}, 401));
+      await expectLater(
+        c.api.get('/partner/overview/'),
+        throwsA(isA<UnauthorizedException>()),
+      );
+    });
+  });
+
   group('list responses', () {
     test('a paginated page gives up its results', () async {
       final c = clientAnswering(

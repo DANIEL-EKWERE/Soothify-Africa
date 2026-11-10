@@ -2823,9 +2823,45 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
-  /// The blue runs inside the closing call to action.
+  /// The blue runs inside the closing call to action, and any link an
+  /// author embedded in the body.
   static TextStyle get articleLink =>
       articleBody.copyWith(color: appTheme.soothifyBlue);
+
+  /// A section heading inside an article's body.
+  ///
+  /// Below [articleTitle] on purpose: the title is the first level and a
+  /// heading in the body must not compete with it. 19 to the title's 24.
+  static TextStyle get articleHeading2 => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 19.fSize,
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+    height: 26 / 19,
+    color: appTheme.textPrimary,
+  );
+
+  /// The level under [articleHeading2]. Set in the body size and told apart
+  /// by its weight, which is as far as the hierarchy needs to go inside a
+  /// piece this short.
+  static TextStyle get articleHeading3 => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 16.fSize,
+    fontWeight: FontWeight.w600,
+    fontVariations: _semiBold,
+    height: 22 / 16,
+    color: appTheme.textPrimary,
+  );
+
+  /// The caption under a picture in the body, which is its alt text.
+  static TextStyle get articleCaption => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 13.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 18 / 13,
+    color: appTheme.textSecondary,
+  );
 
   // --- Booking payment (259:58862 therapist, 259:58919 / 259:58941) ---
 

@@ -99,56 +99,282 @@ class ArticleTap {
   String toString() => 'ArticleTap($target, $id)';
 }
 
-/// A stretch of an article's body: plain words, or a link.
+/// A stretch of an article's body: words, with or without emphasis, and
+/// with or without a link on them.
 class ArticleSpan {
-  const ArticleSpan(this.text, {this.tap});
+  const ArticleSpan(
+    this.text, {
+    this.tap,
+    this.bold = false,
+    this.italic = false,
+  });
 
   final String text;
 
-  /// Null for plain prose.
+  /// Null for prose that is not a link.
   final ArticleTap? tap;
 
+  final bool bold;
+  final bool italic;
+
   bool get isLink => tap != null;
+  bool get isPlain => tap == null && !bold && !italic;
+
+  ArticleSpan copyWith({bool? bold, bool? italic}) => ArticleSpan(
+        text,
+        tap: tap,
+        bold: bold ?? this.bold,
+        italic: italic ?? this.italic,
+      );
 
   @override
-  String toString() => isLink ? '[$text]($tap)' : text;
+  bool operator ==(Object other) =>
+      other is ArticleSpan &&
+      other.text == text &&
+      other.tap == tap &&
+      other.bold == bold &&
+      other.italic == italic;
+
+  @override
+  int get hashCode => Object.hash(text, tap, bold, italic);
+
+  @override
+  String toString() {
+    final marks = [if (bold) 'b', if (italic) 'i'].join();
+    final body = marks.isEmpty ? text : '<$marks>$text';
+    return isLink ? '[$body]($tap)' : body;
+  }
 }
 
-/// Splits a body into plain runs and links.
+// ---------------------------------------------------------------------
+// Blocks
+// ---------------------------------------------------------------------
+
+/// One block of an article: a paragraph, a heading, a list or a picture.
 ///
-/// Returns a single plain span for a body with no links in it, so a caller
-/// never has to special-case the ordinary article.
+/// Blocks rather than one long string of spans, because a heading and a
+/// bullet are laid out, not merely styled -- they need their own spacing,
+/// their own width and, for a bullet, something drawn in the margin.
+sealed class ArticleBlock {
+  const ArticleBlock();
+}
+
+/// Ordinary prose.
+class ArticleParagraph extends ArticleBlock {
+  const ArticleParagraph(this.spans);
+
+  final List<ArticleSpan> spans;
+
+  @override
+  String toString() => 'p(${spans.join()})';
+}
+
+/// A section heading. [level] is 2 or 3 -- the article's own title is the
+/// first level, so a body heading never competes with it.
+class ArticleHeading extends ArticleBlock {
+  const ArticleHeading(this.level, this.spans);
+
+  final int level;
+  final List<ArticleSpan> spans;
+
+  @override
+  String toString() => 'h$level(${spans.join()})';
+}
+
+/// A run of bullets or numbers. Kept as one block rather than a block per
+/// item, so the gap between two bullets is not the gap between paragraphs.
+class ArticleList extends ArticleBlock {
+  const ArticleList({required this.ordered, required this.items});
+
+  final bool ordered;
+  final List<List<ArticleSpan>> items;
+
+  @override
+  String toString() =>
+      '${ordered ? 'ol' : 'ul'}(${items.map((i) => i.join()).join('|')})';
+}
+
+/// A picture inside the body, as opposed to the article's cover.
+class ArticleImage extends ArticleBlock {
+  const ArticleImage(this.url, {this.alt = ''});
+
+  final String url;
+
+  /// What a screen reader says, and what is shown if the picture will not
+  /// load. Optional, as it is in the syntax.
+  final String alt;
+
+  @override
+  String toString() => 'img($url)';
+}
+
+// ---------------------------------------------------------------------
+// Parsing
+// ---------------------------------------------------------------------
+
+/// `[text](destination)`.
 ///
-/// Deliberately not a general Markdown parser. Links are the only thing the
-/// dashboard offers and the only thing the reader renders, so bold, headings
-/// and images would all be syntax that looks supported and is not.
+/// The text may not contain a bracket of its own and the destination may
+/// not contain a paren or a space, which keeps a stray bracket in ordinary
+/// prose from swallowing the rest of a paragraph.
+final _link = RegExp(r'(!?)\[([^\[\]]*)\]\(([^()\s]+)\)');
+
+/// `**bold**` and `*italic*`, longest marker first so `**` is never read as
+/// two singles.
+final _emphasis = RegExp(r'\*\*(.+?)\*\*|\*(.+?)\*|__(.+?)__|_(.+?)_');
+
+/// Splits one line of prose into runs: plain, emphasised, and links.
+///
+/// Returns a single plain span for a line with no markup in it, so a caller
+/// never has to special-case the ordinary sentence.
+///
+/// Deliberately a small subset of Markdown, not the whole of it. The
+/// dashboard offers exactly these and the reader draws exactly these, so
+/// there is no syntax that looks supported and is not.
 List<ArticleSpan> parseArticleBody(String body) {
   if (body.isEmpty) return const [];
-
-  // [text](destination). The text may not contain a bracket of its own and
-  // the destination may not contain a paren, which keeps a stray bracket in
-  // ordinary prose from swallowing the rest of the paragraph.
-  final pattern = RegExp(r'\[([^\[\]]+)\]\(([^()\s]+)\)');
 
   final spans = <ArticleSpan>[];
   var at = 0;
 
-  for (final match in pattern.allMatches(body)) {
-    final tap = ArticleTap.parse(match.group(2)!);
+  for (final match in _link.allMatches(body)) {
+    // An image is a block, not an inline run. One written mid-sentence is
+    // left as typed rather than silently dropped, so the author sees it.
+    if (match.group(1) == '!') continue;
+
+    final tap = ArticleTap.parse(match.group(3)!);
     // Not a destination we know: leave the whole thing as the author typed
     // it. A blue phrase that does nothing is worse than visible syntax,
     // because only one of the two tells anybody something is wrong.
     if (tap == null) continue;
 
+    final text = match.group(2)!;
+    if (text.isEmpty) continue;
+
     if (match.start > at) {
-      spans.add(ArticleSpan(body.substring(at, match.start)));
+      spans.addAll(_emphasised(body.substring(at, match.start)));
     }
-    spans.add(ArticleSpan(match.group(1)!, tap: tap));
+    // Emphasis inside a link is read too: a whole link is often bold.
+    for (final run in _emphasised(text)) {
+      spans.add(ArticleSpan(run.text,
+          tap: tap, bold: run.bold, italic: run.italic));
+    }
     at = match.end;
   }
 
   if (at < body.length) {
-    spans.add(ArticleSpan(body.substring(at)));
+    spans.addAll(_emphasised(body.substring(at)));
   }
   return spans;
+}
+
+/// Splits prose on `**bold**` and `*italic*`.
+List<ArticleSpan> _emphasised(String text) {
+  if (text.isEmpty) return const [];
+
+  final spans = <ArticleSpan>[];
+  var at = 0;
+
+  for (final match in _emphasis.allMatches(text)) {
+    if (match.start > at) {
+      spans.add(ArticleSpan(text.substring(at, match.start)));
+    }
+    // Groups 1 and 3 are the double markers, 2 and 4 the single ones.
+    final strong = match.group(1) ?? match.group(3);
+    final slant = match.group(2) ?? match.group(4);
+    spans.add(
+      strong != null
+          ? ArticleSpan(strong, bold: true)
+          : ArticleSpan(slant!, italic: true),
+    );
+    at = match.end;
+  }
+
+  if (at < text.length) spans.add(ArticleSpan(text.substring(at)));
+  return spans;
+}
+
+final _heading = RegExp(r'^(#{2,3})\s+(.*)$');
+final _bullet = RegExp(r'^\s*[-*+]\s+(.*)$');
+final _numbered = RegExp(r'^\s*\d+[.)]\s+(.*)$');
+final _imageLine = RegExp(r'^!\[([^\[\]]*)\]\(([^()\s]+)\)$');
+
+/// Reads a body into the blocks the reader lays out.
+///
+/// A blank line ends a block; consecutive bullets are gathered into one
+/// list. Anything that is not a heading, a bullet or a picture is prose,
+/// which means a body written with no markup at all comes back as the one
+/// paragraph it reads as.
+List<ArticleBlock> parseArticleBlocks(String body) {
+  if (body.trim().isEmpty) return const [];
+
+  final blocks = <ArticleBlock>[];
+  final paragraph = <String>[];
+  List<List<ArticleSpan>>? items;
+  var ordered = false;
+
+  void closeParagraph() {
+    if (paragraph.isEmpty) return;
+    // Joined with a space, not a newline: a hard wrap in the editor is a
+    // line break the author did not ask for.
+    blocks.add(ArticleParagraph(parseArticleBody(paragraph.join(' '))));
+    paragraph.clear();
+  }
+
+  void closeList() {
+    if (items == null) return;
+    blocks.add(ArticleList(ordered: ordered, items: items!));
+    items = null;
+  }
+
+  void close() {
+    closeParagraph();
+    closeList();
+  }
+
+  for (final raw in body.split('\n')) {
+    final line = raw.trimRight();
+
+    if (line.trim().isEmpty) {
+      close();
+      continue;
+    }
+
+    final image = _imageLine.firstMatch(line.trim());
+    if (image != null) {
+      close();
+      blocks.add(ArticleImage(image.group(2)!, alt: image.group(1) ?? ''));
+      continue;
+    }
+
+    final heading = _heading.firstMatch(line);
+    if (heading != null) {
+      close();
+      blocks.add(ArticleHeading(
+        heading.group(1)!.length,
+        parseArticleBody(heading.group(2)!.trim()),
+      ));
+      continue;
+    }
+
+    final bullet = _bullet.firstMatch(line);
+    final numbered = bullet == null ? _numbered.firstMatch(line) : null;
+    if (bullet != null || numbered != null) {
+      final wantsOrdered = numbered != null;
+      // A numbered list directly under a bulleted one is two lists, not a
+      // list that changes its mind halfway down.
+      if (items != null && ordered != wantsOrdered) closeList();
+      closeParagraph();
+      ordered = wantsOrdered;
+      items ??= <List<ArticleSpan>>[];
+      items!.add(parseArticleBody((bullet ?? numbered)!.group(1)!.trim()));
+      continue;
+    }
+
+    closeList();
+    paragraph.add(line.trim());
+  }
+
+  close();
+  return blocks;
 }

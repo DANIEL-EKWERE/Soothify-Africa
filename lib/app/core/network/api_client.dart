@@ -342,11 +342,36 @@ class ApiClient {
     Log.d('API $code ${response.request?.url.path}: ${response.body}');
     throw switch (code) {
       400 => _validation(response.body),
-      401 || 403 => const UnauthorizedException(),
+      401 => const UnauthorizedException(),
+      // Not the same as a 401, and it used to be. The session is good;
+      // this account simply may not see this. Saying "your session has
+      // expired" sent a studio whose login was never joined to a studio
+      // round a sign-in loop with nothing to fix at the end of it.
+      403 => _forbidden(response.body),
       404 => const NotFoundException(),
       >= 500 => const ServerException(),
       _ => const UnknownException(),
     };
+  }
+
+  /// The server's own sentence, where it sent one.
+  ///
+  /// DRF puts it in `detail`. It is the only thing that can explain a 403
+  /// -- the app cannot know why this account is not allowed -- so it is
+  /// shown as written rather than paraphrased.
+  ForbiddenException _forbidden(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) {
+        final detail = decoded['detail'];
+        if (detail is String && detail.trim().isNotEmpty) {
+          return ForbiddenException(detail.trim());
+        }
+      }
+    } catch (_) {
+      // Not JSON, or not a shape we know. The default says enough.
+    }
+    return const ForbiddenException();
   }
 
   /// DRF writes `{"field": ["msg", ...]}`, and sometimes

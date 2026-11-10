@@ -131,27 +131,170 @@ class _TitleRow extends StatelessWidget {
   }
 }
 
-/// The article's own text, with any links the author embedded.
+/// The article itself, laid out block by block.
 ///
-/// An author writes them inline on the dashboard, so a piece about winding
-/// down can send the reader to the sleep story it is describing:
+/// An author writes it on the dashboard in a small slice of Markdown --
+/// headings, bold, italic, bullets, numbers, pictures, and links to other
+/// content:
 ///
-///     Wind down with [our Deep Rest story](media:42) tonight.
+///     ## Why your core matters
 ///
-/// A body with no links renders as a plain [Text] — no recognizers to build
-/// or dispose, which is the ordinary article and should cost nothing.
+///     True strength runs **deep**. Wind down with
+///     [our Deep Rest story](media:42) tonight.
+///
+/// Blocks rather than one long rich string, because a heading and a bullet
+/// are laid out, not merely styled: each needs its own spacing, and a
+/// bullet needs something drawn in the margin.
 class _Body extends StatelessWidget {
   const _Body();
+
+  /// The gap above each kind of block. Not one uniform rhythm: a heading
+  /// needs room above it to belong to what follows rather than to what
+  /// came before, and two bullets are closer than two paragraphs.
+  double _gapAbove(ArticleBlock block, ArticleBlock? previous) {
+    if (previous == null) return 0;
+    return switch (block) {
+      ArticleHeading() => 26,
+      ArticleImage() => 20,
+      _ => previous is ArticleHeading ? 10 : 16,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ArticleController>();
-    if (!controller.bodyHasLinks) {
-      return Text(controller.body, style: CustomTextStyles.articleBody);
+    final blocks = controller.bodyBlocks;
+
+    // Nothing written. The reader shows the cover and the title rather than
+    // an empty space where the words should be.
+    if (blocks.isEmpty) return const SizedBox.shrink();
+
+    ArticleBlock? previous;
+    final children = <Widget>[];
+    for (final block in blocks) {
+      final gap = _gapAbove(block, previous);
+      if (gap > 0) children.add(SizedBox(height: gap.v));
+      children.add(_blockWidget(block, controller));
+      previous = block;
     }
-    return _LinkedProse(
-      spans: controller.bodySpans,
-      onTap: controller.followTap,
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+  }
+
+  Widget _blockWidget(ArticleBlock block, ArticleController controller) {
+    return switch (block) {
+      ArticleParagraph(:final spans) => _LinkedProse(
+          spans: spans,
+          onTap: controller.followTap,
+        ),
+      ArticleHeading(:final level, :final spans) => _LinkedProse(
+          spans: spans,
+          onTap: controller.followTap,
+          style: level == 2
+              ? CustomTextStyles.articleHeading2
+              : CustomTextStyles.articleHeading3,
+        ),
+      ArticleList(:final ordered, :final items) => _List(
+          ordered: ordered,
+          items: items,
+          onTap: controller.followTap,
+        ),
+      ArticleImage(:final url, :final alt) => _BodyImage(url: url, alt: alt),
+    };
+  }
+}
+
+/// Bullets or numbers.
+///
+/// A Column of Rows rather than a bulleted Text: the marker sits in its own
+/// column so that a item wrapping onto a second line lines up under the
+/// first word, not under the bullet.
+class _List extends StatelessWidget {
+  const _List({
+    required this.ordered,
+    required this.items,
+    required this.onTap,
+  });
+
+  final bool ordered;
+  final List<List<ArticleSpan>> items;
+  final void Function(ArticleTap) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0) SizedBox(height: 8.v),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 22.h,
+                child: Text(
+                  ordered ? '${i + 1}.' : '•',
+                  style: CustomTextStyles.articleBody,
+                ),
+              ),
+              Expanded(
+                child: _LinkedProse(spans: items[i], onTap: onTap),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// A picture partway through the body, with its alt text as a caption.
+///
+/// Optional in the syntax and optional in fact: a picture that will not
+/// load leaves the article readable rather than a broken box in the middle
+/// of it.
+class _BodyImage extends StatelessWidget {
+  const _BodyImage({required this.url, required this.alt});
+
+  final String url;
+  final String alt;
+
+  /// Sixteen by nine, and a definite box rather than none.
+  ///
+  /// Without a height this drew at zero: `CustomImageView` hands its own
+  /// height straight to the placeholder, and a placeholder of height null
+  /// inside a Column has unbounded height to fill and so fills none of it.
+  /// The picture was in the body, parsed, and 342 by 0 on the screen.
+  ///
+  /// A ratio rather than a fixed height so it holds on every screen width,
+  /// and it also means the space is reserved while the picture loads --
+  /// the text below does not jump when it arrives.
+  static const ratio = 16 / 9;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12.h),
+          child: AspectRatio(
+            aspectRatio: ratio,
+            child: CustomImageView(
+              imagePath: url,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        if (alt.isNotEmpty) ...[
+          SizedBox(height: 8.v),
+          Text(alt, style: CustomTextStyles.articleCaption),
+        ],
+      ],
     );
   }
 }
@@ -188,10 +331,15 @@ class _CallToAction extends StatelessWidget {
 /// Stateful only because a [TapGestureRecognizer] has to be disposed — one
 /// built inline in `build` leaks a recognizer on every rebuild.
 class _LinkedProse extends StatefulWidget {
-  const _LinkedProse({required this.spans, required this.onTap});
+  const _LinkedProse({required this.spans, required this.onTap, this.style});
 
   final List<ArticleSpan> spans;
   final void Function(ArticleTap) onTap;
+
+  /// What the plain runs are set in. Body copy unless a heading says
+  /// otherwise -- emphasis and links are applied on top of whatever this
+  /// is, so a bold word inside a heading stays heading-sized.
+  final TextStyle? style;
 
   @override
   State<_LinkedProse> createState() => _LinkedProseState();
@@ -243,21 +391,35 @@ class _LinkedProseState extends State<_LinkedProse> {
 
   @override
   Widget build(BuildContext context) {
+    final base = widget.style ?? CustomTextStyles.articleBody;
     var next = 0;
     return Text.rich(
       TextSpan(
         children: [
           for (final span in widget.spans)
-            if (span.isLink)
-              TextSpan(
-                text: span.text,
-                style: CustomTextStyles.articleLink,
-                recognizer: _recognizers[next++],
-              )
-            else
-              TextSpan(text: span.text, style: CustomTextStyles.articleBody),
+            TextSpan(
+              text: span.text,
+              style: _styleFor(span, base),
+              recognizer: span.isLink ? _recognizers[next++] : null,
+            ),
         ],
       ),
     );
+  }
+
+  /// Emphasis and link colour applied on top of the block's own style,
+  /// rather than replacing it -- a bold word in a heading has to stay
+  /// heading-sized, and a link in a bullet has to stay body-sized.
+  TextStyle _styleFor(ArticleSpan span, TextStyle base) {
+    var style = base;
+    if (span.isLink) style = style.copyWith(color: appTheme.soothifyBlue);
+    if (span.bold) {
+      style = style.copyWith(
+        fontWeight: FontWeight.w700,
+        fontVariations: const [FontVariation('wght', 700)],
+      );
+    }
+    if (span.italic) style = style.copyWith(fontStyle: FontStyle.italic);
+    return style;
   }
 }

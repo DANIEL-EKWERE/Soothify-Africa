@@ -46,7 +46,10 @@ void main() {
     useDesignFrame(tester);
     await loadAppFonts();
     final c = Get.put(PartnerController(MockPartnerRepository(now: now)));
-    await pumpScreen(tester, const PartnerPortalScreen(),
+    // The same clock the fixtures use. Without it the screen printed the
+    // real today over data pinned to November, so the goldens recorded
+    // whatever day they were taken and failed every day after.
+    await pumpScreen(tester, PartnerPortalScreen(now: now),
         brightness: brightness);
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();

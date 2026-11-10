@@ -55,9 +55,16 @@ class ArticleController extends GetxController {
   /// [parseArticleBody].
   List<ArticleSpan> get bodySpans => parseArticleBody(body);
 
-  /// Whether this article has any links in its body at all. The reader uses
-  /// a plain [Text] when it has none, which needs no gesture recognizers.
+  /// Whether this article has any links in its body at all.
   bool get bodyHasLinks => bodySpans.any((span) => span.isLink);
+
+  /// The body as the reader lays it out: headings, prose, lists, pictures.
+  ///
+  /// Parsed once per read rather than cached. An article is a few hundred
+  /// words and this runs when the screen is built, so the cost is a
+  /// rounding error against laying the text out -- and a cache would be
+  /// one more thing to invalidate when the piece is reopened.
+  List<ArticleBlock> get bodyBlocks => parseArticleBlocks(body);
 
   double get rating => item.rating;
 

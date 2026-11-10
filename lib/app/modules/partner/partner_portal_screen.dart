@@ -14,7 +14,25 @@ import 'widgets/partner_chrome.dart';
 /// header at 69, metrics at 137 (two 167x85 counts over a 342x115 payout
 /// card), the tabs at 369, and the content from 442.
 class PartnerPortalScreen extends GetView<PartnerController> {
-  const PartnerPortalScreen({super.key});
+  const PartnerPortalScreen({super.key, this.now});
+
+  /// The clock the screen reads, for the date over the door list and for
+  /// "4 minutes ago" under a request.
+  ///
+  /// Injected by the tests. Live it is null and [DateTime.now] is used.
+  /// Without this seam the goldens here record whatever day they were
+  /// taken on and fail every day after -- which is what they were doing.
+  final DateTime Function()? now;
+
+  /// Reads the injected clock where a test gave one.
+  ///
+  /// Static and passed down rather than read off `controller`, because the
+  /// pieces that need it are private widgets built from a const
+  /// constructor and cannot reach the screen above them otherwise.
+  static DateTime Function() clockOf(BuildContext context) {
+    final screen = context.findAncestorWidgetOfExactType<PartnerPortalScreen>();
+    return screen?.now ?? DateTime.now;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +190,7 @@ class _RequestCard extends StatelessWidget {
                         style: CustomTextStyles.partnerCardTitle),
                     SizedBox(height: 2.v),
                     Text(
-                      '${_ago(request.receivedAt)} · '
+                      '${_ago(request.receivedAt, PartnerPortalScreen.clockOf(context))} · '
                       '${DateFormat('MMM d').format(request.receivedAt)}',
                       style: CustomTextStyles.partnerMeta,
                     ),
@@ -245,8 +263,8 @@ class _RequestCard extends StatelessWidget {
   }
 
   /// "Just now", "4 minutes ago" — the frame's own two forms.
-  static String _ago(DateTime at) {
-    final minutes = DateTime.now().difference(at).inMinutes;
+  static String _ago(DateTime at, DateTime Function() now) {
+    final minutes = now().difference(at).inMinutes;
     if (minutes < 1) return 'Just now';
     if (minutes == 1) return '1 minute ago';
     if (minutes < 60) return '$minutes minutes ago';
@@ -334,7 +352,9 @@ class _GuestList extends StatelessWidget {
             Icon(Icons.calendar_today_outlined,
                 size: 14.h, color: appTheme.partnerMuted),
             SizedBox(width: 6.h),
-            Text(DateFormat('MMM d, yyyy').format(DateTime.now()),
+            Text(
+                DateFormat('MMM d, yyyy')
+                    .format(PartnerPortalScreen.clockOf(context)()),
                 style: CustomTextStyles.partnerMeta),
           ],
         ),

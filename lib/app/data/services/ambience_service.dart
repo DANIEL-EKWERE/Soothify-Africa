@@ -95,7 +95,13 @@ class AmbienceService extends GetxService {
       await player.setLoopMode(LoopMode.all);
       await player.setVolume(0);
       _volume = 0;
-      await player.play();
+      // Not awaited, and it must not be. just_audio's play() completes
+      // when playback *stops*, not when it starts -- and this is looped, so
+      // it never stops. Awaiting it here meant the fade below was never
+      // reached: the stream played the whole splash at volume zero.
+      unawaited(player.play().catchError((Object error) {
+        Log.e('splash ambience stopped playing', error: error);
+      }));
       _fadeTo(peak, fadeIn);
     } catch (error, stack) {
       // Nothing to recover: there is simply no sound this launch.

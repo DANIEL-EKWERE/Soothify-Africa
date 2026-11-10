@@ -304,9 +304,8 @@ class _PromoCard extends StatelessWidget {
   }
 }
 
-/// The Articles shelf — two pieces side by side, cover above the title.
-///
-/// Both redrawn frames close on this; neither draws a "See All" beside it.
+/// The Articles shelf — two pieces side by side, cover above the title,
+/// and a See All for the rest.
 class _Articles extends StatelessWidget {
   const _Articles();
 
@@ -317,15 +316,35 @@ class _Articles extends StatelessWidget {
       // Nothing written for this section yet: the heading would announce
       // an empty row.
       if (articles.isEmpty) return const SizedBox.shrink();
-      return _list(articles.toList());
+      // Two, as the frames draw it. Every article used to go into the one
+      // Row, so a library with three squeezed three into the width of two
+      // and each cover shrank to fit. The rest are a See All away.
+      return _list(articles.take(shown).toList());
     });
   }
 
+  /// How many sit side by side. The rest are on the See All page.
+  static const shown = 2;
+
   Widget _list(List<MediaItem> articles) {
+    final controller = Get.find<LibraryController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Articles', style: CustomTextStyles.sectionTitle),
+        // The same heading row as every other shelf. The original frames
+        // drew none here, which read as broken beside shelves that had one
+        // -- and left no way to reach the third article at all.
+        Row(
+          children: [
+            Expanded(
+              child: Text('Articles', style: CustomTextStyles.sectionTitle),
+            ),
+            GestureDetector(
+              onTap: controller.openArticles,
+              child: Text('See All', style: CustomTextStyles.seeAll),
+            ),
+          ],
+        ),
         SizedBox(height: 16.v),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

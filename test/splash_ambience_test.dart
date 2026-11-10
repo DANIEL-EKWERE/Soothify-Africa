@@ -56,11 +56,25 @@ class _FakePlayer extends Fake implements AudioPlayer {
   @override
   Future<void> setVolume(double volume) async => volumes.add(volume);
 
-  @override
-  Future<void> play() async => plays++;
+  /// Never completes while playing -- which is what the real one does.
+  ///
+  /// just_audio's play() resolves when playback stops, not when it starts.
+  /// This fake used to return at once, so the service awaiting it looked
+  /// fine here and played silently on every phone: the line after the
+  /// await, which starts the fade, was never reached.
+  final Completer<void> _playing = Completer<void>();
 
   @override
-  Future<void> stop() async => stops++;
+  Future<void> play() {
+    plays++;
+    return _playing.future;
+  }
+
+  @override
+  Future<void> stop() async {
+    stops++;
+    if (!_playing.isCompleted) _playing.complete();
+  }
 
   @override
   Future<void> dispose() async => disposals++;

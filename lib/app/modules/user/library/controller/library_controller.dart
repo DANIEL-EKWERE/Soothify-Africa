@@ -78,6 +78,22 @@ class LibraryController extends BaseController {
   /// the server is asked for. "Movement" is `pilates-movement` here and
   /// `balance-movement` in the other section, so the two cannot be derived from
   /// each other.
+  /// The articles shelf's own query, or null when this library has none.
+  String? get articlesQuery =>
+      section.blocks.whereType<LibraryArticles>().firstOrNull?.query;
+
+  /// Every article in this library, on the See All grid the other shelves
+  /// use. The grid opens each through [openMedia], which sends an article
+  /// to the reader.
+  void openArticles() {
+    final query = articlesQuery;
+    if (query == null) return;
+    Get.toNamed(
+      AppRoutes.shelf,
+      arguments: {'shelf': 'Articles', 'key': query},
+    );
+  }
+
   void openShelf(String shelf) {
     final match = section.shelves.where((s) => s.title == shelf);
     Get.toNamed(

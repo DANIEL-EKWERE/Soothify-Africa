@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/studio_partner.dart';
+import '../../../widgets/soothify_word.dart';
 import '../controller/partner_controller.dart';
 
 /// "₦342,000" — grouped, as every figure in the portal is.
@@ -58,7 +59,7 @@ class PartnerHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: CustomTextStyles.partnerStudio),
                 SizedBox(height: 4.v),
-                Text('Soothify Partner Dashboard',
+                SoothifyText('partner.dashboard'.tr,
                     style: CustomTextStyles.partnerMeta),
               ],
             ),
@@ -113,7 +114,7 @@ class PartnerMetrics extends StatelessWidget {
             Expanded(
               child: _Metric(
                 icon: Icons.schedule_outlined,
-                label: 'Pending Bookings',
+                label: 'partner.pendingBookings'.tr,
                 value: '${overview?.pending ?? 0}',
               ),
             ),
@@ -121,7 +122,7 @@ class PartnerMetrics extends StatelessWidget {
             Expanded(
               child: _Metric(
                 icon: Icons.check_circle_outline,
-                label: 'Confirmed Today',
+                label: 'partner.confirmedToday'.tr,
                 value: '${overview?.confirmedToday ?? 0}',
               ),
             ),
@@ -214,7 +215,7 @@ class _PayoutCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Monthly Payout Accrued',
+                Text('partner.monthlyPayout'.tr,
                     style: CustomTextStyles.partnerMeta
                         .copyWith(color: appTheme.onPrimary)),
                 SizedBox(height: 4.v),
@@ -252,8 +253,8 @@ class PartnerTabs extends StatelessWidget {
         child: Row(
           children: [
             for (final (tab, label) in const [
-              (PartnerTab.overview, 'Overview'),
-              (PartnerTab.guests, 'Active Guest List'),
+              (PartnerTab.overview, 'partner.overview'),
+              (PartnerTab.guests, 'partner.guestList'),
             ])
               Expanded(
                 child: GestureDetector(
@@ -269,7 +270,7 @@ class PartnerTabs extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.h),
                     ),
                     child: Text(
-                      label,
+                      label.tr,
                       style: CustomTextStyles.partnerTab.copyWith(
                         color: controller.tab.value == tab
                             ? appTheme.soothifyBlue

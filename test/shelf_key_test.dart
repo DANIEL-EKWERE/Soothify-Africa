@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:soothifyafrica/app/core/app_export.dart';
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/library_section.dart';
 import 'package:soothifyafrica/app/data/models/media_item.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
@@ -80,6 +82,12 @@ void main() {
     Get.put<ContentRepository>(repository, permanent: true);
     await tester.pumpWidget(
       GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
         home: const SizedBox.shrink(),
         getPages: [
           GetPage(

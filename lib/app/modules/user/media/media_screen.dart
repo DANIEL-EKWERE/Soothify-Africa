@@ -29,7 +29,7 @@ class _CouldNotOpen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'That content could not be opened.',
+                  'media.cannotOpen'.tr,
                   textAlign: TextAlign.center,
                   style: CustomTextStyles.emptyStateBody,
                 ),
@@ -37,7 +37,7 @@ class _CouldNotOpen extends StatelessWidget {
                 TextButton(
                   onPressed: Get.back,
                   child: Text(
-                    'Go back',
+                    'media.goBack'.tr,
                     style: CustomTextStyles.emptyStateBody.copyWith(
                       color: appTheme.soothifyBlue,
                     ),
@@ -433,7 +433,7 @@ class _InstructorCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Instructor', style: CustomTextStyles.mediaCaption),
+              Text('media.instructor'.tr, style: CustomTextStyles.mediaCaption),
               Text(
                 controller.item.practitionerName,
                 style: CustomTextStyles.mediaInstructor,
@@ -465,7 +465,7 @@ class _RateIt extends StatelessWidget {
       () => Row(
         children: [
           Text(
-            controller.myRating.value == 0 ? 'Rate this' : 'Your rating',
+            controller.myRating.value == 0 ? 'media.rateThis'.tr : 'media.yourRating'.tr,
             style: CustomTextStyles.mediaBody,
           ),
           SizedBox(width: 12.h),
@@ -517,7 +517,7 @@ class _AddNote extends StatelessWidget {
           child: Center(
             widthFactor: 1,
             child: GradientText(
-              'Add Note',
+              'media.addNote'.tr,
               gradient: appTheme.authHeaderGradient,
               style: CustomTextStyles.addNote,
             ),

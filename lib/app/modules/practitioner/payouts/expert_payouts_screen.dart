@@ -24,7 +24,7 @@ class ExpertPayoutsScreen extends GetView<PayoutController> {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Recent payouts'),
+            ExpertHeader(title: 'expert.recentPayouts'.tr),
             Expanded(
               child: Obx(() {
                 final payouts = controller.payouts;
@@ -32,7 +32,7 @@ class ExpertPayoutsScreen extends GetView<PayoutController> {
                   return ListView(
                     padding: EdgeInsets.fromLTRB(24.h, 46.v, 24.h, 32.v),
                     children: [
-                      Text('No payouts yet.',
+                      Text('expert.noPayouts'.tr,
                           style: CustomTextStyles.expertCardMeta),
                     ],
                   );

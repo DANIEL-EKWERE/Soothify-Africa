@@ -195,7 +195,7 @@ class _RepeatCard extends StatelessWidget {
                     onTap: controller.toggleEveryday,
                     behavior: HitTestBehavior.opaque,
                     child:
-                        Text('Everyday', style: CustomTextStyles.slotRepeat),
+                        Text('expert.everyday'.tr, style: CustomTextStyles.slotRepeat),
                   ),
                 ),
                 InkWell(
@@ -297,7 +297,7 @@ Future<void> _pickDate(
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text('Cancel',
+                        child: Text('common.cancel'.tr,
                             style: CustomTextStyles.expertRowLabel),
                       ),
                     ),
@@ -311,7 +311,7 @@ Future<void> _pickDate(
                     Expanded(
                       child: TextButton(
                         onPressed: () => Navigator.of(context).pop(picked),
-                        child: Text('Done',
+                        child: Text('common.done'.tr,
                             style: CustomTextStyles.expertRowLabel),
                       ),
                     ),

@@ -46,7 +46,7 @@ class SpaceDirections extends StatelessWidget {
         children: [
           Icon(Icons.near_me_outlined, size: 16.h, color: appTheme.soothifyBlue),
           SizedBox(width: 8.h),
-          Text('Get Directions', style: CustomTextStyles.spaceDirections),
+          Text('spaces.directions'.tr, style: CustomTextStyles.spaceDirections),
         ],
       ),
     );

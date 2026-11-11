@@ -7,8 +7,10 @@ import 'package:flutter/services.dart';
 
 import 'app/core/app_export.dart';
 import 'app/core/utils/initial_bindings.dart';
+import 'app/core/l10n/app_translations.dart';
 import 'app/core/network/api_client.dart';
 import 'app/core/network/app_api_client.dart';
+import 'app/data/models/app_language.dart';
 import 'app/data/repositories/api_device_token_repository.dart';
 import 'app/data/repositories/device_token_repository.dart';
 import 'app/data/services/ambience_service.dart';
@@ -90,6 +92,13 @@ class SoothifyApp extends StatelessWidget {
             darkTheme: darkTheme,
             themeMode: Get.find<ThemeService>().mode.value,
             initialBinding: InitialBindings(),
+            // English is the fallback, so a string Pidgin has not been
+            // given yet still reads in English rather than printing its
+            // own key. That is what lets the app be translated a screen at
+            // a time without any screen breaking in between.
+            translations: AppTranslations(),
+            locale: Get.find<LanguageService>().effective.locale,
+            fallbackLocale: AppLanguage.english.locale,
             getPages: AppPages.pages,
             // One transition for the whole app. Pushes slide in from the
             // right and fade at the same time — directional enough to say

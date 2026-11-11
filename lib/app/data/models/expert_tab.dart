@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'nav_destination.dart';
 
@@ -17,17 +18,20 @@ import 'nav_destination.dart';
 /// `ion:wallet-outline` and `ci:note-edit` — so this is a real second bar, not
 /// the client's with different words.
 enum ExpertTab implements NavDestination {
-  home('Home', asset: 'nav_home'),
-  schedule('Schedule', asset: 'ic_calendar_outline'),
-  earnings('Earnings', asset: 'ic_wallet'),
-  notes('Notes', asset: 'ic_note_edit');
+  home('nav.home', asset: 'nav_home'),
+  schedule('nav.schedule', asset: 'ic_calendar_outline'),
+  earnings('nav.earnings', asset: 'ic_wallet'),
+  notes('nav.notes', asset: 'ic_note_edit');
 
-  const ExpertTab(this.label, {String? asset, this.icon})
+  const ExpertTab(this._key, {String? asset, this.icon})
       : _asset = asset,
         assert((asset == null) != (icon == null), 'exactly one glyph source');
 
+  /// Looked up, not held — see AppTab.
+  final String _key;
+
   @override
-  final String label;
+  String get label => _key.tr;
 
   final String? _asset;
 

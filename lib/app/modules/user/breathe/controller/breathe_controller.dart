@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/animation.dart' show Curves;
+
 import '../../../../core/app_export.dart';
 import '../../../../data/models/app_tab.dart';
 import '../../../../data/models/checkin_kind.dart';
@@ -36,6 +38,20 @@ enum BreatheCue {
       into -= c.seconds;
     }
     return (BreatheCue.inhale, 0);
+  }
+
+  /// How full the lungs are, 0 at rest and 1 at the top of a breath.
+  ///
+  /// Eased at both ends of the inhale and the exhale, so a turn reads as a
+  /// pause rather than a bounce. Whatever draws the breath follows this, so
+  /// it moves with the words under the clock and not merely near them.
+  static double fullnessAt(double secondsIntoCycle) {
+    final (cue, through) = at(secondsIntoCycle);
+    return switch (cue) {
+      BreatheCue.inhale => Curves.easeInOutSine.transform(through),
+      BreatheCue.hold => 1,
+      BreatheCue.exhale => 1 - Curves.easeInOutSine.transform(through),
+    };
   }
 }
 

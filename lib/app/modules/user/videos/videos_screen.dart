@@ -77,7 +77,7 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Videos',
+            'videos.title'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),
@@ -113,7 +113,7 @@ class _Shelf extends StatelessWidget {
             ),
             InkWell(
               onTap: () => controller.openShelf(title),
-              child: Text('See All', style: CustomTextStyles.seeAll),
+              child: Text('common.seeAll'.tr, style: CustomTextStyles.seeAll),
             ),
           ],
         ),
@@ -153,8 +153,8 @@ class _Rail extends StatelessWidget {
     if (items.isEmpty) {
       return Text(
         controller.filters.value.isEmpty
-            ? 'No videos here yet.'
-            : 'Nothing here matches your filters.',
+            ? 'videos.empty'.tr
+            : 'library.noMatches'.tr,
         style: CustomTextStyles.emptyStateBody,
       );
     }

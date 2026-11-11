@@ -24,16 +24,16 @@ class CareProtectionScreen extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Care & protection hub'),
+            ExpertHeader(title: 'expert.careHub'.tr),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 32.v),
                 children: [
-                  Text('Your practice, fully protected',
+                  Text('expert.practiceProtected'.tr,
                       style: CustomTextStyles.expertSection),
                   SizedBox(height: 8.v),
                   SoothifyText(
-                    'What Soothify covers for you, on every session you take.',
+                    'expert.practiceProtectedBody'.tr,
                     style: CustomTextStyles.expertBlurb,
                   ),
                   SizedBox(height: 24.v),

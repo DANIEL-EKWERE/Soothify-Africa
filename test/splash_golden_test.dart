@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/modules/auth/splash/splash_screen.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 
@@ -28,6 +30,12 @@ void main() {
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
             debugShowCheckedModeBanner: false,
             theme: data,
             home: const SplashView(),
@@ -59,6 +67,12 @@ void main() {
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
             debugShowCheckedModeBanner: false,
             theme: theme,
             home: SplashView(step: i),
@@ -95,6 +109,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           debugShowCheckedModeBanner: false,
           theme: theme,
           home: const SplashView(step: 0),
@@ -108,6 +128,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           debugShowCheckedModeBanner: false,
           theme: theme,
           home: const SplashView(step: 1),

@@ -34,7 +34,7 @@ class ExpertRecommendationView extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(24.h, 26.v, 24.h, 32.v),
       children: [
         if (recent.isNotEmpty) ...[
-          Text('Recent Live Sessions',
+          Text('journal.recentLive'.tr,
               style: CustomTextStyles.expertGroupHeading),
           SizedBox(height: 13.v),
           for (final item in recent) ...[
@@ -44,7 +44,7 @@ class ExpertRecommendationView extends StatelessWidget {
           SizedBox(height: 9.v),
         ],
         if (earlier.isNotEmpty) ...[
-          Text('Earlier Sessions', style: CustomTextStyles.expertGroupHeading),
+          Text('journal.earlier'.tr, style: CustomTextStyles.expertGroupHeading),
           SizedBox(height: 13.v),
           for (final item in earlier) ...[
             SessionCard(recommendation: item, onTap: () => onOpen(item)),

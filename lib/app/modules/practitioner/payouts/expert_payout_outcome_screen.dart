@@ -26,7 +26,7 @@ class ExpertPayoutOutcomeScreen extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Payment Method'),
+            ExpertHeader(title: 'expert.paymentMethod'.tr),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.h),
@@ -72,7 +72,7 @@ class ExpertPayoutOutcomeScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
               child: CustomElevatedButton(
-                text: 'Continue',
+                text: 'common.continue'.tr,
                 // Never back one step: the step behind is the form that was
                 // just submitted. A saved account lands on Payout method, so
                 // the expert sees what is now on file; a withdrawal goes
@@ -97,19 +97,18 @@ class ExpertPayoutOutcomeScreen extends StatelessWidget {
 
 /// Which of the two confirmations is being shown.
 enum PayoutOutcome {
-  methodUpdated(
-    'Payout Method Updated',
-    'Your payout details have been saved successfully. You’ll now receive '
-        'your earnings based on your selected method.',
-  ),
-  withdrawalSent(
-    'Withdrawal Successful',
-    'Your withdrawal request has been submitted successfully. The funds will '
-        'be sent to your payout account shortly.',
-  );
+  methodUpdated('expert.payoutUpdated', 'expert.payoutUpdatedBody'),
+  withdrawalSent('expert.withdrawalSent', 'expert.withdrawalSentBody');
 
-  const PayoutOutcome(this.title, this.body);
+  const PayoutOutcome(this._title, this._body);
 
-  final String title;
-  final String body;
+  final String _title;
+  final String _body;
+
+  /// Looked up on each read rather than stored: an enum's values are built
+  /// once, before any locale is known, so translating them in the
+  /// constructor would freeze whichever language the app started in.
+  String get title => _title.tr;
+
+  String get body => _body.tr;
 }

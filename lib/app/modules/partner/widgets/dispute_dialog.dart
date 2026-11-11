@@ -36,7 +36,7 @@ class _DisputeDialog extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: Text('Dispute check-in',
+                  child: Text('partner.disputeTitle'.tr,
                       style: CustomTextStyles.partnerSection
                           .copyWith(fontSize: 18.fSize)),
                 ),
@@ -54,8 +54,7 @@ class _DisputeDialog extends StatelessWidget {
                   style: CustomTextStyles.partnerCardBody),
             SizedBox(height: 10.v),
             Text(
-              'Select all reasons that apply. The member can enter class '
-              'while this is reviewed.',
+              'partner.disputeBody'.tr,
               style: CustomTextStyles.partnerMeta,
             ),
             SizedBox(height: 16.v),
@@ -110,13 +109,12 @@ class _DisputeDialog extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Entry now, review later',
+                  Text('partner.entryNowReviewLater'.tr,
                       style: CustomTextStyles.partnerCardTitle
                           .copyWith(color: appTheme.partnerOfflineInk)),
                   SizedBox(height: 4.v),
                   Text(
-                    'Status becomes Provisionally Verified. A report is '
-                    'sent to the admin log.',
+                    'partner.provisionalBody'.tr,
                     style: CustomTextStyles.partnerMeta
                         .copyWith(color: appTheme.partnerOfflineInk),
                   ),
@@ -139,7 +137,7 @@ class _DisputeDialog extends StatelessWidget {
                         : appTheme.partnerTabTrack,
                     borderRadius: BorderRadius.circular(10.h),
                   ),
-                  child: Text('Submit & Grant Entry',
+                  child: Text('partner.submitAndGrant'.tr,
                       style: CustomTextStyles.partnerCardTitle.copyWith(
                         color: controller.canSubmitDispute
                             ? appTheme.onPrimary
@@ -152,7 +150,7 @@ class _DisputeDialog extends StatelessWidget {
             Center(
               child: InkWell(
                 onTap: Get.back,
-                child: Text('Cancel',
+                child: Text('common.cancel'.tr,
                     style: CustomTextStyles.partnerCardBody
                         .copyWith(color: appTheme.partnerName)),
               ),

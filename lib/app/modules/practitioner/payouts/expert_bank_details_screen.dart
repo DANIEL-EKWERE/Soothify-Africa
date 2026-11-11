@@ -26,25 +26,24 @@ class ExpertBankDetailsScreen extends GetView<PayoutController> {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Bank Transfer Details'),
+            ExpertHeader(title: 'expert.bankDetailsTitle'.tr),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
                 children: [
                   Text(
-                    'Enter your bank account details to receive payment in '
-                    'Nigerian Naira (NGN)',
+                    'expert.bankDetailsBody'.tr,
                     style: CustomTextStyles.expertBlurb,
                   ),
                   SizedBox(height: 32.v),
-                  Text('Bank Name', style: CustomTextStyles.expertFieldLabel),
+                  Text('expert.bankName'.tr, style: CustomTextStyles.expertFieldLabel),
                   SizedBox(height: 8.v),
                   Obx(() => _BankPicker(
                         value: controller.bank.value,
                         onPick: () => _pickBank(context),
                       )),
                   SizedBox(height: 24.v),
-                  Text('Account Number',
+                  Text('expert.accountNumber'.tr,
                       style: CustomTextStyles.expertFieldLabel),
                   SizedBox(height: 8.v),
                   _Field(
@@ -53,7 +52,7 @@ class ExpertBankDetailsScreen extends GetView<PayoutController> {
                     onChanged: (_) => controller.touchBank(),
                   ),
                   SizedBox(height: 24.v),
-                  Text('Account Name',
+                  Text('expert.accountName'.tr,
                       style: CustomTextStyles.expertFieldLabel),
                   SizedBox(height: 8.v),
                   _Field(
@@ -69,7 +68,7 @@ class ExpertBankDetailsScreen extends GetView<PayoutController> {
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
               child: Obx(
                 () => CustomElevatedButton(
-                  text: 'Add Bank Details',
+                  text: 'expert.addBankDetails'.tr,
                   isEnabled: controller.canSaveBank,
                   onPressed: controller.saveBankDetails,
                 ),
@@ -132,7 +131,7 @@ class _BankPicker extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                value.isEmpty ? 'Select Bank' : value,
+                value.isEmpty ? 'expert.selectBank'.tr : value,
                 style: value.isEmpty
                     ? CustomTextStyles.expertFieldHint
                     : CustomTextStyles.expertRowLabel,

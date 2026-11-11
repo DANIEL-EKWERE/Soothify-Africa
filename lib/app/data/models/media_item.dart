@@ -13,6 +13,7 @@ class MediaItem {
     this.description = '',
     this.coverUrl = '',
     this.coverAsset = '',
+    this.language = 'en',
     this.remoteUrl = '',
     this.localPath,
     this.rating = 0,
@@ -33,6 +34,10 @@ class MediaItem {
   final String description;
   final MediaType type;
   final int durationSeconds;
+  /// Which language the piece is in — 'en' or 'pcm'. The server decides
+  /// what a member is offered; this is here so a screen can say so.
+  final String language;
+
   final String coverUrl;
 
   /// Bundled cover art, exported from Figma. Distinct from [coverUrl], which
@@ -92,6 +97,7 @@ class MediaItem {
         durationSeconds: durationSeconds,
         coverUrl: coverUrl,
         coverAsset: coverAsset,
+        language: language,
         remoteUrl: remoteUrl,
         localPath: localPath ?? this.localPath,
         categoryId: categoryId,
@@ -116,6 +122,7 @@ class MediaItem {
         durationSeconds: json['duration_seconds'] as int? ?? 0,
         rating: (json['rating'] as num?)?.toDouble() ?? 0,
         coverUrl: json['cover_url'] as String? ?? '',
+        language: json['language'] as String? ?? 'en',
         remoteUrl: json['media_url'] as String? ?? '',
         categoryId: '${json['category'] ?? ''}',
         practitionerName: json['practitioner_name'] as String? ?? '',

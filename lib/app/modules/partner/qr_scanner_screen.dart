@@ -197,7 +197,7 @@ class _CameraTrouble extends StatelessWidget {
                 onTap: Get.back,
                 child: Padding(
                   padding: EdgeInsets.all(10.h),
-                  child: Text('Back to the desk',
+                  child: Text('partner.backToDesk'.tr,
                       style: CustomTextStyles.partnerCardTitle
                           .copyWith(color: appTheme.soothifyBlue)),
                 ),

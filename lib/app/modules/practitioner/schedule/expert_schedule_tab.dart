@@ -20,7 +20,7 @@ class ExpertScheduleTab extends GetView<ExpertDashboardController> {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            Text('Upcoming Session', style: CustomTextStyles.appBarTitle),
+            Text('expert.upcomingSession'.tr, style: CustomTextStyles.appBarTitle),
             SizedBox(height: 24.v),
             Expanded(
               child: RefreshIndicator(
@@ -43,7 +43,7 @@ class ExpertScheduleTab extends GetView<ExpertDashboardController> {
                     return ListView(
                       padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
                       children: [
-                        Text('Nothing booked yet.',
+                        Text('expert.nothingBooked'.tr,
                             style: CustomTextStyles.expertCardMeta),
                       ],
                     );

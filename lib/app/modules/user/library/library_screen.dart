@@ -138,7 +138,7 @@ class _Shelf extends StatelessWidget {
             ),
             InkWell(
               onTap: () => controller.openShelf(title),
-              child: Text('See All', style: CustomTextStyles.seeAll),
+              child: Text('common.seeAll'.tr, style: CustomTextStyles.seeAll),
             ),
           ],
         ),
@@ -166,7 +166,7 @@ class _Shelf extends StatelessWidget {
           SizedBox(
             height: 166.v,
             child: Text(
-              'Nothing here matches your filters.',
+              'library.noMatches'.tr,
               style: CustomTextStyles.emptyStateBody,
             ),
           )
@@ -337,11 +337,11 @@ class _Articles extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text('Articles', style: CustomTextStyles.sectionTitle),
+              child: Text('library.articles'.tr, style: CustomTextStyles.sectionTitle),
             ),
             GestureDetector(
               onTap: controller.openArticles,
-              child: Text('See All', style: CustomTextStyles.seeAll),
+              child: Text('common.seeAll'.tr, style: CustomTextStyles.seeAll),
             ),
           ],
         ),

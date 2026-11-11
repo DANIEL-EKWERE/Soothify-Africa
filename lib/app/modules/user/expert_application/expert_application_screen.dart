@@ -106,7 +106,7 @@ class _ProfileStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('What are your primary areas of expertise?',
+        Text('application.expertise'.tr,
             style: CustomTextStyles.expertFormLabel),
         SizedBox(height: 16.v),
         Obx(
@@ -286,7 +286,7 @@ class _Submitted extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 32.4.v),
-                Text('Application Submitted!',
+                Text('application.submitted'.tr,
                     textAlign: TextAlign.center,
                     style: CustomTextStyles.expertSubmittedTitle),
                 SizedBox(height: 16.v),

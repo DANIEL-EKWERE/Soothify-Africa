@@ -85,7 +85,7 @@ void main() {
     expect(c.overview.value?.payoutNaira, 342000);
 
     expect(find.text('Luma Pilates Studio'), findsOneWidget);
-    expect(find.text('Soothify Partner Dashboard'), findsOneWidget);
+    expect(findSoothify('Soothify Partner Dashboard'), findsOneWidget);
     expect(find.text('₦342,000'), findsOneWidget);
     expect(find.text('2 requests need your attention today.'), findsOneWidget);
   });
@@ -232,7 +232,7 @@ void main() {
       expect(week.slotsOpen, 8);
       expect(week.utilisation, 67);
 
-      expect(find.text('Soothify slot manager'), findsOneWidget);
+      expect(findSoothify('Soothify slot manager'), findsOneWidget);
       expect(find.text('Reformer'), findsWidgets);
     });
 

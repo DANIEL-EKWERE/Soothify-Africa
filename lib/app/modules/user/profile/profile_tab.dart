@@ -84,7 +84,7 @@ class _Dashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
-            Text('My stats', style: CustomTextStyles.statsHeading),
+            Text('profile.myStats'.tr, style: CustomTextStyles.statsHeading),
             const Spacer(),
             // The range the server actually counted, not the app's guess.
             Obx(() => Text(
@@ -129,7 +129,7 @@ class _WeeklyGoalCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Your weekly goal', style: CustomTextStyles.statsHeading),
+                Text('profile.weeklyGoal'.tr, style: CustomTextStyles.statsHeading),
                 const Spacer(),
                 Text(
                   '${stats.minutesDone} / ${stats.goalMinutes} min',
@@ -162,7 +162,7 @@ class _WeeklyGoalCard extends StatelessWidget {
             SizedBox(height: 14.v),
             Text(
               stats.minutesRemaining == 0
-                  ? 'You have reached your goal this week.'
+                  ? 'profile.goalReached'.tr
                   : 'Just ${stats.minutesRemaining} more minutes to reach '
                       'your goal.',
               style: CustomTextStyles.emptyStateBody,
@@ -216,7 +216,7 @@ class _RecentActivity extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Recent activity', style: CustomTextStyles.statsHeading),
+          Text('profile.recentActivity'.tr, style: CustomTextStyles.statsHeading),
           SizedBox(height: 16.v),
           Container(
             decoration: BoxDecoration(
@@ -249,7 +249,7 @@ class _RecentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final item = row.item;
     return InkWell(
-      onTap: () => openMedia(item, source: 'Recent activity'),
+      onTap: () => openMedia(item, source: 'profile.recentActivity'.tr),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.h, vertical: 14.v),
         child: Row(
@@ -354,7 +354,7 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Profile',
+            'nav.profile'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),
@@ -546,7 +546,7 @@ class _StatRow extends StatelessWidget {
         SizedBox(width: 4.h),
         _Stat(
           asset: ImageConstant.icLiveSession,
-          label: 'Live sessions',
+          label: 'profile.liveSessions'.tr,
           value: stats.liveSessions,
           width: 82,
         ),

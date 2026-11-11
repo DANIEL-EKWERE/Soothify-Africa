@@ -29,7 +29,7 @@ class ProfileHistory extends StatelessWidget {
     return Obx(() => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('My Calendar', style: CustomTextStyles.statsHeading),
+            Text('profile.myCalendar'.tr, style: CustomTextStyles.statsHeading),
             SizedBox(height: 19.v),
             Container(
               padding: EdgeInsets.fromLTRB(22.h, 24.v, 22.h, 24.v),

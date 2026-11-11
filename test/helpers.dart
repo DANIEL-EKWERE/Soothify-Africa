@@ -13,6 +13,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:soothifyafrica/app/core/utils/map_tiles.dart';
 import 'package:soothifyafrica/app/core/utils/where_i_am.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/widgets/soothify_word.dart';
 
@@ -282,10 +284,23 @@ Future<void> pumpScreen(
   List<GetPage<dynamic>>? pages,
 }) async {
   if (!motion) disableMotion(tester);
+  // Registered here as well as on the app below, because `GetMaterialApp`
+  // only registers in its `initState`. A test that pumps a second screen
+  // reuses the same element -- same widget type in the same slot -- so that
+  // never runs again, and after a `Get.reset()` in between every lookup
+  // comes back as its own key.
+  Get.addTranslations(AppTranslations().keys);
+  Get.locale = AppLanguage.english.locale;
   await tester.pumpWidget(
     Sizer(
       builder: (_, _, _) => GetMaterialApp(
         debugShowCheckedModeBanner: false,
+        // The same catalogue the app registers. Without it `.tr` returns
+        // the key itself, so a screen under test would show "nav.home"
+        // where the app shows "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
         theme: theme,
         darkTheme: darkTheme,
         themeMode:

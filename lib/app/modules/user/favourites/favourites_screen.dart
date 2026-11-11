@@ -31,7 +31,7 @@ class FavouritesScreen extends GetView<FavouritesController> {
                         size: 16.h, color: appTheme.textPrimary),
                   ),
                   SizedBox(width: 12.h),
-                  Text('Favourites', style: CustomTextStyles.joiningHeading),
+                  Text('favourites.title'.tr, style: CustomTextStyles.joiningHeading),
                 ],
               ),
             ),
@@ -86,7 +86,7 @@ class _Empty extends StatelessWidget {
             ),
             SizedBox(height: 16.v),
             Text(
-              'Nothing saved yet',
+              'favourites.empty'.tr,
               textAlign: TextAlign.center,
               style: CustomTextStyles.coachSection,
             ),
@@ -95,7 +95,7 @@ class _Empty extends StatelessWidget {
               // Says where the heart is rather than only that the list is
               // empty: an empty screen that does not say how to fill it is
               // a dead end.
-              'Tap the heart on anything in the library and it will be here.',
+              'favourites.emptyBody'.tr,
               textAlign: TextAlign.center,
               style: CustomTextStyles.coachBlurb,
             ),

@@ -102,7 +102,7 @@ class _Header extends StatelessWidget {
           ),
           SizedBox(width: 10.h),
           Expanded(
-            child: Text('Wellness Guide', style: CustomTextStyles.guideName),
+            child: Text('ai.guide'.tr, style: CustomTextStyles.guideName),
           ),
           InkWell(
             onTap: onClose,

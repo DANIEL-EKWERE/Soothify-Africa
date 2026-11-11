@@ -23,13 +23,12 @@ class ExpertNotesTab extends GetView<ExpertDashboardController> {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            Text('Session notes', style: CustomTextStyles.appBarTitle),
+            Text('expert.sessionNotes'.tr, style: CustomTextStyles.appBarTitle),
             SizedBox(height: 16.v),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.h),
               child: Text(
-                'Keep track of your sessions and client progress, key insight '
-                'and next steps.',
+                'expert.notesBlurb'.tr,
                 style: CustomTextStyles.expertBlurb,
               ),
             ),
@@ -57,7 +56,7 @@ class ExpertNotesTab extends GetView<ExpertDashboardController> {
                     return ExpertSessionCard(
                       session: session,
                       now: controller.now,
-                      actionLabel: 'Notes',
+                      actionLabel: 'nav.notes'.tr,
                       onAction: () => controller.openNotes(session),
                       onTap: () => controller.openNotes(session),
                     );

@@ -346,7 +346,10 @@ void main() {
 
       // '+' rather than '%20': that is how a space is written in a query
       // string, and Django decodes it to a space either way.
-      expect(c.sent.single.url.query, 'q=deep+rest');
+      expect(c.sent.single.url.query, contains('q=deep+rest'));
+      // The chosen language rides along, so searching returns the same
+      // catalogue the rest of the app is already showing.
+      expect(c.sent.single.url.queryParameters['language'], 'en');
     });
   });
 

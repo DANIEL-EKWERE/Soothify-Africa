@@ -31,7 +31,7 @@ class RecommendationScreen extends GetView<RecommendationController> {
           ),
           onPressed: Get.back,
         ),
-        title: const Text('Mood Checker'),
+        title: Text('home.moodChecker'.tr),
       ),
       body: SafeArea(
         child: Obx(() {
@@ -44,7 +44,7 @@ class RecommendationScreen extends GetView<RecommendationController> {
               children: [
                 Padding(
                   padding: EdgeInsets.only(bottom: 8.h),
-                  child: Text('Recommended for you',
+                  child: Text('home.recommended'.tr,
                       style: CustomTextStyles.sectionTitle),
                 ),
                 const SkeletonShimmer(
@@ -71,7 +71,7 @@ class RecommendationScreen extends GetView<RecommendationController> {
                 if (i == 0) {
                   return Padding(
                     padding: EdgeInsets.only(bottom: 8.h),
-                    child: Text('Recommended for you',
+                    child: Text('home.recommended'.tr,
                         style: CustomTextStyles.sectionTitle),
                   );
                 }

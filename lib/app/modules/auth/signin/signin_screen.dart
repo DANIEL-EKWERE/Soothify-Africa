@@ -34,7 +34,7 @@ class SigninScreen extends GetView<SigninController> {
                   // from the words it belongs to.
                   Flexible(
                     child: Text(
-                      'Log in to your account',
+                      'auth.logInTitle'.tr,
                       style: CustomTextStyles.authHeading,
                     ),
                   ),
@@ -48,12 +48,12 @@ class SigninScreen extends GetView<SigninController> {
               ),
               SizedBox(height: 8.h),
               SoothifyText(
-                'Welcome back to SoothifyAfrica!',
+                'auth.welcomeBackBrand'.tr,
                 style: CustomTextStyles.authBlurb,
               ),
               SizedBox(height: 32.h),
               FilledTextField(
-                label: 'Email Address',
+                label: 'auth.emailAddress'.tr,
                 controller: controller.emailController,
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (v) => controller.email.value = v,
@@ -61,7 +61,7 @@ class SigninScreen extends GetView<SigninController> {
               SizedBox(height: 24.h),
               Obx(
                 () => FilledTextField(
-                  label: 'Password',
+                  label: 'auth.password'.tr,
                   controller: controller.passwordController,
                   obscureText: controller.obscurePassword.value,
                   hasError: controller.errorText.value != null,
@@ -94,7 +94,7 @@ class SigninScreen extends GetView<SigninController> {
                     : GestureDetector(
                         onTap: controller.forgotPassword,
                         child: GradientText(
-                          'Have you forgotten password?',
+                          'auth.forgotPassword'.tr,
                           gradient: appTheme.titleGradient,
                           style: CustomTextStyles.authFooter,
                         ),
@@ -103,7 +103,7 @@ class SigninScreen extends GetView<SigninController> {
               SizedBox(height: 55.h),
               Obx(
                 () => CustomElevatedButton(
-                  text: 'Proceed',
+                  text: 'common.proceed'.tr,
                   isLoading: controller.isLoading.value,
                   isEnabled: controller.canSubmit,
                   onPressed: controller.submit,
@@ -123,7 +123,7 @@ class SigninScreen extends GetView<SigninController> {
               GestureDetector(
                 onTap: controller.goToSignUp,
                 child: Text(
-                  'Don’t have an account? Sign up',
+                  'auth.noAccount'.tr,
                   style: CustomTextStyles.authFooter,
                 ),
               ),

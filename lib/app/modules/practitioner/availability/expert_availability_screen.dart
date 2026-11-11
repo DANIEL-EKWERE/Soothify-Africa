@@ -41,7 +41,7 @@ class ExpertAvailabilityScreen extends GetView<ExpertDashboardController> {
                     ),
                   ),
                 ),
-                Text('Update Availability',
+                Text('expert.updateAvailability'.tr,
                     style: CustomTextStyles.appBarTitle),
               ],
             ),
@@ -188,7 +188,7 @@ class _NoHoursYet extends StatelessWidget {
           children: [
             Icon(Icons.schedule, size: 32.h, color: appTheme.navInactive),
             SizedBox(height: 16.v),
-            Text('No hours set yet',
+            Text('expert.noHoursSet'.tr,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.expertSlotDay),
             SizedBox(height: 8.v),

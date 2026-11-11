@@ -46,7 +46,7 @@ class _BrowseView extends GetView<DiscoveryTabController> {
         padding: EdgeInsets.fromLTRB(24.h, 31.v, 24.h, 32.v),
         children: [
           Text(
-            'Discovery',
+            'nav.discovery'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),
@@ -58,6 +58,7 @@ class _BrowseView extends GetView<DiscoveryTabController> {
           Obx(
             () => _Shelf(
               title: 'Recent',
+              label: 'discovery.recent'.tr,
               items: controller.recent.toList(),
               onTap: controller.open,
             ),
@@ -66,6 +67,7 @@ class _BrowseView extends GetView<DiscoveryTabController> {
           Obx(
             () => _Shelf(
               title: 'Popular',
+              label: 'discovery.popular'.tr,
               items: controller.popular.toList(),
               onTap: controller.open,
             ),
@@ -112,7 +114,7 @@ class _SearchView extends GetView<DiscoveryTabController> {
             child: Column(
               children: [
                 Text(
-                  'Discovery',
+                  'nav.discovery'.tr,
                   textAlign: TextAlign.center,
                   style: CustomTextStyles.appBarTitle,
                 ),
@@ -169,7 +171,7 @@ class _SearchView extends GetView<DiscoveryTabController> {
           children: [
             Icon(Icons.search_off, size: 40.h, color: appTheme.navInactive),
             SizedBox(height: 16.v),
-            Text('No results found', style: CustomTextStyles.searchStatus),
+            Text('discovery.noResults'.tr, style: CustomTextStyles.searchStatus),
             SizedBox(height: 8.v),
             Text(
               'Nothing matches \u201C${controller.query.value.trim()}\u201D yet. '
@@ -254,12 +256,12 @@ class _SpacesButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Spaces Around Me',
+                        'discovery.spaces'.tr,
                         style: CustomTextStyles.spacesEntryTitle,
                       ),
                       SizedBox(height: 4.v),
                       Text(
-                        'Find studios & wellness spaces near you',
+                        'discovery.spacesBody'.tr,
                         style: CustomTextStyles.spacesEntrySubtitle,
                       ),
                     ],
@@ -342,7 +344,7 @@ class _SearchRowState extends State<_SearchRow> {
                   // Flexible so a large system text scale shortens the hint
                   // rather than overflowing the field.
                   child: Text(
-                    'What can we help you find?',
+                    'discovery.searchHint'.tr,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: CustomTextStyles.searchHint,
@@ -395,7 +397,7 @@ class _SearchRowState extends State<_SearchRow> {
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
-                  hintText: 'What can we help you find?',
+                  hintText: 'discovery.searchHint'.tr,
                   hintStyle: CustomTextStyles.searchHint,
                 ),
               ),
@@ -434,9 +436,21 @@ class _SearchRowState extends State<_SearchRow> {
 }
 
 class _Shelf extends StatelessWidget {
-  const _Shelf({required this.title, required this.items, required this.onTap});
+  const _Shelf({
+    required this.title,
+    required this.label,
+    required this.items,
+    required this.onTap,
+  });
 
+  /// What the shelf is called on the server: lower-cased, it is the key the
+  /// shelf page fetches by. It stays English in every language, which is
+  /// why the heading is passed separately rather than read off this.
   final String title;
+
+  /// The heading, in the reader's language.
+  final String label;
+
   final List<MediaItem> items;
   final ValueChanged<MediaItem> onTap;
 
@@ -450,7 +464,7 @@ class _Shelf extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                title,
+                label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: CustomTextStyles.sectionTitle,
@@ -458,7 +472,7 @@ class _Shelf extends StatelessWidget {
             ),
             InkWell(
               onTap: () => Get.find<DiscoveryTabController>().openShelf(title),
-              child: Text('See All', style: CustomTextStyles.seeAll),
+              child: Text('common.seeAll'.tr, style: CustomTextStyles.seeAll),
             ),
           ],
         ),

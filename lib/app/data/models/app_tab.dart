@@ -1,20 +1,25 @@
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 
 import 'nav_destination.dart';
 
 /// The five destinations in the signed-in bottom navigation, in the order the
 /// design lays them out.
 enum AppTab implements NavDestination {
-  home('Home', 'nav_home'),
-  plans('Plans', 'nav_plans'),
-  discovery('Discovery', 'nav_discovery'),
-  community('Community', 'nav_community'),
-  profile('Profile', 'nav_profile');
+  home('nav.home', 'nav_home'),
+  plans('nav.plans', 'nav_plans'),
+  discovery('nav.discovery', 'nav_discovery'),
+  community('nav.community', 'nav_community'),
+  profile('nav.profile', 'nav_profile');
 
-  const AppTab(this.label, this._icon);
+  const AppTab(this._key, this._icon);
+
+  /// Looked up rather than held: the bar is redrawn when the language
+  /// changes, and a const label would keep saying what it said at startup.
+  final String _key;
 
   @override
-  final String label;
+  String get label => _key.tr;
 
   final String _icon;
 

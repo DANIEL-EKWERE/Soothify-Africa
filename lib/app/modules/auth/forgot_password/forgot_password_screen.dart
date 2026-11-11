@@ -45,15 +45,15 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
   }
 
   List<Widget> _askForEmail(BuildContext context) => [
-        Text('Reset your password', style: CustomTextStyles.authHeading),
+        Text('auth.resetPassword'.tr, style: CustomTextStyles.authHeading),
         SizedBox(height: 8.h),
         SoothifyText(
-          'We will email you a six-digit code.',
+          'auth.resetBlurb'.tr,
           style: CustomTextStyles.authBlurb,
         ),
         SizedBox(height: 32.h),
         FilledTextField(
-          label: 'Email Address',
+          label: 'auth.emailAddress'.tr,
           controller: controller.emailController,
           keyboardType: TextInputType.emailAddress,
           hasError: controller.errorText.value != null,
@@ -66,7 +66,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
         _error(),
         SizedBox(height: 40.h),
         CustomElevatedButton(
-          text: 'Send the code',
+          text: 'auth.sendTheCode'.tr,
           isLoading: controller.isLoading.value,
           isEnabled: controller.canSend,
           onPressed: controller.sendCode,
@@ -74,7 +74,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
       ];
 
   List<Widget> _enterCode(BuildContext context) => [
-        Text('Enter the code', style: CustomTextStyles.authHeading),
+        Text('auth.enterTheCode'.tr, style: CustomTextStyles.authHeading),
         SizedBox(height: 8.h),
         // The server's own wording, which does not say whether the address
         // has an account — and neither should this screen.
@@ -84,7 +84,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
         ),
         SizedBox(height: 32.h),
         FilledTextField(
-          label: 'Six-digit code',
+          label: 'auth.sixDigitCode'.tr,
           controller: controller.codeController,
           keyboardType: TextInputType.number,
           hasError: controller.errorText.value != null,
@@ -95,7 +95,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
         ),
         SizedBox(height: 24.h),
         FilledTextField(
-          label: 'New password',
+          label: 'auth.newPassword'.tr,
           controller: controller.passwordController,
           obscureText: controller.obscurePassword.value,
           hasError: controller.errorText.value != null,
@@ -118,7 +118,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
         _error(),
         SizedBox(height: 40.h),
         CustomElevatedButton(
-          text: 'Set my password',
+          text: 'auth.setMyPassword'.tr,
           isLoading: controller.isLoading.value,
           isEnabled: controller.canReset,
           onPressed: controller.reset,
@@ -128,7 +128,7 @@ class ForgotPasswordScreen extends GetView<ForgotPasswordController> {
           child: GestureDetector(
             onTap: controller.startAgain,
             child: GradientText(
-              'Send another code',
+              'auth.sendAnotherCode'.tr,
               gradient: appTheme.titleGradient,
               style: CustomTextStyles.authFooter,
             ),

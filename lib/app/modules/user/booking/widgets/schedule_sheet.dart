@@ -31,7 +31,7 @@ class ScheduleSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Select dates', style: CustomTextStyles.coachSection),
+            Text('booking.selectDates'.tr, style: CustomTextStyles.coachSection),
             SizedBox(height: 24.v),
             MonthCalendar(
               month: controller.calendarMonth.value,

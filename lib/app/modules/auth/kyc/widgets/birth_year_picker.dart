@@ -121,14 +121,14 @@ class _Readout extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Age', style: CustomTextStyles.ageReadoutLabel),
+        Text('kyc.age'.tr, style: CustomTextStyles.ageReadoutLabel),
         SizedBox(height: 22.v),
         Text(
           '${KycQuestion.ageFor(year, currentYear)}',
           style: CustomTextStyles.ageReadoutValue,
         ),
         SizedBox(height: 22.v),
-        Text('yrs', style: CustomTextStyles.ageReadoutLabel),
+        Text('kyc.years'.tr, style: CustomTextStyles.ageReadoutLabel),
       ],
     );
   }

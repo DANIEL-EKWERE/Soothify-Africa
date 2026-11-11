@@ -68,7 +68,7 @@ class _Header extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            'Settings',
+            'expert.settings'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.appBarTitle,
           ),

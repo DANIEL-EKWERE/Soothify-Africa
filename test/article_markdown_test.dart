@@ -206,24 +206,121 @@ Wind down with [Deep Rest](media:42).
     });
   });
 
+  group('tables', () {
+    String cellText(List<ArticleSpan> cell) => cell.map((s) => s.text).join();
+
+    test('a header, a rule, and rows', () {
+      final table = parseArticleBlocks(
+        '| Pose | Hold |\n'
+        '| --- | --- |\n'
+        '| Child\'s pose | 1 min |\n'
+        '| Cat-cow | 30 s |',
+      ).single as ArticleTable;
+
+      expect(table.columns, 2);
+      expect(table.header.map(cellText), ['Pose', 'Hold']);
+      expect(table.rows, hasLength(2));
+      expect(table.rows[1].map(cellText), ['Cat-cow', '30 s']);
+    });
+
+    test('the pipes at the ends are optional', () {
+      final table = parseArticleBlocks(
+        'Pose | Hold\n--- | ---\nChild | 1 min',
+      ).single as ArticleTable;
+      expect(table.header.map(cellText), ['Pose', 'Hold']);
+      expect(table.rows.single.map(cellText), ['Child', '1 min']);
+    });
+
+    test('alignment colons in the rule still make a table', () {
+      expect(
+        parseArticleBlocks('| a | b |\n|:---|---:|\n| 1 | 2 |').single,
+        isA<ArticleTable>(),
+      );
+    });
+
+    test('a short row is padded, a long one is cut', () {
+      // The grid the reader sees is always square.
+      final table = parseArticleBlocks(
+        '| a | b | c |\n| --- | --- | --- |\n| 1 |\n| 1 | 2 | 3 | 4 |',
+      ).single as ArticleTable;
+      expect(table.rows[0].map(cellText), ['1', '', '']);
+      expect(table.rows[1].map(cellText), ['1', '2', '3']);
+    });
+
+    test('a header with no rows is still a table', () {
+      final table = parseArticleBlocks('| a | b |\n| --- | --- |').single
+          as ArticleTable;
+      expect(table.rows, isEmpty);
+    });
+
+    test('a pipe in a sentence is not a table', () {
+      // Without the rule under it, a pipe is just a character.
+      final blocks = parseArticleBlocks('Pilates | Yoga | Therapy\nis a choice.');
+      expect(blocks.single, isA<ArticleParagraph>());
+    });
+
+    test('the table ends where the pipes stop', () {
+      final blocks = parseArticleBlocks(
+        '| a | b |\n| --- | --- |\n| 1 | 2 |\nThen prose.',
+      );
+      expect(blocks.map((b) => b.runtimeType.toString()),
+          ['ArticleTable', 'ArticleParagraph']);
+    });
+
+    test('prose before and after, and the line after is not lost', () {
+      final blocks = parseArticleBlocks(
+        'Before.\n\n| a | b |\n| --- | --- |\n| 1 | 2 |\n\nAfter.',
+      );
+      expect(blocks.map((b) => b.runtimeType.toString()),
+          ['ArticleParagraph', 'ArticleTable', 'ArticleParagraph']);
+      expect(
+        (blocks.last as ArticleParagraph).spans.map((s) => s.text).join(),
+        'After.',
+      );
+    });
+
+    test('cells carry links and emphasis', () {
+      final table = parseArticleBlocks(
+        '| Session | Why |\n| --- | --- |\n'
+        '| [Deep Rest](media:12) | **sleep** |',
+      ).single as ArticleTable;
+      expect(table.rows.single[0].single.tap,
+          const ArticleTap(ArticleTarget.media, id: '12'));
+      expect(table.rows.single[1].single.bold, isTrue);
+    });
+
+    test('two tables one after the other stay two', () {
+      final blocks = parseArticleBlocks(
+        '| a |\n| --- |\n| 1 |\n\n| b |\n| --- |\n| 2 |',
+      );
+      expect(blocks.whereType<ArticleTable>(), hasLength(2));
+    });
+  });
+
   group('what the reader must never show', () {
     test('no syntax survives into the text', () {
-      const body = '## Heading\n\n**Bold** and [a link](media:1).\n\n- bullet';
+      const body = '## Heading\n\n**Bold** and [a link](media:1).\n\n- bullet'
+          '\n\n| Pose | Hold |\n| --- | --- |\n| **Child** | 1 min |';
+      String text(List<ArticleSpan> spans) => spans.map((s) => s.text).join();
       final shown = parseArticleBlocks(body)
           .map((b) => switch (b) {
-                ArticleHeading(:final spans) => spans.map((s) => s.text).join(),
-                ArticleParagraph(:final spans) =>
-                  spans.map((s) => s.text).join(),
-                ArticleList(:final items) =>
-                  items.map((i) => i.map((s) => s.text).join()).join(),
+                ArticleHeading(:final spans) => text(spans),
+                ArticleParagraph(:final spans) => text(spans),
+                ArticleList(:final items) => items.map(text).join(),
                 ArticleImage() => '',
+                ArticleTable(:final header, :final rows) => [
+                    ...header.map(text),
+                    for (final row in rows) ...row.map(text),
+                  ].join(' '),
               })
           .join(' ');
 
-      for (final mark in ['##', '**', '](', 'media:1', '- ']) {
+      for (final mark in ['##', '**', '](', 'media:1', '- ', '|', '---']) {
         expect(shown, isNot(contains(mark)), reason: mark);
       }
       expect(shown, contains('Heading'));
+      expect(shown, contains('Child'));
+      expect(shown, contains('1 min'));
       expect(shown, contains('Bold'));
       expect(shown, contains('a link'));
       expect(shown, contains('bullet'));

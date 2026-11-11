@@ -1,9 +1,11 @@
+import '../../core/app_export.dart';
 import '../../core/network/api_client.dart';
-import '../../core/utils/logger.dart';
 import '../models/library_section.dart';
 import '../models/media_filter.dart';
+import '../models/app_language.dart';
 import '../models/media_item.dart';
 import 'content_repository.dart';
+import '../services/language_service.dart';
 import 'kyc_repository.dart';
 
 /// The library, from `/api/v1/content/`.
@@ -17,6 +19,17 @@ class ApiContentRepository implements ContentRepository {
 
   final ApiClient _api;
 
+  /// What the member chose, as a query parameter.
+  ///
+  /// Sent rather than left to the server's copy of the profile: the choice
+  /// is made before there is an account, and a guest browsing in Pidgin
+  /// should still be offered Pidgin.
+  String get _language => Get.isRegistered<LanguageService>()
+      ? Get.find<LanguageService>().effective.code
+      : AppLanguage.english.code;
+
+  String get _languageQuery => 'language=$_language';
+
   /// Where the onboarding answers live, which is the device. Optional so a
   /// test can build this without one; without it, recommendations are the
   /// staff-picked list, which is what the server falls back to anyway.
@@ -29,10 +42,12 @@ class ApiContentRepository implements ContentRepository {
   }
 
   @override
-  Future<List<MediaItem>> getFeatured() => _items('/content/featured/');
+  Future<List<MediaItem>> getFeatured() =>
+      _items('/content/featured/?$_languageQuery');
 
   @override
-  Future<List<MediaItem>> getRecent() => _items('/content/recent/');
+  Future<List<MediaItem>> getRecent() =>
+      _items('/content/recent/?$_languageQuery');
 
   /// Recommendations, shaped by the onboarding questionnaire.
   ///
@@ -47,7 +62,7 @@ class ApiContentRepository implements ContentRepository {
   @override
   Future<List<MediaItem>> getRecommendations({String mood = ''}) async {
     final body = await _api.post(
-      '/content/recommendations/',
+      '/content/recommendations/?$_languageQuery',
       // A read, despite the verb: the questionnaire travels in the body to
       // keep it out of access logs. Safe to send again if the first
       // attempt times out on a cold server.
@@ -98,11 +113,12 @@ class ApiContentRepository implements ContentRepository {
 
   @override
   Future<List<MediaItem>> getByCategory(String categoryId) =>
-      _items('/content/items/?category=${Uri.encodeQueryComponent(categoryId)}');
+      _items('/content/items/?$_languageQuery'
+          '&category=${Uri.encodeQueryComponent(categoryId)}');
 
   @override
   Future<List<MediaItem>> bySection(LibrarySection section) =>
-      _items('/content/items/?section=${section.wire}');
+      _items('/content/items/?$_languageQuery&section=${section.wire}');
 
   @override
   Future<MediaItem?> getById(String id) async {
@@ -118,7 +134,8 @@ class ApiContentRepository implements ContentRepository {
     // is what the screen expects and what the server does with `?q=`.
     if (term.isEmpty) return Future.value(const []);
     return _items(
-      '/content/items/?q=${Uri.encodeQueryComponent(term)}'
+      '/content/items/?$_languageQuery'
+      '&q=${Uri.encodeQueryComponent(term)}'
       '${_query(filters, leading: '&')}',
     );
   }
@@ -195,7 +212,7 @@ class ApiContentRepository implements ContentRepository {
       {String query = '', Map<String, String> filters = const {}}) {
     final term = query.trim();
     return _items(
-      '/content/items/?type=${kind.name}'
+      '/content/items/?$_languageQuery&type=${kind.name}'
       '${term.isEmpty ? '' : '&q=${Uri.encodeQueryComponent(term)}'}'
       '${_query(filters, leading: '&')}',
     );

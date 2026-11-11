@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/data/models/app_tab.dart';
@@ -16,6 +19,13 @@ void main() {
 
   group('AppTab', () {
     test('carries the five designed destinations in order', () {
+      // The labels are looked up now, so the catalogue has to be loaded —
+      // outside a GetMaterialApp nothing else registers it.
+      Get.addTranslations(AppTranslations().keys);
+      // Assigned, not `updateLocale`: that one reassembles the app, which
+      // asserts it is inside a widget test — and this one is not.
+      Get.locale = AppLanguage.english.locale;
+
       expect(
         AppTab.values.map((t) => t.label),
         ['Home', 'Plans', 'Discovery', 'Community', 'Profile'],

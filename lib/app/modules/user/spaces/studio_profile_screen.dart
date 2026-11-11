@@ -25,7 +25,7 @@ class StudioProfileScreen extends StatelessWidget {
       // rather than drawing somebody else's studio.
       return Scaffold(
         backgroundColor: appTheme.background,
-        body: const Center(child: Text('That studio is no longer listed.')),
+        body: Center(child: Text('spaces.notListed'.tr)),
       );
     }
 

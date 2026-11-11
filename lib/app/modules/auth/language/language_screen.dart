@@ -62,13 +62,13 @@ class LanguageScreen extends GetView<LanguageController> {
               // spacing at reference size and compress below it.
               const Spacer(flex: 172),
               GradientText(
-                'How would you like to converse?',
+                'language.title'.tr,
                 gradient: appTheme.titleGradient,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.onboardingSlideTitle,
               ),
               GradientText(
-                'Choose your preferred language.',
+                'language.subtitle'.tr,
                 gradient: appTheme.titleGradient,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.onboardingSlideSubtitle,

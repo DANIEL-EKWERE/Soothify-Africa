@@ -29,7 +29,7 @@ class YourSubscriptionScreen extends GetView<SubscriptionManageController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SettingsHeader(title: 'Your Subscription'),
+            SettingsHeader(title: 'subscription.title'.tr),
             SizedBox(height: 38.v),
             Expanded(
               // Every observable is read here, inside the builder. Reading
@@ -72,16 +72,15 @@ class _InactiveCard extends StatelessWidget {
     final controller = Get.find<SubscriptionManageController>();
     return SubscriptionCard(
       children: [
-        const StatusBadge(label: 'Inactive', live: false),
+        StatusBadge(label: 'subscription.inactive'.tr, live: false),
         SizedBox(height: 32.v),
         Text(
-          'You currently don’t have an active subscription.',
+          'subscription.none'.tr,
           style: CustomTextStyles.subscriptionHeadline,
         ),
         SizedBox(height: 16.v),
         Text(
-          'Unlock unlimited access to all expert-led yoga & Pilates classes, '
-          'offline streaming, and daily wellness micro-routines.',
+          'subscription.pitch'.tr,
           style: CustomTextStyles.subscriptionBody,
         ),
         SizedBox(height: 32.v),
@@ -99,7 +98,7 @@ class _InactiveCard extends StatelessWidget {
           child: InkWell(
             onTap: controller.openBillingHistory,
             child: Text(
-              'View past receipts',
+              'subscription.pastReceipts'.tr,
               style: CustomTextStyles.subscriptionLink,
             ),
           ),
@@ -129,7 +128,7 @@ class _ActiveCard extends StatelessWidget {
         StatusBadge(label: status, live: true),
         SizedBox(height: 32.v),
         Text(
-          'Subscription details',
+          'subscription.details'.tr,
           style: CustomTextStyles.subscriptionHeadline,
         ),
         SizedBox(height: 8.v),
@@ -140,17 +139,17 @@ class _ActiveCard extends StatelessWidget {
         SizedBox(height: 8.v),
         Text(plan.billed, style: CustomTextStyles.subscriptionPlanPrice),
         SizedBox(height: 32.v),
-        Text('Payment Method', style: CustomTextStyles.subscriptionLabel),
+        Text('expert.paymentMethod'.tr, style: CustomTextStyles.subscriptionLabel),
         SizedBox(height: 8.v),
         Text(controller.card, style: CustomTextStyles.subscriptionValue),
         SizedBox(height: 4.v),
         InkWell(
           onTap: controller.updatePaymentMethod,
-          child: Text('Update', style: CustomTextStyles.subscriptionLink),
+          child: Text('subscription.update'.tr, style: CustomTextStyles.subscriptionLink),
         ),
         SizedBox(height: 31.v),
         CustomGhostButton(
-          text: 'Change Plan',
+          text: 'subscription.changePlan'.tr,
           onPressed: controller.openChangePlan,
         ),
         SizedBox(height: 16.v),
@@ -158,7 +157,7 @@ class _ActiveCard extends StatelessWidget {
           child: InkWell(
             onTap: () => CancelSubscriptionCard.show(context),
             child: Text(
-              'Cancel Subscription',
+              'subscription.cancel'.tr,
               style: CustomTextStyles.subscriptionDestructive,
             ),
           ),

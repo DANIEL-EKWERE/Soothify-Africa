@@ -2,6 +2,9 @@ import '../../../../core/app_export.dart';
 import '../../../../core/base_controller.dart';
 import '../../../../data/models/app_language.dart';
 import '../../../../data/services/language_service.dart';
+import '../../../user/discovery/controller/discovery_tab_controller.dart';
+import '../../../user/library/controller/library_controller.dart';
+import '../../../user/shell/tabs/home_tab_controller.dart';
 
 /// Why the language screen is open.
 ///
@@ -63,8 +66,35 @@ class LanguageController extends BaseController {
     if (ok != true) return;
     if (fromSettings) {
       Get.back();
+      // Started, not awaited: leaving the screen should not wait on the
+      // network, and `updateLocale` has just rebuilt the app -- holding the
+      // frame open across a fetch is what made the pop land mid-frame.
+      _refetchContent();
     } else {
       Get.offAllNamed(AppRoutes.kyc);
+    }
+  }
+
+  /// Re-asks the server for the library in the language just chosen.
+  ///
+  /// Words on screen retranslate themselves — `updateLocale` rebuilds the
+  /// app — but the media behind them was fetched with the old `?language=`
+  /// and would keep showing until something else happened to reload it.
+  /// Only the tabs that are actually alive are asked; one that has not been
+  /// opened yet will fetch in the new language when it is.
+  Future<void> _refetchContent() async {
+    try {
+      await Future.wait([
+        if (Get.isRegistered<HomeTabController>())
+          Get.find<HomeTabController>().load(),
+        if (Get.isRegistered<DiscoveryTabController>())
+          Get.find<DiscoveryTabController>().load(),
+        if (Get.isRegistered<LibraryController>())
+          Get.find<LibraryController>().load(),
+      ]);
+    } catch (_) {
+      // Each tab already shows its own failure. Nothing here can report one
+      // usefully -- the screen that asked has been popped.
     }
   }
 }

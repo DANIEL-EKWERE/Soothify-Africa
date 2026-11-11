@@ -2853,6 +2853,24 @@ class CustomTextStyles {
     color: appTheme.textPrimary,
   );
 
+  /// A cell of a table in the body. A size under the prose: a table is
+  /// read across, and the body size wraps every cell onto three lines on a
+  /// phone.
+  static TextStyle get articleTableCell => TextStyle(
+    fontFamily: fontNunitoSans,
+    fontSize: 14.fSize,
+    fontWeight: FontWeight.w400,
+    fontVariations: _regular,
+    height: 20 / 14,
+    color: appTheme.textPrimary,
+  );
+
+  /// The header row of a table in the body.
+  static TextStyle get articleTableHead => articleTableCell.copyWith(
+    fontWeight: FontWeight.w700,
+    fontVariations: _bold,
+  );
+
   /// The caption under a picture in the body, which is its alt text.
   static TextStyle get articleCaption => TextStyle(
     fontFamily: fontNunitoSans,

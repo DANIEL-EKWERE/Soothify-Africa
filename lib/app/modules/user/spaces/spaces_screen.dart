@@ -49,7 +49,7 @@ class SpacesScreen extends GetView<SpacesController> {
                     ),
                   ),
                   Expanded(
-                    child: Text('Spaces Around Me',
+                    child: Text('discovery.spaces'.tr,
                         textAlign: TextAlign.center,
                         style: CustomTextStyles.appBarTitle),
                   ),
@@ -111,7 +111,7 @@ class _SearchField extends StatelessWidget {
                   // rectangle inside the search pill, inset from it.
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
-                  hintText: 'Find a quiet space near you...',
+                  hintText: 'spaces.searchHint'.tr,
                   hintStyle: CustomTextStyles.spaceSearchHint,
                 ),
               ),
@@ -220,7 +220,7 @@ class _UseMyLocation extends StatelessWidget {
               ),
               SizedBox(width: 8.h),
               Text(
-                'Use my location to see how far away these are',
+                'spaces.useLocation'.tr,
                 style: CustomTextStyles.emptyStateBody.copyWith(
                   color: appTheme.soothifyBlue,
                 ),
@@ -294,8 +294,7 @@ class _List extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 48.h),
             child: Text(
-              'No spaces match that yet. Try another filter, or widen your '
-              'search.',
+              'spaces.noMatches'.tr,
               textAlign: TextAlign.center,
               style: CustomTextStyles.spaceArea,
             ),
@@ -406,8 +405,8 @@ class _Map extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: 16.v),
                   child: Text(
                     placed.isEmpty
-                        ? 'None of these have a location yet'
-                        : 'Tap a pin to preview a space',
+                        ? 'spaces.noLocations'.tr
+                        : 'spaces.tapPin'.tr,
                     style: CustomTextStyles.spaceArea,
                   ),
                 ),

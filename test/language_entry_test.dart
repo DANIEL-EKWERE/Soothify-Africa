@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/services/language_service.dart';
@@ -29,6 +30,12 @@ void main() {
 
     await tester.pumpWidget(
       GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
         initialRoute: '/settings',
         getPages: [
           GetPage(name: '/settings', page: () => const SizedBox.shrink()),
@@ -67,6 +74,12 @@ void main() {
 
     await tester.pumpWidget(
       GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
         initialRoute: AppRoutes.language,
         getPages: [
           GetPage(

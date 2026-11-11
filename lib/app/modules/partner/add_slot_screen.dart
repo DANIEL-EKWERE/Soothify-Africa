@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import '../../data/models/studio_partner.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_ghost_button.dart';
+import '../../widgets/soothify_word.dart';
 import 'controller/add_slot_controller.dart';
 
 /// "Add Sōōthify Class Slot" — Figma `416:26557`.
@@ -39,7 +40,7 @@ class AddSlotScreen extends GetView<AddSlotController> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text('Add Soothify Class Slot',
+                        child: SoothifyText('partner.addSlotTitle'.tr,
                             style: CustomTextStyles.partnerSection
                                 .copyWith(fontSize: 20.fSize)),
                       ),
@@ -55,19 +56,19 @@ class AddSlotScreen extends GetView<AddSlotController> {
                     ],
                   ),
                   SizedBox(height: 16.v),
-                  Text(
+                  SoothifyText(
                     'Select a class on your schedule and choose how many '
                     'spots to reserve for Soothify Passport members.',
                     style: CustomTextStyles.partnerMeta
                         .copyWith(fontSize: 14.fSize),
                   ),
                   SizedBox(height: 24.v),
-                  Text('Class details',
+                  Text('partner.classDetails'.tr,
                       style: CustomTextStyles.partnerSection),
                   SizedBox(height: 12.v),
                   const _CategoryField(),
                   SizedBox(height: 6.v),
-                  Text('Available: Reformer · Mat · Yoga',
+                  Text('partner.availableKinds'.tr,
                       style: CustomTextStyles.partnerMeta
                           .copyWith(fontSize: 11.fSize)),
                   SizedBox(height: 14.v),
@@ -92,7 +93,7 @@ class AddSlotScreen extends GetView<AddSlotController> {
                     onChanged: (_) => controller.touch(),
                   ),
                   SizedBox(height: 24.v),
-                  Text('Schedule', style: CustomTextStyles.partnerSection),
+                  Text('nav.schedule'.tr, style: CustomTextStyles.partnerSection),
                   SizedBox(height: 12.v),
                   const _DateField(),
                   SizedBox(height: 14.v),
@@ -102,7 +103,7 @@ class AddSlotScreen extends GetView<AddSlotController> {
                   SizedBox(height: 20.v),
                   const _OffPeak(),
                   SizedBox(height: 24.v),
-                  Text('Recurrence automation',
+                  Text('partner.recurrence'.tr,
                       style: CustomTextStyles.partnerSection),
                   SizedBox(height: 12.v),
                   const _Recurrence(),
@@ -339,7 +340,7 @@ class _Allocation extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Soothify Passport Spot Allocation',
+          SoothifyText('partner.spotAllocation'.tr,
               style: CustomTextStyles.partnerCardTitle),
           SizedBox(height: 8.v),
           Text(
@@ -444,10 +445,10 @@ class _OffPeak extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Mark as Off-Peak Session',
+                  Text('partner.offPeak'.tr,
                       style: CustomTextStyles.partnerCardBody),
                   SizedBox(height: 2.v),
-                  Text('Gives higher visibility in Soothify app feed.',
+                  SoothifyText('partner.offPeakBody'.tr,
                       style: CustomTextStyles.partnerMeta),
                 ],
               ),

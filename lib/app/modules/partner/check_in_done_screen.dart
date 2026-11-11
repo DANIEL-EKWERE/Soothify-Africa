@@ -28,7 +28,7 @@ class CheckInDoneScreen extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 12.v),
-            Text('Check-in confirmation',
+            Text('partner.checkInConfirmation'.tr,
                 style: CustomTextStyles.partnerCardTitle
                     .copyWith(fontSize: 16.fSize)),
             Expanded(
@@ -49,7 +49,7 @@ class CheckInDoneScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 24.v),
-                  Text('Check-in successful',
+                  Text('partner.checkInOk'.tr,
                       textAlign: TextAlign.center,
                       style: CustomTextStyles.partnerSection
                           .copyWith(fontSize: 20.fSize)),
@@ -112,14 +112,13 @@ class CheckInDoneScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Check-in saved on this device',
+                          Text('partner.savedOnDevice'.tr,
                               style: CustomTextStyles.partnerCardTitle
                                   .copyWith(
                                       color: appTheme.partnerOfflineInk)),
                           SizedBox(height: 4.v),
                           Text(
-                            'Offline mode is active. This check-in will '
-                            'sync automatically when reconnected.',
+                            'partner.offlineBody'.tr,
                             style: CustomTextStyles.partnerMeta
                                 .copyWith(color: appTheme.partnerOfflineInk),
                           ),
@@ -138,7 +137,7 @@ class CheckInDoneScreen extends StatelessWidget {
                         color: appTheme.soothifyBlue,
                         borderRadius: BorderRadius.circular(10.h),
                       ),
-                      child: Text('Check in next member',
+                      child: Text('partner.nextMember'.tr,
                           style: CustomTextStyles.partnerCardTitle
                               .copyWith(color: appTheme.onPrimary)),
                     ),
@@ -149,7 +148,7 @@ class CheckInDoneScreen extends StatelessWidget {
                       onTap: Get.back,
                       child: Padding(
                         padding: EdgeInsets.all(8.h),
-                        child: Text('Back to roster',
+                        child: Text('partner.backToRoster'.tr,
                             style: CustomTextStyles.partnerCardBody
                                 .copyWith(color: appTheme.partnerName)),
                       ),

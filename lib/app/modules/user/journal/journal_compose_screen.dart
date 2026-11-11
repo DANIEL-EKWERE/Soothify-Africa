@@ -88,7 +88,7 @@ class _HeaderBar extends StatelessWidget {
           const Spacer(),
           GestureDetector(
             onTap: controller.done,
-            child: Text('Done', style: CustomTextStyles.journalDate),
+            child: Text('common.done'.tr, style: CustomTextStyles.journalDate),
           ),
           SizedBox(width: 60.h),
         ],
@@ -137,7 +137,7 @@ class _ChangePrompt extends StatelessWidget {
             color: appTheme.textPrimary,
           ),
           SizedBox(width: 8.h),
-          Text('Change prompt', style: CustomTextStyles.journalChangePrompt),
+          Text('journal.changePrompt'.tr, style: CustomTextStyles.journalChangePrompt),
         ],
       ),
     );

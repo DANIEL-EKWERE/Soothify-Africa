@@ -34,7 +34,7 @@ class DailyStartScreen extends GetView<DailyController> {
           children: [
             _Header(title: controller.title),
             SizedBox(height: 40.v),
-            Text('Recommended for you',
+            Text('home.recommended'.tr,
                 style: CustomTextStyles.sectionTitle),
             SizedBox(height: 16.v),
             FutureBuilder<List<MediaItem>>(

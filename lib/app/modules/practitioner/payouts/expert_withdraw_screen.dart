@@ -27,7 +27,9 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
         child: Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Withdrawal'),
+            // Not const: the title is looked up, and a lookup cannot
+            // be folded at compile time.
+            ExpertHeader(title: 'expert.withdrawal'.tr),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 90.v, 24.h, 24.v),
@@ -89,7 +91,7 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
                       // constraints, and the frame's pill hugs its words.
                       child: Center(
                         widthFactor: 1,
-                        child: Text('How much do you want to withdraw',
+                        child: Text('expert.withdrawHowMuch'.tr,
                             style: CustomTextStyles.withdrawPrompt),
                       ),
                     ),
@@ -108,7 +110,7 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
                     ),
                   ),
                   SizedBox(height: 41.v),
-                  Text('Destination of funds',
+                  Text('expert.destination'.tr,
                       style: CustomTextStyles.expertSection),
                   SizedBox(height: 16.v),
                   const _DestinationTiles(),
@@ -122,7 +124,7 @@ class ExpertWithdrawScreen extends GetView<PayoutController> {
                 // thing it does, and it ends on the confirmation rather than
                 // doubling back to the method chooser.
                 () => CustomElevatedButton(
-                  text: 'Withdraw',
+                  text: 'expert.withdraw'.tr,
                   isEnabled: controller.canProceed,
                   onPressed: controller.withdraw,
                 ),
@@ -254,7 +256,7 @@ class _AddFirstDestination extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.h),
           border: Border.all(color: appTheme.soothifyBlue),
         ),
-        child: Text('+  Add a payout account',
+        child: Text('expert.addPayoutAccount'.tr,
             style: CustomTextStyles.subscribeLabel
                 .copyWith(color: appTheme.soothifyBlue)),
       ),

@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/checkout_launcher.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/article_body.dart';
 import 'package:soothifyafrica/app/data/models/library_section.dart';
 import 'package:soothifyafrica/app/data/models/media_item.dart';
@@ -408,6 +410,12 @@ void main() {
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
             theme: theme,
             home: const ArticleScreen(),
             getPages: [
@@ -439,7 +447,13 @@ void main() {
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) =>
-              GetMaterialApp(theme: theme, home: const ArticleScreen()),
+              GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,theme: theme, home: const ArticleScreen()),
         ),
       );
       await tester.pump(const Duration(seconds: 1));

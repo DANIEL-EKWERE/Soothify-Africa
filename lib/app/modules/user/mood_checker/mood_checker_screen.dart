@@ -34,7 +34,7 @@ class MoodCheckerScreen extends GetView<MoodCheckerController> {
           onPressed: () =>
               Get.key.currentState?.canPop() == true ? Get.back() : null,
         ),
-        title: const Text('Mood Checker'),
+        title: Text('home.moodChecker'.tr),
       ),
       body: SafeArea(
         // Scrolls only as a guard: the stack below adds up to the design's
@@ -50,7 +50,7 @@ class MoodCheckerScreen extends GetView<MoodCheckerController> {
               // button 570.
               SizedBox(height: 44.v),
               Text(
-                'How do you feel today?',
+                'mood.howDoYouFeel'.tr,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.screenQuestion,
               ),
@@ -65,7 +65,7 @@ class MoodCheckerScreen extends GetView<MoodCheckerController> {
               const _Slider(),
               SizedBox(height: 74.v),
               Obx(() => CustomElevatedButton(
-                    text: 'Add Detail',
+                    text: 'mood.addDetail'.tr,
                     isLoading: controller.isSaving.value,
                     onPressed: controller.submit,
                   )),
@@ -133,8 +133,8 @@ class _Slider extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Awful', style: CustomTextStyles.moodScaleEnd),
-            Text('Awesome', style: CustomTextStyles.moodScaleEnd),
+            Text('mood.awful'.tr, style: CustomTextStyles.moodScaleEnd),
+            Text('mood.awesome'.tr, style: CustomTextStyles.moodScaleEnd),
           ],
         ),
       ],

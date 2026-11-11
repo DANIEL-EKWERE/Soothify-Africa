@@ -32,19 +32,18 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
             () => Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Confirm your email', style: CustomTextStyles.authHeading),
+                Text('auth.confirmEmailTitle'.tr, style: CustomTextStyles.authHeading),
                 SizedBox(height: 8.h),
                 SoothifyText(
                   controller.email.value.isEmpty
-                      ? 'We sent a six-digit code to your email address. '
-                          'Enter it below.'
+                      ? 'auth.codeSentBlurb'.tr
                       : 'We sent a six-digit code to '
                           '${controller.email.value}. Enter it below.',
                   style: CustomTextStyles.authBlurb,
                 ),
                 SizedBox(height: 32.h),
                 FilledTextField(
-                  label: 'Six-digit code',
+                  label: 'auth.sixDigitCode'.tr,
                   controller: controller.codeController,
                   keyboardType: TextInputType.number,
                   hasError: controller.errorText.value != null,
@@ -66,7 +65,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                   ),
                 SizedBox(height: 40.h),
                 CustomElevatedButton(
-                  text: 'Confirm my email',
+                  text: 'auth.confirmMyEmail'.tr,
                   isLoading: controller.isLoading.value,
                   isEnabled: controller.canVerify,
                   onPressed: controller.verify,
@@ -77,8 +76,8 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                     onTap: controller.resend,
                     child: GradientText(
                       controller.isResending.value
-                          ? 'Sending…'
-                          : 'Send another code',
+                          ? 'auth.sending'.tr
+                          : 'auth.sendAnotherCode'.tr,
                       gradient: appTheme.titleGradient,
                       style: CustomTextStyles.authFooter,
                     ),
@@ -89,7 +88,7 @@ class VerifyEmailScreen extends GetView<VerifyEmailController> {
                   child: GestureDetector(
                     onTap: controller.leave,
                     child: Text(
-                      'Use a different email',
+                      'auth.differentEmail'.tr,
                       style: CustomTextStyles.authBlurb,
                     ),
                   ),

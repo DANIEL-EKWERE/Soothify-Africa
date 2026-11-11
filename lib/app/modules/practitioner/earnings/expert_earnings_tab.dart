@@ -37,7 +37,7 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
               children: [
                 // No back chevron: Earnings is one of the bar's four tabs,
                 // and there is nothing behind it to go back to.
-                Text('Earnings',
+                Text('expert.earningsTitle'.tr,
                     textAlign: TextAlign.center,
                     style: CustomTextStyles.appBarTitle),
                 SizedBox(height: 32.v),
@@ -50,11 +50,11 @@ class ExpertEarningsTab extends GetView<ExpertDashboardController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Recent payouts',
+                    Text('expert.recentPayouts'.tr,
                         style: CustomTextStyles.expertSection),
                     InkWell(
                       onTap: () => Get.toNamed(AppRoutes.expertPayouts),
-                      child: Text('See All',
+                      child: Text('common.seeAll'.tr,
                           style: CustomTextStyles.expertSeeAll),
                     ),
                   ],
@@ -132,7 +132,7 @@ class _BalanceCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Available Earnings',
+                    Text('expert.availableEarnings'.tr,
                         style: CustomTextStyles.expertBalanceCaption
                             .copyWith(color: appTheme.onPrimary)),
                     SizedBox(height: 4.v),
@@ -165,14 +165,14 @@ class _BalanceCard extends StatelessWidget {
                   color: appTheme.onPrimary,
                   borderRadius: BorderRadius.circular(8.h),
                 ),
-                child: Text('Withdraw',
+                child: Text('expert.withdraw'.tr,
                     style: CustomTextStyles.subscribeLabel
                         .copyWith(color: appTheme.soothifyBlue)),
               ),
             ),
           ),
           SizedBox(height: 12.v),
-          Text('10% bank service charges applies.',
+          Text('expert.bankCharge'.tr,
               style: CustomTextStyles.expertBalanceCaption
                   .copyWith(color: appTheme.onPrimary)),
         ],
@@ -200,7 +200,7 @@ class _PayoutDetails extends StatelessWidget {
       child: Column(
         children: [
           _DetailRow(
-            label: 'Next automatic payout',
+            label: 'expert.nextPayout'.tr,
             value: switch (earnings) {
               null => '—',
               final e => payoutDay(e.nextPayout),
@@ -214,7 +214,7 @@ class _PayoutDetails extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Text('Payout method',
+                    Text('expert.payoutMethod'.tr,
                         style: CustomTextStyles.expertRowLabel),
                     SizedBox(width: 20.h),
                     Flexible(
@@ -225,7 +225,7 @@ class _PayoutDetails extends StatelessWidget {
                         final saved =
                             Get.find<ExpertDashboardController>().destinations;
                         return Text(
-                          saved.isEmpty ? 'Not set' : saved.first.masked,
+                          saved.isEmpty ? 'expert.notSet'.tr : saved.first.masked,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: CustomTextStyles.expertRowLabel,
@@ -271,7 +271,7 @@ class _Summary extends StatelessWidget {
       children: [
         Expanded(
           child: _SummaryCell(
-            caption: 'This week',
+            caption: 'expert.thisWeek'.tr,
             amount: earnings?.thisWeek ?? 0,
             sessions: earnings?.thisWeekSessions ?? 0,
           ),
@@ -279,7 +279,7 @@ class _Summary extends StatelessWidget {
         SizedBox(width: 8.h),
         Expanded(
           child: _SummaryCell(
-            caption: 'Total earned',
+            caption: 'expert.totalEarned'.tr,
             amount: earnings?.totalEarned ?? 0,
             sessions: earnings?.totalSessions ?? 0,
           ),

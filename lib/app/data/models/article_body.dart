@@ -194,6 +194,25 @@ class ArticleList extends ArticleBlock {
       '${ordered ? 'ol' : 'ul'}(${items.map((i) => i.join()).join('|')})';
 }
 
+/// A table: one header row, then the body rows.
+///
+/// Every row has exactly as many cells as the header. A row typed with too
+/// few is padded with empty cells and one with too many is cut, so the
+/// grid the reader sees is always square -- a ragged table is a layout the
+/// screen cannot draw sensibly.
+class ArticleTable extends ArticleBlock {
+  const ArticleTable({required this.header, required this.rows});
+
+  final List<List<ArticleSpan>> header;
+  final List<List<List<ArticleSpan>>> rows;
+
+  int get columns => header.length;
+
+  @override
+  String toString() =>
+      'table(${header.map((c) => c.join()).join('|')} / ${rows.length} rows)';
+}
+
 /// A picture inside the body, as opposed to the article's cover.
 class ArticleImage extends ArticleBlock {
   const ArticleImage(this.url, {this.alt = ''});
@@ -299,6 +318,23 @@ final _bullet = RegExp(r'^\s*[-*+]\s+(.*)$');
 final _numbered = RegExp(r'^\s*\d+[.)]\s+(.*)$');
 final _imageLine = RegExp(r'^!\[([^\[\]]*)\]\(([^()\s]+)\)$');
 
+/// `| --- | :---: | ---: |` -- the line under a table's header.
+///
+/// What makes a table a table. A line with a pipe in it is ordinary prose
+/// unless the next line is one of these, so "Pilates | Yoga" written in a
+/// sentence stays a sentence.
+final _tableRule = RegExp(r'^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?\s*$');
+
+/// The cells of one row, with the pipes at either end dropped.
+List<String> _cellsOf(String line) {
+  var row = line.trim();
+  if (row.startsWith('|')) row = row.substring(1);
+  if (row.endsWith('|')) row = row.substring(0, row.length - 1);
+  return row.split('|').map((cell) => cell.trim()).toList();
+}
+
+bool _isTableRow(String line) => line.trim().isNotEmpty && line.contains('|');
+
 /// Reads a body into the blocks the reader lays out.
 ///
 /// A blank line ends a block; consecutive bullets are gathered into one
@@ -332,11 +368,38 @@ List<ArticleBlock> parseArticleBlocks(String body) {
     closeList();
   }
 
-  for (final raw in body.split('\n')) {
-    final line = raw.trimRight();
+  final lines = body.split('\n');
+  for (var at = 0; at < lines.length; at++) {
+    final line = lines[at].trimRight();
 
     if (line.trim().isEmpty) {
       close();
+      continue;
+    }
+
+    // A header row, then the rule under it, then rows until a line with
+    // no pipe in it.
+    if (_isTableRow(line) &&
+        at + 1 < lines.length &&
+        _tableRule.hasMatch(lines[at + 1])) {
+      close();
+      final header = _cellsOf(line);
+      final rows = <List<List<ArticleSpan>>>[];
+      at += 2;
+      while (at < lines.length && _isTableRow(lines[at])) {
+        final cells = _cellsOf(lines[at]);
+        rows.add([
+          for (var c = 0; c < header.length; c++)
+            parseArticleBody(c < cells.length ? cells[c] : ''),
+        ]);
+        at++;
+      }
+      // The loop's own increment would skip the line that ended the table.
+      at--;
+      blocks.add(ArticleTable(
+        header: [for (final cell in header) parseArticleBody(cell)],
+        rows: rows,
+      ));
       continue;
     }
 

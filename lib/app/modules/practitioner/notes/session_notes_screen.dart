@@ -58,8 +58,7 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                 padding: EdgeInsets.fromLTRB(24.h, 39.v, 24.h, 32.v),
                 children: [
                   Text(
-                    'Keep track of your sessions and client progress, key '
-                    'insight and next steps.',
+                    'expert.notesBlurb'.tr,
                     style: CustomTextStyles.expertBlurb,
                   ),
                   SizedBox(height: 26.v),
@@ -74,30 +73,26 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                       showTimeIcon: false,
                     ),
                   SizedBox(height: 37.v),
-                  Text('How did the session go',
+                  Text('expert.howDidItGo'.tr,
                       style: CustomTextStyles.expertSection),
                   SizedBox(height: 16.v),
                   const _OutcomeChips(),
                   SizedBox(height: 33.v),
                   ExpertFormField(
-                    label: 'Session Summary',
+                    label: 'expert.sessionSummary'.tr,
                     controller: controller.summary,
                     height: 175,
                     maxLines: null,
                     // The frame writes the same prompt into both boxes.
-                    hint: 'How did the session go? Add notes about the '
-                        'client’s progress, key topics discussed, '
-                        'observations or next steps',
+                    hint: 'expert.notesHint'.tr,
                   ),
                   SizedBox(height: 33.v),
                   ExpertFormField(
-                    label: 'Recommendation',
+                    label: 'expert.recommendation'.tr,
                     controller: controller.recommendation,
                     height: 175,
                     maxLines: null,
-                    hint: 'How did the session go? Add notes about the '
-                        'client’s progress, key topics discussed, '
-                        'observations or next steps',
+                    hint: 'expert.notesHint'.tr,
                   ),
                   SizedBox(height: 21.v),
                   Obx(() {
@@ -122,8 +117,7 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                   }),
                   SizedBox(height: 27.v),
                   Text(
-                    'Keep track of your sessions and client progress, key '
-                    'insight and next steps.',
+                    'expert.notesBlurb'.tr,
                     style: CustomTextStyles.expertCardMeta,
                   ),
                   SizedBox(height: 40.v),
@@ -146,7 +140,7 @@ class SessionNotesScreen extends GetView<SessionNotesController> {
                   }),
                   Obx(
                     () => CustomElevatedButton(
-                      text: controller.isLoading.value ? 'Saving…' : 'Save',
+                      text: controller.isLoading.value ? 'expert.saving'.tr : 'common.save'.tr,
                       onPressed: controller.isLoading.value
                           ? null
                           : controller.save,
@@ -233,7 +227,7 @@ class _PickContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Send them something to work with',
+        Text('expert.sendSomething'.tr,
             style: CustomTextStyles.expertCardMeta),
         SizedBox(height: 10.v),
         Row(

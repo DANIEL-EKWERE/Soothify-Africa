@@ -39,7 +39,7 @@ class PartnerLedgerScreen extends GetView<PartnerLedgerController> {
                   ),
                 ),
                 Expanded(
-                  child: Text('Studio payout ledger',
+                  child: Text('partner.ledgerTitle'.tr,
                       textAlign: TextAlign.center,
                       style: CustomTextStyles.partnerCardTitle
                           .copyWith(fontSize: 16.fSize)),
@@ -54,11 +54,11 @@ class PartnerLedgerScreen extends GetView<PartnerLedgerController> {
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(24.h, 20.v, 24.h, 32.v),
                     children: [
-                      Text('Financials & Settlement Hub',
+                      Text('partner.financials'.tr,
                           style: CustomTextStyles.partnerSection
                               .copyWith(fontSize: 20.fSize)),
                       SizedBox(height: 8.v),
-                      Text('Your verified check-ins, earnings and payouts.',
+                      Text('partner.ledgerBlurb'.tr,
                           style: CustomTextStyles.partnerMeta),
                       SizedBox(height: 20.v),
                       _Accrued(ledger: controller.ledger.value),
@@ -68,8 +68,7 @@ class PartnerLedgerScreen extends GetView<PartnerLedgerController> {
                       _Table(controller: controller),
                       SizedBox(height: 20.v),
                       Text(
-                        'Payouts are processed on the 1st and 15th. Dispute '
-                        'a check-in within 48 hours.',
+                        'partner.payoutSchedule'.tr,
                         style: CustomTextStyles.partnerMeta,
                       ),
                     ],
@@ -120,7 +119,7 @@ class _Accrued extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Accrued Unpaid Balance',
+                Text('partner.unpaidBalance'.tr,
                     style: CustomTextStyles.partnerStatus
                         .copyWith(color: appTheme.onPrimary)),
                 SizedBox(height: 6.v),
@@ -128,7 +127,7 @@ class _Accrued extends StatelessWidget {
                     style: CustomTextStyles.partnerPayout
                         .copyWith(fontSize: 24.fSize)),
                 SizedBox(height: 6.v),
-                Text('Queued for your next settlement',
+                Text('partner.queuedForSettlement'.tr,
                     style: CustomTextStyles.partnerMeta
                         .copyWith(color: appTheme.onPrimary)),
               ],
@@ -151,19 +150,19 @@ class _SettlementMetrics extends StatelessWidget {
       children: [
         Expanded(
           child: _Settlement(
-            label: 'Next Disbursement',
+            label: 'partner.nextDisbursement'.tr,
             value: ledger == null
                 ? '—'
                 : DateFormat('dd MMM yyyy').format(ledger!.nextDisbursement),
-            note: 'Every 1st & 15th',
+            note: 'partner.every1st15th'.tr,
           ),
         ),
         SizedBox(width: 10.h),
         Expanded(
           child: _Settlement(
-            label: 'Lifetime Earnings',
+            label: 'partner.lifetimeEarnings'.tr,
             value: partnerMoney(ledger?.lifetimeNaira ?? 0),
-            note: 'Total earned to date',
+            note: 'partner.totalToDate'.tr,
           ),
         ),
       ],
@@ -222,7 +221,7 @@ class _Table extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Earnings', style: CustomTextStyles.partnerSection),
+        Text('partner.earnings'.tr, style: CustomTextStyles.partnerSection),
         SizedBox(height: 12.v),
         Container(
           height: 52.v,
@@ -305,7 +304,7 @@ class _EarningRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Wholesale Payout Amount',
+                    Text('partner.wholesaleAmount'.tr,
                         style: CustomTextStyles.partnerMeta),
                     SizedBox(height: 2.v),
                     Text(partnerMoney(earning.payoutNaira),
@@ -361,7 +360,7 @@ class _EarningRow extends StatelessWidget {
                             color: appTheme.soothifyBlue,
                           ),
                         )
-                      : Text('Dispute Check-In',
+                      : Text('partner.disputeCheckInShort'.tr,
                           style: CustomTextStyles.partnerStatus.copyWith(
                             color: appTheme.soothifyBlue,
                           )),

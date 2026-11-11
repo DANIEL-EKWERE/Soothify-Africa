@@ -43,13 +43,13 @@ class IntroScreen extends GetView<IntroController> {
                   behavior: HitTestBehavior.opaque,
                   child: Semantics(
                     button: true,
-                    child: Text('Skip', style: CustomTextStyles.skipAction),
+                    child: Text('auth.skip'.tr, style: CustomTextStyles.skipAction),
                   ),
                 ),
               ),
             ),
             GradientText(
-              'Welcome to Soothify',
+              'auth.introWelcome'.tr,
               gradient: appTheme.titleGradient,
               textAlign: TextAlign.center,
               style: CustomTextStyles.onboardingScreenTitle,
@@ -81,7 +81,7 @@ class IntroScreen extends GetView<IntroController> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.h),
               child: CustomElevatedButton(
-                text: 'Get started',
+                text: 'auth.getStarted'.tr,
                 onPressed: controller.start,
               ),
             ),

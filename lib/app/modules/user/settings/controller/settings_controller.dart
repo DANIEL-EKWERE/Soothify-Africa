@@ -256,7 +256,7 @@ class SettingsController extends BaseController {
     return showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete your account?'),
+        title: Text('settings.deleteTitle'.tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +265,7 @@ class SettingsController extends BaseController {
               social
                   ? 'Type your email address to confirm. This cannot be '
                       'undone.'
-                  : 'Enter your password to confirm. This cannot be undone.',
+                  : 'settings.confirmPassword'.tr,
             ),
             SizedBox(height: 12.v),
             TextField(
@@ -281,11 +281,11 @@ class SettingsController extends BaseController {
         actions: [
           TextButton(
             onPressed: () => Get.back<String>(result: null),
-            child: const Text('Keep my account'),
+            child: Text('settings.keepAccount'.tr),
           ),
           TextButton(
             onPressed: () => Get.back<String>(result: field.text.trim()),
-            child: const Text('Delete'),
+            child: Text('settings.delete'.tr),
           ),
         ],
       ),

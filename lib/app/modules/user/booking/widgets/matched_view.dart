@@ -52,7 +52,7 @@ class _Matched extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 32.v),
       children: [
         SizedBox(height: 51.v),
-        Text('Awesome! You matched with',
+        Text('booking.matchedWith'.tr,
             style: CustomTextStyles.matchedLead),
         SizedBox(height: 46.v),
         GradientText(

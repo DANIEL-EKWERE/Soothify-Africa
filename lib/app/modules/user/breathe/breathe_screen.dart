@@ -5,6 +5,7 @@ import '../../../widgets/confetti_overlay.dart';
 import '../../../widgets/custom_elevated_button.dart';
 import '../../../widgets/custom_ghost_button.dart';
 import 'controller/breathe_controller.dart';
+import 'widgets/breath_waves.dart';
 
 /// The 60-second breathing minute — Figma's "Push Notification" section:
 /// `313:25770` (invitation), `313:25785` (countdown) and `313:25825`
@@ -52,7 +53,7 @@ class BreatheScreen extends GetView<BreatheController> {
                   ),
                 ),
                 SizedBox(height: 69.v),
-                const Center(child: _BreathCircle()),
+                const _BreathVisual(),
                 SizedBox(height: 44.v),
                 Expanded(
                   child: Obx(
@@ -72,6 +73,35 @@ class BreatheScreen extends GetView<BreatheController> {
                   : const SizedBox.shrink(),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// What sits above the words: the waves while the minute runs, the circle
+/// either side of it.
+///
+/// The circle greets you on the invitation and is what you finish on; the
+/// waves are what you breathe along with in between. A crossfade between
+/// them, so pressing Start and reaching the end are not a cut. The box is
+/// the circle's own height either way, so nothing under it moves.
+class _BreathVisual extends StatelessWidget {
+  const _BreathVisual();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<BreatheController>();
+    return SizedBox(
+      height: 210.h,
+      child: Obx(
+        () => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 450),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: controller.phase.value == BreathePhase.active
+              ? BreathWaves(key: const ValueKey('waves'), height: 210.h)
+              : const Center(key: ValueKey('circle'), child: _BreathCircle()),
         ),
       ),
     );

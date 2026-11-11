@@ -56,7 +56,7 @@ class CareGuaranteeScreen extends GetView<BookingPaymentController> {
                     ),
                   ),
                   Expanded(
-                    child: Text('Schedule',
+                    child: Text('nav.schedule'.tr,
                         textAlign: TextAlign.center,
                         style: CustomTextStyles.appBarTitle),
                   ),
@@ -65,14 +65,13 @@ class CareGuaranteeScreen extends GetView<BookingPaymentController> {
               ),
               SizedBox(height: 51.v),
               GradientText(
-                'Confirm booking',
+                'booking.confirm'.tr,
                 gradient: appTheme.authHeaderGradient,
                 style: CustomTextStyles.kycQuestion,
               ),
               SizedBox(height: 16.v),
               Text(
-                'Secure your spot to unlock your calendar link and start your '
-                'journey',
+                'payment.securePlace'.tr,
                 style: CustomTextStyles.policyScreenBody,
               ),
               SizedBox(height: 32.v),
@@ -86,10 +85,10 @@ class CareGuaranteeScreen extends GetView<BookingPaymentController> {
               Obx(
                 () => CustomElevatedButton(
                   text: controller.paying.value
-                      ? 'Waiting for payment\u2026'
+                      ? 'payment.waiting'.tr
                       : controller.isLoading.value
-                          ? 'Opening checkout\u2026'
-                          : 'Pay with card',
+                          ? 'payment.openingCheckout'.tr
+                          : 'payment.payWithCard'.tr,
                   onPressed: controller.paying.value || controller.isLoading.value
                       ? null
                       : controller.pay,
@@ -181,7 +180,7 @@ class _Summary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Session', style: CustomTextStyles.summaryLabel),
+              Text('payment.session'.tr, style: CustomTextStyles.summaryLabel),
               Text(price, style: CustomTextStyles.summaryValue),
             ],
           ),
@@ -189,7 +188,7 @@ class _Summary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Total', style: CustomTextStyles.summaryValue),
+              Text('payment.total'.tr, style: CustomTextStyles.summaryValue),
               Text(price, style: CustomTextStyles.summaryValue),
             ],
           ),

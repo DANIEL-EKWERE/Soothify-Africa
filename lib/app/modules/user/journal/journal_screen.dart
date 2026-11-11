@@ -35,7 +35,7 @@ class JournalScreen extends GetView<JournalController> {
           ),
           onPressed: Get.back,
         ),
-        title: const Text('Journal'),
+        title: Text('journal.title'.tr),
       ),
       // Only the journal's own tab can be written to; the other holds what an
       // expert left, so the button would have nothing to do there.
@@ -288,14 +288,13 @@ class _EmptyState extends StatelessWidget {
           ),
           SizedBox(height: 40.v),
           Text(
-            'No entries yet',
+            'journal.empty'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.emptyStateTitle,
           ),
           SizedBox(height: 8.v),
           Text(
-            'There are no limits on topics in your Notepad. Write down how '
-            'feel, what you’re planning, or simply something you noticed.',
+            'journal.emptyBody'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.emptyStateBody,
           ),

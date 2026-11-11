@@ -46,9 +46,9 @@ class HomeTabController extends BaseController {
   /// The unsigned header's greeting. The frame prints "Good morning".
   String get greeting {
     final h = _now().hour;
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return 'home.greetingMorning'.tr;
+    if (h < 17) return 'home.greetingAfternoon'.tr;
+    return 'home.greetingEvening'.tr;
   }
 
   /// The signed-in person's first name, once it has arrived.

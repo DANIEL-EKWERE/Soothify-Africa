@@ -37,7 +37,7 @@ class RosterScreen extends GetView<RosterController> {
                   ),
                 ),
                 Expanded(
-                  child: Text('Live roster & verification',
+                  child: Text('partner.rosterTitle'.tr,
                       textAlign: TextAlign.center,
                       style: CustomTextStyles.partnerCardTitle
                           .copyWith(fontSize: 16.fSize)),
@@ -152,11 +152,11 @@ class _OfflineBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Offline Mode Active',
+          Text('partner.offlineTitle'.tr,
               style: CustomTextStyles.partnerCardTitle
                   .copyWith(color: appTheme.partnerOfflineInk)),
           SizedBox(height: 4.v),
-          Text('Check-ins will sync automatically when reconnected.',
+          Text('partner.offlineSync'.tr,
               style: CustomTextStyles.partnerMeta
                   .copyWith(color: appTheme.partnerOfflineInk)),
         ],
@@ -186,7 +186,7 @@ class _GrantedBanner extends StatelessWidget {
               style: CustomTextStyles.partnerCardTitle
                   .copyWith(color: appTheme.partnerOkInk)),
           SizedBox(height: 4.v),
-          Text('Report sent to admin log · Code Expired',
+          Text('partner.reportSent'.tr,
               style: CustomTextStyles.partnerMeta
                   .copyWith(color: appTheme.partnerOkInk)),
         ],
@@ -212,7 +212,7 @@ class _Verification extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Front desk verification',
+          Text('partner.frontDesk'.tr,
               style: CustomTextStyles.partnerSection),
           SizedBox(height: 14.v),
           InkWell(
@@ -225,18 +225,18 @@ class _Verification extends StatelessWidget {
                 color: appTheme.soothifyBlue,
                 borderRadius: BorderRadius.circular(10.h),
               ),
-              child: Text('Scan Passport QR Code',
+              child: Text('partner.scanQr'.tr,
                   style: CustomTextStyles.partnerCardTitle
                       .copyWith(color: appTheme.onPrimary)),
             ),
           ),
           SizedBox(height: 12.v),
           Text(
-            'Or use the member’s entry code if the network or camera fails.',
+            'partner.orUseCode'.tr,
             style: CustomTextStyles.partnerMeta,
           ),
           SizedBox(height: 14.v),
-          Text('Member entry code',
+          Text('partner.memberCode'.tr,
               style: CustomTextStyles.partnerStatus
                   .copyWith(color: appTheme.textPrimary)),
           SizedBox(height: 8.v),
@@ -273,7 +273,7 @@ class _Verification extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8.v),
-          Text('Enter the 6-character code; the hyphen is automatic.',
+          Text('partner.codeHelp'.tr,
               style: CustomTextStyles.partnerMeta
                   .copyWith(fontSize: 11.fSize)),
           SizedBox(height: 14.v),
@@ -302,7 +302,7 @@ class _Verification extends StatelessWidget {
                           color: appTheme.passportAction,
                         ),
                       )
-                    : Text('Verify Entry Code',
+                    : Text('partner.verifyCode'.tr,
                         style: CustomTextStyles.partnerCardTitle.copyWith(
                           color: controller.canVerify
                               ? appTheme.passportAction
@@ -342,7 +342,7 @@ class _Failure extends StatelessWidget {
               Icon(Icons.error_outline,
                   size: 20.h, color: appTheme.partnerWarnInk),
               SizedBox(width: 8.h),
-              Text('Check-in unsuccessful',
+              Text('partner.checkInFailed'.tr,
                   style: CustomTextStyles.partnerSection),
             ],
           ),
@@ -371,7 +371,7 @@ class _Failure extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10.h),
                       border: Border.all(color: appTheme.cardRim),
                     ),
-                    child: Text('Try Again',
+                    child: Text('common.retry'.tr,
                         style: CustomTextStyles.partnerCardTitle
                             .copyWith(color: appTheme.soothifyBlue)),
                   ),
@@ -391,7 +391,7 @@ class _Failure extends StatelessWidget {
                       color: appTheme.soothifyBlue,
                       borderRadius: BorderRadius.circular(10.h),
                     ),
-                    child: Text('Dispute Check in',
+                    child: Text('partner.disputeCheckIn'.tr,
                         style: CustomTextStyles.partnerCardTitle
                             .copyWith(color: appTheme.onPrimary)),
                   ),
@@ -401,8 +401,7 @@ class _Failure extends StatelessWidget {
           ),
           SizedBox(height: 12.v),
           Text(
-            'Grant entry now. The issue will be sent to the admin log for '
-            'review.',
+            'partner.grantNowBody'.tr,
             style: CustomTextStyles.partnerMeta
                 .copyWith(fontSize: 11.fSize),
           ),
@@ -427,7 +426,7 @@ class _RosterTable extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text('Passport members',
+              child: Text('partner.passportMembers'.tr,
                   style: CustomTextStyles.partnerSection),
             ),
             Text('${roster.bookings} booked',
@@ -466,19 +465,19 @@ class _RosterTable extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 4,
-                    child: Text('Member Name',
+                    child: Text('partner.memberName'.tr,
                         style: CustomTextStyles.partnerMeta
                             .copyWith(fontSize: 11.fSize)),
                   ),
                   Expanded(
                     flex: 3,
-                    child: Text('Tier Tag',
+                    child: Text('partner.tierTag'.tr,
                         style: CustomTextStyles.partnerMeta
                             .copyWith(fontSize: 11.fSize)),
                   ),
                   Expanded(
                     flex: 4,
-                    child: Text('Check-in Status',
+                    child: Text('partner.checkInStatus'.tr,
                         textAlign: TextAlign.right,
                         style: CustomTextStyles.partnerMeta
                             .copyWith(fontSize: 11.fSize)),

@@ -6,6 +6,8 @@
 /// booking requests, and work the door on the day.
 library;
 
+import 'package:get/get.dart';
+
 /// Where a request has got to. The frames draw only the pending state, but
 /// the two buttons under it say what the other two are.
 enum StudioRequestStatus {
@@ -94,12 +96,14 @@ class StudioBookingRequest {
 
 /// Whether the guest is through the door.
 enum StudioArrival {
-  checkedIn('Checked In'),
-  awaiting('Awaiting Arrival');
+  checkedIn('partner.checkedIn'),
+  awaiting('partner.awaitingArrival');
 
-  const StudioArrival(this.label);
+  const StudioArrival(this._key);
 
-  final String label;
+  final String _key;
+
+  String get label => _key.tr;
 }
 
 /// One row of "Today's Guests".

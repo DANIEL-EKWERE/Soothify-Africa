@@ -35,11 +35,11 @@ class ExpertDashboardScreen extends GetView<ExpertDashboardController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Upcoming Sessions',
+                  Text('expert.upcomingSessions'.tr,
                       style: CustomTextStyles.expertSection),
                   InkWell(
                     onTap: controller.seeAllSessions,
-                    child: Text('See All',
+                    child: Text('common.seeAll'.tr,
                         style: CustomTextStyles.expertSeeAll),
                   ),
                 ],
@@ -47,7 +47,7 @@ class ExpertDashboardScreen extends GetView<ExpertDashboardController> {
               SizedBox(height: 16.v),
               const _SessionPreview(),
               SizedBox(height: 28.v),
-              Text('Quick Actions', style: CustomTextStyles.expertSection),
+              Text('expert.quickActions'.tr, style: CustomTextStyles.expertSection),
               SizedBox(height: 16.v),
               const _QuickActions(),
             ],
@@ -85,7 +85,7 @@ class _Greeting extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Welcome back,', style: CustomTextStyles.expertGreeting),
+              Text('expert.welcomeBack'.tr, style: CustomTextStyles.expertGreeting),
               SizedBox(height: 1.v),
               // The frame sets the badge immediately after the name, not at
               // the end of the line: "Baraqhat" is 83 wide from x=75 and the
@@ -120,7 +120,7 @@ class _Greeting extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 1.v),
-              Text('You’re making a real difference.',
+              Text('expert.difference'.tr,
                   style: CustomTextStyles.expertGreetingSub),
             ],
           ),
@@ -215,7 +215,7 @@ class _EarningsCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Total Earnings this week',
+                        Text('expert.totalThisWeek'.tr,
                             style: CustomTextStyles.expertEarningsCaption),
                         SizedBox(height: 4.v),
                         Text(
@@ -265,7 +265,7 @@ class _SessionPreview extends StatelessWidget {
         );
       }
       if (controller.sessions.isEmpty) {
-        return Text('Nothing booked yet.',
+        return Text('expert.nothingBooked'.tr,
             style: CustomTextStyles.expertCardMeta);
       }
       return Column(
@@ -275,7 +275,7 @@ class _SessionPreview extends StatelessWidget {
               child: ExpertSessionCard(
                 session: session,
                 now: controller.now,
-                actionLabel: 'Join call',
+                actionLabel: 'expert.joinCall'.tr,
                 onAction: () => controller.joinCall(session),
                 onTap: () => controller.openNotes(session),
               ),
@@ -306,8 +306,8 @@ class _QuickActions extends StatelessWidget {
           Expanded(
             child: _ActionTile(
               iconPath: ImageConstant.icCalendarOutline,
-              title: 'Update Availability',
-              body: 'Set your available days and time slots.',
+              title: 'expert.updateAvailability'.tr,
+              body: 'expert.updateAvailabilityBody'.tr,
               onTap: controller.openAvailability,
             ),
           ),
@@ -315,8 +315,8 @@ class _QuickActions extends StatelessWidget {
           Expanded(
             child: _ActionTile(
               iconPath: ImageConstant.icNoteEdit,
-              title: 'Add Session Notes',
-              body: 'Keep track of your sessions and client progress.',
+              title: 'expert.addSessionNotes'.tr,
+              body: 'expert.addSessionNotesBody'.tr,
               onTap: controller.openSessionNotes,
             ),
           ),

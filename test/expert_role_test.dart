@@ -17,6 +17,8 @@ import 'package:soothifyafrica/app/modules/practitioner/widgets/expert_money.dar
 import 'package:soothifyafrica/app/modules/practitioner/widgets/expert_session_card.dart';
 
 import 'package:soothifyafrica/app/core/app_export.dart';
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 
 import 'helpers.dart';
 
@@ -189,6 +191,13 @@ void main() {
 
     test('is labelled from the frame, not from the layers it was built on',
         () {
+      // The labels are looked up now, so the catalogue has to be loaded —
+      // outside a GetMaterialApp nothing else registers it.
+      Get.addTranslations(AppTranslations().keys);
+      // Assigned, not `updateLocale`: that one reassembles the app, which
+      // asserts it is inside a widget test — and this one is not.
+      Get.locale = AppLanguage.english.locale;
+
       // The design's text layers are still named "Plans" and "Discovery".
       expect(ExpertTab.values.map((t) => t.label),
           ['Home', 'Schedule', 'Earnings', 'Notes']);

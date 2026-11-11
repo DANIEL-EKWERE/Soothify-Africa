@@ -70,7 +70,7 @@ void main() {
 
     await pumpScreen(tester, const PassportTiersScreen());
 
-    expect(find.text('Soothify Passport'), findsOneWidget);
+    expect(findSoothify('Soothify Passport'), findsOneWidget);
     expect(find.text('Find Your Rhythm'), findsOneWidget);
 
     // The page is 1548 tall against an 844 viewport, so the third card is

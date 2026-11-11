@@ -156,6 +156,7 @@ class _Body extends StatelessWidget {
     return switch (block) {
       ArticleHeading() => 26,
       ArticleImage() => 20,
+      ArticleTable() => 18,
       _ => previous is ArticleHeading ? 10 : 16,
     };
   }
@@ -203,6 +204,7 @@ class _Body extends StatelessWidget {
           onTap: controller.followTap,
         ),
       ArticleImage(:final url, :final alt) => _BodyImage(url: url, alt: alt),
+      ArticleTable() => _BodyTable(table: block, onTap: controller.followTap),
     };
   }
 }
@@ -249,6 +251,82 @@ class _List extends StatelessWidget {
       ],
     );
   }
+}
+
+/// A table in the body.
+///
+/// Fills the width when its columns fit, and scrolls sideways when they do
+/// not. Squeezing six columns into a phone's width gives each one a word
+/// per line, which is a table nobody can read; a table that scrolls is one
+/// they can.
+class _BodyTable extends StatelessWidget {
+  const _BodyTable({required this.table, required this.onTap});
+
+  final ArticleTable table;
+  final void Function(ArticleTap) onTap;
+
+  /// The narrowest a column may be before the table scrolls instead.
+  static const minColumn = 104.0;
+
+  /// The width each column is given once it scrolls.
+  static const scrollingColumn = 140.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final fits = table.columns * minColumn.h <= constraints.maxWidth;
+      final grid = Table(
+        defaultColumnWidth: fits
+            ? const FlexColumnWidth()
+            : FixedColumnWidth(scrollingColumn.h),
+        defaultVerticalAlignment: TableCellVerticalAlignment.top,
+        border: TableBorder(
+          horizontalInside: BorderSide(color: appTheme.cardBorder),
+          verticalInside: BorderSide(color: appTheme.cardBorder),
+        ),
+        children: [
+          TableRow(
+            decoration: BoxDecoration(color: appTheme.surfaceAlt),
+            children: [
+              for (final cell in table.header)
+                _cell(cell, CustomTextStyles.articleTableHead),
+            ],
+          ),
+          for (final row in table.rows)
+            TableRow(children: [
+              for (final cell in row)
+                _cell(cell, CustomTextStyles.articleTableCell),
+            ]),
+        ],
+      );
+
+      final framed = Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: appTheme.cardBorder),
+          borderRadius: BorderRadius.circular(10.h),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.h),
+          child: grid,
+        ),
+      );
+
+      return fits
+          ? framed
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                width: table.columns * scrollingColumn.h,
+                child: framed,
+              ),
+            );
+    });
+  }
+
+  Widget _cell(List<ArticleSpan> spans, TextStyle style) => Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.h, vertical: 9.v),
+        child: _LinkedProse(spans: spans, onTap: onTap, style: style),
+      );
 }
 
 /// A picture partway through the body, with its alt text as a caption.

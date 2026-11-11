@@ -208,7 +208,7 @@ class _PlanSummary extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text('Total today', style: CustomTextStyles.paymentTotalLabel),
+              Text('payment.totalToday'.tr, style: CustomTextStyles.paymentTotalLabel),
               const Spacer(),
               Text(
                 controller.dueToday,
@@ -367,7 +367,7 @@ class _MethodOption extends StatelessWidget {
               Row(
                 children: [
                   Icon(Icons.apple, size: 20.h, color: appTheme.textPrimary),
-                  Text('Pay', style: CustomTextStyles.paymentWallet),
+                  Text('payment.pay'.tr, style: CustomTextStyles.paymentWallet),
                 ],
               ),
           ],
@@ -616,7 +616,7 @@ class _PromoRow extends StatelessWidget {
           ),
           InkWell(
             onTap: controller.applyPromo,
-            child: Text('Apply', style: CustomTextStyles.paymentApply),
+            child: Text('payment.apply'.tr, style: CustomTextStyles.paymentApply),
           ),
         ],
       ),

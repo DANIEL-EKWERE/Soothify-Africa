@@ -45,20 +45,19 @@ class _SavedDestination extends GetView<PayoutController> {
     return Column(
       children: [
         SizedBox(height: 33.v),
-        const ExpertHeader(title: 'Payout method'),
+        ExpertHeader(title: 'expert.payoutMethod'.tr),
         Expanded(
           child: ListView(
             padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
             children: [
               // The frame sets this heading at 20, a step above the section
               // headings elsewhere — it is the screen's own title.
-              Text('Payout Method',
+              Text('expert.payoutMethodHeading'.tr,
                   style: CustomTextStyles.expertSection
                       .copyWith(fontSize: 20.fSize)),
               SizedBox(height: 8.v),
               Text(
-                'This is where your earnings will be sent. You can edit your '
-                'details anytime.',
+                'expert.payoutMethodBody'.tr,
                 style: CustomTextStyles.expertBlurb,
               ),
               SizedBox(height: 32.v),
@@ -98,7 +97,7 @@ class _SavedDestination extends GetView<PayoutController> {
                   borderRadius: BorderRadius.circular(8.h),
                   border: Border.all(color: appTheme.soothifyBlue),
                 ),
-                child: Text('+  Add New Payout Method',
+                child: Text('expert.addNewPayoutMethod'.tr,
                     style: CustomTextStyles.subscribeLabel
                         .copyWith(color: appTheme.soothifyBlue)),
               ),
@@ -108,7 +107,7 @@ class _SavedDestination extends GetView<PayoutController> {
         Padding(
           padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
           child: CustomElevatedButton(
-            text: 'Back to Earnings',
+            text: 'expert.backToEarnings'.tr,
             onPressed: Get.back,
           ),
         ),
@@ -153,7 +152,7 @@ class _DestinationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Bank Transfer (NGN)',
+                Text('expert.bankTransferNgn'.tr,
                     style: CustomTextStyles.expertCardMeta),
                 SizedBox(height: 6.v),
                 Text(destination.bank,
@@ -177,7 +176,7 @@ class _DestinationCard extends StatelessWidget {
                   color: appTheme.success.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8.h),
                 ),
-                child: Text('Active',
+                child: Text('expert.active'.tr,
                     style: CustomTextStyles.expertCardMeta
                         .copyWith(color: appTheme.success)),
               ),
@@ -214,7 +213,7 @@ class _Chooser extends GetView<PayoutController> {
     return Column(
           children: [
             SizedBox(height: 33.v),
-            const ExpertHeader(title: 'Payout method'),
+            ExpertHeader(title: 'expert.payoutMethod'.tr),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 25.v, 24.h, 24.v),
@@ -222,8 +221,7 @@ class _Chooser extends GetView<PayoutController> {
                   SoothifyText(
                     // The frame drops a verb: "Choose how you'd like to your
                     // payments from Soothify."
-                    'Choose how you’d like to receive your payments from '
-                    'Soothify.',
+                    'expert.chooseMethodBody'.tr,
                     style: CustomTextStyles.expertBlurb,
                   ),
                   SizedBox(height: 32.v),
@@ -248,7 +246,7 @@ class _Chooser extends GetView<PayoutController> {
             Padding(
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
               child: CustomElevatedButton(
-                text: 'Proceed',
+                text: 'common.proceed'.tr,
                 onPressed: controller.proceed,
               ),
             ),
@@ -351,7 +349,7 @@ class Assurance extends StatelessWidget {
                 Text(
                   // The frame writes "All payment are processed securely by
                   // Paystack."
-                  'All payments are processed securely by Paystack.',
+                  'expert.paystackNote'.tr,
                   style: CustomTextStyles.payoutAssurance,
                 ),
                 SizedBox(height: 10.v),

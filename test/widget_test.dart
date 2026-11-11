@@ -5,10 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 
 import 'package:soothifyafrica/app/core/errors/app_exception.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/mood.dart';
 import 'package:soothifyafrica/app/routes/app_pages.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
@@ -59,6 +61,12 @@ void main() {
   // records screen, as the designed flow does.
   Widget wrap(Widget child) => Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           theme: theme,
           getPages: AppPages.pages,
           home: child,

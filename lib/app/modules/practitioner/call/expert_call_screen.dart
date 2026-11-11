@@ -129,7 +129,7 @@ class _RecommendOffer extends StatelessWidget {
             children: [
               Icon(Icons.ios_share, size: 18.h, color: appTheme.textPrimary),
               SizedBox(width: 10.h),
-              Text('Recommend Contents',
+              Text('expert.recommendContents'.tr,
                   style: CustomTextStyles.expertRowLabel),
             ],
           ),

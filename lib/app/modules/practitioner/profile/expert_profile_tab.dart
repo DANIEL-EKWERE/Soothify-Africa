@@ -25,7 +25,7 @@ class ExpertProfileTab extends GetView<ExpertDashboardController> {
           child: Column(
             children: [
               SizedBox(height: 33.v),
-              Text('Profile', style: CustomTextStyles.appBarTitle),
+              Text('nav.profile'.tr, style: CustomTextStyles.appBarTitle),
               SizedBox(height: 48.v),
               ClipOval(
                 child: CustomImageView(
@@ -42,8 +42,7 @@ class ExpertProfileTab extends GetView<ExpertDashboardController> {
               ),
               SizedBox(height: 32.v),
               Text(
-                'Your availability, session notes and earnings are on their '
-                'own tabs.',
+                'expert.profileBody'.tr,
                 textAlign: TextAlign.center,
                 style: CustomTextStyles.expertCardMeta,
               ),
@@ -51,12 +50,12 @@ class ExpertProfileTab extends GetView<ExpertDashboardController> {
               // The expert's Settings had no door at all — the list existed
               // and nothing opened it, which also stranded the protection hub.
               CustomGhostButton(
-                text: 'Settings',
+                text: 'expert.settings'.tr,
                 onPressed: () => Get.toNamed(AppRoutes.settings),
               ),
               const Spacer(),
               CustomGhostButton(
-                text: 'Switch role',
+                text: 'expert.switchRole'.tr,
                 onPressed: () async {
                   await Get.find<SessionService>().signOut();
                   await Get.offAllNamed(AppRoutes.roleSelect);

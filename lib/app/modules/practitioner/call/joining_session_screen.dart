@@ -33,7 +33,7 @@ class JoiningSessionScreen extends GetView<JoiningSessionController> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 17.v, 24.h, 24.v),
                 children: [
-                  Text('You’re joining a live session with your client.',
+                  Text('expert.joiningLive'.tr,
                       style: CustomTextStyles.expertBlurb),
                   SizedBox(height: 33.v),
                   // The pulse is the room opening. Not pulsing at a

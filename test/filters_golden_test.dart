@@ -3,8 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/library_section.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
@@ -189,6 +191,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           debugShowCheckedModeBanner: false,
           theme: theme,
           getPages: AppPages.pages,
@@ -269,6 +277,12 @@ void main() {
       await tester.pumpWidget(
         Sizer(
           builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
             debugShowCheckedModeBanner: false,
             theme: theme,
             darkTheme: darkTheme,
@@ -314,6 +328,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           debugShowCheckedModeBanner: false,
           theme: theme,
           getPages: AppPages.pages,
@@ -378,6 +398,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           debugShowCheckedModeBanner: false,
           theme: theme,
           getPages: AppPages.pages,

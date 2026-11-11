@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/data/models/profile_stats.dart';
 import 'package:soothifyafrica/app/data/models/user_profile.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
@@ -39,6 +42,14 @@ class _Profiles implements ProfileRepository {
 }
 
 void main() {
+  // The greeting is looked up rather than spelled out, so the catalogue
+  // has to be loaded: no GetMaterialApp runs here to do it. Assigned
+  // instead of `updateLocale`, which asserts it is inside a widget test.
+  setUpAll(() {
+    Get.addTranslations(AppTranslations().keys);
+    Get.locale = AppLanguage.english.locale;
+  });
+
   DateTime morning() => DateTime(2024, 7, 15, 9, 41);
 
   HomeTabController build(ProfileRepository? profiles) => HomeTabController(

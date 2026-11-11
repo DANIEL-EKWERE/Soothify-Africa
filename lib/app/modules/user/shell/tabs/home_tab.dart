@@ -122,7 +122,7 @@ class _Header extends StatelessWidget {
                 ),
               SizedBox(height: 1.h),
               Text(
-                'How are you today?',
+                'home.howAreYou'.tr,
                 style: CustomTextStyles.homeGreetingSub,
               ),
             ],
@@ -207,7 +207,7 @@ class _MoodCheckerCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Mood Checker', style: CustomTextStyles.homeCardTitle),
+                  Text('home.moodChecker'.tr, style: CustomTextStyles.homeCardTitle),
                   SizedBox(height: 2.h),
                   Text(
                     'Take a moment to check in with yourself. Be gentle and '
@@ -241,7 +241,7 @@ class _ExploreSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Explore', style: CustomTextStyles.sectionTitle),
+        Text('home.explore'.tr, style: CustomTextStyles.sectionTitle),
         SizedBox(height: 16.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -335,12 +335,13 @@ class _RecommendedSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Recommended for you', style: CustomTextStyles.sectionTitle),
+            Text('home.recommended'.tr,
+                style: CustomTextStyles.sectionTitle),
             Obx(
               () => controller.hasMoreRecommended.value
                   ? InkWell(
                       onTap: controller.seeAllRecommended,
-                      child: Text('See more',
+                      child: Text('home.seeMore'.tr,
                           style: CustomTextStyles.seeAll),
                     )
                   // Only when there is more than the five shown: a link to
@@ -397,10 +398,11 @@ class _PopularSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Popular Content', style: CustomTextStyles.popularHeading),
+            Text('home.popular'.tr,
+                style: CustomTextStyles.popularHeading),
             GestureDetector(
               onTap: controller.seeAllPopular,
-              child: Text('See All', style: CustomTextStyles.seeAll),
+              child: Text('home.seeAll'.tr, style: CustomTextStyles.seeAll),
             ),
           ],
         ),

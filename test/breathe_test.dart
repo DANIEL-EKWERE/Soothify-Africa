@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/modules/user/breathe/breathe_screen.dart';
 import 'package:soothifyafrica/app/modules/user/breathe/controller/breathe_controller.dart';
+import 'package:soothifyafrica/app/modules/user/breathe/widgets/breath_waves.dart';
 
 import 'helpers.dart';
 
@@ -67,7 +68,50 @@ void main() {
     expect(BreatheCue.at(13).$1, BreatheCue.inhale);
   });
 
-  testWidgets('the circle grows through the inhale and settles on the exhale',
+  test('the breath fills on the inhale, holds, and empties on the exhale', () {
+    expect(BreatheCue.fullnessAt(0), closeTo(0, 0.001));
+    // Flutter's easeInOutSine is a cubic approximation: a hair off 0.5.
+    expect(BreatheCue.fullnessAt(2), closeTo(0.5, 0.01));
+    expect(BreatheCue.fullnessAt(4), closeTo(1, 0.001));
+    expect(BreatheCue.fullnessAt(5), closeTo(1, 0.001));
+    expect(BreatheCue.fullnessAt(9), closeTo(0.5, 0.01));
+    expect(BreatheCue.fullnessAt(11.99), closeTo(0, 0.01));
+  });
+
+  // The circle, found by its shape rather than by position in the tree.
+  final circle = find.byWidgetPredicate((w) =>
+      w is Container &&
+      w.decoration is BoxDecoration &&
+      (w.decoration! as BoxDecoration).shape == BoxShape.circle);
+
+  final waves = find.byType(BreathWaves);
+
+  testWidgets('the circle either side of the minute, the waves during it',
+      (tester) async {
+    final c = await mount(tester);
+
+    // Before: the circle, as it always was.
+    expect(circle, findsOneWidget);
+    expect(waves, findsNothing);
+
+    // During: the waves, and no circle once the crossfade is done.
+    c.phase.value = BreathePhase.active;
+    c.remaining.value = 59;
+    await tester.pumpAndSettle();
+    expect(waves, findsOneWidget);
+    expect(circle, findsNothing);
+
+    // After: the circle again, untouched.
+    c.phase.value = BreathePhase.done;
+    c.streak.value = 1;
+    await tester.pumpAndSettle();
+    expect(circle, findsOneWidget);
+    expect(waves, findsNothing);
+    expect(tester.getSize(circle).width, closeTo(210, 1),
+        reason: 'the circle you finish on is the size the frames draw it');
+  });
+
+  testWidgets('the waves rise through the inhale and settle on the exhale',
       (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
@@ -76,37 +120,45 @@ void main() {
     // Motion on: this is the one test that is about the movement itself.
     await pumpScreen(tester, const BreatheScreen(), motion: true);
 
-    // The circle, found by its shape rather than by position in the tree.
-    // Measured on screen, so the scale the Transform applies is in the figure.
-    final circle = find.byWidgetPredicate((w) =>
-        w is Container &&
-        w.decoration is BoxDecoration &&
-        (w.decoration! as BoxDecoration).shape == BoxShape.circle);
-    double scale() => tester.getRect(circle).width;
-
-    final still = scale();
+    BreathWavePainter painter() => tester
+        .widget<CustomPaint>(find.descendant(
+          of: waves,
+          matching: find.byType(CustomPaint),
+        ).first)
+        .painter! as BreathWavePainter;
 
     c.start();
     await tester.pump();
-    // The inhale starts from the bottom of the breath, so the circle is at
-    // its smallest the moment the minute begins.
-    final atStart = scale();
-    expect(atStart, lessThan(still));
+    await tester.pump(const Duration(milliseconds: 500));
+    // The inhale starts from the bottom of the breath.
+    final early = painter().fullness;
+    expect(early, lessThan(0.2));
 
     // Four seconds in is the top of the inhale.
-    await tester.pump(const Duration(seconds: 4));
-    final atTop = scale();
-    expect(atTop, greaterThan(atStart));
+    await tester.pump(const Duration(milliseconds: 3500));
+    final atTop = painter().fullness;
+    expect(atTop, greaterThan(0.95));
 
-    // Two more holds it there.
-    await tester.pump(const Duration(seconds: 2));
-    expect(scale(), closeTo(atTop, 1));
+    // Two more hold it there -- while the lines keep drifting.
+    final driftAtTop = painter().drift;
+    await tester.pump(const Duration(seconds: 1));
+    expect(painter().fullness, closeTo(atTop, 0.05));
+    expect(painter().drift, isNot(driftAtTop),
+        reason: 'the waves keep moving even during a hold');
 
-    // Then six seconds of exhale put it back where it started.
+    // Then the exhale settles them back down.
     await tester.pump(const Duration(seconds: 6));
-    expect(scale(), closeTo(atStart, 1));
+    expect(painter().fullness, lessThan(0.1));
 
     c.close();
+  });
+
+  testWidgets('the waves fill the width, edge to edge', (tester) async {
+    final c = await mount(tester);
+    c.phase.value = BreathePhase.active;
+    await tester.pumpAndSettle();
+    final screen = tester.view.physicalSize.width / tester.view.devicePixelRatio;
+    expect(tester.getSize(waves).width, closeTo(screen, 1));
   });
 
   testWidgets('the invitation is the frame’s own', (tester) async {

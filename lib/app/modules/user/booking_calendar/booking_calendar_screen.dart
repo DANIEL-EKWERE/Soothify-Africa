@@ -37,7 +37,7 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                   ),
                   Expanded(
                     child: Text(
-                      'Schedule',
+                      'nav.schedule'.tr,
                       textAlign: TextAlign.center,
                       style: CustomTextStyles.appBarTitle,
                     ),
@@ -51,7 +51,7 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                 padding: EdgeInsets.fromLTRB(24.h, 34.v, 24.h, 24.v),
                 children: [
                   Text(
-                    'Pick a day for your session',
+                    'booking.pickDay'.tr,
                     style: CustomTextStyles.coachSection,
                   ),
                   SizedBox(height: 20.v),
@@ -107,7 +107,7 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                     ),
                   ),
                   SizedBox(height: 28.v),
-                  Text('Pick a time', style: CustomTextStyles.coachSection),
+                  Text('booking.pickTime'.tr, style: CustomTextStyles.coachSection),
                   SizedBox(height: 12.v),
                   // Full-width rows, one per line, as the design draws them.
                   Obx(() {
@@ -132,7 +132,7 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
                       // The hours are the expert's own, so a day can have
                       // none left — saying so beats an empty gap.
                       return Text(
-                        'No times left on this day. Try another.',
+                        'booking.noTimes'.tr,
                         style: CustomTextStyles.coachBlurb,
                       );
                     }
@@ -156,7 +156,7 @@ class BookingCalendarScreen extends GetView<BookingCalendarController> {
               padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 32.v),
               child: Obx(
                 () => CustomElevatedButton(
-                  text: 'Confirm booking',
+                  text: 'booking.confirm'.tr,
                   isEnabled: controller.canConfirm,
                   onPressed: controller.canConfirm ? controller.confirm : null,
                 ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../data/models/studio_partner.dart';
 import '../../widgets/custom_elevated_button.dart';
+import '../../widgets/soothify_word.dart';
 import 'controller/partner_schedule_controller.dart';
 import 'widgets/partner_chrome.dart';
 
@@ -45,7 +46,7 @@ class PartnerScheduleScreen extends GetView<PartnerScheduleController> {
                   ),
                 ),
                 Expanded(
-                  child: Text('Master schedule & Soothify slots',
+                  child: SoothifyText('partner.scheduleHeader'.tr,
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -60,11 +61,11 @@ class PartnerScheduleScreen extends GetView<PartnerScheduleController> {
                 () => ListView(
                   padding: EdgeInsets.fromLTRB(24.h, 20.v, 24.h, 32.v),
                   children: [
-                    Text('Soothify slot manager',
+                    SoothifyText('partner.slotManager'.tr,
                         style: CustomTextStyles.partnerSection
                             .copyWith(fontSize: 20.fSize)),
                     SizedBox(height: 8.v),
-                    Text('Master schedule · Passport classes only',
+                    Text('partner.passportOnly'.tr,
                         style: CustomTextStyles.partnerMeta),
                     SizedBox(height: 20.v),
                     const _SpanSwitcher(),

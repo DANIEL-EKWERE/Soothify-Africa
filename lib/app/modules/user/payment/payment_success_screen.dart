@@ -58,7 +58,7 @@ class PaymentSuccessScreen extends GetView<BookingPaymentController> {
                         ),
                       ),
                       SizedBox(height: 34.v),
-                      Text('Your payment was successful',
+                      Text('payment.success'.tr,
                           style: CustomTextStyles.paymentSuccess),
                     ],
                   ),
@@ -68,7 +68,7 @@ class PaymentSuccessScreen extends GetView<BookingPaymentController> {
               Padding(
                 padding: EdgeInsets.fromLTRB(24.h, 0, 24.h, 25.v),
                 child: CustomElevatedButton(
-                  text: 'Continue',
+                  text: 'common.continue'.tr,
                   onPressed: controller.done,
                 ),
               ),

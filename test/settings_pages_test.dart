@@ -6,8 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:io';
 
+import 'package:soothifyafrica/app/core/l10n/app_translations.dart';
 import 'package:soothifyafrica/app/core/utils/image_constant.dart';
 import 'package:soothifyafrica/app/core/utils/size_utils.dart';
+import 'package:soothifyafrica/app/data/models/app_language.dart';
 import 'package:soothifyafrica/app/widgets/custom_image_view.dart';
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/routes/app_routes.dart';
@@ -39,6 +41,11 @@ void main() {
   setUp(() {
     PrefUtils.resetForTesting();
     SharedPreferences.setMockInitialValues({});
+    // The rows look their labels up, and `Get.reset` below drops the
+    // catalogue -- so it goes back before each test rather than once, or
+    // every label reads back as its own key.
+    Get.addTranslations(AppTranslations().keys);
+    Get.locale = AppLanguage.english.locale;
   });
   tearDown(Get.reset);
 
@@ -123,6 +130,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           theme: theme,
           builder: (context, widget) {
             PrimaryColors.syncFrom(context);
@@ -179,6 +192,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           theme: theme,
           builder: (context, widget) {
             PrimaryColors.syncFrom(context);
@@ -223,6 +242,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           theme: theme,
           builder: (context, widget) {
             PrimaryColors.syncFrom(context);
@@ -411,6 +436,12 @@ void main() {
     await tester.pumpWidget(
       Sizer(
         builder: (_, _, _) => GetMaterialApp(
+        // The same catalogue the app registers. Without it `.tr` answers
+        // with the key, so a screen under test reads "nav.home" where the
+        // app reads "Home".
+        translations: AppTranslations(),
+        locale: AppLanguage.english.locale,
+        fallbackLocale: AppLanguage.english.locale,
           theme: theme,
           builder: (context, widget) {
             PrimaryColors.syncFrom(context);

@@ -245,7 +245,7 @@ class _CancellationPolicy extends StatelessWidget {
                 color: appTheme.soothifyBlue,
               ),
               SizedBox(width: 17.h),
-              Text('Cancellation Policy',
+              Text('payment.cancellationPolicy'.tr,
                   style: CustomTextStyles.policyTitle),
             ],
           ),
@@ -269,7 +269,7 @@ class _CancellationPolicy extends StatelessWidget {
                 SizedBox(height: 11.v),
                 GestureDetector(
                   onTap: controller.openPolicy,
-                  child: Text('Payment & Policy',
+                  child: Text('payment.andPolicy'.tr,
                       style: CustomTextStyles.policyLink),
                 ),
               ],

@@ -29,7 +29,7 @@ class MoodRecordScreen extends GetView<MoodRecordController> {
           ),
           onPressed: Get.back,
         ),
-        title: const Text('Mood Records'),
+        title: Text('mood.records'.tr),
       ),
       body: SafeArea(
         child: Padding(
@@ -70,7 +70,7 @@ class MoodRecordScreen extends GetView<MoodRecordController> {
               ),
               const Spacer(),
               CustomGhostButton(
-                text: 'Return home',
+                text: 'common.returnHome'.tr,
                 onPressed: controller.returnHome,
               ),
               SizedBox(height: 43.h),

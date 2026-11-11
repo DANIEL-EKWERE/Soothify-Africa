@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
 import '../../../data/models/passport_tier.dart';
+import '../../../widgets/soothify_word.dart';
 import 'controller/passport_controller.dart';
 
 /// Choosing a Passport tier — Figma "Soothify Passport tier selection"
@@ -32,11 +33,10 @@ class PassportTiersScreen extends GetView<PassportController> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(24.h, 16.v, 24.h, 32.v),
                 children: [
-                  Text('Find Your Rhythm', style: CustomTextStyles.tierName),
+                  Text('passport.findRhythm'.tr, style: CustomTextStyles.tierName),
                   SizedBox(height: 8.v),
                   Text(
-                    'Choose the passport tier that matches your practice '
-                    'level.',
+                    'passport.chooseBody'.tr,
                     style: CustomTextStyles.passportFor,
                   ),
                   SizedBox(height: 24.v),
@@ -82,7 +82,7 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          Text('Soothify Passport', style: CustomTextStyles.appBarTitle),
+          SoothifyText('Soothify Passport', style: CustomTextStyles.appBarTitle),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:soothifyafrica/app/core/l10n/en.dart';
 import 'package:soothifyafrica/app/widgets/soothify_word.dart';
 
 import 'helpers.dart';
@@ -45,6 +46,51 @@ void main() {
 
     expect(offenders, isEmpty,
         reason: 'use SoothifyText for these:\n${offenders.join('\n')}');
+  });
+
+  test('nor behind a translation key', () {
+    // The test above reads the source, and the screens hold keys now -- so
+    // `Text('partner.dashboard'.tr)` hides the name from it while still
+    // printing the name. This resolves each key through the catalogue first,
+    // which is what closes that gap.
+    final branded = {
+      for (final entry in en.entries)
+        if (entry.value.contains(SoothifyWord.word)) entry.key,
+    };
+    expect(branded, isNotEmpty, reason: 'the catalogue should carry the name');
+
+    final offenders = <String>[];
+    final call = RegExp(r'(?<![A-Za-z])Text\(');
+
+    for (final file in Directory('lib')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.dart'))) {
+      final source = file.readAsStringSync();
+      for (final match in call.allMatches(source)) {
+        var depth = 0;
+        var i = match.end - 1;
+        for (; i < source.length; i++) {
+          if (source[i] == '(') depth++;
+          if (source[i] == ')') {
+            depth--;
+            if (depth == 0) break;
+          }
+        }
+        final args = source.substring(match.end, i < source.length ? i : null);
+        final asked = RegExp(r"'([a-z][A-Za-z]*(?:\.[A-Za-z]+)+)'\.tr")
+            .allMatches(args)
+            .map((m) => m.group(1)!);
+        if (!asked.any(branded.contains)) continue;
+        final line =
+            '\n'.allMatches(source.substring(0, match.start)).length + 1;
+        offenders.add('${file.path}:$line');
+      }
+    }
+
+    expect(offenders, isEmpty,
+        reason: 'these print the name through a key, so use SoothifyText:\n'
+            '${offenders.join('\n')}');
   });
 
   testWidgets('the mark is drawn, and the plain name is still readable',

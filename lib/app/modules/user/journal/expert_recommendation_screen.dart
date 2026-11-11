@@ -34,7 +34,7 @@ class ExpertRecommendationScreen
           ),
           onPressed: Get.back,
         ),
-        title: const Text('Journal'),
+        title: Text('journal.title'.tr),
       ),
       body: SafeArea(
         child: ListView(
@@ -42,7 +42,7 @@ class ExpertRecommendationScreen
           children: [
             _ExpertCard(recommendation: controller.recommendation),
             SizedBox(height: 36.5.v),
-            Text('Recommended Content', style: CustomTextStyles.shelfHeading),
+            Text('journal.recommendedContent'.tr, style: CustomTextStyles.shelfHeading),
             SizedBox(height: 20.5.v),
             ExpertContentCard(
               content: controller.recommendation.content,
@@ -134,7 +134,7 @@ class _ExpertCard extends StatelessWidget {
                       color: appTheme.soothifyBlue,
                     ),
                     SizedBox(width: 8.h),
-                    Text('Expert’s Note',
+                    Text('journal.expertNote'.tr,
                         style: CustomTextStyles.expertNoteLabel),
                   ],
                 ),

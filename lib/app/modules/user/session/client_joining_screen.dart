@@ -284,7 +284,7 @@ class _SafeSpacePanel extends StatelessWidget {
                 width: 20.h,
               ),
               SizedBox(width: 16.h),
-              Text('Your Safe Space is Protected',
+              Text('session.safeSpace'.tr,
                   style: CustomTextStyles.safeSpaceTitle),
             ],
           ),

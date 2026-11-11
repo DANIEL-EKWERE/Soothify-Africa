@@ -19,20 +19,20 @@ class RoleSelectScreen extends GetView<RoleSelectController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(),
-              Text('Welcome', style: theme.textTheme.displaySmall),
+              Text('auth.welcome'.tr, style: theme.textTheme.displaySmall),
               SizedBox(height: 8.v),
               SoothifyText(
-                'How will you be using Soothify Africa?',
+                'auth.roleQuestion'.tr,
                 style: theme.textTheme.bodyMedium,
               ),
               const Spacer(),
               CustomElevatedButton(
-                text: 'I am here to listen',
+                text: 'auth.roleListen'.tr,
                 onPressed: () => controller.choose(UserRole.user),
               ),
               SizedBox(height: 12.v),
               CustomElevatedButton(
-                text: 'I am a practitioner',
+                text: 'auth.rolePractitioner'.tr,
                 style: CustomButtonStyles.secondary,
                 onPressed: () => controller.choose(UserRole.practitioner),
               ),

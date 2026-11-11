@@ -95,7 +95,7 @@ class _Overview extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text('Real-Time Notifications',
+              child: Text('partner.realTime'.tr,
                   style: CustomTextStyles.partnerSection),
             ),
             Container(
@@ -107,7 +107,7 @@ class _Overview extends StatelessWidget {
               ),
             ),
             SizedBox(width: 5.h),
-            Text('Live',
+            Text('partner.live'.tr,
                 style: CustomTextStyles.partnerStatus
                     .copyWith(color: appTheme.partnerOkInk)),
           ],
@@ -138,7 +138,7 @@ class _Overview extends StatelessWidget {
             Icon(Icons.refresh_rounded,
                 size: 13.h, color: appTheme.partnerMuted),
             SizedBox(width: 6.h),
-            Text('Bookings update automatically in real time.',
+            Text('partner.bookingsLive'.tr,
                 style: CustomTextStyles.partnerMeta),
           ],
         ),
@@ -186,7 +186,7 @@ class _RequestCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('New Booking Request!',
+                    Text('partner.newBooking'.tr,
                         style: CustomTextStyles.partnerCardTitle),
                     SizedBox(height: 2.v),
                     Text(
@@ -346,7 +346,7 @@ class _GuestList extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Text('Today’s Guests',
+              child: Text('partner.todaysGuests'.tr,
                   style: CustomTextStyles.partnerSection),
             ),
             Icon(Icons.calendar_today_outlined,

@@ -33,7 +33,7 @@ class SignupScreen extends GetView<SignupController> {
                   // from the words it belongs to.
                   Flexible(
                     child: Text(
-                      'Create your account',
+                      'auth.createAccountTitle'.tr,
                       style: CustomTextStyles.authHeading,
                     ),
                   ),
@@ -47,20 +47,19 @@ class SignupScreen extends GetView<SignupController> {
               ),
               SizedBox(height: 8.h),
               Text(
-                'Rest assured that your personal information is securely '
-                'protected and never shared with third parties.',
+                'auth.signupBlurb'.tr,
                 style: CustomTextStyles.authBlurb,
               ),
               SizedBox(height: 24.h),
               FilledTextField(
-                label: 'Fullname',
+                label: 'auth.fullname'.tr,
                 controller: controller.fullnameController,
                 textCapitalization: TextCapitalization.words,
                 onChanged: (v) => controller.fullname.value = v,
               ),
               SizedBox(height: 24.h),
               FilledTextField(
-                label: 'Email Address',
+                label: 'auth.emailAddress'.tr,
                 controller: controller.emailController,
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (v) => controller.email.value = v,
@@ -68,7 +67,7 @@ class SignupScreen extends GetView<SignupController> {
               SizedBox(height: 24.h),
               Obx(
                 () => FilledTextField(
-                  label: 'Password',
+                  label: 'auth.password'.tr,
                   controller: controller.passwordController,
                   obscureText: controller.obscurePassword.value,
                   onChanged: (v) => controller.password.value = v,
@@ -98,7 +97,7 @@ class SignupScreen extends GetView<SignupController> {
               SizedBox(height: 24.h),
               Obx(
                 () => FilledTextField(
-                  label: 'Confirm password',
+                  label: 'auth.confirmPassword'.tr,
                   controller: controller.confirmController,
                   obscureText: controller.obscureConfirm.value,
                   onChanged: (v) => controller.confirm.value = v,
@@ -116,7 +115,7 @@ class SignupScreen extends GetView<SignupController> {
                     ? Padding(
                         padding: EdgeInsets.only(top: 8.h),
                         child: Text(
-                          'Passwords do not match.',
+                          'auth.passwordsDiffer'.tr,
                           style: CustomTextStyles.inlineError,
                         ),
                       )
@@ -125,7 +124,7 @@ class SignupScreen extends GetView<SignupController> {
               SizedBox(height: 40.h),
               Obx(
                 () => CustomElevatedButton(
-                  text: 'Create Account',
+                  text: 'auth.createAccount'.tr,
                   isLoading: controller.isLoading.value,
                   isEnabled: controller.canSubmit,
                   onPressed: controller.submit,
@@ -145,7 +144,7 @@ class SignupScreen extends GetView<SignupController> {
               GestureDetector(
                 onTap: controller.goToSignIn,
                 child: Text(
-                  'Already have an account? Log in',
+                  'auth.haveAccount'.tr,
                   style: CustomTextStyles.authFooter,
                 ),
               ),

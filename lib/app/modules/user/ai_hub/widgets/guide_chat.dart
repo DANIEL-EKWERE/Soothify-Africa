@@ -115,9 +115,11 @@ class _Header extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
+                // The disc is white in both themes; `textPrimary` would
+                // turn this cross white on white in the dark palette.
                 Icons.close,
                 size: 18.h,
-                color: appTheme.textPrimary,
+                color: appTheme.onFixedLight,
               ),
             ),
           ),

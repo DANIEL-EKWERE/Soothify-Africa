@@ -82,7 +82,9 @@ class _Counter extends StatelessWidget {
       width: 45.h,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: appTheme.textPrimary.withValues(alpha: 0.72),
+        // Ink that stays dark: this washes over a photograph, and
+        // `textPrimary` inverted it to near-white under the white count.
+        color: appTheme.onFixedLight.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(16.h),
       ),
       child: Text('1/5', style: CustomTextStyles.studioCounter),

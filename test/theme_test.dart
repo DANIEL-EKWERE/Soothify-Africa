@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -18,6 +20,40 @@ void main() {
   tearDown(Get.reset);
 
   group('palettes', () {
+    test('ink on a surface that stays white stays dark too', () {
+      // `onPrimary` is white in both palettes: it is the fill of a surface
+      // that does not follow the theme -- the guest Sign up button, the
+      // wellness guide's close disc, a badge on a gradient card. Anything
+      // written on one of those has to come from a token that also stays
+      // put, which is what `onFixedLight` is for.
+      //
+      // The bug this guards: those labels were coloured `textPrimary`, which
+      // flips to near-white in the dark palette, so they went white on white
+      // -- on the signed-out Profile the person glyph kept its own dark fill
+      // and the words beside it simply were not there.
+      for (final palette in [PrimaryColors.light, PrimaryColors.dark]) {
+        expect(palette.onPrimary, PrimaryColors.light.onPrimary,
+            reason: 'onPrimary is a fixed white surface');
+        expect(palette.onFixedLight, PrimaryColors.light.onFixedLight,
+            reason: 'onFixedLight is the ink for one');
+        expect(
+          _contrast(palette.onFixedLight, palette.onPrimary),
+          greaterThan(4.5),
+          reason: 'onFixedLight must be readable on onPrimary',
+        );
+      }
+
+      // And the token that must not be used there really does flip, so the
+      // check above keeps meaning something.
+      expect(PrimaryColors.dark.textPrimary,
+          isNot(PrimaryColors.light.textPrimary));
+      expect(
+        _contrast(PrimaryColors.dark.textPrimary, PrimaryColors.dark.onPrimary),
+        lessThan(4.5),
+        reason: 'textPrimary on a white surface is the mistake being guarded',
+      );
+    });
+
     test('both brightnesses are declared and distinct', () {
       expect(PrimaryColors.light.brightness, Brightness.light);
       expect(PrimaryColors.dark.brightness, Brightness.dark);
@@ -157,4 +193,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(painted().color, PrimaryColors.light.background);
   });
+}
+
+/// WCAG relative luminance, and the contrast ratio built from it.
+///
+/// Spelled out rather than pulled in: the only thing asked of it is whether
+/// two colours can be told apart, and 4.5 is the ratio body text needs.
+double _luminance(Color c) {
+  double channel(double v) =>
+      v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+  return 0.2126 * channel(c.r) +
+      0.7152 * channel(c.g) +
+      0.0722 * channel(c.b);
+}
+
+double _contrast(Color a, Color b) {
+  final (x, y) = (_luminance(a), _luminance(b));
+  final (hi, lo) = x > y ? (x, y) : (y, x);
+  return (hi + 0.05) / (lo + 0.05);
 }

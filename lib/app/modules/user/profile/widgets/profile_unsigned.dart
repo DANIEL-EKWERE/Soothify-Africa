@@ -126,8 +126,12 @@ class _SignupButton extends StatelessWidget {
             SizedBox(width: 12.h),
             Text(
               'Sign up',
+              // The button is white in both themes, so its label has to be
+              // ink that does not flip: `textPrimary` goes near-white in
+              // the dark palette, which left this white on white next to a
+              // person glyph that kept its own dark fill.
               style: CustomTextStyles.subscribeLabel
-                  .copyWith(color: appTheme.textPrimary),
+                  .copyWith(color: appTheme.onFixedLight),
             ),
           ],
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/app_export.dart';
+import 'package:soothifyafrica/app/data/models/partner_nav_tab.dart';
 import 'package:soothifyafrica/app/data/models/studio_partner.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_partner_repository.dart';
 import 'package:soothifyafrica/app/modules/partner/controller/partner_controller.dart';
@@ -16,6 +17,8 @@ import 'package:soothifyafrica/app/modules/partner/controller/roster_controller.
 import 'package:soothifyafrica/app/modules/partner/partner_schedule_screen.dart';
 import 'package:soothifyafrica/app/modules/partner/roster_screen.dart';
 import 'package:soothifyafrica/app/modules/partner/partner_portal_screen.dart';
+import 'package:soothifyafrica/app/modules/partner/widgets/partner_chrome.dart';
+import 'package:soothifyafrica/app/routes/app_pages.dart';
 
 import 'helpers.dart';
 
@@ -138,6 +141,66 @@ void main() {
     // A door scanning twice is one arrival.
     await tester.runAsync(() => c.checkIn(again));
     expect(c.checkedIn, 3);
+  });
+
+  group('the partner bar', () {
+    // What was wrong: the portal, the ledger, the schedule and the roster
+    // were all built and routed, and nothing navigated to three of them. A
+    // partner signed in, was sent to the portal with `offAllNamed` -- which
+    // clears the stack, so there was no back either -- and could reach
+    // nothing else. The bar is the door the frames draw and the app lacked.
+
+    // The bar itself, pumped on its own. Each screen's wiring -- which tab
+    // it declares -- is what the twelve regenerated goldens record; mounting
+    // all five again here only added load to a file that is already
+    // timing-sensitive, and broke the ledger goldens from three groups away.
+    for (final lit in PartnerNavTab.values) {
+      testWidgets('the bar draws three tabs, with ${lit.name} lit',
+          (tester) async {
+        useDesignFrame(tester);
+        await loadAppFonts();
+        await pumpScreen(
+          tester,
+          Scaffold(bottomNavigationBar: PartnerNav(current: lit)),
+        );
+
+        // Three, not the portal frames' four: there is no partner notes
+        // screen for a fourth tab to open.
+        expect(find.byType(PartnerNav), findsOneWidget);
+        for (final tab in PartnerNavTab.values) {
+          expect(find.text(tab.label), findsOneWidget, reason: tab.name);
+        }
+        expect(find.text('Notes'), findsNothing);
+
+        // The lit one is the only tab the bar reports as selected.
+        final selected = tester
+            .widgetList<Semantics>(find.byType(Semantics))
+            .where((w) => w.properties.selected ?? false)
+            .length;
+        expect(selected, 1, reason: lit.name);
+      });
+    }
+
+    test('each tab goes somewhere the app can actually open', () {
+      // The three destinations were registered as routes all along. This is
+      // what was missing: something that names them.
+      final registered = {for (final page in AppPages.pages) page.name};
+
+      for (final tab in PartnerNavTab.values) {
+        expect(registered, contains(tab.route), reason: tab.name);
+      }
+    });
+
+    test('the bar covers the partner routes a studio starts from', () {
+      expect(
+        PartnerNavTab.values.map((t) => t.route),
+        containsAll(<String>[
+          AppRoutes.partnerPortal,
+          AppRoutes.partnerSchedule,
+          AppRoutes.partnerLedger,
+        ]),
+      );
+    });
   });
 
   group('the payout ledger', () {

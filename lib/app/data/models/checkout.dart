@@ -75,6 +75,10 @@ class MembershipStatus {
     this.trialAvailable = true,
     this.trialRequiresCard = false,
     this.cardCheckNaira = 0,
+    this.passportTotal = 0,
+    this.passportUsed = 0,
+    this.passportRemaining = 0,
+    this.priceNaira = 0,
   });
 
   /// 'inactive', 'trial', 'active', 'past_due' or 'cancelled'.
@@ -108,7 +112,25 @@ class MembershipStatus {
   final bool trialRequiresCard;
   final int cardCheckNaira;
 
+  /// The Passport allowance: studio classes this period buys, how many are
+  /// spoken for, and what is left. Zero total means the plan opens no studio
+  /// doors -- which is how Plans knows to offer the tiers rather than draw
+  /// the Hub.
+  final int passportTotal;
+  final int passportUsed;
+  final int passportRemaining;
+
+  /// What the plan costs, so the Hub can print it without a second call.
+  final int priceNaira;
+
   bool get isOnTrial => state == 'trial';
+
+  /// Whether this account holds a Passport that is actually open.
+  bool get hasPassport => isActive && passportTotal > 0;
+
+  /// How much of the allowance is spent, 0..1 -- the Hub's bar.
+  double get passportProgress =>
+      passportTotal == 0 ? 0 : (passportUsed / passportTotal).clamp(0, 1);
 
   static const MembershipStatus none = MembershipStatus(state: 'inactive');
 
@@ -127,6 +149,10 @@ class MembershipStatus {
         trialAvailable: json['trial_available'] as bool? ?? true,
         trialRequiresCard: json['trial_requires_card'] as bool? ?? false,
         cardCheckNaira: json['card_check_naira'] as int? ?? 0,
+        passportTotal: json['passport_total'] as int? ?? 0,
+        passportUsed: json['passport_used'] as int? ?? 0,
+        passportRemaining: json['passport_remaining'] as int? ?? 0,
+        priceNaira: json['price_naira'] as int? ?? 0,
       );
 }
 

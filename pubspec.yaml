@@ -95,6 +95,9 @@ dependencies:
   video_player: ^2.11.1
   flutter_launcher_icons: ^0.14.4
   mobile_scanner: ^7.5.0
+  # The member's pass. `mobile_scanner` only reads codes; the studio
+  # front desk scans this one, so it has to be drawn as well as read.
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

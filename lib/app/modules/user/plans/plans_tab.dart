@@ -302,8 +302,7 @@ class _TierCard extends StatelessWidget {
               onDark: onDark,
               onTap: () => switch (tier.action!) {
                 PlanAction.trial => controller.startTrial(),
-                PlanAction.waitlist =>
-                  Get.toNamed(AppRoutes.passportTiers),
+                PlanAction.waitlist => controller.openPassport(),
                 PlanAction.corporate => controller.openCorporateForm(),
               },
             ),

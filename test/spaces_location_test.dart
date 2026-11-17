@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
 import 'package:soothifyafrica/app/core/utils/where_i_am.dart';
+import 'package:soothifyafrica/app/data/models/passport_reservation.dart';
 import 'package:soothifyafrica/app/data/models/space_listing.dart';
 import 'package:soothifyafrica/app/data/repositories/spaces_repository.dart';
 import 'package:soothifyafrica/app/modules/user/spaces/controller/spaces_controller.dart';
@@ -36,6 +37,22 @@ class _RecordingSpaces implements SpacesRepository {
     String source = '',
   }) async =>
       true;
+
+  // The Passport flow is not what this file is about; these are here so the
+  // fake still satisfies the interface.
+  @override
+  Future<List<StudioSession>> sessions(String spaceId) async => const [];
+
+  @override
+  Future<PassportReservation> reserve(int sessionId) async =>
+      throw UnimplementedError();
+
+  @override
+  Future<List<PassportReservation>> reservations() async => const [];
+
+  @override
+  Future<PassportReservation> cancelReservation(int reservationId) async =>
+      throw UnimplementedError();
 }
 
 void main() {

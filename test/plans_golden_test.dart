@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
 import 'package:soothifyafrica/app/theme/theme_helper.dart';
 import 'package:soothifyafrica/app/data/models/plan_tier.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_subscription_repository.dart';
@@ -30,7 +31,10 @@ void main() {
     testWidgets('plans, $name', (tester) async {
       useDesignFrame(tester);
       await loadAppFonts();
-      Get.put(PlansTabController(MockSubscriptionRepository()));
+      Get.put(PlansTabController(
+      MockSubscriptionRepository(),
+      MockBillingRepository(),
+    ));
 
       await pumpScreen(tester, const PlansTab(), brightness: brightness);
       await tester.pump(const Duration(milliseconds: 600));
@@ -44,7 +48,10 @@ void main() {
   testWidgets('the three cards the designer redrew', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    Get.put(PlansTabController(MockSubscriptionRepository()));
+    Get.put(PlansTabController(
+      MockSubscriptionRepository(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pump(const Duration(milliseconds: 600));
@@ -76,7 +83,10 @@ void main() {
     await loadAppFonts();
     // The sheet reads a previously-left address on mount.
     await PrefUtils().init();
-    Get.put(PlansTabController(MockSubscriptionRepository()));
+    Get.put(PlansTabController(
+      MockSubscriptionRepository(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(
       tester,
@@ -99,10 +109,14 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text(PlanAction.waitlist.label));
+    // The card asks the server what this account already holds before it
+    // decides where to go, so the answer has to land before the route does.
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     // It collected an email for a waitlist until the designer drew the
-    // tiers; it sells now, so the card opens the tier selection.
+    // tiers; it sells now, so the card opens the tier selection -- and for
+    // an account that already holds a Passport, the Hub instead.
     expect(find.text('tier selection'), findsOneWidget);
     expect(find.text(PassportSheet.heading), findsNothing);
   });
@@ -110,7 +124,10 @@ void main() {
   testWidgets('switching period reloads the tiers', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    final controller = PlansTabController(MockSubscriptionRepository());
+    final controller = PlansTabController(
+      MockSubscriptionRepository(),
+      MockBillingRepository(),
+    );
     Get.put(controller);
 
     await pumpScreen(tester, const PlansTab());
@@ -130,7 +147,10 @@ void main() {
   testWidgets('every card rests on the same hairline', (tester) async {
     useDesignFrame(tester);
     await loadAppFonts();
-    Get.put(PlansTabController(MockSubscriptionRepository()));
+    Get.put(PlansTabController(
+      MockSubscriptionRepository(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pump(const Duration(milliseconds: 600));

@@ -74,6 +74,9 @@ import '../modules/partner/roster_screen.dart';
 import '../modules/partner/partner_portal_screen.dart';
 import '../modules/user/passport/binding/passport_binding.dart';
 import '../modules/user/passport/passport_success_screen.dart';
+import '../modules/user/passport/passport_cancel_screen.dart';
+import '../modules/user/passport/passport_hub_screen.dart';
+import '../modules/user/passport/passport_pass_screen.dart';
 import '../modules/user/passport/passport_tiers_screen.dart';
 import '../modules/user/payment/payment_success_screen.dart';
 import '../modules/user/videos/binding/videos_binding.dart';
@@ -584,6 +587,21 @@ class AppPages {
       // No binding: the receipt is handed its tier and needs nothing else.
       name: AppRoutes.passportSuccess,
       page: () => const PassportSuccessScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.passportHub,
+      page: () => const PassportHubScreen(),
+      binding: PassportBinding(),
+    ),
+    GetPage(
+      // Both are handed their reservation; only cancelling reaches for a
+      // repository, and that one is already bound for the whole app.
+      name: AppRoutes.passportReservation,
+      page: () => const PassportPassScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.passportCancel,
+      page: () => const PassportCancelScreen(),
     ),
     GetPage(
       name: AppRoutes.videos,

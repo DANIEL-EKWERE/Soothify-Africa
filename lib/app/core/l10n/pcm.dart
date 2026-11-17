@@ -399,4 +399,60 @@ const Map<String, String> pcm = {
   'partner.offPeakBody': 'E go show more for Soothify app feed.',
   'partner.scheduleHeader': 'Master schedule & Soothify slots',
   'partner.slotManager': 'Soothify slot manager',
+
+  // ---------------------------- the Passport Hub and its reservations
+  'passport.currentPlan': 'Plan Wey You Dey On',
+  'passport.active': 'E Dey Work',
+  'passport.month': 'month',
+  'passport.classBalance': 'Classes wey remain',
+  'passport.renews': 'E go renew',
+  'passport.whatItOpens':
+      'You fit enter any studio for Abuja and Lagos, plus all di '
+      'Soothify Core streaming and articles join body.',
+  'passport.manage': 'Manage Passport',
+  'passport.upcoming': 'Classes Wey You Book',
+  'passport.viewDetails': 'See Details',
+  'passport.cancelReservation': 'Cancel Am',
+  'passport.today': 'Today',
+  'passport.tomorrow': 'Tomorrow',
+  'passport.classWord': 'class',
+  'passport.classesWord': 'classes',
+  'passport.nothingBooked': 'You never book anything',
+  'passport.nothingBookedBody':
+      'Find studio near you make you book class with your '
+      'Passport.',
+  'passport.upcomingSessions': 'Sessions wey dey come',
+  'passport.reserveSpace': 'Book Your Space',
+  'passport.classFull': 'Class don full',
+  'passport.reserveAt': 'You wan book your mat for @studio?',
+  'passport.reserveBody':
+      'Dis one go use 1 class from your Passport for dis month. '
+      'You go remain @left classes.',
+  'passport.reserveBodyPlain':
+      'Dis one go use 1 class from your Passport for dis month.',
+  'passport.balanceAfter': 'Wetin go remain after',
+  'passport.confirmReservation': 'Confirm My Booking',
+  'passport.reserving': 'E dey book…',
+  'passport.spaceSaved': 'Your space don set',
+  'passport.breatheDeep': 'Breathe well and enjoy your flow.',
+  'passport.showAtDesk': 'Show dis pass for di studio front desk',
+  'passport.checkInCode': 'Check-in code',
+  'passport.viewInReservations': 'See Am For My Bookings',
+  'passport.confirmed': 'Dem don confirm your booking',
+  'passport.yourQr': 'Your check-in QR code',
+  'passport.showAtStudio': 'Show your code for di studio make you enter.',
+  'passport.backToPlans': 'Go Back To Plans',
+  'passport.passMissing': 'We no fit open dat booking.',
+  'passport.cancelTitle': 'Cancel booking',
+  'passport.cancelQuestion': 'You wan cancel your booking?',
+  'passport.cancelBody':
+      'You dey about to cancel your space for dis class. You no '
+      'go rather keep am?',
+  'passport.stillBooked':
+      'Your booking still dey until you confirm say you wan '
+      'cancel am.',
+  'passport.keepReservation': 'Keep di booking',
+  'passport.cancelAction': 'Cancel di booking',
+  'passport.cancelling': 'E dey cancel…',
+  'passport.cancelled': 'Dat class don go back inside your allowance.',
 };

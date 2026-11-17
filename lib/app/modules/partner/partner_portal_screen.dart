@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import '../../data/models/studio_partner.dart';
 import 'controller/partner_controller.dart';
 import 'widgets/partner_chrome.dart';
+import '../../data/models/partner_nav_tab.dart';
 
 /// The Studio Partner portal — Figma "Studio partner portal · Overview"
 /// (`4968:32935`) and "· Active Guest List" (`4968:32751`).
@@ -38,6 +39,7 @@ class PartnerPortalScreen extends GetView<PartnerController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appTheme.background,
+      bottomNavigationBar: const PartnerNav(current: PartnerNavTab.home),
       body: SafeArea(
         child: Obx(
           () => RefreshIndicator(

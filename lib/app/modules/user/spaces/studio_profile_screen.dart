@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/app_export.dart';
 import '../../../core/utils/checkout_launcher.dart';
+import '../../../data/models/passport_reservation.dart';
 import '../../../data/models/space_listing.dart';
+import '../../../data/repositories/spaces_repository.dart';
 import '../../../widgets/custom_elevated_button.dart';
+import '../passport/widgets/reserve_sheet.dart';
 import 'widgets/passport_sheet.dart';
 import 'widgets/space_card.dart';
 
@@ -227,6 +231,8 @@ class _Sheet extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 24.5.v),
+                _UpcomingSessions(space: space),
+                SizedBox(height: 24.5.v),
                 const _PassportTeaser(),
               ],
             ),
@@ -266,6 +272,162 @@ class _PassportTeaser extends StatelessWidget {
           ],
         ),
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+/// "Upcoming sessions" — the studio's Passport classes, each with its own
+/// way in.
+///
+/// Only what the studio has opened to Passport members: a class with no
+/// allocation is the studio's own business and does not appear here. A full
+/// one does appear, with its button spent — a class that is full is
+/// information, and hiding it reads as the studio having nothing on.
+class _UpcomingSessions extends StatefulWidget {
+  const _UpcomingSessions({required this.space});
+
+  final SpaceListing space;
+
+  @override
+  State<_UpcomingSessions> createState() => _UpcomingSessionsState();
+}
+
+class _UpcomingSessionsState extends State<_UpcomingSessions> {
+  List<StudioSession>? _sessions;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final rows =
+          await Get.find<SpacesRepository>().sessions(widget.space.id);
+      if (mounted) setState(() => _sessions = rows);
+    } on AppException {
+      // The rest of the profile is still worth reading, so a studio whose
+      // timetable cannot be reached simply shows none.
+      if (mounted) setState(() => _sessions = const []);
+    }
+  }
+
+  Future<void> _reserve(StudioSession session) async {
+    final held = await ReserveSheet.show(
+      context,
+      sessionId: session.id,
+      studioName: widget.space.name,
+    );
+    if (held == null) return;
+    await Get.toNamed(
+      AppRoutes.passportReservation,
+      arguments: {'reservation': held, 'justBooked': true},
+    );
+    // The class has one fewer place now, and may have none.
+    await _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sessions = _sessions;
+    if (sessions == null || sessions.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('passport.upcomingSessions'.tr,
+            style: CustomTextStyles.spaceName),
+        SizedBox(height: 16.v),
+        for (final session in sessions) ...[
+          _SessionCard(
+            session: session,
+            cover: widget.space.photoUrl,
+            onReserve: () => _reserve(session),
+          ),
+          SizedBox(height: 12.v),
+        ],
+      ],
+    );
+  }
+}
+
+class _SessionCard extends StatelessWidget {
+  const _SessionCard({
+    required this.session,
+    required this.cover,
+    required this.onReserve,
+  });
+
+  final StudioSession session;
+  final String cover;
+  final VoidCallback onReserve;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(12.h),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(12.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CustomImageView(
+            imagePath: cover,
+            height: 72.h,
+            width: 72.h,
+            fit: BoxFit.cover,
+            radius: BorderRadius.circular(8.h),
+          ),
+          SizedBox(width: 16.h),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(session.title, style: CustomTextStyles.spaceName),
+                SizedBox(height: 4.v),
+                Text(
+                  '${DateFormat('EEE, d MMM').format(session.startsAt)} · '
+                  '${DateFormat('h:mm a').format(session.startsAt)}',
+                  style: CustomTextStyles.studioLocation,
+                ),
+                SizedBox(height: 10.v),
+                SizedBox(
+                  width: double.infinity,
+                  child: InkWell(
+                    onTap: session.isFull ? null : onReserve,
+                    borderRadius: BorderRadius.circular(8.h),
+                    child: Container(
+                      height: 44.v,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: session.isFull
+                            ? appTheme.cardRim
+                            : appTheme.actionFill,
+                        borderRadius: BorderRadius.circular(8.h),
+                      ),
+                      child: Text(
+                        session.isFull
+                            ? 'passport.classFull'.tr
+                            : 'passport.reserveSpace'.tr,
+                        style: CustomTextStyles.subscribeLabel.copyWith(
+                          color: session.isFull
+                              ? appTheme.textMuted
+                              : appTheme.onPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

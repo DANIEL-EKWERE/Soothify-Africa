@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:soothifyafrica/app/core/utils/pref_utils.dart';
 import 'package:soothifyafrica/app/data/models/app_tab.dart';
+import 'package:soothifyafrica/app/data/repositories/billing_repository.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_content_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/mock_subscription_repository.dart';
@@ -56,6 +58,10 @@ void main() {
       Get.put(await SessionService().init());
       Get.put<ProfileRepository>(LocalProfileRepository());
       Get.put<SubscriptionRepository>(MockSubscriptionRepository());
+    // Plans asks what this account already holds before it decides
+    // where its Passport card goes. `InitialBindings` registers this
+    // for the app; nothing runs them here.
+    Get.put<BillingRepository>(MockBillingRepository());
       // Through the real binding rather than by hand: the shell's IndexedStack
       // builds every tab at once, so each new tab's controller has to be
       // registered here too, and a hand-written list silently drifts out of
@@ -110,6 +116,10 @@ void main() {
     Get.put(await SessionService().init());
     Get.put<ProfileRepository>(LocalProfileRepository());
     Get.put<SubscriptionRepository>(MockSubscriptionRepository());
+    // Plans asks what this account already holds before it decides
+    // where its Passport card goes. `InitialBindings` registers this
+    // for the app; nothing runs them here.
+    Get.put<BillingRepository>(MockBillingRepository());
     ShellBinding().dependencies();
     Get.delete<HomeTabController>();
     Get.put(HomeTabController(Get.find<ContentRepository>(),

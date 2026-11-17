@@ -229,6 +229,12 @@ class AppRoutes {
   static const String passportTiers = '/plans/passport';
   static const String passportSuccess = '/plans/passport/success';
 
+  /// The Hub — what the Plans tab becomes once a Passport is held, and the
+  /// two screens reached from its reservation list.
+  static const String passportHub = '/plans/passport/hub';
+  static const String passportReservation = '/plans/passport/reservation';
+  static const String passportCancel = '/plans/passport/reservation/cancel';
+
   static const String corporateSuccess = '/corporate-success';
 
   /// The notification feed, reached from the bell on Home.

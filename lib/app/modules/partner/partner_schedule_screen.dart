@@ -6,6 +6,7 @@ import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/soothify_word.dart';
 import 'controller/partner_schedule_controller.dart';
 import 'widgets/partner_chrome.dart';
+import '../../data/models/partner_nav_tab.dart';
 
 /// The master schedule — Figma "5.1 · Master schedule & Sōōthify slots"
 /// (`416:26376`).
@@ -28,6 +29,7 @@ class PartnerScheduleScreen extends GetView<PartnerScheduleController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appTheme.passportPage,
+      bottomNavigationBar: const PartnerNav(current: PartnerNavTab.schedule),
       body: SafeArea(
         child: Column(
           children: [

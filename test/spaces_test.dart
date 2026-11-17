@@ -64,6 +64,11 @@ void main() {
     final c = await mount(tester, brightness: brightness);
     Get.toNamed(AppRoutes.studioProfile, arguments: c.spaces.first);
     await tester.pumpAndSettle();
+    // The profile asks the studio for its Passport classes on mount, and
+    // the mock answers after a delay. Without this the list is still empty
+    // when the golden is taken, and its timer is still pending at teardown.
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
     return c;
   }
 

@@ -1,3 +1,4 @@
+import '../models/passport_reservation.dart';
 import '../models/space_listing.dart';
 import '../models/wellness_space.dart';
 import 'spaces_repository.dart';
@@ -47,6 +48,92 @@ class MockSpacesRepository implements SpacesRepository {
     // Nothing is sent anywhere, so this must not claim a place was reserved
     // on a list that does not exist. The sheet says as much.
     return true;
+  }
+
+  // ----------------------------------------------------- the Passport flow
+  //
+  // Held in memory so the flow can be walked end to end without a server:
+  // reserving moves a class from [_sessions] into [_held], the Hub reads
+  // [_held], and cancelling puts it back. That is the same arithmetic the
+  // server does, which is what makes the screens behave the same either way.
+
+  final List<PassportReservation> _held = [];
+  int _nextId = 1;
+
+  static List<StudioSession> _sessionsFor(String spaceId) {
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    DateTime at(int hour) => DateTime(
+          tomorrow.year, tomorrow.month, tomorrow.day, hour,
+        );
+    return [
+      StudioSession(
+        id: 101, title: 'Reformer Flow', category: 'reformer',
+        startsAt: at(9), minutes: 60, instructor: 'Kemi A.',
+        room: 'Studio A', spotsOpen: 3,
+      ),
+      StudioSession(
+        id: 102, title: 'Mat Pilates', category: 'mat',
+        startsAt: at(10), minutes: 60, instructor: 'Ada N.',
+        room: 'Studio B', spotsOpen: 2,
+      ),
+      StudioSession(
+        id: 103, title: 'Recovery Spa', category: 'yoga',
+        startsAt: at(11), minutes: 60, instructor: 'Sade O.',
+        room: 'Studio B', spotsOpen: 0, isFull: true,
+      ),
+    ];
+  }
+
+  @override
+  Future<List<StudioSession>> sessions(String spaceId) async {
+    await Future<void>.delayed(_latency);
+    return _sessionsFor(spaceId);
+  }
+
+  @override
+  Future<PassportReservation> reserve(int sessionId) async {
+    await Future<void>.delayed(_latency);
+    final already = _held.where((r) => r.id == sessionId);
+    if (already.isNotEmpty) return already.first;
+
+    final session = _sessionsFor('').firstWhere((s) => s.id == sessionId);
+    final held = PassportReservation(
+      // The session's own id, so reserving the same class twice is caught
+      // the way the server catches it.
+      id: sessionId,
+      className: session.title,
+      sessionType: session.category,
+      startsAt: session.startsAt,
+      code: 'STH${_nextId++}9A'.substring(0, 6),
+      spaceName: 'Sage & She',
+      spaceArea: 'Lekki Phase 1',
+    );
+    _held.add(held);
+    return held;
+  }
+
+  @override
+  Future<List<PassportReservation>> reservations() async {
+    await Future<void>.delayed(_latency);
+    return List.unmodifiable(_held);
+  }
+
+  @override
+  Future<PassportReservation> cancelReservation(int reservationId) async {
+    await Future<void>.delayed(_latency);
+    final held = _held.firstWhere((r) => r.id == reservationId);
+    _held.removeWhere((r) => r.id == reservationId);
+    return PassportReservation(
+      id: held.id,
+      className: held.className,
+      startsAt: held.startsAt,
+      sessionType: held.sessionType,
+      status: 'cancelled',
+      code: held.code,
+      spaceName: held.spaceName,
+      spaceArea: held.spaceArea,
+      canCancel: false,
+    );
   }
 
   /// Roughly where these three places are. The map is a flat picture, so a

@@ -1,6 +1,7 @@
 import '../../core/network/api_client.dart';
 import '../models/space_listing.dart';
 import 'spaces_repository.dart';
+import '../models/passport_reservation.dart';
 
 /// Spaces against `/api/v1/spaces/`.
 class ApiSpacesRepository implements SpacesRepository {
@@ -46,6 +47,33 @@ class ApiSpacesRepository implements SpacesRepository {
       if (source.isNotEmpty) 'source': source,
     });
     return body['already_on_list'] != true;
+  }
+
+  // ----------------------------------------------------- the Passport flow
+
+  @override
+  Future<List<StudioSession>> sessions(String spaceId) async {
+    final rows = await _api.getList('/spaces/$spaceId/classes/');
+    return rows.map(StudioSession.fromJson).toList();
+  }
+
+  @override
+  Future<PassportReservation> reserve(int sessionId) async {
+    final body = await _api.post('/spaces/classes/$sessionId/reserve/');
+    return PassportReservation.fromJson(body);
+  }
+
+  @override
+  Future<List<PassportReservation>> reservations() async {
+    final rows = await _api.getList('/spaces/reservations/');
+    return rows.map(PassportReservation.fromJson).toList();
+  }
+
+  @override
+  Future<PassportReservation> cancelReservation(int reservationId) async {
+    final body =
+        await _api.post('/spaces/reservations/$reservationId/cancel/');
+    return PassportReservation.fromJson(body);
   }
 
   String _encode(Map<String, String> params) => params.entries

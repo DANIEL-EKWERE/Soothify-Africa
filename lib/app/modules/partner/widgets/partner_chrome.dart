@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/app_export.dart';
+import '../../../data/models/partner_nav_tab.dart';
 import '../../../data/models/studio_partner.dart';
 import '../../../widgets/soothify_word.dart';
+import '../../user/shell/widgets/app_bottom_nav.dart';
 import '../controller/partner_controller.dart';
 
 /// "₦342,000" — grouped, as every figure in the portal is.
@@ -320,6 +322,42 @@ class PartnerStatusPill extends StatelessWidget {
               style: CustomTextStyles.partnerStatus.copyWith(color: ink)),
         ],
       ),
+    );
+  }
+}
+
+/// The partner bar — the "Partner navigation" frame (`416:26366`), which sits
+/// at the foot of every partner screen the design draws one on.
+///
+/// Not a shell with an IndexedStack, the way the client and expert bars are
+/// built: the frames keep the bar visible on screens that are pushed rather
+/// than switched to — the roster and both check-in results draw it with
+/// Schedule still lit, under a header carrying a back chevron. So each screen
+/// declares which tab it sits beneath, and the bar is told rather than
+/// working it out from a route.
+///
+/// Switching tab clears the stack. The three destinations are roots, not
+/// pages to pile up: without this, Schedule -> roster -> Earnings -> Schedule
+/// would leave four partner screens stacked behind the one on display.
+class PartnerNav extends StatelessWidget {
+  const PartnerNav({super.key, required this.current});
+
+  /// The tab this screen sits beneath, lit whether or not it is the route
+  /// actually showing.
+  final PartnerNavTab current;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBottomNav(
+      tabs: PartnerNavTab.values,
+      currentIndex: current.index,
+      onSelected: (i) {
+        final tab = PartnerNavTab.values[i];
+        // Re-tapping the lit tab on a screen beneath it goes back up to that
+        // tab's own screen, which is what every other bar in the app does.
+        if (tab == current && Get.currentRoute == tab.route) return;
+        Get.offAllNamed(tab.route);
+      },
     );
   }
 }

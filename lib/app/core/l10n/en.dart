@@ -392,4 +392,62 @@ const Map<String, String> en = {
   'partner.offPeakBody': 'Gives higher visibility in Soothify app feed.',
   'partner.scheduleHeader': 'Master schedule & Soothify slots',
   'partner.slotManager': 'Soothify slot manager',
+
+  // ---------------------------- the Passport Hub and its reservations
+  'passport.currentPlan': 'Current Plan',
+  'passport.active': 'Active',
+  'passport.month': 'month',
+  'passport.classBalance': 'Class balance',
+  'passport.renews': 'Renews',
+  'passport.whatItOpens':
+      'Full physical studio access across Abuja and Lagos, plus '
+      'fully bundled Soothify Core digital streaming and '
+      'articles.',
+  'passport.manage': 'Manage Passport',
+  'passport.upcoming': 'Your Upcoming Reservations',
+  'passport.viewDetails': 'View Details',
+  'passport.cancelReservation': 'Cancel Reservation',
+  'passport.today': 'Today',
+  'passport.tomorrow': 'Tomorrow',
+  'passport.classWord': 'class',
+  'passport.classesWord': 'classes',
+  'passport.nothingBooked': 'Nothing booked yet',
+  'passport.nothingBookedBody':
+      'Find a studio near you and reserve a class with your '
+      'Passport.',
+  'passport.upcomingSessions': 'Upcoming sessions',
+  'passport.reserveSpace': 'Reserve Your Space',
+  'passport.classFull': 'Class full',
+  'passport.reserveAt': 'Reserve your mat at @studio?',
+  'passport.reserveBody':
+      'This will use 1 class from your monthly Passport '
+      'allowance. You will have @left classes remaining.',
+  'passport.reserveBodyPlain':
+      'This will use 1 class from your monthly Passport '
+      'allowance.',
+  'passport.balanceAfter': 'Balance after booking',
+  'passport.confirmReservation': 'Confirm My Reservation',
+  'passport.reserving': 'Reserving…',
+  'passport.spaceSaved': 'Your space is saved',
+  'passport.breatheDeep': 'Breathe deep and enjoy your flow.',
+  'passport.showAtDesk': 'Show this pass at the studio front desk',
+  'passport.checkInCode': 'Check-in code',
+  'passport.viewInReservations': 'View in My Reservations',
+  'passport.confirmed': 'Reservation confirmed',
+  'passport.yourQr': 'Your check-in QR code',
+  'passport.showAtStudio': 'Show your code at the studio to check in.',
+  'passport.backToPlans': 'Back to Plans',
+  'passport.passMissing': 'That reservation could not be opened.',
+  'passport.cancelTitle': 'Cancel reservation',
+  'passport.cancelQuestion': 'Cancel your reservation?',
+  'passport.cancelBody':
+      'You’re about to cancel your spot in this class. Would you '
+      'like to keep it instead?',
+  'passport.stillBooked':
+      'Your reservation is still booked until you confirm '
+      'cancellation.',
+  'passport.keepReservation': 'Keep reservation',
+  'passport.cancelAction': 'Cancel reservation',
+  'passport.cancelling': 'Cancelling…',
+  'passport.cancelled': 'That class is back in your allowance.',
 };

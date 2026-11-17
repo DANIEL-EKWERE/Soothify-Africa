@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../data/models/studio_partner.dart';
 import 'controller/roster_controller.dart';
+import '../../data/models/partner_nav_tab.dart';
+import 'widgets/partner_chrome.dart';
 
 /// "Check-in successful" — Figma "5.6 · Check-in successful"
 /// (`416:26905`).
@@ -24,6 +26,7 @@ class CheckInDoneScreen extends StatelessWidget {
         : null;
     return Scaffold(
       backgroundColor: appTheme.passportPage,
+      bottomNavigationBar: const PartnerNav(current: PartnerNavTab.schedule),
       body: SafeArea(
         child: Column(
           children: [

@@ -5,6 +5,7 @@ import '../../data/models/studio_partner.dart';
 import 'controller/roster_controller.dart';
 import 'widgets/dispute_dialog.dart';
 import 'widgets/partner_chrome.dart';
+import '../../data/models/partner_nav_tab.dart';
 
 /// The door — Figma "5.3 · Live roster & verification" (`416:26667`), with
 /// its error state (`416:26744`) and the banner it wears once provisional
@@ -19,6 +20,7 @@ class RosterScreen extends GetView<RosterController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appTheme.passportPage,
+      bottomNavigationBar: const PartnerNav(current: PartnerNavTab.schedule),
       body: SafeArea(
         child: Column(
           children: [

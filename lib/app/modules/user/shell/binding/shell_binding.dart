@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../data/repositories/content_repository.dart';
 import '../../../../data/repositories/profile_repository.dart';
 import '../../../../data/services/session_service.dart';
+import '../../../../data/repositories/billing_repository.dart';
 import '../../../../data/repositories/subscription_repository.dart';
 import '../../community/controller/community_tab_controller.dart';
 import '../../discovery/controller/discovery_tab_controller.dart';
@@ -34,7 +35,10 @@ class ShellBinding extends Bindings {
           Get.find<ProfileRepository>(),
           Get.find<SessionService>(),
         ));
-    Get.lazyPut(() => PlansTabController(Get.find<SubscriptionRepository>()));
+    Get.lazyPut(() => PlansTabController(
+          Get.find<SubscriptionRepository>(),
+          Get.find<BillingRepository>(),
+        ));
     Get.lazyPut(() => CommunityTabController());
     Get.lazyPut(() => DiscoveryTabController(
           Get.find<ContentRepository>(),

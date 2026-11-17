@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import '../../data/models/studio_partner.dart';
 import 'controller/partner_ledger_controller.dart';
 import 'widgets/partner_chrome.dart';
+import '../../data/models/partner_nav_tab.dart';
 
 /// "Financials & Settlement Hub" — Figma "4.2 · Studio payout ledger"
 /// (`416:26282`).
@@ -21,6 +22,7 @@ class PartnerLedgerScreen extends GetView<PartnerLedgerController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appTheme.passportPage,
+      bottomNavigationBar: const PartnerNav(current: PartnerNavTab.earnings),
       body: SafeArea(
         child: Column(
           children: [

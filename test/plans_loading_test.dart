@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
 import 'package:soothifyafrica/app/data/models/plan_tier.dart';
+import 'package:soothifyafrica/app/data/repositories/mock_billing_repository.dart';
 import 'package:soothifyafrica/app/data/repositories/subscription_repository.dart';
 import 'package:soothifyafrica/app/modules/user/plans/controller/plans_tab_controller.dart';
 import 'package:soothifyafrica/app/modules/user/plans/plans_tab.dart';
@@ -53,7 +54,10 @@ void main() {
     // that has nothing to do with it.
     await loadAppFonts();
     Get.put<SubscriptionRepository>(_SlowPlans(const []));
-    Get.put(PlansTabController(Get.find<SubscriptionRepository>()));
+    Get.put(PlansTabController(
+      Get.find<SubscriptionRepository>(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(tester, const PlansTab());
 
@@ -83,7 +87,10 @@ void main() {
         delay: const Duration(milliseconds: 100),
       ),
     );
-    Get.put(PlansTabController(Get.find<SubscriptionRepository>()));
+    Get.put(PlansTabController(
+      Get.find<SubscriptionRepository>(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pump(const Duration(milliseconds: 300));
@@ -102,7 +109,10 @@ void main() {
     // that has nothing to do with it.
     await loadAppFonts();
     Get.put<SubscriptionRepository>(_FailingPlans());
-    Get.put(PlansTabController(Get.find<SubscriptionRepository>()));
+    Get.put(PlansTabController(
+      Get.find<SubscriptionRepository>(),
+      MockBillingRepository(),
+    ));
 
     await pumpScreen(tester, const PlansTab());
     await tester.pumpAndSettle();

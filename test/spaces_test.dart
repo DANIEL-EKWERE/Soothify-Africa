@@ -21,6 +21,10 @@ const _art = [
   'assets/images/spaces/studio.png',
 ];
 
+/// The sample classes are dated from this, so the golden records one
+/// day rather than whichever day it was taken on.
+DateTime _fixedDay() => DateTime(2026, 11, 17, 8, 50);
+
 void main() {
   setUp(() {
     useStubTiles();
@@ -37,7 +41,7 @@ void main() {
     await loadAppFonts();
     // The Passport sheet reaches for the repository itself, as the binding
     // gives it in the app.
-    Get.put<SpacesRepository>(MockSpacesRepository());
+    Get.put<SpacesRepository>(MockSpacesRepository(now: _fixedDay));
     final c = Get.put(SpacesController(Get.find<SpacesRepository>()));
     await pumpScreen(
       tester,
@@ -233,7 +237,7 @@ void main() {
     // The sheet reads a previously-left address on mount, so preferences
     // have to be up — `main.dart` awaits this before the first frame.
     await PrefUtils().init();
-    Get.put<SpacesRepository>(MockSpacesRepository());
+    Get.put<SpacesRepository>(MockSpacesRepository(now: _fixedDay));
     await pumpScreen(tester, const PassportSheet());
 
     // Supplied by the designer rather than read from the file — the sheet is
@@ -253,7 +257,7 @@ void main() {
     useDesignFrame(tester);
     await loadAppFonts();
     await PrefUtils().init();
-    Get.put<SpacesRepository>(MockSpacesRepository());
+    Get.put<SpacesRepository>(MockSpacesRepository(now: _fixedDay));
     await pumpScreen(tester, const PassportSheet());
 
     expect(find.text('Email address'), findsOneWidget);

@@ -31,16 +31,31 @@ class PassportHubController extends BaseController {
     load();
   }
 
+  /// Why the reservations list failed, when it did. Null when it did not.
+  final RxnString listError = RxnString();
+
   Future<void> load() => guard(() async {
-        // Together, not in sequence: the bar and the list are two halves of
-        // one statement, and a screen that shows "4 of 6" above three
-        // classes has told the member something untrue.
-        final both = await Future.wait([
-          _billing.membership(),
-          _spaces.reservations(),
-        ]);
-        membership.value = both[0] as MembershipStatus;
-        reservations.assignAll(both[1] as List<PassportReservation>);
+        // Started together but failed apart. They were awaited as one pair,
+        // which meant a failing reservations call left the plan unread --
+        // and `MembershipStatus.none` draws as a perfectly plausible
+        // "Soothify Passport · Active · ₦0/month · 0 of 0 remaining", which
+        // is a lie about something somebody paid for. A plan that cannot be
+        // read is worth saying out loud; a plan that can should be shown
+        // whatever the list does.
+        final plan = _billing.membership();
+        final list = _spaces.reservations();
+
+        listError.value = null;
+        try {
+          reservations.assignAll(await list);
+        } on AppException catch (failure) {
+          reservations.clear();
+          listError.value = failure.message;
+        }
+
+        // Last, and unguarded: this one failing is worth the screen's own
+        // error state rather than a card full of zeroes.
+        membership.value = await plan;
       });
 
   /// "4 of 6 remaining", as the card prints it.

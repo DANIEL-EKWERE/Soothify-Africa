@@ -6,6 +6,15 @@ import 'spaces_repository.dart';
 /// Studios without a server: the three the design draws, filtered the same
 /// way the server filters them so the screen behaves identically.
 class MockSpacesRepository implements SpacesRepository {
+  MockSpacesRepository({DateTime Function()? now}) : _now = now ?? DateTime.now;
+
+  /// The clock the sample classes are dated from.
+  ///
+  /// Injected by the tests. Without it the sessions sit a day after whenever
+  /// they were asked for, so a golden of this screen recorded the date it
+  /// was taken and failed every day after -- which is exactly what it did.
+  final DateTime Function() _now;
+
   static const _latency = Duration(milliseconds: 300);
 
   @override
@@ -60,8 +69,8 @@ class MockSpacesRepository implements SpacesRepository {
   final List<PassportReservation> _held = [];
   int _nextId = 1;
 
-  static List<StudioSession> _sessionsFor(String spaceId) {
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
+  List<StudioSession> _sessionsFor(String spaceId) {
+    final tomorrow = _now().add(const Duration(days: 1));
     DateTime at(int hour) => DateTime(
           tomorrow.year, tomorrow.month, tomorrow.day, hour,
         );

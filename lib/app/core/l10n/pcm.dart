@@ -455,4 +455,5 @@ const Map<String, String> pcm = {
   'passport.cancelAction': 'Cancel di booking',
   'passport.cancelling': 'E dey cancel…',
   'passport.cancelled': 'Dat class don go back inside your allowance.',
+  'passport.listFailed': 'We no fit load your bookings',
 };

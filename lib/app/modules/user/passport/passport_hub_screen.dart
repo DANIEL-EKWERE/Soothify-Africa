@@ -65,7 +65,9 @@ class PassportHubScreen extends GetView<PassportHubController> {
                       Text('passport.upcoming'.tr,
                           style: CustomTextStyles.statsHeading),
                       SizedBox(height: 16.v),
-                      if (!controller.hasReservations)
+                      if (controller.listError.value case final why?)
+                        _ListFailed(why: why)
+                      else if (!controller.hasReservations)
                         const _NothingBooked()
                       else
                         for (final held in controller.reservations) ...[
@@ -110,19 +112,24 @@ class _PlanCard extends StatelessWidget {
                   style: CustomTextStyles.tierName,
                 ),
               ),
-              Container(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 14.h, vertical: 6.v),
-                decoration: BoxDecoration(
-                  color: appTheme.success.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(16.h),
+              // The real state, not a fixed "Active". It was hardcoded,
+              // which meant a plan that failed to load still read as live
+              // -- green pill, ₦0/month, 0 of 0 remaining -- and that is a
+              // worse thing to show somebody than an obvious blank.
+              if (plan.isActive)
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 14.h, vertical: 6.v),
+                  decoration: BoxDecoration(
+                    color: appTheme.success.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(16.h),
+                  ),
+                  child: Text(
+                    'passport.active'.tr,
+                    style: CustomTextStyles.expertCardMeta
+                        .copyWith(color: appTheme.success),
+                  ),
                 ),
-                child: Text(
-                  'passport.active'.tr,
-                  style: CustomTextStyles.expertCardMeta
-                      .copyWith(color: appTheme.success),
-                ),
-              ),
             ],
           ),
           SizedBox(height: 8.v),
@@ -322,6 +329,49 @@ class _NothingBooked extends StatelessWidget {
             'passport.nothingBookedBody'.tr,
             textAlign: TextAlign.center,
             style: CustomTextStyles.passportFor,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The list could not be read. Said plainly, because "Nothing booked yet"
+/// in its place would tell somebody their classes had vanished.
+class _ListFailed extends StatelessWidget {
+  const _ListFailed({required this.why});
+
+  final String why;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<PassportHubController>();
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 28.v, horizontal: 24.h),
+      decoration: BoxDecoration(
+        color: appTheme.surface,
+        borderRadius: BorderRadius.circular(12.h),
+        border: Border.all(color: appTheme.cardRim),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'passport.listFailed'.tr,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.statsHeading,
+          ),
+          SizedBox(height: 8.v),
+          Text(
+            why,
+            textAlign: TextAlign.center,
+            style: CustomTextStyles.passportFor,
+          ),
+          SizedBox(height: 16.v),
+          InkWell(
+            onTap: controller.load,
+            child: Text('common.retry'.tr,
+                style: CustomTextStyles.expertSeeAll),
           ),
         ],
       ),

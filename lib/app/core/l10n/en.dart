@@ -450,4 +450,5 @@ const Map<String, String> en = {
   'passport.cancelAction': 'Cancel reservation',
   'passport.cancelling': 'Cancelling…',
   'passport.cancelled': 'That class is back in your allowance.',
+  'passport.listFailed': 'Your reservations could not be loaded',
 };
